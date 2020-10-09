@@ -45,6 +45,7 @@ storage_proto:
 workflow:
 	protoc -I/usr/local/include -I. -I${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis  \
       -I${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway \
+      --micro_out=plugins=grpc,paths=source_relative:. \
       --go_out=plugins=grpc,paths=source_relative:. ./workflow/*.proto
 
 .PHONY: chat
