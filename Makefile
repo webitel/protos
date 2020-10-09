@@ -1,7 +1,7 @@
 
 .PHONY: all
 
-all: engine_swagger engine_proto fs storage_swagger storage_proto swagger_mix
+all: engine_swagger engine_proto fs storage_swagger storage_proto workflow swagger_mix
 
 
 .PHONY: engine_swagger
@@ -40,6 +40,13 @@ storage_proto:
       -I${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway \
       --go_out=plugins=grpc,paths=source_relative:. ./storage/*.proto
 
+.PHONY: workflow
+
+workflow:
+	protoc -I/usr/local/include -I. -I${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis  \
+      -I${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway \
+      --go_out=plugins=grpc,paths=source_relative:. ./workflow/*.proto
+
 .PHONY: swagger_mix
 
 swagger_mix:
@@ -52,4 +59,5 @@ clean:
 	rm -rf ./engine/*.go
 	rm -rf ./fs/*.go
 	rm -rf ./storage/*.go
+	rm -rf ./workflow/*.go
 	rm -rf ./swagger/*
