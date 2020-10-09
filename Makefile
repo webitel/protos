@@ -17,12 +17,12 @@ engine_swagger:
 engine_proto:
 	protoc -I/usr/local/include -I./engine -I${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis  \
       -I${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway \
-      --go_out=plugins=grpc:./engine ./engine/*.proto
+      --go_out=plugins=grpc,paths=source_relative:./engine ./engine/*.proto
 
 .PHONY: fs
 
 fs:
-	protoc --go_out=plugins=grpc:./ ./fs/fs.proto
+	protoc -I/usr/local/include -I./fs --go_out=plugins=grpc,paths=source_relative:./fs ./fs/fs.proto
 
 .PHONY: storage_swagger
 
