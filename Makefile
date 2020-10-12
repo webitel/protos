@@ -1,7 +1,7 @@
 
 .PHONY: all
 
-all: engine_swagger engine_proto fs storage_swagger storage_proto workflow chat bot swagger_mix
+all: engine_swagger engine_proto fs storage_swagger storage_proto workflow chat bot call_center swagger_mix
 
 
 .PHONY: engine_swagger
@@ -18,6 +18,13 @@ engine_proto:
 	protoc -I/usr/local/include -I./engine -I${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis  \
       -I${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway \
       --go_out=plugins=grpc,paths=source_relative:./engine ./engine/*.proto
+
+.PHONY: call_center
+
+call_center:
+	protoc -I/usr/local/include -I./cc -I${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis  \
+      -I${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway \
+      --go_out=plugins=grpc,paths=source_relative:./cc ./cc/*.proto
 
 .PHONY: fs
 
