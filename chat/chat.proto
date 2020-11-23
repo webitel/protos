@@ -32,8 +32,8 @@ message Error {
 }
 
 message Message {
-  int64 id = 1;
-  string type = 2;
+  int64 id = 1;    // required: update unique identifier (internal)
+  string type = 2; // optional: update message type, e.g.: text, file etc. TODO: REMOVE; use oneof field instead
 
   message File {
     int64 id = 1;
@@ -46,7 +46,7 @@ message Message {
       File file = 4;
   }
 
-  map<string, string> variables = 5;
+  map<string, string> variables = 5; // optional: extra context
 }
 
 message Profile {
@@ -157,9 +157,12 @@ message SendMessageResponse {
 }
 
 message StartConversationRequest {
+  // FROM: client (contact)
   User user = 1;
   int64 domain_id = 2;
   string username = 3;
+  // MESSAGE: the very first
+  Message message = 4;
 }
 
 message StartConversationResponse {

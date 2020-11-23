@@ -58,12 +58,23 @@ workflow:
 .PHONY: chat
 
 chat:
-	protoc --go_out=plugins=grpc,paths=source_relative:. --micro_out=plugins=grpc,paths=source_relative:. ./chat/*.proto
+	protoc \
+	-I ./chat \
+	--go_opt=paths=source_relative --go_out=chat \
+	--micro_out=plugins=grpc,paths=source_relative:chat \
+	 \
+	./chat/*.proto
 
 .PHONY: bot
 
 bot:
-	protoc -Ichat -Ibot --go_out=plugins=grpc,paths=source_relative:bot --micro_out=plugins=grpc,paths=source_relative:bot ./bot/*.proto
+	protoc \
+	-I ./bot \
+	-I ./chat \
+	--go_opt=paths=source_relative --go_out=bot \
+	--micro_out=plugins=grpc,paths=source_relative:bot \
+	 \
+	./bot/*.proto
 
 
 .PHONY: swagger_mix
