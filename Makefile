@@ -61,9 +61,18 @@ chat:
 	protoc \
 	-I ./chat \
 	--go_opt=paths=source_relative --go_out=chat \
+	--go-grpc_out=paths=source_relative:chat \
 	--micro_out=plugins=grpc,paths=source_relative:chat \
-	 \
+	\
 	./chat/*.proto
+
+	# export GO111MODULE=on  # Enable module mode
+	##### require google.golang.org/protobuf v1.25.0
+	# go get google.golang.org/protobuf/cmd/protoc-gen-go@v1.25.0 # *.pb.go
+	##### require google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.0.1
+	# go get google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.0.1 # *_grpc.pb.go
+	##### require github.com/micro/micro/v2 v2.9.1
+	# go get github.com/micro/micro/v2/cmd/protoc-gen-micro@v2.9.1 # *.pb.micro.go
 
 .PHONY: bot
 
