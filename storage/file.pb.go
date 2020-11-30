@@ -25,32 +25,134 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
-type UploadFileResponse_UploadStatusCode int32
+type UploadStatusCode int32
 
 const (
-	UploadFileResponse_Unknown UploadFileResponse_UploadStatusCode = 0
-	UploadFileResponse_Ok      UploadFileResponse_UploadStatusCode = 1
-	UploadFileResponse_Failed  UploadFileResponse_UploadStatusCode = 2
+	UploadStatusCode_Unknown UploadStatusCode = 0
+	UploadStatusCode_Ok      UploadStatusCode = 1
+	UploadStatusCode_Failed  UploadStatusCode = 2
 )
 
-var UploadFileResponse_UploadStatusCode_name = map[int32]string{
+var UploadStatusCode_name = map[int32]string{
 	0: "Unknown",
 	1: "Ok",
 	2: "Failed",
 }
 
-var UploadFileResponse_UploadStatusCode_value = map[string]int32{
+var UploadStatusCode_value = map[string]int32{
 	"Unknown": 0,
 	"Ok":      1,
 	"Failed":  2,
 }
 
-func (x UploadFileResponse_UploadStatusCode) String() string {
-	return proto.EnumName(UploadFileResponse_UploadStatusCode_name, int32(x))
+func (x UploadStatusCode) String() string {
+	return proto.EnumName(UploadStatusCode_name, int32(x))
 }
 
-func (UploadFileResponse_UploadStatusCode) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_0090dcf2f9a0ac7d, []int{1, 0}
+func (UploadStatusCode) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_0090dcf2f9a0ac7d, []int{0}
+}
+
+type UploadFileUrlRequest struct {
+	DomainId             int64    `protobuf:"varint,1,opt,name=domain_id,json=domainId,proto3" json:"domain_id,omitempty"`
+	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Url                  string   `protobuf:"bytes,3,opt,name=url,proto3" json:"url,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *UploadFileUrlRequest) Reset()         { *m = UploadFileUrlRequest{} }
+func (m *UploadFileUrlRequest) String() string { return proto.CompactTextString(m) }
+func (*UploadFileUrlRequest) ProtoMessage()    {}
+func (*UploadFileUrlRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0090dcf2f9a0ac7d, []int{0}
+}
+
+func (m *UploadFileUrlRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UploadFileUrlRequest.Unmarshal(m, b)
+}
+func (m *UploadFileUrlRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UploadFileUrlRequest.Marshal(b, m, deterministic)
+}
+func (m *UploadFileUrlRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UploadFileUrlRequest.Merge(m, src)
+}
+func (m *UploadFileUrlRequest) XXX_Size() int {
+	return xxx_messageInfo_UploadFileUrlRequest.Size(m)
+}
+func (m *UploadFileUrlRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_UploadFileUrlRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UploadFileUrlRequest proto.InternalMessageInfo
+
+func (m *UploadFileUrlRequest) GetDomainId() int64 {
+	if m != nil {
+		return m.DomainId
+	}
+	return 0
+}
+
+func (m *UploadFileUrlRequest) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *UploadFileUrlRequest) GetUrl() string {
+	if m != nil {
+		return m.Url
+	}
+	return ""
+}
+
+type UploadFileUrlResponse struct {
+	FileId               int64            `protobuf:"varint,1,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
+	Code                 UploadStatusCode `protobuf:"varint,2,opt,name=code,proto3,enum=storage.UploadStatusCode" json:"code,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
+	XXX_unrecognized     []byte           `json:"-"`
+	XXX_sizecache        int32            `json:"-"`
+}
+
+func (m *UploadFileUrlResponse) Reset()         { *m = UploadFileUrlResponse{} }
+func (m *UploadFileUrlResponse) String() string { return proto.CompactTextString(m) }
+func (*UploadFileUrlResponse) ProtoMessage()    {}
+func (*UploadFileUrlResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0090dcf2f9a0ac7d, []int{1}
+}
+
+func (m *UploadFileUrlResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UploadFileUrlResponse.Unmarshal(m, b)
+}
+func (m *UploadFileUrlResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UploadFileUrlResponse.Marshal(b, m, deterministic)
+}
+func (m *UploadFileUrlResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UploadFileUrlResponse.Merge(m, src)
+}
+func (m *UploadFileUrlResponse) XXX_Size() int {
+	return xxx_messageInfo_UploadFileUrlResponse.Size(m)
+}
+func (m *UploadFileUrlResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_UploadFileUrlResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UploadFileUrlResponse proto.InternalMessageInfo
+
+func (m *UploadFileUrlResponse) GetFileId() int64 {
+	if m != nil {
+		return m.FileId
+	}
+	return 0
+}
+
+func (m *UploadFileUrlResponse) GetCode() UploadStatusCode {
+	if m != nil {
+		return m.Code
+	}
+	return UploadStatusCode_Unknown
 }
 
 type UploadFileRequest struct {
@@ -67,7 +169,7 @@ func (m *UploadFileRequest) Reset()         { *m = UploadFileRequest{} }
 func (m *UploadFileRequest) String() string { return proto.CompactTextString(m) }
 func (*UploadFileRequest) ProtoMessage()    {}
 func (*UploadFileRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0090dcf2f9a0ac7d, []int{0}
+	return fileDescriptor_0090dcf2f9a0ac7d, []int{2}
 }
 
 func (m *UploadFileRequest) XXX_Unmarshal(b []byte) error {
@@ -147,7 +249,7 @@ func (m *UploadFileRequest_Metadata) Reset()         { *m = UploadFileRequest_Me
 func (m *UploadFileRequest_Metadata) String() string { return proto.CompactTextString(m) }
 func (*UploadFileRequest_Metadata) ProtoMessage()    {}
 func (*UploadFileRequest_Metadata) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0090dcf2f9a0ac7d, []int{0, 0}
+	return fileDescriptor_0090dcf2f9a0ac7d, []int{2, 0}
 }
 
 func (m *UploadFileRequest_Metadata) XXX_Unmarshal(b []byte) error {
@@ -197,18 +299,18 @@ func (m *UploadFileRequest_Metadata) GetUuid() string {
 }
 
 type UploadFileResponse struct {
-	FileId               int64                               `protobuf:"varint,1,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
-	Code                 UploadFileResponse_UploadStatusCode `protobuf:"varint,2,opt,name=code,proto3,enum=storage.UploadFileResponse_UploadStatusCode" json:"code,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                            `json:"-"`
-	XXX_unrecognized     []byte                              `json:"-"`
-	XXX_sizecache        int32                               `json:"-"`
+	FileId               int64            `protobuf:"varint,1,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
+	Code                 UploadStatusCode `protobuf:"varint,2,opt,name=code,proto3,enum=storage.UploadStatusCode" json:"code,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
+	XXX_unrecognized     []byte           `json:"-"`
+	XXX_sizecache        int32            `json:"-"`
 }
 
 func (m *UploadFileResponse) Reset()         { *m = UploadFileResponse{} }
 func (m *UploadFileResponse) String() string { return proto.CompactTextString(m) }
 func (*UploadFileResponse) ProtoMessage()    {}
 func (*UploadFileResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0090dcf2f9a0ac7d, []int{1}
+	return fileDescriptor_0090dcf2f9a0ac7d, []int{3}
 }
 
 func (m *UploadFileResponse) XXX_Unmarshal(b []byte) error {
@@ -236,15 +338,17 @@ func (m *UploadFileResponse) GetFileId() int64 {
 	return 0
 }
 
-func (m *UploadFileResponse) GetCode() UploadFileResponse_UploadStatusCode {
+func (m *UploadFileResponse) GetCode() UploadStatusCode {
 	if m != nil {
 		return m.Code
 	}
-	return UploadFileResponse_Unknown
+	return UploadStatusCode_Unknown
 }
 
 func init() {
-	proto.RegisterEnum("storage.UploadFileResponse_UploadStatusCode", UploadFileResponse_UploadStatusCode_name, UploadFileResponse_UploadStatusCode_value)
+	proto.RegisterEnum("storage.UploadStatusCode", UploadStatusCode_name, UploadStatusCode_value)
+	proto.RegisterType((*UploadFileUrlRequest)(nil), "storage.UploadFileUrlRequest")
+	proto.RegisterType((*UploadFileUrlResponse)(nil), "storage.UploadFileUrlResponse")
 	proto.RegisterType((*UploadFileRequest)(nil), "storage.UploadFileRequest")
 	proto.RegisterType((*UploadFileRequest_Metadata)(nil), "storage.UploadFileRequest.Metadata")
 	proto.RegisterType((*UploadFileResponse)(nil), "storage.UploadFileResponse")
@@ -253,31 +357,34 @@ func init() {
 func init() { proto.RegisterFile("storage/file.proto", fileDescriptor_0090dcf2f9a0ac7d) }
 
 var fileDescriptor_0090dcf2f9a0ac7d = []byte{
-	// 372 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x92, 0x4d, 0x8e, 0xda, 0x40,
-	0x10, 0x85, 0x6d, 0x70, 0x8c, 0x29, 0xa2, 0xc8, 0xe9, 0x45, 0x62, 0x99, 0x2c, 0x88, 0xd9, 0xb0,
-	0x88, 0x6c, 0x09, 0x2e, 0x90, 0x10, 0x09, 0xc1, 0x22, 0x8a, 0x64, 0x82, 0x14, 0x65, 0x83, 0x1a,
-	0x77, 0xc5, 0xb4, 0xb0, 0xbb, 0x3d, 0xb8, 0x3d, 0x88, 0xfb, 0xcc, 0xd1, 0xe6, 0x20, 0xa3, 0xb6,
-	0x3d, 0xc3, 0x68, 0xfe, 0x76, 0x55, 0xaf, 0xde, 0x57, 0xaf, 0xfc, 0x03, 0xa4, 0x54, 0xf2, 0x48,
-	0x53, 0x8c, 0xfe, 0xf3, 0x0c, 0xc3, 0xe2, 0x28, 0x95, 0x24, 0xbd, 0x56, 0xf3, 0xbf, 0xa4, 0x52,
-	0xa6, 0x19, 0x46, 0xb4, 0xe0, 0x11, 0x15, 0x42, 0x2a, 0xaa, 0xb8, 0x14, 0x65, 0x63, 0x0b, 0x6e,
-	0x4d, 0xf8, 0xb8, 0x29, 0x32, 0x49, 0xd9, 0x82, 0x67, 0x18, 0xe3, 0x55, 0x85, 0xa5, 0x22, 0x3f,
-	0xc0, 0xc9, 0x51, 0x51, 0x46, 0x15, 0xf5, 0xcc, 0x91, 0x39, 0x19, 0x4c, 0xc7, 0x61, 0xbb, 0x2f,
-	0x7c, 0xe6, 0x0e, 0x7f, 0xb5, 0xd6, 0xa5, 0x11, 0x3f, 0x60, 0xe4, 0x13, 0xbc, 0x4b, 0xf6, 0x95,
-	0x38, 0x78, 0x9d, 0x91, 0x39, 0x79, 0xbf, 0x34, 0xe2, 0xa6, 0xf5, 0x33, 0x70, 0xee, 0xfd, 0x64,
-	0x08, 0x7d, 0x26, 0x73, 0xca, 0xc5, 0x96, 0xb3, 0x3a, 0xa7, 0x1b, 0x3b, 0x8d, 0xb0, 0x62, 0x84,
-	0x80, 0x25, 0x68, 0x8e, 0x35, 0xdf, 0x8f, 0xeb, 0x5a, 0x03, 0x39, 0xcf, 0x71, 0xab, 0xce, 0x05,
-	0x7a, 0xdd, 0x7a, 0xe0, 0x68, 0xe1, 0xcf, 0xb9, 0x40, 0x0d, 0x54, 0x15, 0x67, 0x9e, 0xd5, 0x00,
-	0xba, 0x9e, 0xdb, 0x60, 0xe9, 0xa4, 0xe0, 0xc6, 0x04, 0xf2, 0xf8, 0xf0, 0xb2, 0x90, 0xa2, 0x44,
-	0xf2, 0x19, 0x7a, 0xfa, 0x95, 0x5d, 0xe2, 0x6d, 0xdd, 0xae, 0x18, 0xf9, 0x0e, 0x56, 0x22, 0x59,
-	0x13, 0xfe, 0x61, 0xfa, 0xed, 0xc5, 0x87, 0x6f, 0x76, 0xb4, 0xd2, 0x5a, 0x51, 0x55, 0x95, 0x3f,
-	0x25, 0xc3, 0xb8, 0x26, 0x83, 0x19, 0xb8, 0x4f, 0x27, 0x64, 0x00, 0xbd, 0x8d, 0x38, 0x08, 0x79,
-	0x12, 0xae, 0x41, 0x6c, 0xe8, 0xfc, 0x3e, 0xb8, 0x26, 0x01, 0xb0, 0x17, 0x94, 0x67, 0xc8, 0xdc,
-	0xce, 0xf4, 0x2f, 0x0c, 0xf4, 0xee, 0x35, 0x1e, 0xaf, 0x79, 0x82, 0x64, 0x05, 0x70, 0x09, 0x24,
-	0xfe, 0xeb, 0x9f, 0xc0, 0x1f, 0xbe, 0x71, 0x61, 0x60, 0x4c, 0xcc, 0xf9, 0xf8, 0xdf, 0xd7, 0x94,
-	0xab, 0x7d, 0xb5, 0x0b, 0x13, 0x99, 0x47, 0x27, 0xdc, 0x71, 0x85, 0x59, 0x54, 0xff, 0x03, 0x65,
-	0xd4, 0xb2, 0x3b, 0xbb, 0xee, 0x67, 0x77, 0x01, 0x00, 0x00, 0xff, 0xff, 0x2a, 0x1c, 0x2a, 0xb7,
-	0x50, 0x02, 0x00, 0x00,
+	// 423 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x52, 0x5d, 0x8b, 0xd3, 0x40,
+	0x14, 0x6d, 0xda, 0x9a, 0xb6, 0xb7, 0x2a, 0xf1, 0xe2, 0x47, 0x4d, 0x55, 0xd6, 0xec, 0x4b, 0x11,
+	0x4c, 0xa0, 0xfb, 0x0b, 0x5c, 0x61, 0xd9, 0x3e, 0x88, 0x92, 0xb5, 0x0f, 0x8a, 0x50, 0xa6, 0x9d,
+	0x6b, 0x76, 0xe8, 0x64, 0x26, 0x26, 0x13, 0x97, 0xfd, 0x4b, 0xfe, 0x2e, 0x7f, 0x88, 0x4c, 0x92,
+	0x9a, 0xb5, 0x6c, 0x1f, 0x84, 0x7d, 0xbb, 0x1f, 0xe7, 0x9c, 0x39, 0x73, 0xb8, 0x80, 0x85, 0xd1,
+	0x39, 0x4b, 0x28, 0xfa, 0x2e, 0x24, 0x85, 0x59, 0xae, 0x8d, 0xc6, 0x41, 0x33, 0xf3, 0x5f, 0x24,
+	0x5a, 0x27, 0x92, 0x22, 0x96, 0x89, 0x88, 0x29, 0xa5, 0x0d, 0x33, 0x42, 0xab, 0xa2, 0x86, 0x05,
+	0x5f, 0xe0, 0xf1, 0x32, 0x93, 0x9a, 0xf1, 0x33, 0x21, 0x69, 0x99, 0xcb, 0x98, 0x7e, 0x94, 0x54,
+	0x18, 0x9c, 0xc2, 0x88, 0xeb, 0x94, 0x09, 0xb5, 0x12, 0x7c, 0xe2, 0x1c, 0x39, 0xb3, 0x5e, 0x3c,
+	0xac, 0x07, 0x0b, 0x8e, 0x08, 0x7d, 0xc5, 0x52, 0x9a, 0x74, 0x8f, 0x9c, 0xd9, 0x28, 0xae, 0x6a,
+	0xf4, 0xa0, 0x57, 0xe6, 0x72, 0xd2, 0xab, 0x46, 0xb6, 0x0c, 0x56, 0xf0, 0x64, 0x4f, 0xba, 0xc8,
+	0xb4, 0x2a, 0x08, 0x9f, 0xc1, 0xc0, 0x1a, 0x6d, 0x95, 0x5d, 0xdb, 0x2e, 0x38, 0xbe, 0x85, 0xfe,
+	0x46, 0xf3, 0x5a, 0xf7, 0xe1, 0xfc, 0x79, 0xd8, 0x7c, 0x21, 0xac, 0x65, 0x2e, 0x0c, 0x33, 0x65,
+	0xf1, 0x5e, 0x73, 0x8a, 0x2b, 0x58, 0xf0, 0xdb, 0x81, 0x47, 0xed, 0x0b, 0x3b, 0xe7, 0xef, 0x60,
+	0x98, 0x92, 0x61, 0x9c, 0x19, 0x56, 0xc9, 0x8f, 0xe7, 0xc7, 0x7b, 0x42, 0x37, 0xd0, 0xe1, 0x87,
+	0x06, 0x7a, 0xde, 0x89, 0xff, 0xd2, 0xf0, 0x29, 0xdc, 0xdb, 0x5c, 0x96, 0x6a, 0x5b, 0x19, 0xb9,
+	0x7f, 0xde, 0x89, 0xeb, 0xd6, 0x97, 0x30, 0xdc, 0xe1, 0xff, 0x3f, 0xa0, 0x29, 0x8c, 0x52, 0x91,
+	0xd2, 0xca, 0x5c, 0x67, 0xd4, 0xc4, 0x34, 0xb4, 0x83, 0xcf, 0xd7, 0x19, 0x59, 0x42, 0x59, 0x0a,
+	0x3e, 0xe9, 0xd7, 0x04, 0x5b, 0x9f, 0xba, 0xd0, 0xb7, 0x2f, 0x05, 0xdf, 0x00, 0x6f, 0xfa, 0xbe,
+	0xdb, 0x10, 0xdf, 0x9c, 0x80, 0xb7, 0xbf, 0xc1, 0x31, 0x0c, 0x96, 0x6a, 0xab, 0xf4, 0x95, 0xf2,
+	0x3a, 0xe8, 0x42, 0xf7, 0xe3, 0xd6, 0x73, 0x10, 0xc0, 0x3d, 0x63, 0x42, 0x12, 0xf7, 0xba, 0xf3,
+	0x5f, 0x0e, 0x8c, 0xad, 0x9b, 0x0b, 0xca, 0x7f, 0x8a, 0x0d, 0xe1, 0x02, 0xa0, 0xb5, 0x88, 0xfe,
+	0xe1, 0xbc, 0xfd, 0xe9, 0xad, 0xbb, 0xfa, 0x4f, 0x41, 0x67, 0xe6, 0xe0, 0x27, 0x78, 0xf0, 0xcf,
+	0xd5, 0xe0, 0xcb, 0x5b, 0x18, 0xed, 0xa1, 0xfa, 0xaf, 0x0e, 0xad, 0x77, 0x9a, 0xa7, 0xc7, 0x5f,
+	0x5f, 0x27, 0xc2, 0x5c, 0x96, 0xeb, 0x70, 0xa3, 0xd3, 0xe8, 0x8a, 0xd6, 0xc2, 0x90, 0x8c, 0xaa,
+	0xf3, 0x2f, 0xa2, 0x86, 0xbc, 0x76, 0xab, 0xfe, 0xe4, 0x4f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x9c,
+	0x85, 0x36, 0xe0, 0x4b, 0x03, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -293,6 +400,7 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type FileServiceClient interface {
 	UploadFile(ctx context.Context, opts ...grpc.CallOption) (FileService_UploadFileClient, error)
+	UploadFileUrl(ctx context.Context, in *UploadFileUrlRequest, opts ...grpc.CallOption) (*UploadFileUrlResponse, error)
 }
 
 type fileServiceClient struct {
@@ -337,9 +445,19 @@ func (x *fileServiceUploadFileClient) CloseAndRecv() (*UploadFileResponse, error
 	return m, nil
 }
 
+func (c *fileServiceClient) UploadFileUrl(ctx context.Context, in *UploadFileUrlRequest, opts ...grpc.CallOption) (*UploadFileUrlResponse, error) {
+	out := new(UploadFileUrlResponse)
+	err := c.cc.Invoke(ctx, "/storage.FileService/UploadFileUrl", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // FileServiceServer is the server API for FileService service.
 type FileServiceServer interface {
 	UploadFile(FileService_UploadFileServer) error
+	UploadFileUrl(context.Context, *UploadFileUrlRequest) (*UploadFileUrlResponse, error)
 }
 
 // UnimplementedFileServiceServer can be embedded to have forward compatible implementations.
@@ -348,6 +466,9 @@ type UnimplementedFileServiceServer struct {
 
 func (*UnimplementedFileServiceServer) UploadFile(srv FileService_UploadFileServer) error {
 	return status.Errorf(codes.Unimplemented, "method UploadFile not implemented")
+}
+func (*UnimplementedFileServiceServer) UploadFileUrl(ctx context.Context, req *UploadFileUrlRequest) (*UploadFileUrlResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UploadFileUrl not implemented")
 }
 
 func RegisterFileServiceServer(s *grpc.Server, srv FileServiceServer) {
@@ -380,10 +501,33 @@ func (x *fileServiceUploadFileServer) Recv() (*UploadFileRequest, error) {
 	return m, nil
 }
 
+func _FileService_UploadFileUrl_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UploadFileUrlRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FileServiceServer).UploadFileUrl(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/storage.FileService/UploadFileUrl",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FileServiceServer).UploadFileUrl(ctx, req.(*UploadFileUrlRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _FileService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "storage.FileService",
 	HandlerType: (*FileServiceServer)(nil),
-	Methods:     []grpc.MethodDesc{},
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "UploadFileUrl",
+			Handler:    _FileService_UploadFileUrl_Handler,
+		},
+	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "UploadFile",
