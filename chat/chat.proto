@@ -4,6 +4,8 @@ package webitel.chat.server;
 
 option go_package = "github.com/webitel/protos/chat";
 
+import "chat.v1.proto";
+
 service ChatService {
   rpc SendMessage(SendMessageRequest) returns (SendMessageResponse) {}
   rpc StartConversation(StartConversationRequest) returns (StartConversationResponse) {}
@@ -32,13 +34,19 @@ message Error {
 }
 
 message Message {
+
   int64 id = 1;    // required: update unique identifier (internal)
   string type = 2; // optional: update message type, e.g.: text, file etc. TODO: REMOVE; use oneof field instead
 
   message File {
+
     int64 id = 1;
     string url = 2;
-    string mime_type = 3;
+    string mime = 3;
+
+    string name = 4;
+    int64 size = 5;
+
   }
 
   oneof value {
@@ -139,9 +147,14 @@ message CheckSessionRequest {
 }
 
 message CheckSessionResponse {
+
   bool exists = 1;
   string channel_id = 2;
   int64 client_id = 3;
+  // Account for .this chat channel, end-user contact info
+  Account account = 4;
+  // Properties defined in .StartConversationRequest.message.variables
+  map<string,string> properties = 5; // optional: extra context
 }
 
 message SendMessageRequest {
@@ -202,6 +215,7 @@ message LeaveConversationResponse {
 }
 
 message InviteToConversationRequest {
+
   User user = 1;
   string conversation_id = 2;
   string inviter_channel_id = 3;
@@ -211,6 +225,8 @@ message InviteToConversationRequest {
   //  bool from_flow = 7;
   string title = 7;
   string app_id = 8;
+
+  map<string,string> variables = 9;
 }
 
 message InviteToConversationResponse {
