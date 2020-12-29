@@ -19,6 +19,14 @@ engine_proto:
       -I${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway \
       --go_out=plugins=grpc,paths=source_relative:./engine ./engine/*.proto
 
+engine_chat_proto:
+	protoc -I/usr/local/include -I./engine/chat -I${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis  \
+      -I${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway \
+      --go_out=plugins=grpc,paths=source_relative:./engine/chat ./engine/chat/*.proto
+
+engine: engine_proto engine_chat_proto engine_swagger
+
+
 .PHONY: call_center
 
 call_center:
@@ -52,7 +60,7 @@ storage_proto:
 workflow:
 	protoc -I/usr/local/include -I. -I${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis  \
       -I${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway \
-      --micro_out=plugins=grpc,paths=source_relative:. \
+      -I./engine/chat \
       --go_out=plugins=grpc,paths=source_relative:. ./workflow/*.proto
 
 .PHONY: chat
