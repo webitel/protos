@@ -21,9 +21,18 @@ service MemberService {
 message QueueEvent {
     string name = 1;
 
-    message BridgedData {
+    message OfferingData {
         int32 agent_id = 1;
         string agent_call_id = 2;
+        string agent_name = 3;
+    }
+
+    message MissedAgent {
+        int64 timeout = 1;
+    }
+
+    message BridgedData {
+        int32 agent_id = 1;
     }
 
     message LeavingData {
@@ -31,8 +40,10 @@ message QueueEvent {
     }
 
     oneof data {
-        BridgedData bridged = 2;
-        LeavingData leaving = 3;
+        OfferingData offering = 2;
+        BridgedData bridged = 3;
+        MissedAgent missed = 4;
+        LeavingData leaving = 5;
     }
 }
 
