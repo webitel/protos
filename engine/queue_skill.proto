@@ -1,0 +1,128 @@
+syntax = "proto3";
+
+package engine;
+
+option go_package = "github.com/webitel/protos/engine";
+
+import "google/api/annotations.proto";
+import "const.proto";
+
+service QueueSkillService {
+
+    rpc CreateQueueSkill (CreateQueueSkillRequest) returns (QueueSkill) {
+        option (google.api.http) = {
+            post: "/call_center/queues/{queue_id}/skills"
+            body: "*"
+        };
+    }
+
+    rpc SearchQueueSkill(SearchQueueSkillRequest) returns (ListQueueSkill) {
+        option (google.api.http) = {
+            get: "/call_center/queues/{queue_id}/skills"
+        };
+    }
+
+    rpc ReadQueueSkill(ReadQueueSkillRequest) returns (QueueSkill) {
+        option (google.api.http) = {
+            get: "/call_center/queues/{queue_id}/skills/{id}"
+        };
+    }
+
+    rpc UpdateQueueSkill(UpdateQueueSkillRequest) returns (QueueSkill) {
+        option (google.api.http) = {
+            put: "/call_center/queues/{queue_id}/skills/{id}"
+            body: "*"
+        };
+    }
+
+    rpc PatchQueueSkill(PatchQueueSkillRequest) returns (QueueSkill) {
+        option (google.api.http) = {
+            patch: "/call_center/queues/{queue_id}/skills/{id}"
+            body: "*"
+        };
+    }
+
+    rpc DeleteQueueSkill(DeleteQueueSkillRequest) returns (QueueSkill) {
+        option (google.api.http) = {
+            delete: "/call_center/queues/{queue_id}/skills/{id}"
+        };
+    }
+}
+
+message CreateQueueSkillRequest {
+    uint32 queue_id = 1;
+
+    Lookup skill = 2;
+    repeated Lookup buckets = 3;
+    int32 lvl = 4;
+    int32 min_capacity = 5;
+    int32 max_capacity = 6;
+    bool disabled = 7;
+}
+
+message QueueSkill {
+    uint32 id = 1;
+    Lookup skill = 2;
+    repeated Lookup buckets = 3;
+    int32 lvl = 4;
+    int32 min_capacity = 5;
+    int32 max_capacity = 6;
+    bool disabled = 7;
+}
+
+message UpdateQueueSkillRequest {
+    uint32 queue_id = 1;
+    uint32 id = 2;
+
+    Lookup skill = 3;
+    repeated Lookup buckets = 4;
+    int32 lvl = 5;
+    int32 min_capacity = 6;
+    int32 max_capacity = 7;
+    bool disabled = 8;
+}
+
+message PatchQueueSkillRequest {
+    uint32 queue_id = 1;
+    uint32 id = 2;
+
+    Lookup skill = 3;
+    repeated Lookup buckets = 4;
+    int32 lvl = 5;
+    int32 min_capacity = 6;
+    int32 max_capacity = 7;
+    bool disabled = 8;
+
+    repeated string fields = 9;
+}
+
+message SearchQueueSkillRequest {
+    uint32 queue_id = 1;
+    int32 page = 2;
+    int32 size = 3;
+    string q = 4;
+
+    repeated uint32 id = 6;
+    repeated uint32 skill_id = 7;
+    repeated uint32 bucket_id = 8;
+    repeated int32 lvl = 9;
+    repeated int32 min_capacity = 10;
+    repeated int32 max_capacity = 11;
+
+    bool disabled = 12;
+}
+
+message DeleteQueueSkillRequest {
+    uint32 queue_id = 1;
+    uint32 id = 2;
+}
+
+message ListQueueSkill {
+    bool next = 1;
+    repeated QueueSkill items = 2;
+}
+
+message ReadQueueSkillRequest {
+    uint32 queue_id = 1;
+    uint32 id = 2;
+}
