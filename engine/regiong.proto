@@ -1,0 +1,102 @@
+syntax = "proto3";
+
+package engine;
+
+option go_package = "github.com/webitel/protos/engine";
+
+import "google/api/annotations.proto";
+import "const.proto";
+
+service RegionService {
+
+    rpc CreateRegion (CreateRegionRequest) returns (Region) {
+        option (google.api.http) = {
+            post: "/region"
+            body: "*"
+        };
+    }
+
+    rpc SearchRegion(SearchRegionRequest) returns (ListRegion) {
+        option (google.api.http) = {
+            get: "/region"
+        };
+    }
+
+    rpc ReadRegion(ReadRegionRequest) returns (Region) {
+        option (google.api.http) = {
+            get: "/region/{id}"
+        };
+    }
+
+    rpc PatchRegion(PatchRegionRequest) returns (Region) {
+        option (google.api.http) = {
+            patch: "/region/{id}"
+            body: "*"
+        };
+    }
+
+    rpc UpdateRegion(UpdateRegionRequest) returns (Region) {
+        option (google.api.http) = {
+            put: "/region/{id}"
+            body: "*"
+        };
+    }
+
+    rpc DeleteRegion(DeleteRegionRequest) returns (Region) {
+        option (google.api.http) = {
+            delete: "/region/{id}"
+        };
+    }
+}
+
+message Region {
+    uint32 id = 1;
+    string name = 2;
+    string description = 3;
+    Lookup timezone = 4;
+}
+
+message CreateRegionRequest {
+    string name = 1;
+    string description = 2;
+    Lookup timezone = 3;
+}
+
+message SearchRegionRequest {
+    int32 page = 1;
+    int32 size = 2;
+    string q = 3;
+
+    repeated uint32 id = 4;
+    string name = 5;
+    string description = 6;
+    repeated uint32 timezone_id = 7;
+}
+
+message ListRegion {
+    bool next = 1;
+    repeated Region items = 2;
+}
+
+message ReadRegionRequest {
+    uint32 id = 1;
+}
+
+message PatchRegionRequest {
+    repeated string fields = 1;
+    uint32 id = 2;
+    string name = 3;
+    string description = 4;
+    Lookup timezone = 5;
+}
+
+message UpdateRegionRequest {
+    uint32 id = 1;
+    string name = 2;
+    string description = 3;
+    Lookup timezone = 4;
+}
+
+message DeleteRegionRequest {
+    uint32 id = 1;
+}
