@@ -992,6 +992,55 @@
             }
           }
         }
+      },
+      "patch": {
+        "tags": [
+          "AgentSkillService"
+        ],
+        "operationId": "PatchAgentSkill",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "agent_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/enginePatchAgentSkillRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineAgentSkill"
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {}
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        }
       }
     },
     "/call_center/agents/{agent_id}/states/history": {
@@ -2545,17 +2594,17 @@
             "in": "query"
           },
           {
+            "type": "string",
+            "name": "q",
+            "in": "query"
+          },
+          {
             "type": "array",
             "items": {
               "type": "string"
             },
             "collectionFormat": "multi",
             "name": "fields",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "name": "q",
             "in": "query"
           },
           {
@@ -10285,6 +10334,10 @@
     "engineAgentPauseCause": {
       "type": "object",
       "properties": {
+        "allow_admin": {
+          "type": "boolean",
+          "format": "boolean"
+        },
         "allow_agent": {
           "type": "boolean",
           "format": "boolean"
@@ -10307,7 +10360,7 @@
           "type": "integer",
           "format": "int64"
         },
-        "limit_per_day": {
+        "limit_min": {
           "type": "integer",
           "format": "int64"
         },
@@ -10344,6 +10397,10 @@
           "type": "string",
           "format": "int64"
         },
+        "enabled": {
+          "type": "boolean",
+          "format": "boolean"
+        },
         "id": {
           "type": "string",
           "format": "int64"
@@ -10366,6 +10423,10 @@
         "capacity": {
           "type": "integer",
           "format": "int32"
+        },
+        "enabled": {
+          "type": "boolean",
+          "format": "boolean"
         },
         "id": {
           "type": "string",
@@ -11194,6 +11255,10 @@
     "engineCreateAgentPauseCauseRequest": {
       "type": "object",
       "properties": {
+        "allow_admin": {
+          "type": "boolean",
+          "format": "boolean"
+        },
         "allow_agent": {
           "type": "boolean",
           "format": "boolean"
@@ -11205,7 +11270,7 @@
         "description": {
           "type": "string"
         },
-        "limit_per_day": {
+        "limit_min": {
           "type": "integer",
           "format": "int64"
         },
@@ -11276,6 +11341,10 @@
         "domain_id": {
           "type": "string",
           "format": "int64"
+        },
+        "enabled": {
+          "type": "boolean",
+          "format": "boolean"
         },
         "skill": {
           "$ref": "#/definitions/engineLookup"
@@ -13559,6 +13628,10 @@
     "enginePatchAgentPauseCauseRequest": {
       "type": "object",
       "properties": {
+        "allow_admin": {
+          "type": "boolean",
+          "format": "boolean"
+        },
         "allow_agent": {
           "type": "boolean",
           "format": "boolean"
@@ -13580,12 +13653,46 @@
           "type": "integer",
           "format": "int64"
         },
-        "limit_per_day": {
+        "limit_min": {
           "type": "integer",
           "format": "int64"
         },
         "name": {
           "type": "string"
+        }
+      }
+    },
+    "enginePatchAgentSkillRequest": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "capacity": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "domain_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "enabled": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "skill": {
+          "$ref": "#/definitions/engineLookup"
         }
       }
     },
@@ -14590,6 +14697,10 @@
     "engineUpdateAgentPauseCauseRequest": {
       "type": "object",
       "properties": {
+        "allow_admin": {
+          "type": "boolean",
+          "format": "boolean"
+        },
         "allow_agent": {
           "type": "boolean",
           "format": "boolean"
@@ -14605,7 +14716,7 @@
           "type": "integer",
           "format": "int64"
         },
-        "limit_per_day": {
+        "limit_min": {
           "type": "integer",
           "format": "int64"
         },
@@ -14680,6 +14791,10 @@
         "domain_id": {
           "type": "string",
           "format": "int64"
+        },
+        "enabled": {
+          "type": "boolean",
+          "format": "boolean"
         },
         "id": {
           "type": "string",
