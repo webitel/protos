@@ -390,6 +390,22 @@
             "collectionFormat": "multi",
             "name": "auditor_id",
             "in": "query"
+          },
+          {
+            "type": "boolean",
+            "format": "boolean",
+            "name": "is_supervisor",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "name": "skill_id",
+            "in": "query"
           }
         ],
         "responses": {
@@ -1260,6 +1276,49 @@
             "format": "int64",
             "name": "domain_id",
             "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineAgent"
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {}
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "AgentService"
+        ],
+        "summary": "Update Agent",
+        "operationId": "PatchAgent",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/enginePatchAgentRequest"
+            }
           }
         ],
         "responses": {
@@ -13665,6 +13724,60 @@
         },
         "name": {
           "type": "string"
+        }
+      }
+    },
+    "enginePatchAgentRequest": {
+      "type": "object",
+      "properties": {
+        "allow_channels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "auditor": {
+          "$ref": "#/definitions/engineLookup"
+        },
+        "chat_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "description": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "greeting_media": {
+          "$ref": "#/definitions/engineLookup"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "is_supervisor": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "progressive_count": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "region": {
+          "$ref": "#/definitions/engineLookup"
+        },
+        "supervisor": {
+          "$ref": "#/definitions/engineLookup"
+        },
+        "team": {
+          "$ref": "#/definitions/engineLookup"
+        },
+        "user": {
+          "$ref": "#/definitions/engineLookup"
         }
       }
     },
