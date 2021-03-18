@@ -11,11 +11,27 @@ service MemberService {
         };
     }
 
+    rpc AttemptRenewalResult(AttemptRenewalResultRequest) returns (AttemptRenewalResultResponse) {
+        option (google.api.http) = {
+            patch: "/call_center/queues/{queue_id}/members/{member_id}/attempts/{attempt_id}"
+        };
+    }
+
     rpc CallJoinToQueue(CallJoinToQueueRequest) returns (stream QueueEvent) {}
     rpc ChatJoinToQueue(ChatJoinToQueueRequest) returns (stream QueueEvent) {}
 
     rpc EmailJoinToQueue(EmailJoinToQueueRequest) returns (EmailJoinToQueueResponse) {}
     rpc DirectAgentToMember(DirectAgentToMemberRequest) returns (DirectAgentToMemberResponse) {}
+}
+
+message AttemptRenewalResultRequest {
+    int64 domain_id = 1;
+    int64 attempt_id = 2;
+    uint32 renewal = 3;
+}
+
+message AttemptRenewalResultResponse {
+
 }
 
 message QueueEvent {
@@ -90,6 +106,7 @@ message DirectAgentToMemberRequest {
     int32 communication_id = 3;
     int64 domain_id = 4;
 }
+
 message DirectAgentToMemberResponse {
     int64 attempt_id = 1;
 }
