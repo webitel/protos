@@ -53,6 +53,7 @@ storage_swagger:
 storage_proto:
 	protoc -I/usr/local/include -I. -I${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis  \
       -I${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway \
+      -I${GOPATH}/src/github.com/webitel/protos/engine \
       --go_out=plugins=grpc,paths=source_relative:. ./storage/*.proto
 
 .PHONY: workflow
