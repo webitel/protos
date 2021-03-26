@@ -76,26 +76,50 @@ message SearchQueueReportGeneralRequest {
 }
 
 message ListReportGeneral {
+    message QueueReportGeneralStatusAggs {
+        uint32 online = 1;
+        uint32 pause = 2;
+        uint32 offline = 3;
+        uint32 free = 4;
+    }
+
+    message Aggs {
+        QueueReportGeneralStatusAggs agent_status = 1;
+    }
+
     bool next = 1;
     repeated QueueReportGeneral items = 2;
+    QueueReportGeneralAgentStatus aggs = 3;
+}
+
+message QueueReportGeneralAgentStatus {
+    uint32 online = 1;
+    uint32 pause = 2;
+    uint32 offline = 3;
+    uint32 free = 4;
 }
 
 message QueueReportGeneral {
     Lookup queue = 1;
-    Lookup team = 2;
-    int32 online = 3;
-    int32 pause = 4;
-    float bridged = 5;
-    int64 waiting = 6;
-    int64 processed = 7;
-    int64 count = 8;
-    float abandoned = 9;
-    float sum_bill_sec = 10;
-    float avg_wrap_sec = 11;
-    float avg_awt_sec = 12;
-    float max_awt_sec = 13;
-    float avg_asa_sec = 14;
-    float avg_aht_sec = 15;
+    QueueReportGeneralAgentStatus agent_status = 2;
+
+    Lookup team = 3;
+
+    uint32 missed = 4;
+    uint32 processed = 5;
+    uint32 waiting = 6;
+
+    uint64 count = 11;
+    uint32 transferred = 12;
+    uint32 abandoned = 13;
+    uint32 attempts = 14;
+
+
+    float sum_talk_sec = 15;
+    float avg_wrap_sec = 16;
+    float avg_awt_sec = 17;
+    float avg_asa_sec = 18;
+    float avg_aht_sec = 19;
 }
 
 message PatchQueueRequest {
