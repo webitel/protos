@@ -91,6 +91,12 @@ service AgentService {
         };
     }
 
+    rpc SearchPauseCauseForAgent(SearchPauseCauseForAgentRequest) returns (ForAgentPauseCauseList) {
+        option (google.api.http) = {
+            get: "/call_center/agents/{agent_id}/pause_causes"
+        };
+    }
+
     rpc SearchAgentInQueueStatistics(SearchAgentInQueueStatisticsRequest) returns (AgentInQueueStatisticsList) {
         option (google.api.http) = {
             get: "/call_center/agents/{agent_id}/statistics/queues"
@@ -116,6 +122,21 @@ service AgentService {
         };
     }
     
+}
+
+message SearchPauseCauseForAgentRequest {
+    int64 agent_id = 1;
+}
+
+message ForAgentPauseCause {
+    uint32 id = 1;
+    string name = 2;
+    uint32 limit_min = 3;
+    uint32 duration_min = 4;
+}
+
+message ForAgentPauseCauseList {
+    repeated ForAgentPauseCause items = 1;
 }
 
 message AgentSetStateRequest {
