@@ -802,6 +802,56 @@
         ]
       }
     },
+    "/call_center/agents/reports/status/{agent_id}": {
+      "get": {
+        "operationId": "SearchAgentStatusStatisticItem",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineAgentStatusStatisticItem"
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {}
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "time.from",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "time.to",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "AgentService"
+        ]
+      }
+    },
     "/call_center/agents/states/history": {
       "get": {
         "operationId": "SearchAgentStateHistory",
@@ -10423,6 +10473,66 @@
           "type": "string"
         },
         "domain_id": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "engineAgentStatusStatisticItem": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "status_duration": {
+          "type": "string",
+          "format": "int64"
+        },
+        "user": {
+          "$ref": "#/definitions/engineLookup"
+        },
+        "extension": {
+          "type": "string"
+        },
+        "team": {
+          "$ref": "#/definitions/engineLookup"
+        },
+        "supervisor": {
+          "$ref": "#/definitions/engineLookup"
+        },
+        "auditor": {
+          "$ref": "#/definitions/engineLookup"
+        },
+        "region": {
+          "$ref": "#/definitions/engineLookup"
+        },
+        "progressive_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "chat_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "pause_cause": {
+          "type": "string"
+        },
+        "online": {
+          "type": "string",
+          "format": "int64"
+        },
+        "offline": {
+          "type": "string",
+          "format": "int64"
+        },
+        "pause": {
           "type": "string",
           "format": "int64"
         }
