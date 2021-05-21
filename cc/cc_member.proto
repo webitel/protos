@@ -19,9 +19,33 @@ service MemberService {
 
     rpc CallJoinToQueue(CallJoinToQueueRequest) returns (stream QueueEvent) {}
     rpc ChatJoinToQueue(ChatJoinToQueueRequest) returns (stream QueueEvent) {}
+    rpc CallJoinToAgent(CallJoinToAgentRequest) returns (stream QueueEvent) {}
 
     rpc EmailJoinToQueue(EmailJoinToQueueRequest) returns (EmailJoinToQueueResponse) {}
     rpc DirectAgentToMember(DirectAgentToMemberRequest) returns (DirectAgentToMemberResponse) {}
+}
+
+message CallJoinToAgentRequest {
+    message WaitingMusic {
+        int32 id = 1;
+        string name = 2;
+        string type = 3;
+    }
+
+    message Processing {
+        bool enabled = 1;
+        uint32 renewal_sec = 2;
+        uint32 sec = 3;
+    }
+
+    string member_call_id = 1;
+    int32 agent_id = 2;
+    WaitingMusic waitingMusic = 3;
+    int32 timeout = 4;
+    map<string,string> variables= 5;
+    Processing processing = 6;
+
+    int64 domain_id = 100;
 }
 
 message AttemptRenewalResultRequest {
