@@ -7,7 +7,37 @@ option go_package = "github.com/webitel/protos/workflow";
 
 service FlowService {
     rpc DistributeAttempt(DistributeAttemptRequest) returns (DistributeAttemptResponse) {}
+    rpc ResultAttempt(ResultAttemptRequest) returns (ResultAttemptResponse) {}
+
     rpc StartFlow(StartFlowRequest) returns (StartFlowResponse) {}
+}
+
+message ResultAttemptRequest {
+    int32 schema_id = 1;
+    int64 domain_id = 2;
+
+    string cause = 3;
+
+    map<string,string> variables = 4;
+}
+
+message ResultAttemptResponse {
+    message Success {
+
+    }
+
+    message Abandoned {
+        string status = 1;
+        uint32 max_attempts = 2;
+        uint32 wait_between_retries = 3;
+    }
+
+    oneof result {
+        Success success = 1;
+        Abandoned abandoned = 2;
+    }
+
+    map<string,string> variables = 3;
 }
 
 message StartFlowRequest {

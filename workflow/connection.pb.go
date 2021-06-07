@@ -24,6 +24,243 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+type ResultAttemptRequest struct {
+	SchemaId             int32             `protobuf:"varint,1,opt,name=schema_id,json=schemaId,proto3" json:"schema_id,omitempty"`
+	DomainId             int64             `protobuf:"varint,2,opt,name=domain_id,json=domainId,proto3" json:"domain_id,omitempty"`
+	Cause                string            `protobuf:"bytes,3,opt,name=cause,proto3" json:"cause,omitempty"`
+	Variables            map[string]string `protobuf:"bytes,4,rep,name=variables,proto3" json:"variables,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
+	XXX_unrecognized     []byte            `json:"-"`
+	XXX_sizecache        int32             `json:"-"`
+}
+
+func (m *ResultAttemptRequest) Reset()         { *m = ResultAttemptRequest{} }
+func (m *ResultAttemptRequest) String() string { return proto.CompactTextString(m) }
+func (*ResultAttemptRequest) ProtoMessage()    {}
+func (*ResultAttemptRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ab8abf1dcbab6634, []int{0}
+}
+
+func (m *ResultAttemptRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ResultAttemptRequest.Unmarshal(m, b)
+}
+func (m *ResultAttemptRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ResultAttemptRequest.Marshal(b, m, deterministic)
+}
+func (m *ResultAttemptRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ResultAttemptRequest.Merge(m, src)
+}
+func (m *ResultAttemptRequest) XXX_Size() int {
+	return xxx_messageInfo_ResultAttemptRequest.Size(m)
+}
+func (m *ResultAttemptRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ResultAttemptRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ResultAttemptRequest proto.InternalMessageInfo
+
+func (m *ResultAttemptRequest) GetSchemaId() int32 {
+	if m != nil {
+		return m.SchemaId
+	}
+	return 0
+}
+
+func (m *ResultAttemptRequest) GetDomainId() int64 {
+	if m != nil {
+		return m.DomainId
+	}
+	return 0
+}
+
+func (m *ResultAttemptRequest) GetCause() string {
+	if m != nil {
+		return m.Cause
+	}
+	return ""
+}
+
+func (m *ResultAttemptRequest) GetVariables() map[string]string {
+	if m != nil {
+		return m.Variables
+	}
+	return nil
+}
+
+type ResultAttemptResponse struct {
+	// Types that are valid to be assigned to Result:
+	//	*ResultAttemptResponse_Success_
+	//	*ResultAttemptResponse_Abandoned_
+	Result               isResultAttemptResponse_Result `protobuf_oneof:"result"`
+	Variables            map[string]string              `protobuf:"bytes,3,rep,name=variables,proto3" json:"variables,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	XXX_NoUnkeyedLiteral struct{}                       `json:"-"`
+	XXX_unrecognized     []byte                         `json:"-"`
+	XXX_sizecache        int32                          `json:"-"`
+}
+
+func (m *ResultAttemptResponse) Reset()         { *m = ResultAttemptResponse{} }
+func (m *ResultAttemptResponse) String() string { return proto.CompactTextString(m) }
+func (*ResultAttemptResponse) ProtoMessage()    {}
+func (*ResultAttemptResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ab8abf1dcbab6634, []int{1}
+}
+
+func (m *ResultAttemptResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ResultAttemptResponse.Unmarshal(m, b)
+}
+func (m *ResultAttemptResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ResultAttemptResponse.Marshal(b, m, deterministic)
+}
+func (m *ResultAttemptResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ResultAttemptResponse.Merge(m, src)
+}
+func (m *ResultAttemptResponse) XXX_Size() int {
+	return xxx_messageInfo_ResultAttemptResponse.Size(m)
+}
+func (m *ResultAttemptResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ResultAttemptResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ResultAttemptResponse proto.InternalMessageInfo
+
+type isResultAttemptResponse_Result interface {
+	isResultAttemptResponse_Result()
+}
+
+type ResultAttemptResponse_Success_ struct {
+	Success *ResultAttemptResponse_Success `protobuf:"bytes,1,opt,name=success,proto3,oneof"`
+}
+
+type ResultAttemptResponse_Abandoned_ struct {
+	Abandoned *ResultAttemptResponse_Abandoned `protobuf:"bytes,2,opt,name=abandoned,proto3,oneof"`
+}
+
+func (*ResultAttemptResponse_Success_) isResultAttemptResponse_Result() {}
+
+func (*ResultAttemptResponse_Abandoned_) isResultAttemptResponse_Result() {}
+
+func (m *ResultAttemptResponse) GetResult() isResultAttemptResponse_Result {
+	if m != nil {
+		return m.Result
+	}
+	return nil
+}
+
+func (m *ResultAttemptResponse) GetSuccess() *ResultAttemptResponse_Success {
+	if x, ok := m.GetResult().(*ResultAttemptResponse_Success_); ok {
+		return x.Success
+	}
+	return nil
+}
+
+func (m *ResultAttemptResponse) GetAbandoned() *ResultAttemptResponse_Abandoned {
+	if x, ok := m.GetResult().(*ResultAttemptResponse_Abandoned_); ok {
+		return x.Abandoned
+	}
+	return nil
+}
+
+func (m *ResultAttemptResponse) GetVariables() map[string]string {
+	if m != nil {
+		return m.Variables
+	}
+	return nil
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*ResultAttemptResponse) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*ResultAttemptResponse_Success_)(nil),
+		(*ResultAttemptResponse_Abandoned_)(nil),
+	}
+}
+
+type ResultAttemptResponse_Success struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ResultAttemptResponse_Success) Reset()         { *m = ResultAttemptResponse_Success{} }
+func (m *ResultAttemptResponse_Success) String() string { return proto.CompactTextString(m) }
+func (*ResultAttemptResponse_Success) ProtoMessage()    {}
+func (*ResultAttemptResponse_Success) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ab8abf1dcbab6634, []int{1, 0}
+}
+
+func (m *ResultAttemptResponse_Success) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ResultAttemptResponse_Success.Unmarshal(m, b)
+}
+func (m *ResultAttemptResponse_Success) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ResultAttemptResponse_Success.Marshal(b, m, deterministic)
+}
+func (m *ResultAttemptResponse_Success) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ResultAttemptResponse_Success.Merge(m, src)
+}
+func (m *ResultAttemptResponse_Success) XXX_Size() int {
+	return xxx_messageInfo_ResultAttemptResponse_Success.Size(m)
+}
+func (m *ResultAttemptResponse_Success) XXX_DiscardUnknown() {
+	xxx_messageInfo_ResultAttemptResponse_Success.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ResultAttemptResponse_Success proto.InternalMessageInfo
+
+type ResultAttemptResponse_Abandoned struct {
+	Status               string   `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	MaxAttempts          uint32   `protobuf:"varint,2,opt,name=max_attempts,json=maxAttempts,proto3" json:"max_attempts,omitempty"`
+	WaitBetweenRetries   uint32   `protobuf:"varint,3,opt,name=wait_between_retries,json=waitBetweenRetries,proto3" json:"wait_between_retries,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ResultAttemptResponse_Abandoned) Reset()         { *m = ResultAttemptResponse_Abandoned{} }
+func (m *ResultAttemptResponse_Abandoned) String() string { return proto.CompactTextString(m) }
+func (*ResultAttemptResponse_Abandoned) ProtoMessage()    {}
+func (*ResultAttemptResponse_Abandoned) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ab8abf1dcbab6634, []int{1, 1}
+}
+
+func (m *ResultAttemptResponse_Abandoned) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ResultAttemptResponse_Abandoned.Unmarshal(m, b)
+}
+func (m *ResultAttemptResponse_Abandoned) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ResultAttemptResponse_Abandoned.Marshal(b, m, deterministic)
+}
+func (m *ResultAttemptResponse_Abandoned) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ResultAttemptResponse_Abandoned.Merge(m, src)
+}
+func (m *ResultAttemptResponse_Abandoned) XXX_Size() int {
+	return xxx_messageInfo_ResultAttemptResponse_Abandoned.Size(m)
+}
+func (m *ResultAttemptResponse_Abandoned) XXX_DiscardUnknown() {
+	xxx_messageInfo_ResultAttemptResponse_Abandoned.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ResultAttemptResponse_Abandoned proto.InternalMessageInfo
+
+func (m *ResultAttemptResponse_Abandoned) GetStatus() string {
+	if m != nil {
+		return m.Status
+	}
+	return ""
+}
+
+func (m *ResultAttemptResponse_Abandoned) GetMaxAttempts() uint32 {
+	if m != nil {
+		return m.MaxAttempts
+	}
+	return 0
+}
+
+func (m *ResultAttemptResponse_Abandoned) GetWaitBetweenRetries() uint32 {
+	if m != nil {
+		return m.WaitBetweenRetries
+	}
+	return 0
+}
+
 type StartFlowRequest struct {
 	SchemaId             uint32            `protobuf:"varint,1,opt,name=schema_id,json=schemaId,proto3" json:"schema_id,omitempty"`
 	DomainId             int64             `protobuf:"varint,2,opt,name=domain_id,json=domainId,proto3" json:"domain_id,omitempty"`
@@ -37,7 +274,7 @@ func (m *StartFlowRequest) Reset()         { *m = StartFlowRequest{} }
 func (m *StartFlowRequest) String() string { return proto.CompactTextString(m) }
 func (*StartFlowRequest) ProtoMessage()    {}
 func (*StartFlowRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ab8abf1dcbab6634, []int{0}
+	return fileDescriptor_ab8abf1dcbab6634, []int{2}
 }
 
 func (m *StartFlowRequest) XXX_Unmarshal(b []byte) error {
@@ -90,7 +327,7 @@ func (m *StartFlowResponse) Reset()         { *m = StartFlowResponse{} }
 func (m *StartFlowResponse) String() string { return proto.CompactTextString(m) }
 func (*StartFlowResponse) ProtoMessage()    {}
 func (*StartFlowResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ab8abf1dcbab6634, []int{1}
+	return fileDescriptor_ab8abf1dcbab6634, []int{3}
 }
 
 func (m *StartFlowResponse) XXX_Unmarshal(b []byte) error {
@@ -133,7 +370,7 @@ func (m *DistributeAttemptRequest) Reset()         { *m = DistributeAttemptReque
 func (m *DistributeAttemptRequest) String() string { return proto.CompactTextString(m) }
 func (*DistributeAttemptRequest) ProtoMessage()    {}
 func (*DistributeAttemptRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ab8abf1dcbab6634, []int{2}
+	return fileDescriptor_ab8abf1dcbab6634, []int{4}
 }
 
 func (m *DistributeAttemptRequest) XXX_Unmarshal(b []byte) error {
@@ -204,7 +441,7 @@ func (m *DistributeAttemptResponse) Reset()         { *m = DistributeAttemptResp
 func (m *DistributeAttemptResponse) String() string { return proto.CompactTextString(m) }
 func (*DistributeAttemptResponse) ProtoMessage()    {}
 func (*DistributeAttemptResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ab8abf1dcbab6634, []int{3}
+	return fileDescriptor_ab8abf1dcbab6634, []int{5}
 }
 
 func (m *DistributeAttemptResponse) XXX_Unmarshal(b []byte) error {
@@ -290,7 +527,7 @@ func (m *DistributeAttemptResponse_Cancel) Reset()         { *m = DistributeAtte
 func (m *DistributeAttemptResponse_Cancel) String() string { return proto.CompactTextString(m) }
 func (*DistributeAttemptResponse_Cancel) ProtoMessage()    {}
 func (*DistributeAttemptResponse_Cancel) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ab8abf1dcbab6634, []int{3, 0}
+	return fileDescriptor_ab8abf1dcbab6634, []int{5, 0}
 }
 
 func (m *DistributeAttemptResponse_Cancel) XXX_Unmarshal(b []byte) error {
@@ -344,7 +581,7 @@ func (m *DistributeAttemptResponse_Confirm) Reset()         { *m = DistributeAtt
 func (m *DistributeAttemptResponse_Confirm) String() string { return proto.CompactTextString(m) }
 func (*DistributeAttemptResponse_Confirm) ProtoMessage()    {}
 func (*DistributeAttemptResponse_Confirm) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ab8abf1dcbab6634, []int{3, 1}
+	return fileDescriptor_ab8abf1dcbab6634, []int{5, 1}
 }
 
 func (m *DistributeAttemptResponse_Confirm) XXX_Unmarshal(b []byte) error {
@@ -380,6 +617,12 @@ func (m *DistributeAttemptResponse_Confirm) GetDisplay() string {
 }
 
 func init() {
+	proto.RegisterType((*ResultAttemptRequest)(nil), "workflow.ResultAttemptRequest")
+	proto.RegisterMapType((map[string]string)(nil), "workflow.ResultAttemptRequest.VariablesEntry")
+	proto.RegisterType((*ResultAttemptResponse)(nil), "workflow.ResultAttemptResponse")
+	proto.RegisterMapType((map[string]string)(nil), "workflow.ResultAttemptResponse.VariablesEntry")
+	proto.RegisterType((*ResultAttemptResponse_Success)(nil), "workflow.ResultAttemptResponse.Success")
+	proto.RegisterType((*ResultAttemptResponse_Abandoned)(nil), "workflow.ResultAttemptResponse.Abandoned")
 	proto.RegisterType((*StartFlowRequest)(nil), "workflow.StartFlowRequest")
 	proto.RegisterMapType((map[string]string)(nil), "workflow.StartFlowRequest.VariablesEntry")
 	proto.RegisterType((*StartFlowResponse)(nil), "workflow.StartFlowResponse")
@@ -394,40 +637,52 @@ func init() {
 func init() { proto.RegisterFile("workflow/connection.proto", fileDescriptor_ab8abf1dcbab6634) }
 
 var fileDescriptor_ab8abf1dcbab6634 = []byte{
-	// 519 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x54, 0x4d, 0x6f, 0xd3, 0x4c,
-	0x10, 0x8e, 0xed, 0xe6, 0xc3, 0x13, 0xb5, 0x6a, 0xf6, 0x7d, 0x0f, 0x6e, 0x7a, 0x89, 0x5c, 0x0e,
-	0x01, 0x24, 0x47, 0x84, 0x0b, 0x42, 0x5c, 0x28, 0xfd, 0x3c, 0x81, 0x36, 0x12, 0x07, 0x0e, 0x44,
-	0xce, 0x7a, 0x4a, 0x57, 0x75, 0x76, 0xcd, 0xee, 0x26, 0x21, 0xbf, 0x86, 0x5f, 0xc1, 0x2f, 0xe1,
-	0xe7, 0x70, 0x41, 0x5e, 0xc7, 0x49, 0xfa, 0x91, 0x12, 0x09, 0x71, 0xf3, 0xce, 0xe3, 0x67, 0x9e,
-	0x99, 0x67, 0x66, 0x17, 0x0e, 0x66, 0x52, 0xdd, 0x5c, 0xa5, 0x72, 0xd6, 0x63, 0x52, 0x08, 0x64,
-	0x86, 0x4b, 0x11, 0x65, 0x4a, 0x1a, 0x49, 0x1a, 0x25, 0x14, 0xfe, 0x74, 0x60, 0x7f, 0x60, 0x62,
-	0x65, 0xce, 0x52, 0x39, 0xa3, 0xf8, 0x75, 0x82, 0xda, 0x90, 0x43, 0xf0, 0x35, 0xbb, 0xc6, 0x71,
-	0x3c, 0xe4, 0x49, 0xe0, 0x74, 0x9c, 0xee, 0x2e, 0x6d, 0x14, 0x81, 0xcb, 0x24, 0x07, 0x13, 0x39,
-	0x8e, 0xb9, 0xc8, 0x41, 0xb7, 0xe3, 0x74, 0x3d, 0xda, 0x28, 0x02, 0x97, 0x09, 0x39, 0x07, 0x7f,
-	0x1a, 0x2b, 0x1e, 0x8f, 0x52, 0xd4, 0x81, 0xd7, 0xf1, 0xba, 0xcd, 0xfe, 0xd3, 0xa8, 0x14, 0x8b,
-	0xee, 0x0a, 0x45, 0x1f, 0xcb, 0x7f, 0x4f, 0x85, 0x51, 0x73, 0xba, 0xe2, 0xb6, 0xdf, 0xc0, 0xde,
-	0x6d, 0x90, 0xec, 0x83, 0x77, 0x83, 0x73, 0x5b, 0x8e, 0x4f, 0xf3, 0x4f, 0xf2, 0x3f, 0x54, 0xa7,
-	0x71, 0x3a, 0x41, 0x5b, 0x85, 0x4f, 0x8b, 0xc3, 0x6b, 0xf7, 0x95, 0x13, 0x1e, 0x41, 0x6b, 0x4d,
-	0x4b, 0x67, 0x52, 0x68, 0x24, 0x7b, 0xe0, 0x2e, 0xda, 0xf1, 0xa9, 0xcb, 0x93, 0xf0, 0xbb, 0x0b,
-	0xc1, 0x09, 0xd7, 0x46, 0xf1, 0xd1, 0xc4, 0xe0, 0x5b, 0x63, 0x70, 0x9c, 0x99, 0x8d, 0x16, 0x54,
-	0xb7, 0xb5, 0xa0, 0x03, 0xcd, 0x04, 0xb5, 0xe1, 0x22, 0xce, 0x0d, 0x0f, 0x3c, 0xab, 0xb7, 0x1e,
-	0x22, 0x01, 0xd4, 0x13, 0xae, 0xb3, 0x34, 0x9e, 0x07, 0x3b, 0x16, 0x2d, 0x8f, 0xe4, 0xfd, 0xba,
-	0x7d, 0x55, 0x6b, 0xdf, 0x8b, 0x95, 0x7d, 0x9b, 0x8a, 0xfd, 0x67, 0x36, 0xfe, 0xf2, 0xe0, 0xe0,
-	0x01, 0xd1, 0x85, 0x9f, 0x27, 0x50, 0x63, 0xb1, 0x60, 0x98, 0xda, 0x64, 0xcd, 0xfe, 0xb3, 0x47,
-	0x2b, 0x2d, 0x48, 0xd1, 0x3b, 0xcb, 0xb8, 0xa8, 0xd0, 0x05, 0x97, 0x9c, 0x43, 0x9d, 0x49, 0x71,
-	0xc5, 0xd5, 0xd8, 0xea, 0x37, 0xfb, 0xcf, 0xb7, 0x4a, 0x53, 0x50, 0x2e, 0x2a, 0xb4, 0x64, 0x93,
-	0x0f, 0xf7, 0x57, 0xaf, 0xbf, 0x4d, 0xaa, 0xcd, 0xe6, 0x09, 0xa8, 0x15, 0xe5, 0x2e, 0x66, 0xca,
-	0x14, 0xcf, 0xec, 0x4c, 0x9d, 0xe5, 0x4c, 0xcb, 0x10, 0x89, 0xe0, 0x3f, 0x81, 0xdf, 0xcc, 0x30,
-	0x59, 0xea, 0x0c, 0x35, 0x32, 0xdb, 0xd2, 0x2e, 0x6d, 0xe5, 0xd0, 0xaa, 0x82, 0x01, 0x32, 0x42,
-	0x60, 0x47, 0x1b, 0x99, 0xd9, 0xf5, 0x68, 0x50, 0xfb, 0xdd, 0x3e, 0x85, 0xfa, 0xa2, 0xaf, 0xbb,
-	0x4b, 0xe4, 0x3c, 0xba, 0x44, 0xee, 0xad, 0x25, 0xfa, 0xbb, 0x99, 0x1f, 0x37, 0xa0, 0xa6, 0x50,
-	0x4f, 0x52, 0xd3, 0xff, 0xe1, 0x40, 0x33, 0xbf, 0x40, 0x03, 0x54, 0x53, 0xce, 0x90, 0x7c, 0x86,
-	0xd6, 0x3d, 0x17, 0x49, 0xf8, 0xe7, 0xf5, 0x6c, 0x1f, 0x6d, 0x31, 0x86, 0xb0, 0x42, 0xce, 0xc0,
-	0x5f, 0x5e, 0x5a, 0xd2, 0xde, 0xfc, 0x6a, 0xb4, 0x0f, 0x1f, 0xc4, 0xca, 0x3c, 0xc7, 0x4f, 0x3e,
-	0x85, 0x5f, 0xb8, 0xb9, 0x9e, 0x8c, 0x22, 0x26, 0xc7, 0xbd, 0x19, 0x8e, 0xb8, 0xc1, 0xb4, 0x67,
-	0x1f, 0x3e, 0xdd, 0x2b, 0x99, 0xa3, 0x9a, 0x0d, 0xbc, 0xfc, 0x1d, 0x00, 0x00, 0xff, 0xff, 0xa3,
-	0xf1, 0x82, 0xe2, 0x26, 0x05, 0x00, 0x00,
+	// 709 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x56, 0xdd, 0x6e, 0xd3, 0x4a,
+	0x10, 0x8e, 0x93, 0x36, 0x89, 0x27, 0xa7, 0x55, 0xbb, 0xa7, 0xe7, 0x28, 0x4d, 0x25, 0x08, 0x2e,
+	0x12, 0x01, 0x84, 0x03, 0xe1, 0x06, 0x21, 0x6e, 0xfa, 0xdf, 0x0a, 0x24, 0xd0, 0x46, 0xe2, 0x82,
+	0x0b, 0xa2, 0xf5, 0x7a, 0x4b, 0x57, 0xb5, 0xd7, 0xc1, 0xbb, 0x6e, 0xd2, 0x47, 0xe0, 0x29, 0x78,
+	0x17, 0x5e, 0x81, 0x27, 0xe1, 0x9a, 0x1b, 0xe4, 0xf5, 0x3a, 0x49, 0x7f, 0xd2, 0x44, 0xa2, 0xbd,
+	0xf3, 0xce, 0xec, 0xcc, 0x7c, 0xfb, 0xcd, 0x37, 0x93, 0xc0, 0xfa, 0x20, 0x8a, 0x4f, 0x8f, 0x83,
+	0x68, 0xd0, 0xa6, 0x91, 0x10, 0x8c, 0x2a, 0x1e, 0x09, 0xb7, 0x1f, 0x47, 0x2a, 0x42, 0xd5, 0xdc,
+	0xe5, 0xfc, 0xb2, 0x60, 0x0d, 0x33, 0x99, 0x04, 0x6a, 0x4b, 0x29, 0x16, 0xf6, 0x15, 0x66, 0x5f,
+	0x13, 0x26, 0x15, 0xda, 0x00, 0x5b, 0xd2, 0x13, 0x16, 0x92, 0x1e, 0xf7, 0xeb, 0x56, 0xd3, 0x6a,
+	0x2d, 0xe2, 0x6a, 0x66, 0x38, 0xf2, 0x53, 0xa7, 0x1f, 0x85, 0x84, 0x8b, 0xd4, 0x59, 0x6c, 0x5a,
+	0xad, 0x12, 0xae, 0x66, 0x86, 0x23, 0x1f, 0xad, 0xc1, 0x22, 0x25, 0x89, 0x64, 0xf5, 0x52, 0xd3,
+	0x6a, 0xd9, 0x38, 0x3b, 0xa0, 0xb7, 0x60, 0x9f, 0x91, 0x98, 0x13, 0x2f, 0x60, 0xb2, 0xbe, 0xd0,
+	0x2c, 0xb5, 0x6a, 0x9d, 0x67, 0x6e, 0x0e, 0xc3, 0xbd, 0x0e, 0x82, 0xfb, 0x31, 0xbf, 0xbf, 0x27,
+	0x54, 0x7c, 0x8e, 0xc7, 0xf1, 0x8d, 0x37, 0xb0, 0x7c, 0xd1, 0x89, 0x56, 0xa0, 0x74, 0xca, 0xce,
+	0x35, 0x50, 0x1b, 0xa7, 0x9f, 0x29, 0x8c, 0x33, 0x12, 0x24, 0x4c, 0xe3, 0xb3, 0x71, 0x76, 0x78,
+	0x5d, 0x7c, 0x65, 0x39, 0x3f, 0x4a, 0xf0, 0xdf, 0xa5, 0x82, 0xb2, 0x1f, 0x09, 0xc9, 0xd0, 0x0e,
+	0x54, 0x64, 0x42, 0x29, 0x93, 0x52, 0x67, 0xaa, 0x75, 0x1e, 0x4d, 0x85, 0x98, 0x45, 0xb8, 0xdd,
+	0xec, 0xfa, 0x61, 0x01, 0xe7, 0x91, 0xe8, 0x08, 0x6c, 0xe2, 0x11, 0xe1, 0x47, 0x82, 0x65, 0xe4,
+	0xd4, 0x3a, 0x8f, 0x67, 0xa5, 0xd9, 0xca, 0x03, 0x0e, 0x0b, 0x78, 0x1c, 0x8d, 0xde, 0x4d, 0x92,
+	0x56, 0xd2, 0xa4, 0xb9, 0xb3, 0x52, 0x4d, 0x67, 0xcd, 0x86, 0x8a, 0x81, 0xdb, 0x18, 0x82, 0x3d,
+	0x2a, 0x89, 0xfe, 0x87, 0xb2, 0x54, 0x44, 0x25, 0xd2, 0xd0, 0x67, 0x4e, 0xe8, 0x01, 0xfc, 0x13,
+	0x92, 0x61, 0x8f, 0x64, 0x05, 0xa4, 0x7e, 0xcb, 0x12, 0xae, 0x85, 0x64, 0x68, 0x6a, 0x4a, 0xf4,
+	0x1c, 0xd6, 0x06, 0x84, 0xab, 0x9e, 0xc7, 0xd4, 0x80, 0x31, 0xd1, 0x8b, 0x99, 0x8a, 0xb9, 0xc6,
+	0x9a, 0x5e, 0x45, 0xa9, 0x6f, 0x3b, 0x73, 0xe1, 0xcc, 0xf3, 0x77, 0xad, 0xdb, 0xae, 0x42, 0x39,
+	0xd6, 0xaf, 0x76, 0x7e, 0x5a, 0xb0, 0xd2, 0x55, 0x24, 0x56, 0xfb, 0x41, 0x34, 0x98, 0x2a, 0xda,
+	0xa5, 0x79, 0x45, 0x7b, 0x70, 0x95, 0xe9, 0x89, 0xa6, 0x5d, 0x2e, 0x74, 0x67, 0xd2, 0xdc, 0x84,
+	0xd5, 0x89, 0x5a, 0x46, 0x95, 0xcb, 0x50, 0x34, 0xcf, 0xb1, 0x71, 0x91, 0xfb, 0xce, 0xf7, 0x22,
+	0xd4, 0x77, 0xb9, 0x54, 0x31, 0xf7, 0x12, 0xc5, 0x6e, 0x6d, 0x6e, 0x9b, 0x50, 0xf3, 0x99, 0x54,
+	0x5c, 0x90, 0x74, 0x53, 0x98, 0xe9, 0x9d, 0x34, 0xa1, 0x3a, 0x54, 0x7c, 0x2e, 0xfb, 0x01, 0x39,
+	0xaf, 0x2f, 0x68, 0x6f, 0x7e, 0x44, 0xef, 0x27, 0xe9, 0x5b, 0xd4, 0xf4, 0xbd, 0x18, 0xd3, 0x37,
+	0x0d, 0xec, 0x9d, 0xd1, 0xf8, 0xbb, 0x04, 0xeb, 0xd7, 0x14, 0x35, 0x7c, 0xee, 0x42, 0x99, 0x12,
+	0x41, 0x59, 0x60, 0x86, 0xfc, 0xc9, 0x8d, 0x48, 0xcd, 0x58, 0xed, 0xe8, 0x88, 0xc3, 0x02, 0x36,
+	0xb1, 0xe8, 0x00, 0x2a, 0x34, 0x12, 0xc7, 0x3c, 0x0e, 0xcd, 0x90, 0x3f, 0x9d, 0x2b, 0x4d, 0x16,
+	0x92, 0xee, 0x0b, 0x13, 0x8d, 0x3e, 0x5c, 0x95, 0x5e, 0x67, 0x9e, 0x54, 0xd3, 0xc9, 0x13, 0x50,
+	0xce, 0xe0, 0x9a, 0x9e, 0xd2, 0x98, 0xf7, 0x75, 0x4f, 0xad, 0x51, 0x4f, 0x73, 0x13, 0x72, 0xe1,
+	0x5f, 0xc1, 0x86, 0xaa, 0xe7, 0x8f, 0xea, 0xf4, 0x24, 0xa3, 0x66, 0xd6, 0x57, 0x53, 0xd7, 0x18,
+	0x41, 0x97, 0x51, 0x84, 0x60, 0x41, 0xaa, 0xa8, 0xaf, 0xe5, 0x51, 0xc5, 0xfa, 0xbb, 0xb1, 0x07,
+	0x15, 0xf3, 0xae, 0xcb, 0x22, 0xb2, 0x6e, 0x14, 0x51, 0xf1, 0x82, 0x88, 0x6e, 0x6b, 0x35, 0x74,
+	0xbe, 0x15, 0xa1, 0x96, 0x0e, 0x50, 0x97, 0xc5, 0x67, 0x9c, 0x32, 0xf4, 0x19, 0x56, 0xaf, 0xb0,
+	0x88, 0x9c, 0xd9, 0xf2, 0x6c, 0x6c, 0xce, 0xd1, 0x06, 0xa7, 0x80, 0x30, 0x2c, 0x5d, 0x58, 0xc5,
+	0xe8, 0xde, 0xcd, 0x3f, 0x6c, 0x8d, 0xfb, 0x33, 0x76, 0xb8, 0x53, 0x40, 0xfb, 0x60, 0x8f, 0x16,
+	0x01, 0x6a, 0x4c, 0xdf, 0x44, 0x8d, 0x8d, 0x6b, 0x7d, 0x79, 0x9e, 0xed, 0x87, 0x9f, 0x9c, 0x2f,
+	0x5c, 0x9d, 0x24, 0x9e, 0x4b, 0xa3, 0xb0, 0x3d, 0x60, 0x1e, 0x57, 0x2c, 0x68, 0xeb, 0x7f, 0x01,
+	0xb2, 0x9d, 0x47, 0x7a, 0x65, 0x6d, 0x78, 0xf9, 0x27, 0x00, 0x00, 0xff, 0xff, 0x00, 0xb5, 0xf0,
+	0xa1, 0x33, 0x08, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -443,6 +698,7 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type FlowServiceClient interface {
 	DistributeAttempt(ctx context.Context, in *DistributeAttemptRequest, opts ...grpc.CallOption) (*DistributeAttemptResponse, error)
+	ResultAttempt(ctx context.Context, in *ResultAttemptRequest, opts ...grpc.CallOption) (*ResultAttemptResponse, error)
 	StartFlow(ctx context.Context, in *StartFlowRequest, opts ...grpc.CallOption) (*StartFlowResponse, error)
 }
 
@@ -463,6 +719,15 @@ func (c *flowServiceClient) DistributeAttempt(ctx context.Context, in *Distribut
 	return out, nil
 }
 
+func (c *flowServiceClient) ResultAttempt(ctx context.Context, in *ResultAttemptRequest, opts ...grpc.CallOption) (*ResultAttemptResponse, error) {
+	out := new(ResultAttemptResponse)
+	err := c.cc.Invoke(ctx, "/workflow.FlowService/ResultAttempt", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *flowServiceClient) StartFlow(ctx context.Context, in *StartFlowRequest, opts ...grpc.CallOption) (*StartFlowResponse, error) {
 	out := new(StartFlowResponse)
 	err := c.cc.Invoke(ctx, "/workflow.FlowService/StartFlow", in, out, opts...)
@@ -475,6 +740,7 @@ func (c *flowServiceClient) StartFlow(ctx context.Context, in *StartFlowRequest,
 // FlowServiceServer is the server API for FlowService service.
 type FlowServiceServer interface {
 	DistributeAttempt(context.Context, *DistributeAttemptRequest) (*DistributeAttemptResponse, error)
+	ResultAttempt(context.Context, *ResultAttemptRequest) (*ResultAttemptResponse, error)
 	StartFlow(context.Context, *StartFlowRequest) (*StartFlowResponse, error)
 }
 
@@ -484,6 +750,9 @@ type UnimplementedFlowServiceServer struct {
 
 func (*UnimplementedFlowServiceServer) DistributeAttempt(ctx context.Context, req *DistributeAttemptRequest) (*DistributeAttemptResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DistributeAttempt not implemented")
+}
+func (*UnimplementedFlowServiceServer) ResultAttempt(ctx context.Context, req *ResultAttemptRequest) (*ResultAttemptResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ResultAttempt not implemented")
 }
 func (*UnimplementedFlowServiceServer) StartFlow(ctx context.Context, req *StartFlowRequest) (*StartFlowResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method StartFlow not implemented")
@@ -507,6 +776,24 @@ func _FlowService_DistributeAttempt_Handler(srv interface{}, ctx context.Context
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(FlowServiceServer).DistributeAttempt(ctx, req.(*DistributeAttemptRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FlowService_ResultAttempt_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResultAttemptRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FlowServiceServer).ResultAttempt(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/workflow.FlowService/ResultAttempt",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FlowServiceServer).ResultAttempt(ctx, req.(*ResultAttemptRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -536,6 +823,10 @@ var _FlowService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DistributeAttempt",
 			Handler:    _FlowService_DistributeAttempt_Handler,
+		},
+		{
+			MethodName: "ResultAttempt",
+			Handler:    _FlowService_ResultAttempt_Handler,
 		},
 		{
 			MethodName: "StartFlow",
