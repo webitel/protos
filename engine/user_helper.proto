@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package engine;
+
+option go_package = "github.com/webitel/protos/engine";
+
+import "google/api/annotations.proto";
+
+service UserHelperService {
+    rpc DefaultDeviceConfig (DefaultDeviceConfigRequest) returns (DefaultDeviceConfigResponse) {
+        option (google.api.http) = {
+            get: "/user/device/config/{type}"
+        };
+    }
+}
+
+message DefaultDeviceConfigRequest {
+    string type = 1;
+}
+
+message DefaultDeviceConfigResponse {
+    message SipDeviceConfig {
+        string auth = 1;
+        string domain = 2;
+        string extension = 3;
+        string password = 4;
+        string proxy = 5;
+    }
+
+    message WebRTCDeviceConfig {
+        string authorization_user = 1;
+        string display_name = 2;
+        string extension = 3;
+        string ha1 = 4;
+        string realm = 5;
+        string server = 6;
+        string uri = 7;
+    }
+
+    oneof data {
+        SipDeviceConfig sip = 1;
+        WebRTCDeviceConfig webrtc = 2;
+    }
+}
