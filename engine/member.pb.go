@@ -7,11 +7,11 @@ import (
 	context "context"
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
-	_struct "github.com/golang/protobuf/ptypes/struct"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 	math "math"
 )
 
@@ -1649,27 +1649,27 @@ func (m *SearchMemberAttemptsRequest) GetDomainId() int64 {
 }
 
 type MemberAttempt struct {
-	Id                   int64          `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Member               *Lookup        `protobuf:"bytes,2,opt,name=member,proto3" json:"member,omitempty"`
-	CreatedAt            int64          `protobuf:"varint,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	Destination          string         `protobuf:"bytes,4,opt,name=destination,proto3" json:"destination,omitempty"`
-	Weight               int32          `protobuf:"varint,5,opt,name=weight,proto3" json:"weight,omitempty"`
-	OriginateAt          int64          `protobuf:"varint,6,opt,name=originate_at,json=originateAt,proto3" json:"originate_at,omitempty"`
-	AnsweredAt           int64          `protobuf:"varint,7,opt,name=answered_at,json=answeredAt,proto3" json:"answered_at,omitempty"`
-	BridgedAt            int64          `protobuf:"varint,8,opt,name=bridged_at,json=bridgedAt,proto3" json:"bridged_at,omitempty"`
-	HangupAt             int64          `protobuf:"varint,9,opt,name=hangup_at,json=hangupAt,proto3" json:"hangup_at,omitempty"`
-	Resource             *Lookup        `protobuf:"bytes,10,opt,name=resource,proto3" json:"resource,omitempty"`
-	LegAId               string         `protobuf:"bytes,11,opt,name=leg_a_id,json=legAId,proto3" json:"leg_a_id,omitempty"`
-	LegBId               string         `protobuf:"bytes,12,opt,name=leg_b_id,json=legBId,proto3" json:"leg_b_id,omitempty"`
-	Node                 string         `protobuf:"bytes,13,opt,name=node,proto3" json:"node,omitempty"`
-	Result               string         `protobuf:"bytes,14,opt,name=result,proto3" json:"result,omitempty"`
-	Agent                *Lookup        `protobuf:"bytes,15,opt,name=agent,proto3" json:"agent,omitempty"`
-	Bucket               *Lookup        `protobuf:"bytes,16,opt,name=bucket,proto3" json:"bucket,omitempty"`
-	Logs                 *_struct.Value `protobuf:"bytes,17,opt,name=logs,proto3" json:"logs,omitempty"`
-	Active               bool           `protobuf:"varint,19,opt,name=active,proto3" json:"active,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
-	XXX_unrecognized     []byte         `json:"-"`
-	XXX_sizecache        int32          `json:"-"`
+	Id                   int64           `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Member               *Lookup         `protobuf:"bytes,2,opt,name=member,proto3" json:"member,omitempty"`
+	CreatedAt            int64           `protobuf:"varint,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	Destination          string          `protobuf:"bytes,4,opt,name=destination,proto3" json:"destination,omitempty"`
+	Weight               int32           `protobuf:"varint,5,opt,name=weight,proto3" json:"weight,omitempty"`
+	OriginateAt          int64           `protobuf:"varint,6,opt,name=originate_at,json=originateAt,proto3" json:"originate_at,omitempty"`
+	AnsweredAt           int64           `protobuf:"varint,7,opt,name=answered_at,json=answeredAt,proto3" json:"answered_at,omitempty"`
+	BridgedAt            int64           `protobuf:"varint,8,opt,name=bridged_at,json=bridgedAt,proto3" json:"bridged_at,omitempty"`
+	HangupAt             int64           `protobuf:"varint,9,opt,name=hangup_at,json=hangupAt,proto3" json:"hangup_at,omitempty"`
+	Resource             *Lookup         `protobuf:"bytes,10,opt,name=resource,proto3" json:"resource,omitempty"`
+	LegAId               string          `protobuf:"bytes,11,opt,name=leg_a_id,json=legAId,proto3" json:"leg_a_id,omitempty"`
+	LegBId               string          `protobuf:"bytes,12,opt,name=leg_b_id,json=legBId,proto3" json:"leg_b_id,omitempty"`
+	Node                 string          `protobuf:"bytes,13,opt,name=node,proto3" json:"node,omitempty"`
+	Result               string          `protobuf:"bytes,14,opt,name=result,proto3" json:"result,omitempty"`
+	Agent                *Lookup         `protobuf:"bytes,15,opt,name=agent,proto3" json:"agent,omitempty"`
+	Bucket               *Lookup         `protobuf:"bytes,16,opt,name=bucket,proto3" json:"bucket,omitempty"`
+	Logs                 *structpb.Value `protobuf:"bytes,17,opt,name=logs,proto3" json:"logs,omitempty"`
+	Active               bool            `protobuf:"varint,19,opt,name=active,proto3" json:"active,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
+	XXX_unrecognized     []byte          `json:"-"`
+	XXX_sizecache        int32           `json:"-"`
 }
 
 func (m *MemberAttempt) Reset()         { *m = MemberAttempt{} }
@@ -1809,7 +1809,7 @@ func (m *MemberAttempt) GetBucket() *Lookup {
 	return nil
 }
 
-func (m *MemberAttempt) GetLogs() *_struct.Value {
+func (m *MemberAttempt) GetLogs() *structpb.Value {
 	if m != nil {
 		return m.Logs
 	}
