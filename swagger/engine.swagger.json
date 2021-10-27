@@ -8411,6 +8411,147 @@
         ]
       }
     },
+    "/calls/history/{call_id}/annotation": {
+      "post": {
+        "operationId": "CreateCallAnnotation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineCallAnnotation"
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {}
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "call_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engineCreateCallAnnotationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CallService"
+        ]
+      }
+    },
+    "/calls/history/{call_id}/annotation/{id}": {
+      "delete": {
+        "operationId": "DeleteCallAnnotation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineCallAnnotation"
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {}
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "call_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engineDeleteCallAnnotationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CallService"
+        ]
+      },
+      "put": {
+        "operationId": "UpdateCallAnnotation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineCallAnnotation"
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {}
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "call_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engineUpdateCallAnnotationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CallService"
+        ]
+      }
+    },
     "/email/profile": {
       "get": {
         "summary": "Search EmailProfile",
@@ -11422,6 +11563,43 @@
         }
       }
     },
+    "engineCallAnnotation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "call_id": {
+          "type": "string"
+        },
+        "created_by": {
+          "$ref": "#/definitions/engineLookup"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_by": {
+          "$ref": "#/definitions/engineLookup"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "note": {
+          "type": "string"
+        },
+        "start_sec": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "end_sec": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
     "engineCallFile": {
       "type": "object",
       "properties": {
@@ -11737,6 +11915,25 @@
         "domain_id": {
           "type": "string",
           "format": "int64"
+        }
+      }
+    },
+    "engineCreateCallAnnotationRequest": {
+      "type": "object",
+      "properties": {
+        "call_id": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "start_sec": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "end_sec": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -12371,6 +12568,18 @@
         }
       }
     },
+    "engineDeleteCallAnnotationRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "call_id": {
+          "type": "string"
+        }
+      }
+    },
     "engineDeleteMembersRequest": {
       "type": "object",
       "properties": {
@@ -12801,6 +13010,12 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/engineCallHold"
+          }
+        },
+        "annotations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/engineCallAnnotation"
           }
         }
       }
@@ -15166,6 +15381,29 @@
         "domain_id": {
           "type": "string",
           "format": "int64"
+        }
+      }
+    },
+    "engineUpdateCallAnnotationRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "call_id": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "start_sec": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "end_sec": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },

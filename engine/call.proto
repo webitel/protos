@@ -84,6 +84,27 @@ service CallService {
             body: "*"
         };
     }
+
+    rpc CreateCallAnnotation (CreateCallAnnotationRequest) returns (CallAnnotation) {
+        option (google.api.http) = {
+            post: "/calls/history/{call_id}/annotation"
+            body: "*"
+        };
+    }
+
+    rpc UpdateCallAnnotation (UpdateCallAnnotationRequest) returns (CallAnnotation) {
+        option (google.api.http) = {
+            put: "/calls/history/{call_id}/annotation/{id}"
+            body: "*"
+        };
+    }
+
+    rpc DeleteCallAnnotation (DeleteCallAnnotationRequest) returns (CallAnnotation) {
+        option (google.api.http) = {
+            delete: "/calls/history/{call_id}/annotation/{id}"
+            body: "*"
+        };
+    }
 }
 
 message SearchHistoryCallRequest {
@@ -209,6 +230,38 @@ message CallHold {
     float sec = 3;
 }
 
+message CallAnnotation {
+    int64 id = 1;
+    string call_id = 2;
+    Lookup created_by = 3;
+    int64 created_at = 4;
+    Lookup updated_by = 5;
+    int64 updated_at = 6;
+    string note = 7;
+    int32 start_sec = 8;
+    int32 end_sec = 9;
+}
+
+message CreateCallAnnotationRequest {
+    string call_id = 1;
+    string note = 2;
+    int32 start_sec = 3;
+    int32 end_sec = 4;
+}
+
+message UpdateCallAnnotationRequest {
+    int64 id = 1;
+    string call_id = 2;
+    string note = 3;
+    int32 start_sec = 4;
+    int32 end_sec = 5;
+}
+
+message DeleteCallAnnotationRequest {
+    int64 id = 1;
+    string call_id = 2;
+}
+
 message HistoryCall {
     string id = 1;
     string app_id = 2;
@@ -259,6 +312,7 @@ message HistoryCall {
     bool has_children = 42;
     string agent_description = 43;
     repeated CallHold hold = 44;
+    repeated CallAnnotation annotations = 45;
 }
 
 message EavesdropCallRequest {
