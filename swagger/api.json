@@ -4695,6 +4695,51 @@
         }
       }
     },
+    "/call_center/queues/{queue_id}/members/reset": {
+      "patch": {
+        "tags": [
+          "MemberService"
+        ],
+        "summary": "ResetMembers",
+        "operationId": "ResetMembers",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "queue_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engineResetMembersRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineResetMembersResponse"
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {}
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        }
+      }
+    },
     "/call_center/queues/{queue_id}/members/{id}": {
       "get": {
         "tags": [
@@ -8197,14 +8242,6 @@
             "name": "id",
             "in": "path",
             "required": true
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/engineDeleteCallAnnotationRequest"
-            }
           }
         ],
         "responses": {
@@ -12553,18 +12590,6 @@
         }
       }
     },
-    "engineDeleteCallAnnotationRequest": {
-      "type": "object",
-      "properties": {
-        "call_id": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string",
-          "format": "int64"
-        }
-      }
-    },
     "engineDeleteMembersRequest": {
       "type": "object",
       "properties": {
@@ -14952,6 +14977,63 @@
         },
         "timezone": {
           "$ref": "#/definitions/engineLookup"
+        }
+      }
+    },
+    "engineResetMembersRequest": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "bucket_id": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
+        "numbers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "queue_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "stop_cause": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "variables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "engineResetMembersResponse": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },

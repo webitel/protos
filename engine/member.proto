@@ -74,6 +74,14 @@ service MemberService {
         };
     }
 
+    // ResetMembers
+    rpc ResetMembers(ResetMembersRequest) returns (ResetMembersResponse) {
+        option (google.api.http) = {
+            patch: "/call_center/queues/{queue_id}/members/reset"
+            body: "*"
+        };
+    }
+
     // SearchMemberAttempts
     rpc SearchMemberAttempts(SearchMemberAttemptsRequest) returns (ListMemberAttempt) {
         option (google.api.http) = {
@@ -325,6 +333,21 @@ message DeleteMembersRequest {
     repeated int32 agent_id = 6;
     repeated string numbers = 7;
     map<string,string> variables = 8;
+}
+
+message ResetMembersRequest {
+    int64 queue_id = 1;
+    repeated int64 ids = 2;
+
+    repeated int64 bucket_id = 3;
+    repeated string stop_cause = 4;
+    repeated int32 agent_id = 5;
+    repeated string numbers = 6;
+    map<string,string> variables = 7;
+}
+
+message ResetMembersResponse {
+    int64 count = 1;
 }
 
 message ListMemberAttempt {
