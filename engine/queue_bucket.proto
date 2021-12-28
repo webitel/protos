@@ -34,6 +34,12 @@ service QueueBucketService {
             body: "*"
         };
     }
+    rpc PatchQueueBucket(PatchQueueBucketRequest) returns (QueueBucket) {
+        option (google.api.http) = {
+            patch: "/call_center/queues/{queue_id}/buckets/{id}"
+            body: "*"
+        };
+    }
     // DeleteQueueRouting
     rpc DeleteQueueBucket(DeleteQueueBucketRequest) returns (QueueBucket) {
         option (google.api.http) = {
@@ -45,7 +51,6 @@ service QueueBucketService {
 message DeleteQueueBucketRequest {
     int64 id = 1;
     int64 queue_id = 2;
-    int64 domain_id = 3;
 }
 
 message UpdateQueueBucketRequest {
@@ -53,7 +58,18 @@ message UpdateQueueBucketRequest {
     int64 queue_id = 2;
     int32 ratio = 3;
     Lookup bucket = 4;
-    int64 domain_id = 5;
+    bool disabled = 5;
+    int32 priority = 6;
+}
+
+message PatchQueueBucketRequest {
+    int64 id = 1;
+    int64 queue_id = 2;
+    int32 ratio = 3;
+    Lookup bucket = 4;
+    bool disabled = 5;
+    int32 priority = 6;
+    repeated string fields = 7;
 }
 
 message SearchQueueBucketRequest {
@@ -76,18 +92,20 @@ message ListQueueBucket {
 message ReadQueueBucketRequest {
     int64 id = 1;
     int64 queue_id = 2;
-    int64 domain_id = 3;
 }
 
 message CreateQueueBucketRequest {
     int64 queue_id = 1;
     int32 ratio = 2;
     Lookup bucket = 3;
-    int64 domain_id = 4;
+    bool disabled = 4;
+    int32 priority = 5;
 }
 
 message QueueBucket {
     int64 id = 1;
     int32 ratio = 2;
     Lookup bucket = 3;
+    bool disabled = 4;
+    int32 priority = 5;
 }

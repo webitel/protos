@@ -4275,13 +4275,6 @@
             "required": true,
             "type": "string",
             "format": "int64"
-          },
-          {
-            "name": "domain_id",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "int64"
           }
         ],
         "tags": [
@@ -4322,13 +4315,6 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
-          },
-          {
-            "name": "domain_id",
-            "in": "query",
-            "required": false,
             "type": "string",
             "format": "int64"
           }
@@ -4380,6 +4366,55 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/engineUpdateQueueBucketRequest"
+            }
+          }
+        ],
+        "tags": [
+          "QueueBucketService"
+        ]
+      },
+      "patch": {
+        "operationId": "PatchQueueBucket",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineQueueBucket"
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {}
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "queue_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/enginePatchQueueBucketRequest"
             }
           }
         ],
@@ -12374,9 +12409,13 @@
         "bucket": {
           "$ref": "#/definitions/engineLookup"
         },
-        "domain_id": {
-          "type": "string",
-          "format": "int64"
+        "disabled": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "priority": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -14457,6 +14496,40 @@
         }
       }
     },
+    "enginePatchQueueBucketRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "queue_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "ratio": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "bucket": {
+          "$ref": "#/definitions/engineLookup"
+        },
+        "disabled": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "priority": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "enginePatchQueueHookRequest": {
       "type": "object",
       "properties": {
@@ -14854,6 +14927,14 @@
         },
         "bucket": {
           "$ref": "#/definitions/engineLookup"
+        },
+        "disabled": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "priority": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -15872,9 +15953,13 @@
         "bucket": {
           "$ref": "#/definitions/engineLookup"
         },
-        "domain_id": {
-          "type": "string",
-          "format": "int64"
+        "disabled": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "priority": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
