@@ -1,0 +1,109 @@
+syntax = "proto3";
+
+option go_package = "github.com/webitel/protos/engine";
+
+package engine;
+
+import "const.proto";
+import "google/api/annotations.proto";
+
+service RoutingChatPlanService {
+
+    rpc CreateChatPlan(CreateChatPlanRequest) returns (ChatPlan) {
+        option (google.api.http) = {
+            post: "/routing/outbound/chat"
+            body: "*"
+        };
+    }
+
+    rpc SearchChatPlan(SearchChatPlanRequest) returns (ListChatPlan) {
+        option (google.api.http) = {
+            get: "/routing/outbound/chat"
+        };
+    }
+
+    rpc ReadChatPlan(ReadChatPlanRequest) returns (ChatPlan) {
+        option (google.api.http) = {
+            get: "/routing/outbound/chat/{id}"
+        };
+    }
+
+    rpc UpdateChatPlan(UpdateChatPlanRequest) returns (ChatPlan) {
+        option (google.api.http) = {
+            put: "/routing/outbound/chat/{id}"
+            body: "*"
+        };
+    }
+
+    rpc PatchChatPlan(PatchChatPlanRequest) returns (ChatPlan) {
+        option (google.api.http) = {
+            patch: "/routing/outbound/chat/{id}"
+            body: "*"
+        };
+    }
+
+    rpc DeleteChatPlan(DeleteChatPlanRequest) returns (ChatPlan) {
+        option (google.api.http) = {
+            delete: "/routing/outbound/calls/{id}"
+        };
+    }
+}
+
+message ChatPlan {
+    int32 id = 1;
+    string name = 2;
+    string description = 3;
+    Lookup schema = 4;
+    bool enabled = 5;
+}
+
+message CreateChatPlanRequest {
+    string name = 1;
+    string description = 2;
+    Lookup schema = 3;
+    bool enabled = 4;
+}
+
+message SearchChatPlanRequest {
+    int32 page = 1;
+    int32 size = 2;
+    string q = 3;
+
+    string sort = 4;
+    repeated string fields = 5;
+
+    repeated int32 id = 6;
+    string name = 7;
+    bool enabled = 8;
+}
+
+message ListChatPlan {
+    bool next = 1;
+    repeated ChatPlan items = 2;
+}
+
+message ReadChatPlanRequest {
+    int32 id = 1;
+}
+
+message UpdateChatPlanRequest {
+    int32 id = 1;
+    string name = 2;
+    string description = 3;
+    Lookup schema = 4;
+    bool enabled = 5;
+}
+
+message PatchChatPlanRequest {
+    int32 id = 1;
+    string name = 2;
+    string description = 3;
+    Lookup schema = 4;
+    bool enabled = 5;
+
+    repeated string fields = 6;
+}
+
+message DeleteChatPlanRequest {
+    int32 id = 1;
+}
