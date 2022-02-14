@@ -10,7 +10,7 @@ option go_package = "github.com/webitel/protos/engine/chat";
 import "message.proto";
 
 service ChatService {
-
+  // SendMessage [FROM] created channel_id (+auth_user_id) [TO] conversation_id chat-room
   rpc SendMessage(SendMessageRequest) returns (SendMessageResponse) {}
   rpc StartConversation(StartConversationRequest) returns (StartConversationResponse) {}
   rpc CloseConversation(CloseConversationRequest) returns (CloseConversationResponse) {}
@@ -22,14 +22,14 @@ service ChatService {
   rpc WaitMessage(WaitMessageRequest) returns (WaitMessageResponse) {}
   rpc UpdateChannel(UpdateChannelRequest) returns (UpdateChannelResponse) {}
 
-  rpc GetConversationByID(GetConversationByIDRequest) returns (GetConversationByIDResponse) {}
   rpc GetConversations(GetConversationsRequest) returns (GetConversationsResponse) {}
-  rpc GetProfiles(GetProfilesRequest) returns (GetProfilesResponse) {}
-  rpc GetProfileByID(GetProfileByIDRequest) returns (GetProfileByIDResponse) {}
-  rpc CreateProfile(CreateProfileRequest) returns (CreateProfileResponse) {}
-  rpc DeleteProfile(DeleteProfileRequest) returns (DeleteProfileResponse) {}
-  rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse) {}
+  rpc GetConversationByID(GetConversationByIDRequest) returns (GetConversationByIDResponse) {}
   rpc GetHistoryMessages(GetHistoryMessagesRequest) returns (GetHistoryMessagesResponse) {}
+
+  // API /v1
+  // rpc GetChannel(GetChannelRequest) returns (GetChannelResponse) {}
+  rpc SetVariables(SetVariablesRequest) returns (ChatVariablesResponse) {}
+  rpc BlindTransfer(ChatTransferRequest) returns (ChatTransferResponse) {}
 }
 
 message Profile {
@@ -101,8 +101,8 @@ message HistoryMessage {
   int64 id = 1;
   string channel_id = 2;
   // int64 conversation_id = 3;
-  //  int64 from_user_id = 2;
-  //  string from_user_type = 3;
+  // // int64 from_user_id = 2;
+  // // string from_user_type = 3;
   string type = 5;
   string text = 4;
   File   file = 8;
@@ -158,6 +158,8 @@ message SendMessageRequest {
 }
 
 message SendMessageResponse {
+  // Message sent !
+  Message message = 1;
 }
 
 message StartConversationRequest {
@@ -187,6 +189,7 @@ message CloseConversationRequest {
 message CloseConversationResponse {
 }
 
+// Invite (-ation) Accepted !
 message JoinConversationRequest {
   string invite_id = 1;
   int64 auth_user_id = 2;
@@ -235,70 +238,6 @@ message DeclineInvitationRequest {
 message DeclineInvitationResponse {
 }
 
-message GetProfilesRequest {
-  // ----- Base Filters ---------------------------
-  int64 id = 1;
-  // ----- Object-Specific Filters ------------------
-  string type = 2;
-  int64 domain_id = 3;
-  // ----- Search Options -------------------------
-  repeated string fields = 4; // select: output (fields,...)
-  repeated string sort = 5;   // select: order by (fields,...)
-  int32 page = 6;             // select: offset {page}
-  int32 size = 7;             // select: limit {size}
-}
-
-message GetProfilesResponse {
-  int32 page = 1; // select: offset {page}
-  bool next = 2; // search: has {next} page ?
-  repeated Profile items = 3;
-}
-
-message GetProfileByIDRequest {
-  // ID filter value to be exact match unique profile.id
-  int64 id = 1;
-
-  // URI filter value to be exact match unique profile.url_id
-  string uri = 2; // .url_id
-}
-
-message GetProfileByIDResponse {
-  Profile item = 1;
-}
-
-message CreateProfileRequest {
-  Profile item = 1;
-}
-
-message CreateProfileResponse {
-  Profile item = 1;
-}
-
-message DeleteProfileRequest {
-  int64 id = 1;
-}
-
-message DeleteProfileResponse {
-  Profile item = 1;
-}
-
-message UpdateProfileRequest {
-  Profile item = 1; // body: modifications/changes
-  repeated string fields = 2; // PATCH: partial update
-}
-
-message UpdateProfileResponse {
-  Profile item = 1;
-}
-
-message GetConversationByIDRequest {
-  string id = 1;
-}
-
-message GetConversationByIDResponse {
-  Conversation item = 1;
-}
-
 message GetConversationsRequest {
   // ----- Base Filters ---------------------------
   string id = 1;
@@ -318,6 +257,14 @@ message GetConversationsResponse {
   int32 page = 1; // select: offset {page}
   bool next = 2; // search: has {next} page ?
   repeated Conversation items = 3;
+}
+
+message GetConversationByIDRequest {
+  string id = 1;
+}
+
+message GetConversationByIDResponse {
+  Conversation item = 1;
 }
 
 message GetHistoryMessagesRequest {
@@ -367,3 +314,48 @@ message GetHistoryMessagesResponse {
 //     // Message identifier in the chat specified in from_chat_id
 //     int64 from_message_id = 2;
 // }
+
+message GetChannelRequest {
+
+}
+
+message GetChannelResponse {
+
+}
+
+message SetVariablesRequest {
+  // Required. Chat channel unique IDentifier
+  // to which .variables must be attached.
+  // Accept `channel_id` or `conversation_id`.
+  string channel_id = 1;
+  // Required. Variables to be merged.
+  // NOTE: Empty value(s) implies unset(remove) key action
+  map<string,string> variables = 2;
+}
+
+message ChatVariablesResponse {
+  // Unique Chat Channel IDentifier.
+  string channel_id = 1;
+  // Result Chat Channel's Variables SET.
+  map<string,string> variables = 2;
+}
+
+message ChatTransferRequest {
+  // ConversationID of chat@flow channel
+  // currently controlling the session
+  string conversation_id = 1;
+  // Optional. [FROM] Joined channel (member)
+  // originator of the transfer operation
+  // Implies the conversation_id if omitted
+  string channel_id = 2;
+
+  // Required. [TO] Flow schema unique ID,
+  // to which a conversation must be transfered
+  int64 schema_id = 3;
+  // Optional. Origination Variables to be chained (merged)
+  map<string,string> variables = 4;
+}
+
+message ChatTransferResponse {
+
+}
