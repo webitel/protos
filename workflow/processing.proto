@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package workflow;
+
+option go_package = "github.com/webitel/protos/workflow";
+
+service FlowProcessingService {
+  rpc StartProcessing(StartProcessingRequest) returns (Form) {}
+  rpc FormAction(FormActionRequest) returns (Form) {}
+  rpc CancelProcessing(CancelProcessingRequest) returns (CancelProcessingResponse) {}
+}
+
+message CancelProcessingRequest {
+  string id = 1;
+}
+
+message CancelProcessingResponse {
+
+}
+
+message StartProcessingRequest {
+  uint32 schema_id = 1;
+  int64 domain_id = 2;
+
+  map<string,string> variables = 3;
+}
+
+message FormActionRequest {
+  string id = 1;
+  int64 domain_id = 2;
+  string action = 3;
+  map<string,string> variables = 4;
+}
+
+message ErrorForm {
+  string id = 1;
+  string message = 2;
+}
+
+message Form {
+  string id = 1;
+  string app_id = 2;
+  bytes form = 3;
+  uint64 timeout = 4;
+  bool stop = 5;
+  ErrorForm error = 6;
+}

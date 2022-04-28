@@ -24,6 +24,23 @@ service MemberService {
 
     rpc EmailJoinToQueue(EmailJoinToQueueRequest) returns (EmailJoinToQueueResponse) {}
     rpc DirectAgentToMember(DirectAgentToMemberRequest) returns (DirectAgentToMemberResponse) {}
+
+    rpc ProcessingFormAction(ProcessingFormActionRequest) returns (ProcessingFormActionResponse) {}
+}
+
+message ProcessingFormActionRequest {
+    int64 domain_id = 1;
+    int64 attempt_id = 2;
+
+    string app_id = 3;
+    string form_id = 4;
+
+    string action = 5;
+    map<string,string> fields = 6;
+}
+
+message ProcessingFormActionResponse {
+
 }
 
 message CancelAgentDistributeRequest {
@@ -51,7 +68,7 @@ message CallJoinToAgentRequest {
     int32 agent_id = 2;
     WaitingMusic waitingMusic = 3;
     int32 timeout = 4;
-    map<string,string> variables= 5;
+    map<string,string> variables = 5;
     Processing processing = 6;
     string queue_name = 7;
     bool cancel_distribute = 8;

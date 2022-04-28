@@ -30,8 +30,8 @@ engine: engine_proto engine_chat_proto engine_swagger
 .PHONY: call_center
 
 call_center:
-	protoc -I/usr/local/include -I./cc -I${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis  \
-      -I${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway \
+	protoc -I/usr/local/include -I./cc -I${GOPATH}/github.com/grpc-ecosystem/grpc-gateway@v1.16.0/third_party/googleapis  \
+      -I${GOPATH}/github.com/grpc-ecosystem/grpc-gateway@v1.16.0 \
       --go_out=plugins=grpc,paths=source_relative:./cc ./cc/*.proto
 
 .PHONY: fs
