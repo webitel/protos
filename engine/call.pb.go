@@ -7,11 +7,11 @@ import (
 	context "context"
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
+	_struct "github.com/golang/protobuf/ptypes/struct"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	structpb "google.golang.org/protobuf/types/known/structpb"
 	math "math"
 )
 
@@ -797,11 +797,11 @@ func (m *AggregateHistoryCallRequest) GetTags() []string {
 }
 
 type AggregateResult struct {
-	Name                 string          `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Data                 *structpb.Value `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
-	XXX_unrecognized     []byte          `json:"-"`
-	XXX_sizecache        int32           `json:"-"`
+	Name                 string         `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Data                 *_struct.Value `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_unrecognized     []byte         `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
 }
 
 func (m *AggregateResult) Reset()         { *m = AggregateResult{} }
@@ -836,7 +836,7 @@ func (m *AggregateResult) GetName() string {
 	return ""
 }
 
-func (m *AggregateResult) GetData() *structpb.Value {
+func (m *AggregateResult) GetData() *_struct.Value {
 	if m != nil {
 		return m.Data
 	}

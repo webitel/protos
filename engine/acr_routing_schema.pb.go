@@ -7,11 +7,11 @@ import (
 	context "context"
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
+	_struct "github.com/golang/protobuf/ptypes/struct"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	structpb "google.golang.org/protobuf/types/known/structpb"
 	math "math"
 )
 
@@ -27,18 +27,18 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type PatchRoutingSchemaRequest struct {
-	Id                   int64           `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name                 string          `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Description          string          `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	Type                 string          `protobuf:"bytes,4,opt,name=type,proto3" json:"type,omitempty"`
-	Schema               *structpb.Value `protobuf:"bytes,5,opt,name=schema,proto3" json:"schema,omitempty"`
-	Payload              *structpb.Value `protobuf:"bytes,6,opt,name=payload,proto3" json:"payload,omitempty"`
-	Debug                bool            `protobuf:"varint,7,opt,name=debug,proto3" json:"debug,omitempty"`
-	Fields               []string        `protobuf:"bytes,8,rep,name=fields,proto3" json:"fields,omitempty"`
-	Editor               bool            `protobuf:"varint,9,opt,name=editor,proto3" json:"editor,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
-	XXX_unrecognized     []byte          `json:"-"`
-	XXX_sizecache        int32           `json:"-"`
+	Id                   int64          `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name                 string         `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description          string         `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Type                 string         `protobuf:"bytes,4,opt,name=type,proto3" json:"type,omitempty"`
+	Schema               *_struct.Value `protobuf:"bytes,5,opt,name=schema,proto3" json:"schema,omitempty"`
+	Payload              *_struct.Value `protobuf:"bytes,6,opt,name=payload,proto3" json:"payload,omitempty"`
+	Debug                bool           `protobuf:"varint,7,opt,name=debug,proto3" json:"debug,omitempty"`
+	Fields               []string       `protobuf:"bytes,8,rep,name=fields,proto3" json:"fields,omitempty"`
+	Editor               bool           `protobuf:"varint,9,opt,name=editor,proto3" json:"editor,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_unrecognized     []byte         `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
 }
 
 func (m *PatchRoutingSchemaRequest) Reset()         { *m = PatchRoutingSchemaRequest{} }
@@ -94,14 +94,14 @@ func (m *PatchRoutingSchemaRequest) GetType() string {
 	return ""
 }
 
-func (m *PatchRoutingSchemaRequest) GetSchema() *structpb.Value {
+func (m *PatchRoutingSchemaRequest) GetSchema() *_struct.Value {
 	if m != nil {
 		return m.Schema
 	}
 	return nil
 }
 
-func (m *PatchRoutingSchemaRequest) GetPayload() *structpb.Value {
+func (m *PatchRoutingSchemaRequest) GetPayload() *_struct.Value {
 	if m != nil {
 		return m.Payload
 	}
@@ -177,17 +177,17 @@ func (m *DeleteRoutingSchemaRequest) GetDomainId() int64 {
 }
 
 type UpdateRoutingSchemaRequest struct {
-	Id                   int64           `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name                 string          `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Description          string          `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	Type                 string          `protobuf:"bytes,4,opt,name=type,proto3" json:"type,omitempty"`
-	Schema               *structpb.Value `protobuf:"bytes,5,opt,name=schema,proto3" json:"schema,omitempty"`
-	Payload              *structpb.Value `protobuf:"bytes,6,opt,name=payload,proto3" json:"payload,omitempty"`
-	Debug                bool            `protobuf:"varint,7,opt,name=debug,proto3" json:"debug,omitempty"`
-	Editor               bool            `protobuf:"varint,8,opt,name=editor,proto3" json:"editor,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
-	XXX_unrecognized     []byte          `json:"-"`
-	XXX_sizecache        int32           `json:"-"`
+	Id                   int64          `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name                 string         `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description          string         `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Type                 string         `protobuf:"bytes,4,opt,name=type,proto3" json:"type,omitempty"`
+	Schema               *_struct.Value `protobuf:"bytes,5,opt,name=schema,proto3" json:"schema,omitempty"`
+	Payload              *_struct.Value `protobuf:"bytes,6,opt,name=payload,proto3" json:"payload,omitempty"`
+	Debug                bool           `protobuf:"varint,7,opt,name=debug,proto3" json:"debug,omitempty"`
+	Editor               bool           `protobuf:"varint,8,opt,name=editor,proto3" json:"editor,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_unrecognized     []byte         `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
 }
 
 func (m *UpdateRoutingSchemaRequest) Reset()         { *m = UpdateRoutingSchemaRequest{} }
@@ -243,14 +243,14 @@ func (m *UpdateRoutingSchemaRequest) GetType() string {
 	return ""
 }
 
-func (m *UpdateRoutingSchemaRequest) GetSchema() *structpb.Value {
+func (m *UpdateRoutingSchemaRequest) GetSchema() *_struct.Value {
 	if m != nil {
 		return m.Schema
 	}
 	return nil
 }
 
-func (m *UpdateRoutingSchemaRequest) GetPayload() *structpb.Value {
+func (m *UpdateRoutingSchemaRequest) GetPayload() *_struct.Value {
 	if m != nil {
 		return m.Payload
 	}
@@ -422,16 +422,16 @@ func (m *SearchRoutingSchemaRequest) GetEditor() bool {
 }
 
 type CreateRoutingSchemaRequest struct {
-	Name                 string          `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Description          string          `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	Type                 string          `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"`
-	Schema               *structpb.Value `protobuf:"bytes,4,opt,name=schema,proto3" json:"schema,omitempty"`
-	Payload              *structpb.Value `protobuf:"bytes,5,opt,name=payload,proto3" json:"payload,omitempty"`
-	Debug                bool            `protobuf:"varint,6,opt,name=debug,proto3" json:"debug,omitempty"`
-	Editor               bool            `protobuf:"varint,7,opt,name=editor,proto3" json:"editor,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
-	XXX_unrecognized     []byte          `json:"-"`
-	XXX_sizecache        int32           `json:"-"`
+	Name                 string         `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Description          string         `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	Type                 string         `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"`
+	Schema               *_struct.Value `protobuf:"bytes,4,opt,name=schema,proto3" json:"schema,omitempty"`
+	Payload              *_struct.Value `protobuf:"bytes,5,opt,name=payload,proto3" json:"payload,omitempty"`
+	Debug                bool           `protobuf:"varint,6,opt,name=debug,proto3" json:"debug,omitempty"`
+	Editor               bool           `protobuf:"varint,7,opt,name=editor,proto3" json:"editor,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_unrecognized     []byte         `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
 }
 
 func (m *CreateRoutingSchemaRequest) Reset()         { *m = CreateRoutingSchemaRequest{} }
@@ -480,14 +480,14 @@ func (m *CreateRoutingSchemaRequest) GetType() string {
 	return ""
 }
 
-func (m *CreateRoutingSchemaRequest) GetSchema() *structpb.Value {
+func (m *CreateRoutingSchemaRequest) GetSchema() *_struct.Value {
 	if m != nil {
 		return m.Schema
 	}
 	return nil
 }
 
-func (m *CreateRoutingSchemaRequest) GetPayload() *structpb.Value {
+func (m *CreateRoutingSchemaRequest) GetPayload() *_struct.Value {
 	if m != nil {
 		return m.Payload
 	}
@@ -509,21 +509,21 @@ func (m *CreateRoutingSchemaRequest) GetEditor() bool {
 }
 
 type RoutingSchema struct {
-	Id                   int64           `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	CreatedAt            int64           `protobuf:"varint,2,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	CreatedBy            *Lookup         `protobuf:"bytes,3,opt,name=created_by,json=createdBy,proto3" json:"created_by,omitempty"`
-	UpdatedAt            int64           `protobuf:"varint,4,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	UpdatedBy            *Lookup         `protobuf:"bytes,5,opt,name=updated_by,json=updatedBy,proto3" json:"updated_by,omitempty"`
-	Name                 string          `protobuf:"bytes,6,opt,name=name,proto3" json:"name,omitempty"`
-	Description          string          `protobuf:"bytes,7,opt,name=description,proto3" json:"description,omitempty"`
-	Type                 string          `protobuf:"bytes,8,opt,name=type,proto3" json:"type,omitempty"`
-	Schema               *structpb.Value `protobuf:"bytes,9,opt,name=schema,proto3" json:"schema,omitempty"`
-	Payload              *structpb.Value `protobuf:"bytes,10,opt,name=payload,proto3" json:"payload,omitempty"`
-	Debug                bool            `protobuf:"varint,11,opt,name=debug,proto3" json:"debug,omitempty"`
-	Editor               bool            `protobuf:"varint,12,opt,name=editor,proto3" json:"editor,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
-	XXX_unrecognized     []byte          `json:"-"`
-	XXX_sizecache        int32           `json:"-"`
+	Id                   int64          `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	CreatedAt            int64          `protobuf:"varint,2,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	CreatedBy            *Lookup        `protobuf:"bytes,3,opt,name=created_by,json=createdBy,proto3" json:"created_by,omitempty"`
+	UpdatedAt            int64          `protobuf:"varint,4,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	UpdatedBy            *Lookup        `protobuf:"bytes,5,opt,name=updated_by,json=updatedBy,proto3" json:"updated_by,omitempty"`
+	Name                 string         `protobuf:"bytes,6,opt,name=name,proto3" json:"name,omitempty"`
+	Description          string         `protobuf:"bytes,7,opt,name=description,proto3" json:"description,omitempty"`
+	Type                 string         `protobuf:"bytes,8,opt,name=type,proto3" json:"type,omitempty"`
+	Schema               *_struct.Value `protobuf:"bytes,9,opt,name=schema,proto3" json:"schema,omitempty"`
+	Payload              *_struct.Value `protobuf:"bytes,10,opt,name=payload,proto3" json:"payload,omitempty"`
+	Debug                bool           `protobuf:"varint,11,opt,name=debug,proto3" json:"debug,omitempty"`
+	Editor               bool           `protobuf:"varint,12,opt,name=editor,proto3" json:"editor,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_unrecognized     []byte         `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
 }
 
 func (m *RoutingSchema) Reset()         { *m = RoutingSchema{} }
@@ -607,14 +607,14 @@ func (m *RoutingSchema) GetType() string {
 	return ""
 }
 
-func (m *RoutingSchema) GetSchema() *structpb.Value {
+func (m *RoutingSchema) GetSchema() *_struct.Value {
 	if m != nil {
 		return m.Schema
 	}
 	return nil
 }
 
-func (m *RoutingSchema) GetPayload() *structpb.Value {
+func (m *RoutingSchema) GetPayload() *_struct.Value {
 	if m != nil {
 		return m.Payload
 	}
