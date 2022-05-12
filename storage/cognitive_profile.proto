@@ -6,6 +6,7 @@ package storage;
 
 import "engine/const.proto";
 import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
 
 service CognitiveProfileService {
   rpc CreateCognitiveProfile (CreateCognitiveProfileRequest) returns (CognitiveProfile) {
@@ -75,6 +76,13 @@ message CognitiveProfile {
 }
 
 message CreateCognitiveProfileRequest {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      title: "Create cognitive profile request body"
+      description: "Create cognitive profile request body for TTS and TTS"
+      required: ["name", "provider", "service", "properties"]
+    }
+  };
   ProviderType provider = 1;
   map<string,string> properties = 2;
   bool enabled = 3;
