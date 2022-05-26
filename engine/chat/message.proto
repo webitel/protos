@@ -4,6 +4,7 @@ package chat;
 
 option go_package = "github.com/webitel/protos/engine/chat";
 
+
 // Account contact info to extend and replace legacy chat.Client message type
 message Account {
     // Unique IDentifier
@@ -32,6 +33,7 @@ message Message {
     map<string, string> variables = 5;
     // End-User extra contact info
     Account contact = 7;
+
     // Optional. Send message date (epochtime ms) Generates by the service.
     int64 created_at = 8;
     // Optional. Edit message date (epochtime ms) Generates by the service.
@@ -48,11 +50,17 @@ message Message {
     int64 forward_from_message_id = 13;
     // External message sent-binding to be able to identify corresponding internal message
     map<string,string> forward_from_variables = 14;
-
     // Reply Markup Buttons SET
     repeated Buttons buttons = 6;
     // Inline Keyboard Buttons SET
     repeated Buttons inline = 15;
+    // From sender user account
+    Account from = 16;
+
+    // NewChatMembers description for {"type":"joined"} notification
+    repeated Account new_chat_members = 20;
+    // LeftChatMember description for {"type":"left"} notification
+    Account left_chat_member = 21;
 }
 
 message File {
@@ -66,13 +74,20 @@ message File {
 }
 
 message Buttons {
+
     repeated Button button = 1;
 }
 
 message Button {
+
     string caption  = 1;
     string text = 2;
     string type = 3;
     string url = 4;
     string code = 5;
 }
+
+// message Contact {
+
+//     string phone_number  = 1;
+// }
