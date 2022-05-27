@@ -231,12 +231,17 @@ message ListHistoryCall {
 }
 
 message CallFile {
+    message TranscriptLookup {
+        int64 id = 1;
+        string locale = 2;
+    }
     int64 id = 1;
     string name = 2;
     int64 size = 3;
     string mime_type = 4;
     int64 start_at = 5;
     int64 stop_at = 6;
+    repeated TranscriptLookup transcripts = 7;
 }
 
 message CallHold {
@@ -275,6 +280,13 @@ message UpdateCallAnnotationRequest {
 message DeleteCallAnnotationRequest {
     int64 id = 1;
     string call_id = 2;
+}
+
+message HistoryFileJob {
+    int64 id = 1;
+    int64 file_id = 2;
+    int64 created_at = 3;
+    string action = 4;
 }
 
 message HistoryCall {
@@ -331,6 +343,8 @@ message HistoryCall {
     string amd_result = 46;
     string hangup_disposition = 47;
     string blind_transfer = 48;
+
+    repeated HistoryFileJob files_job = 49;
 }
 
 message EavesdropCallRequest {
