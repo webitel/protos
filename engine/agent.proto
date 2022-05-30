@@ -103,6 +103,12 @@ service AgentService {
         };
     }
 
+    rpc AgentTodayStatistics(AgentTodayStatisticsRequest) returns (AgentTodayStatisticsResponse) {
+        option (google.api.http) = {
+            get: "/call_center/agents/{agent_id}/statistics/today"
+        };
+    }
+
     rpc SearchAgentCallStatistics(SearchAgentCallStatisticsRequest) returns (AgentCallStatisticsList) {
         option (google.api.http) = {
             get: "/call_center/agents/reports/call"
@@ -128,6 +134,24 @@ service AgentService {
         };
     }
     
+}
+
+message AgentTodayStatisticsRequest {
+    int64 agent_id = 1;
+    repeated string fields = 2;
+}
+
+message AgentTodayStatisticsResponse {
+    float utilization = 1;
+    float occupancy = 2;
+
+    int32 call_abandoned = 3;
+    int32 call_handled = 4;
+    float avg_talk_sec = 5;
+    float avg_hold_sec = 6;
+
+    int32 chat_accepts = 7;
+    float chat_aht = 8;
 }
 
 message SearchAgentStatusStatisticItemRequest {

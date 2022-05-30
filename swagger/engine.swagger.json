@@ -1505,6 +1505,52 @@
         ]
       }
     },
+    "/call_center/agents/{agent_id}/statistics/today": {
+      "get": {
+        "operationId": "AgentTodayStatistics",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineAgentTodayStatisticsResponse"
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {}
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "AgentService"
+        ]
+      }
+    },
     "/call_center/agents/{id}": {
       "get": {
         "summary": "Agent item",
@@ -11430,6 +11476,43 @@
         "invite_chat_timeout": {
           "type": "integer",
           "format": "int32"
+        }
+      }
+    },
+    "engineAgentTodayStatisticsResponse": {
+      "type": "object",
+      "properties": {
+        "utilization": {
+          "type": "number",
+          "format": "float"
+        },
+        "occupancy": {
+          "type": "number",
+          "format": "float"
+        },
+        "call_abandoned": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "call_handled": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "avg_talk_sec": {
+          "type": "number",
+          "format": "float"
+        },
+        "avg_hold_sec": {
+          "type": "number",
+          "format": "float"
+        },
+        "chat_accepts": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "chat_aht": {
+          "type": "number",
+          "format": "float"
         }
       }
     },
