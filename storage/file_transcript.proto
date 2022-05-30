@@ -14,6 +14,31 @@ service FileTranscriptService {
       body: "*"
     };
   }
+
+  rpc GetFileTranscriptPhrases (GetFileTranscriptPhrasesRequest) returns (ListPhrases) {
+    option (google.api.http) = {
+      get: "/storage/transcript_file/{id}/phrases"
+    };
+  }
+}
+
+message TranscriptPhrase {
+  float start_sec = 1;
+  float end_sec = 2;
+  uint32 channel = 3;
+  string phrase = 4;
+}
+
+message GetFileTranscriptPhrasesRequest {
+  int32 page = 1;
+  int32 size = 2;
+
+  int64 id = 4;
+}
+
+message ListPhrases {
+  bool next = 1;
+  repeated TranscriptPhrase items = 2;
 }
 
 
