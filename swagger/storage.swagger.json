@@ -611,9 +611,58 @@
           "MediaFileService"
         ]
       }
+    },
+    "/storage/transcript_file": {
+      "post": {
+        "operationId": "CreateFileTranscript",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storageStartFileTranscriptResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/storageStartFileTranscriptRequest"
+            }
+          }
+        ],
+        "tags": [
+          "FileTranscriptService"
+        ]
+      }
     }
   },
   "definitions": {
+    "StartFileTranscriptResponseTranscriptJob": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "file_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "action": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        }
+      }
+    },
     "UploadFileRequestMetadata": {
       "type": "object",
       "properties": {
@@ -1031,6 +1080,35 @@
         "TTS"
       ],
       "default": "DefaultService"
+    },
+    "storageStartFileTranscriptRequest": {
+      "type": "object",
+      "properties": {
+        "file_id": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
+        "locale": {
+          "type": "string"
+        },
+        "profile": {
+          "$ref": "#/definitions/engineLookup"
+        }
+      }
+    },
+    "storageStartFileTranscriptResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StartFileTranscriptResponseTranscriptJob"
+          }
+        }
+      }
     },
     "storageUpdateBackendProfileRequest": {
       "type": "object",

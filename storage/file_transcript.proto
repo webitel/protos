@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+option go_package = "github.com/webitel/protos/storage";
+
+package storage;
+
+import "engine/const.proto";
+import "google/api/annotations.proto";
+
+service FileTranscriptService {
+  rpc CreateFileTranscript (StartFileTranscriptRequest) returns (StartFileTranscriptResponse) {
+    option (google.api.http) = {
+      post: "/storage/transcript_file"
+      body: "*"
+    };
+  }
+}
+
+
+message StartFileTranscriptRequest {
+  repeated int64 file_id = 1;
+  string locale = 2;
+  engine.Lookup profile = 3;
+
+}
+
+message StartFileTranscriptResponse {
+  message TranscriptJob {
+    int64 id = 1;
+    int64 file_id = 2;
+    int64 created_at = 3;
+    string action = 4;
+    string state = 5;
+  }
+
+  repeated TranscriptJob items = 1;
+}
