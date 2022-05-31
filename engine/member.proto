@@ -297,13 +297,22 @@ message SearchAttemptsRequest {
 message SearchMembersRequest {
     int32 page = 1;
     int32 size = 2;
+    string q = 3;
 
-    int64 id = 3;
-    int64 queue_id = 4;
-    int32 bucket_id = 5;
-    string destination = 6;
+    string sort = 5;
+    repeated string fields = 6;
 
-    int64 domain_id = 7;
+    repeated int64 id = 7;
+    repeated int32 queue_id = 8;
+    repeated int32 bucket_id = 9;
+    string destination = 10;
+
+    FilterBetween created_at = 11;
+    FilterBetween offering_at = 12;
+    repeated string stop_cause = 13;
+    repeated int32 priority = 14;
+    string name = 15;
+    repeated int32 attempts = 16;
 }
 
 message SearchMembersAttemptsRequest {
@@ -441,10 +450,24 @@ message MemberBulkResponse {
 }
 
 message SearchMemberInQueueRequest {
-    int64 queue_id = 1;
-    int32 page = 2;
-    int32 size = 3;
-    int64 domain_id = 4;
+    int32 page = 1;
+    int32 size = 2;
+    string q = 3;
+
+    string sort = 5;
+    repeated string fields = 6;
+
+    repeated int64 id = 7;
+    int32 queue_id = 8;
+    repeated int32 bucket_id = 9;
+    string destination = 10;
+
+    FilterBetween created_at = 11;
+    FilterBetween offering_at = 12;
+    repeated string stop_cause = 13;
+    repeated int32 priority = 14;
+    string name = 15;
+    repeated int32 attempts = 16;
 }
 
 message ListMember {
@@ -480,7 +503,7 @@ message MemberInQueue {
     Lookup timezone = 8;
     repeated MemberCommunication communications = 9;
     Lookup bucket = 10;
-    int64 min_offering_at = 12;
+    int64 min_offering_at = 12; // deprecated
 
     string stop_cause = 13;
     int64 last_activity_at = 14;
