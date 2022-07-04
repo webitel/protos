@@ -1,0 +1,122 @@
+syntax = "proto3";
+
+option go_package = "github.com/webitel/protos/storage";
+
+package storage;
+
+import "engine/const.proto";
+import "google/protobuf/struct.proto";
+import "google/api/annotations.proto";
+
+service ImportTemplateService {
+  rpc CreateImportTemplate (CreateImportTemplateRequest) returns (ImportTemplate) {
+    option (google.api.http) = {
+      post: "/storage/import_templates"
+      body: "*"
+    };
+  }
+
+  rpc SearchImportTemplate(SearchImportTemplateRequest) returns (ListImportTemplate) {
+    option (google.api.http) = {
+      get: "/storage/import_templates"
+    };
+  }
+
+  rpc ReadImportTemplate(ReadImportTemplateRequest) returns (ImportTemplate) {
+    option (google.api.http) = {
+      get: "/storage/import_templates/{id}"
+    };
+  }
+
+  rpc UpdateImportTemplate(UpdateImportTemplateRequest) returns (ImportTemplate) {
+    option (google.api.http) = {
+      put: "/storage/import_templates/{id}"
+      body: "*"
+    };
+  }
+
+  rpc PatchImportTemplate(PatchImportTemplateRequest) returns (ImportTemplate) {
+    option (google.api.http) = {
+      patch: "/storage/import_templates/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteImportTemplate(DeleteImportTemplateRequest) returns (ImportTemplate) {
+    option (google.api.http) = {
+      delete: "/storage/import_templates/{id}"
+    };
+  }
+}
+
+enum ImportSourceType {
+  DefaultSourceType = 0;
+  Dialer = 1;
+}
+
+message ImportTemplate {
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  ImportSourceType source_type = 4;
+  int64 source_id = 5;
+  google.protobuf.Struct parameters = 6;
+  engine.Lookup source = 7;
+}
+
+message CreateImportTemplateRequest {
+//  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+//    json_schema: {
+//      title: "Create import template request body"
+//      description: "Create import template for CSV"
+//      required: ["name", "source_id", "parameters"]
+//    }
+//  };
+  string name = 1;
+  string description = 2;
+  ImportSourceType source_type = 3;
+  int64 source_id = 4;
+  google.protobuf.Struct parameters = 5;
+}
+
+message SearchImportTemplateRequest {
+  int32 page = 1;
+  int32 size = 2;
+  string q = 3;
+
+  string sort = 4;
+  repeated string fields = 5;
+
+  repeated int32 id = 6;
+}
+
+message ListImportTemplate {
+  bool next = 1;
+  repeated ImportTemplate items = 2;
+}
+
+message ReadImportTemplateRequest {
+  int32 id = 1;
+}
+
+message UpdateImportTemplateRequest {
+  int32 id = 1;
+
+  string name = 2;
+  string description = 3;
+  google.protobuf.Struct parameters = 4;
+}
+
+message PatchImportTemplateRequest {
+  int32 id = 1;
+
+  string name = 2;
+  string description = 3;
+  google.protobuf.Struct parameters = 4;
+
+  repeated string fields = 50;
+}
+
+message DeleteImportTemplateRequest {
+  int32 id = 1;
+}
