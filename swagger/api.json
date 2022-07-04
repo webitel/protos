@@ -10704,6 +10704,199 @@
         }
       }
     },
+    "/storage/import_templates": {
+      "get": {
+        "tags": [
+          "ImportTemplateService"
+        ],
+        "operationId": "SearchImportTemplate",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "collectionFormat": "multi",
+            "name": "id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storageListImportTemplate"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "ImportTemplateService"
+        ],
+        "operationId": "CreateImportTemplate",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/storageCreateImportTemplateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storageImportTemplate"
+            }
+          }
+        }
+      }
+    },
+    "/storage/import_templates/{id}": {
+      "get": {
+        "tags": [
+          "ImportTemplateService"
+        ],
+        "operationId": "ReadImportTemplate",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storageImportTemplate"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "ImportTemplateService"
+        ],
+        "operationId": "UpdateImportTemplate",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/storageUpdateImportTemplateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storageImportTemplate"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "ImportTemplateService"
+        ],
+        "operationId": "DeleteImportTemplate",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storageImportTemplate"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "ImportTemplateService"
+        ],
+        "operationId": "PatchImportTemplate",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/storagePatchImportTemplateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storageImportTemplate"
+            }
+          }
+        }
+      }
+    },
     "/storage/media": {
       "get": {
         "tags": [
@@ -17631,6 +17824,34 @@
         }
       }
     },
+    "storageCreateImportTemplateRequest": {
+      "description": "Create import template for CSV",
+      "type": "object",
+      "title": "Create import template request body",
+      "required": [
+        "name",
+        "source_id",
+        "parameters"
+      ],
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object"
+        },
+        "source_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "source_type": {
+          "$ref": "#/definitions/storageImportSourceType"
+        }
+      }
+    },
     "storageDeleteFilesRequest": {
       "type": "object",
       "properties": {
@@ -17645,6 +17866,42 @@
     },
     "storageDeleteFilesResponse": {
       "type": "object"
+    },
+    "storageImportSourceType": {
+      "type": "string",
+      "default": "DefaultSourceType",
+      "enum": [
+        "DefaultSourceType",
+        "Dialer"
+      ]
+    },
+    "storageImportTemplate": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "name": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object"
+        },
+        "source": {
+          "$ref": "#/definitions/engineLookup"
+        },
+        "source_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "source_type": {
+          "$ref": "#/definitions/storageImportSourceType"
+        }
+      }
     },
     "storageListBackendProfile": {
       "type": "object",
@@ -17668,6 +17925,21 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/storageCognitiveProfile"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "storageListImportTemplate": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/storageImportTemplate"
           }
         },
         "next": {
@@ -17827,6 +18099,35 @@
         }
       }
     },
+    "storagePatchImportTemplateRequest": {
+      "description": "Patch import template for CSV",
+      "type": "object",
+      "title": "Patch import template request body",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "name": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object"
+        }
+      }
+    },
     "storageProviderType": {
       "type": "string",
       "default": "DefaultProvider",
@@ -17966,6 +18267,30 @@
         },
         "service": {
           "$ref": "#/definitions/storageServiceType"
+        }
+      }
+    },
+    "storageUpdateImportTemplateRequest": {
+      "description": "Update import template for CSV",
+      "type": "object",
+      "title": "Update import template request body",
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "name": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object"
         }
       }
     },
