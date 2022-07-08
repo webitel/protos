@@ -6,6 +6,7 @@ option go_package = "github.com/webitel/protos/engine";
 
 import "const.proto";
 import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
 
 service EmailProfileService {
     // Create EmailProfile
@@ -30,6 +31,13 @@ service EmailProfileService {
         };
     }
 
+    rpc PatchEmailProfile(PatchEmailProfileRequest) returns (EmailProfile) {
+        option (google.api.http) = {
+            patch: "/email/profile/{id}"
+            body: "*"
+        };
+    }
+
     // Update EmailProfile
     rpc UpdateEmailProfile(UpdateEmailProfileRequest) returns (EmailProfile) {
         option (google.api.http) = {
@@ -37,6 +45,7 @@ service EmailProfileService {
             body: "*"
         };
     }
+
     // Remove EmailProfile
     rpc DeleteEmailProfile(DeleteEmailProfileRequest) returns (EmailProfile) {
         option (google.api.http) = {
@@ -46,16 +55,35 @@ service EmailProfileService {
 }
 
 message ReadEmailProfileRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+            title: "Read email profile"
+            description: "Read email profile"
+            required: ["id"]
+        }
+    };
     int64 id = 1;
-    int64 domain_id = 2;
 }
 
 message DeleteEmailProfileRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+            title: "Delete email profile"
+            description: "Delete email profile"
+            required: ["id"]
+        }
+    };
     int64 id = 1;
-    int64 domain_id = 2;
 }
 
 message UpdateEmailProfileRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+            title: "Update email profile request body"
+            description: "Update email profile for gateway"
+            required: ["id", "name", "schema", "host", "login", "mailbox", "smtp_port", "imap_port"]
+        }
+    };
     int64 id = 1;
 
     string name = 2;
@@ -68,8 +96,6 @@ message UpdateEmailProfileRequest {
     int32 smtp_port = 9;
     int32 imap_port = 10;
     string password = 11;
-
-    int64 domain_id = 12;
 }
 
 message SearchEmailProfileRequest {
@@ -78,8 +104,6 @@ message SearchEmailProfileRequest {
     string q = 3;
     string sort = 4;
     repeated string fields = 5;
-
-    int64 domain_id = 6;
 
 }
 
@@ -90,7 +114,6 @@ message ListEmailProfile {
 
 message EmailProfile {
     int64 id = 1;
-    int64 domain_id = 2;
     int64 created_at = 3;
     Lookup created_by = 4;
     int64 updated_at = 5;
@@ -107,7 +130,13 @@ message EmailProfile {
 }
 
 message CreateEmailProfileRequest {
-    int64 domain_id = 1;
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+            title: "Create email profile request body"
+            description: "Create email profile for gateway"
+            required: ["name", "schema", "host", "login", "mailbox", "smtp_port", "imap_port"]
+        }
+    };
     string name = 2;
     string description = 3;
     Lookup schema = 4;
@@ -118,4 +147,28 @@ message CreateEmailProfileRequest {
     string mailbox = 9;
     int32 smtp_port = 10;
     int32 imap_port = 11;
+}
+
+message PatchEmailProfileRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+            title: "Update email profile request body"
+            description: "Update email profile for gateway"
+            required: ["id"]
+        }
+    };
+    int64 id = 1;
+
+    string name = 2;
+    string description = 3;
+    Lookup schema = 4;
+    bool enabled = 5;
+    string host = 6;
+    string login = 7;
+    string mailbox = 8;
+    int32 smtp_port = 9;
+    int32 imap_port = 10;
+    string password = 11;
+
+    repeated string fields = 50;
 }

@@ -8728,12 +8728,6 @@
             "collectionFormat": "multi",
             "name": "fields",
             "in": "query"
-          },
-          {
-            "type": "string",
-            "format": "int64",
-            "name": "domain_id",
-            "in": "query"
           }
         ],
         "responses": {
@@ -8807,12 +8801,6 @@
             "name": "id",
             "in": "path",
             "required": true
-          },
-          {
-            "type": "string",
-            "format": "int64",
-            "name": "domain_id",
-            "in": "query"
           }
         ],
         "responses": {
@@ -8891,12 +8879,48 @@
             "name": "id",
             "in": "path",
             "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineEmailProfile"
+            }
           },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {}
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "EmailProfileService"
+        ],
+        "operationId": "PatchEmailProfile",
+        "parameters": [
           {
             "type": "string",
             "format": "int64",
-            "name": "domain_id",
-            "in": "query"
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/enginePatchEmailProfileRequest"
+            }
           }
         ],
         "responses": {
@@ -13340,14 +13364,21 @@
       }
     },
     "engineCreateEmailProfileRequest": {
+      "description": "Create email profile for gateway",
       "type": "object",
+      "title": "Create email profile request body",
+      "required": [
+        "name",
+        "schema",
+        "host",
+        "login",
+        "mailbox",
+        "smtp_port",
+        "imap_port"
+      ],
       "properties": {
         "description": {
           "type": "string"
-        },
-        "domain_id": {
-          "type": "string",
-          "format": "int64"
         },
         "enabled": {
           "type": "boolean",
@@ -14095,10 +14126,6 @@
         },
         "description": {
           "type": "string"
-        },
-        "domain_id": {
-          "type": "string",
-          "format": "int64"
         },
         "enabled": {
           "type": "boolean",
@@ -15726,6 +15753,59 @@
         }
       }
     },
+    "enginePatchEmailProfileRequest": {
+      "description": "Update email profile for gateway",
+      "type": "object",
+      "title": "Update email profile request body",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "host": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "imap_port": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "login": {
+          "type": "string"
+        },
+        "mailbox": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "schema": {
+          "$ref": "#/definitions/engineLookup"
+        },
+        "smtp_port": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
     "enginePatchMemberRequest": {
       "type": "object",
       "properties": {
@@ -17077,14 +17157,22 @@
       }
     },
     "engineUpdateEmailProfileRequest": {
+      "description": "Update email profile for gateway",
       "type": "object",
+      "title": "Update email profile request body",
+      "required": [
+        "id",
+        "name",
+        "schema",
+        "host",
+        "login",
+        "mailbox",
+        "smtp_port",
+        "imap_port"
+      ],
       "properties": {
         "description": {
           "type": "string"
-        },
-        "domain_id": {
-          "type": "string",
-          "format": "int64"
         },
         "enabled": {
           "type": "boolean",
