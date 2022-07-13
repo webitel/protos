@@ -20,6 +20,22 @@ service FileTranscriptService {
       get: "/storage/transcript_file/{id}/phrases"
     };
   }
+
+  rpc DeleteFileTranscript (DeleteFileTranscriptRequest) returns (DeleteFileTranscriptResponse) {
+    option (google.api.http) = {
+      delete: "/storage/transcript_file"
+      body: "*"
+    };
+  }
+}
+
+message DeleteFileTranscriptRequest {
+  repeated int64 file_id = 1;
+  repeated string uuid = 2;
+}
+
+message DeleteFileTranscriptResponse {
+  repeated int64 items = 1;
 }
 
 message TranscriptPhrase {
@@ -46,6 +62,7 @@ message StartFileTranscriptRequest {
   repeated int64 file_id = 1;
   string locale = 2;
   engine.Lookup profile = 3;
+  repeated string uuid = 4;
 
 }
 

@@ -8379,8 +8379,13 @@
             "in": "query"
           },
           {
-            "type": "boolean",
-            "format": "boolean",
+            "enum": [
+              "Undefined",
+              "True",
+              "False"
+            ],
+            "type": "string",
+            "default": "Undefined",
             "name": "has_file",
             "in": "query"
           },
@@ -8496,6 +8501,17 @@
             },
             "collectionFormat": "multi",
             "name": "directions",
+            "in": "query"
+          },
+          {
+            "enum": [
+              "Undefined",
+              "True",
+              "False"
+            ],
+            "type": "string",
+            "default": "Undefined",
+            "name": "has_transcript",
             "in": "query"
           }
         ],
@@ -11145,6 +11161,30 @@
             }
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "FileTranscriptService"
+        ],
+        "operationId": "DeleteFileTranscript",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/storageDeleteFileTranscriptRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storageDeleteFileTranscriptResponse"
+            }
+          }
+        }
       }
     },
     "/storage/transcript_file/{id}/phrases": {
@@ -12340,6 +12380,12 @@
             "$ref": "#/definitions/engineAggregateRequest"
           }
         },
+        "amd_result": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "answered_at": {
           "$ref": "#/definitions/engineFilterBetween"
         },
@@ -12359,6 +12405,9 @@
           }
         },
         "direction": {
+          "type": "string"
+        },
+        "directions": {
           "type": "array",
           "items": {
             "type": "string"
@@ -12371,6 +12420,9 @@
         "duration": {
           "$ref": "#/definitions/engineFilterBetween"
         },
+        "fts": {
+          "type": "string"
+        },
         "gateway_id": {
           "type": "array",
           "items": {
@@ -12379,8 +12431,10 @@
           }
         },
         "has_file": {
-          "type": "boolean",
-          "format": "boolean"
+          "$ref": "#/definitions/engineBoolFilter"
+        },
+        "has_transcript": {
+          "$ref": "#/definitions/engineBoolFilter"
         },
         "id": {
           "type": "array",
@@ -12460,6 +12514,12 @@
           "items": {
             "type": "string",
             "format": "int64"
+          }
+        },
+        "variables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
           }
         }
       }
@@ -12835,6 +12895,15 @@
     },
     "engineBlindTransferCallResponse": {
       "type": "object"
+    },
+    "engineBoolFilter": {
+      "type": "string",
+      "default": "Undefined",
+      "enum": [
+        "Undefined",
+        "True",
+        "False"
+      ]
     },
     "engineBucket": {
       "type": "object",
@@ -14149,6 +14218,9 @@
           "type": "string"
         },
         "name": {
+          "type": "string"
+        },
+        "password": {
           "type": "string"
         },
         "schema": {
@@ -18018,6 +18090,36 @@
         }
       }
     },
+    "storageDeleteFileTranscriptRequest": {
+      "type": "object",
+      "properties": {
+        "file_id": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
+        "uuid": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "storageDeleteFileTranscriptResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        }
+      }
+    },
     "storageDeleteFilesRequest": {
       "type": "object",
       "properties": {
@@ -18326,6 +18428,12 @@
         },
         "profile": {
           "$ref": "#/definitions/engineLookup"
+        },
+        "uuid": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },

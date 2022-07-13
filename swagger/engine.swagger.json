@@ -8770,8 +8770,13 @@
             "name": "has_file",
             "in": "query",
             "required": false,
-            "type": "boolean",
-            "format": "boolean"
+            "type": "string",
+            "enum": [
+              "Undefined",
+              "True",
+              "False"
+            ],
+            "default": "Undefined"
           },
           {
             "name": "domain_id",
@@ -8902,6 +8907,18 @@
               "type": "string"
             },
             "collectionFormat": "multi"
+          },
+          {
+            "name": "has_transcript",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "Undefined",
+              "True",
+              "False"
+            ],
+            "default": "Undefined"
           }
         ],
         "tags": [
@@ -11022,6 +11039,25 @@
         }
       }
     },
+    "HistoryFileJobHistoryFileJobAction": {
+      "type": "string",
+      "enum": [
+        "Undefined",
+        "STT",
+        "Delete"
+      ],
+      "default": "Undefined"
+    },
+    "HistoryFileJobHistoryFileJobState": {
+      "type": "string",
+      "enum": [
+        "Idle",
+        "Active",
+        "Finished",
+        "Error"
+      ],
+      "default": "Idle"
+    },
     "engineAcceptOfDay": {
       "type": "object",
       "properties": {
@@ -11904,6 +11940,15 @@
           "type": "integer",
           "format": "int32"
         },
+        "q": {
+          "type": "string"
+        },
+        "aggs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/engineAggregateRequest"
+          }
+        },
         "created_at": {
           "$ref": "#/definitions/engineFilterBetween"
         },
@@ -11949,9 +11994,6 @@
             "format": "int64"
           }
         },
-        "q": {
-          "type": "string"
-        },
         "duration": {
           "$ref": "#/definitions/engineFilterBetween"
         },
@@ -11969,17 +12011,17 @@
           }
         },
         "has_file": {
-          "type": "boolean",
-          "format": "boolean"
+          "$ref": "#/definitions/engineBoolFilter"
+        },
+        "domain_id": {
+          "type": "string",
+          "format": "int64"
         },
         "number": {
           "type": "string"
         },
         "direction": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "type": "string"
         },
         "answered_at": {
           "$ref": "#/definitions/engineFilterBetween"
@@ -12015,21 +12057,35 @@
             "type": "string"
           }
         },
-        "aggs": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/engineAggregateRequest"
-          }
-        },
-        "domain_id": {
-          "type": "string",
-          "format": "int64"
-        },
         "tags": {
           "type": "array",
           "items": {
             "type": "string"
           }
+        },
+        "variables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "amd_result": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fts": {
+          "type": "string"
+        },
+        "directions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "has_transcript": {
+          "$ref": "#/definitions/engineBoolFilter"
         }
       }
     },
@@ -12404,6 +12460,15 @@
     },
     "engineBlindTransferCallResponse": {
       "type": "object"
+    },
+    "engineBoolFilter": {
+      "type": "string",
+      "enum": [
+        "Undefined",
+        "True",
+        "False"
+      ],
+      "default": "Undefined"
     },
     "engineBucket": {
       "type": "object",
@@ -13733,6 +13798,9 @@
         "imap_port": {
           "type": "integer",
           "format": "int32"
+        },
+        "password": {
+          "type": "string"
         }
       }
     },
@@ -14042,10 +14110,10 @@
           "format": "int64"
         },
         "action": {
-          "type": "string"
+          "$ref": "#/definitions/HistoryFileJobHistoryFileJobAction"
         },
         "state": {
-          "type": "string"
+          "$ref": "#/definitions/HistoryFileJobHistoryFileJobState"
         }
       }
     },

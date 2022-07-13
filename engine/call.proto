@@ -140,7 +140,7 @@ message SearchHistoryCallRequest {
     bool skip_parent = 14;
     string parent_id = 15;
     repeated string cause = 16;
-    bool has_file = 17;
+    BoolFilter has_file = 17;
 
     int64 domain_id = 18;
     string number = 19;
@@ -157,6 +157,7 @@ message SearchHistoryCallRequest {
     repeated string amd_result = 30;
     string fts = 31;
     repeated string directions = 32;
+    BoolFilter has_transcript = 33;
 }
 
 message AggregateRequest {
@@ -186,36 +187,39 @@ message AggregateRequest {
 message AggregateHistoryCallRequest {
     int32 page = 1;
     int32 size = 2;
+    string q = 3;
+    repeated AggregateRequest aggs = 4;
 
-    FilterBetween created_at = 3;
-    repeated int64 user_id = 4;
-    repeated int64 agent_id = 5;
-    repeated int64 queue_id = 6;
-    repeated int64 team_id = 7;
-    repeated int64 member_id = 8;
-    repeated int64 gateway_id = 9;
-    string q = 10;
+    FilterBetween created_at = 5;
+    repeated int64 user_id = 6;
+    repeated int64 agent_id = 7;
+    repeated int64 queue_id = 8;
+    repeated int64 team_id = 9;
+    repeated int64 member_id = 10;
+    repeated int64 gateway_id = 11;
 
-    FilterBetween duration = 11;
-    bool skip_parent = 12;
-    string parent_id = 13;
-    repeated string cause = 14;
-    bool has_file = 15;
+    FilterBetween duration = 12;
+    bool skip_parent = 13;
+    string parent_id = 14;
+    repeated string cause = 15;
+    BoolFilter has_file = 16;
 
-    string number = 16;
-    repeated string direction = 17;
-    FilterBetween answered_at = 18;
-    bool missed = 19;
-    FilterBetween stored_at = 20;
-    repeated string id = 21;
-    repeated string transfer_from = 22;
-    repeated string transfer_to = 23;
-    repeated string dependency_id = 24;
-
-    repeated AggregateRequest aggs = 25;
-
-    int64 domain_id = 26;
-    repeated string tags = 28;
+    int64 domain_id = 17;
+    string number = 18;
+    string direction = 19;
+    FilterBetween answered_at = 20;
+    bool missed = 21;
+    FilterBetween stored_at = 22;
+    repeated string id = 23;
+    repeated string transfer_from = 24;
+    repeated string transfer_to = 25;
+    repeated string dependency_id = 26;
+    repeated string tags = 27;
+    map<string,string> variables = 28;
+    repeated string amd_result = 29;
+    string fts = 30;
+    repeated string directions = 31;
+    BoolFilter has_transcript = 32;
 }
 
 message AggregateResult {
@@ -285,11 +289,22 @@ message DeleteCallAnnotationRequest {
 }
 
 message HistoryFileJob {
+    enum HistoryFileJobAction {
+        Undefined = 0;
+        STT = 1;
+        Delete = 2;
+    }
+    enum HistoryFileJobState {
+        Idle = 0;
+        Active = 1;
+        Finished = 2;
+        Error = 3; // TODO
+    }
     int64 id = 1;
     int64 file_id = 2;
     int64 created_at = 3;
-    string action = 4;
-    string state = 5;
+    HistoryFileJobAction action = 4;
+    HistoryFileJobState state = 5;
 }
 
 message HistoryCall {
