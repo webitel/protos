@@ -3895,7 +3895,6 @@ type CallServiceClient interface {
 	SearchActiveCall(ctx context.Context, in *SearchCallRequest, opts ...grpc.CallOption) (*ListCall, error)
 	// Call item
 	ReadCall(ctx context.Context, in *ReadCallRequest, opts ...grpc.CallOption) (*ActiveCall, error)
-	// Create e call
 	CreateCall(ctx context.Context, in *CreateCallRequest, opts ...grpc.CallOption) (*CreateCallResponse, error)
 	HangupCall(ctx context.Context, in *HangupCallRequest, opts ...grpc.CallOption) (*HangupCallResponse, error)
 	HoldCall(ctx context.Context, in *UserCallRequest, opts ...grpc.CallOption) (*HoldCallResponse, error)
@@ -4061,7 +4060,6 @@ type CallServiceServer interface {
 	SearchActiveCall(context.Context, *SearchCallRequest) (*ListCall, error)
 	// Call item
 	ReadCall(context.Context, *ReadCallRequest) (*ActiveCall, error)
-	// Create e call
 	CreateCall(context.Context, *CreateCallRequest) (*CreateCallResponse, error)
 	HangupCall(context.Context, *HangupCallRequest) (*HangupCallResponse, error)
 	HoldCall(context.Context, *UserCallRequest) (*HoldCallResponse, error)
