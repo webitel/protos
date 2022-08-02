@@ -45,6 +45,7 @@ call_center:
 fs:
 	protoc -I/usr/local/include -I./fs \
 	--go_opt=paths=source_relative \
+	--go-grpc_out=./fs --go-grpc_opt=paths=source_relative \
 	--go_out=./fs ./fs/fs.proto
 
 .PHONY: storage_swagger
