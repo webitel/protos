@@ -1,10 +1,12 @@
 module github.com/webitel/protos/storage
 
-go 1.14
+go 1.18
+
+replace (
+	github.com/webitel/protos/engine => ./engine
+)
 
 require (
-	github.com/golang/protobuf v1.4.3
-	github.com/grpc-ecosystem/grpc-gateway v1.15.2
-	google.golang.org/genproto v0.0.0-20201021134325-0d71844de594
-	google.golang.org/grpc v1.33.1
+	google.golang.org/genproto v0.0.0-20220801145646-83ce21fca29f // indirect
+	google.golang.org/protobuf v1.28.1 // indirect
 )

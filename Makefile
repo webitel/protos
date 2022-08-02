@@ -17,12 +17,16 @@ engine_swagger:
 engine_proto:
 	protoc -I/usr/local/include -I./engine -I${GRPC_GATEWAY}/third_party/googleapis  \
       -I${GRPC_GATEWAY}  \
-      --go_out=plugins=grpc,paths=source_relative:./engine ./engine/*.proto
+      --go-grpc_out=./engine --go-grpc_opt=paths=source_relative \
+      --go_opt=paths=source_relative \
+      --go_out=./engine ./engine/*.proto
 
 engine_chat_proto:
 	protoc -I/usr/local/include -I./engine/chat -I${GRPC_GATEWAY}/third_party/googleapis  \
       -I${GRPC_GATEWAY} \
-      --go_out=plugins=grpc,paths=source_relative:./engine/chat ./engine/chat/*.proto
+      --go-grpc_out=./engine/chat --go-grpc_opt=paths=source_relative \
+      --go_opt=paths=source_relative \
+      --go_out=./engine/chat ./engine/chat/*.proto
 
 engine: engine_proto engine_chat_proto engine_swagger
 
@@ -32,12 +36,16 @@ engine: engine_proto engine_chat_proto engine_swagger
 call_center:
 	protoc -I/usr/local/include -I./cc -I${GRPC_GATEWAY}/third_party/googleapis  \
       -I${GRPC_GATEWAY} \
-      --go_out=plugins=grpc,paths=source_relative:./cc ./cc/*.proto
+      --go_opt=paths=source_relative \
+      --go-grpc_out=./cc --go-grpc_opt=paths=source_relative \
+      --go_out=./cc ./cc/*.proto
 
 .PHONY: fs
 
 fs:
-	protoc -I/usr/local/include -I./fs --go_out=plugins=grpc,paths=source_relative:./fs ./fs/fs.proto
+	protoc -I/usr/local/include -I./fs \
+	--go_opt=paths=source_relative \
+	--go_out=./fs ./fs/fs.proto
 
 .PHONY: storage_swagger
 
@@ -52,9 +60,10 @@ storage_swagger:
 
 storage_proto:
 	protoc -I/usr/local/include -I. -I${GRPC_GATEWAY}/third_party/googleapis  \
-      -I${GRPC_GATEWAY}  \
-      -I./engine \
-      --go_out=plugins=grpc,paths=source_relative:. ./storage/*.proto
+	  -I${GRPC_GATEWAY}  \
+	  --go-grpc_out=. --go-grpc_opt=paths=source_relative \
+	  --go_opt=paths=source_relative \
+      --go_out=. ./storage/*.proto
 
 .PHONY: workflow
 
@@ -62,7 +71,9 @@ workflow:
 	protoc -I/usr/local/include -I. -I${GRPC_GATEWAY}/third_party/googleapis  \
       -I${GRPC_GATEWAY}  \
       -I./engine/chat \
-      --go_out=plugins=grpc,paths=source_relative:. ./workflow/*.proto
+      --go-grpc_out=. --go-grpc_opt=paths=source_relative \
+      --go_opt=paths=source_relative \
+      --go_out=. ./workflow/*.proto
 
 .PHONY: chat
 
