@@ -101,7 +101,7 @@ bot:
 	-I ./bot \
 	-I ./chat \
 	--go_opt=paths=source_relative --go_out=bot \
-	--micro_out=plugins=grpc,paths=source_relative:bot \
+	--go-grpc_out=paths=source_relative:bot \
 	 \
 	./bot/*.proto
 
