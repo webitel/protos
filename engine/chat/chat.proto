@@ -1,14 +1,10 @@
 syntax = "proto3";
 
-package chat;
-
-// todo
+package webitel.chat.server;
 
 option go_package = "github.com/webitel/protos/engine/chat";
 
-// import "chat.v1.proto";
 import "message.proto";
-
 
 service ChatService {
   // SendMessage [FROM] created channel_id (+auth_user_id) [TO] conversation_id chat-room
@@ -71,7 +67,7 @@ message Member {
   int64 updated_at = 6;
   // string firstname = 6;
   // string lastname = 7;
-
+  string external_id = 8;
 }
 
 message Channel {
@@ -147,7 +143,7 @@ message CheckSessionResponse {
   // Account for .this chat channel, end-user contact info
   Account account = 4;
   // Properties defined in .StartConversationRequest.message.variables
-  map<string,string> properties = 5; // optional: extra context
+  map<string, string> properties = 5; // optional: extra context
 }
 
 message SendMessageRequest {
@@ -177,7 +173,7 @@ message StartConversationRequest {
   // Message to start conversation with ...
   Message message = 4;
   // Properties (variables) to start conversation chat@bot channel with ...
-  map<string,string> properties = 5;
+  map<string, string> properties = 5;
 }
 
 message StartConversationResponse {
@@ -212,6 +208,7 @@ message LeaveConversationRequest {
   string channel_id = 1;
   string conversation_id = 2;
   int64 auth_user_id = 3;
+  string cause = 4; // optional: reason
 }
 
 message LeaveConversationResponse {
@@ -229,7 +226,7 @@ message InviteToConversationRequest {
   string title = 7;                 // invite: chat title
   string app_id = 8;                // ???
 
-  map<string,string> variables = 9; // invite: chat metadata
+  map<string, string> variables = 9; // invite: chat metadata
 }
 
 message InviteToConversationResponse {
@@ -240,6 +237,7 @@ message DeclineInvitationRequest {
   string invite_id = 1;
   int64 auth_user_id = 2;
   string conversation_id = 3;
+  string cause = 4; // optional: reason
 }
 
 message DeclineInvitationResponse {
@@ -330,14 +328,14 @@ message SetVariablesRequest {
   string channel_id = 1;
   // Required. Variables to be merged.
   // NOTE: Empty value(s) implies unset(remove) key action
-  map<string,string> variables = 2;
+  map<string, string> variables = 2;
 }
 
 message ChatVariablesResponse {
   // Unique Chat Channel IDentifier.
   string channel_id = 1;
   // Result Chat Channel's Variables SET.
-  map<string,string> variables = 2;
+  map<string, string> variables = 2;
 }
 
 message ChatTransferRequest {
@@ -354,7 +352,7 @@ message ChatTransferRequest {
   int64 schema_id = 3;
   int64 user_id = 5;
   // Optional. Origination Variables to be chained (merged)
-  map<string,string> variables = 4;
+  map<string, string> variables = 4;
 }
 
 message ChatTransferResponse {

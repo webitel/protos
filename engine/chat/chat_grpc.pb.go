@@ -58,7 +58,7 @@ func NewChatServiceClient(cc grpc.ClientConnInterface) ChatServiceClient {
 
 func (c *chatServiceClient) SendMessage(ctx context.Context, in *SendMessageRequest, opts ...grpc.CallOption) (*SendMessageResponse, error) {
 	out := new(SendMessageResponse)
-	err := c.cc.Invoke(ctx, "/chat.ChatService/SendMessage", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/webitel.chat.server.ChatService/SendMessage", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (c *chatServiceClient) SendMessage(ctx context.Context, in *SendMessageRequ
 
 func (c *chatServiceClient) StartConversation(ctx context.Context, in *StartConversationRequest, opts ...grpc.CallOption) (*StartConversationResponse, error) {
 	out := new(StartConversationResponse)
-	err := c.cc.Invoke(ctx, "/chat.ChatService/StartConversation", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/webitel.chat.server.ChatService/StartConversation", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +76,7 @@ func (c *chatServiceClient) StartConversation(ctx context.Context, in *StartConv
 
 func (c *chatServiceClient) CloseConversation(ctx context.Context, in *CloseConversationRequest, opts ...grpc.CallOption) (*CloseConversationResponse, error) {
 	out := new(CloseConversationResponse)
-	err := c.cc.Invoke(ctx, "/chat.ChatService/CloseConversation", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/webitel.chat.server.ChatService/CloseConversation", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func (c *chatServiceClient) CloseConversation(ctx context.Context, in *CloseConv
 
 func (c *chatServiceClient) JoinConversation(ctx context.Context, in *JoinConversationRequest, opts ...grpc.CallOption) (*JoinConversationResponse, error) {
 	out := new(JoinConversationResponse)
-	err := c.cc.Invoke(ctx, "/chat.ChatService/JoinConversation", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/webitel.chat.server.ChatService/JoinConversation", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +94,7 @@ func (c *chatServiceClient) JoinConversation(ctx context.Context, in *JoinConver
 
 func (c *chatServiceClient) LeaveConversation(ctx context.Context, in *LeaveConversationRequest, opts ...grpc.CallOption) (*LeaveConversationResponse, error) {
 	out := new(LeaveConversationResponse)
-	err := c.cc.Invoke(ctx, "/chat.ChatService/LeaveConversation", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/webitel.chat.server.ChatService/LeaveConversation", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +103,7 @@ func (c *chatServiceClient) LeaveConversation(ctx context.Context, in *LeaveConv
 
 func (c *chatServiceClient) InviteToConversation(ctx context.Context, in *InviteToConversationRequest, opts ...grpc.CallOption) (*InviteToConversationResponse, error) {
 	out := new(InviteToConversationResponse)
-	err := c.cc.Invoke(ctx, "/chat.ChatService/InviteToConversation", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/webitel.chat.server.ChatService/InviteToConversation", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func (c *chatServiceClient) InviteToConversation(ctx context.Context, in *Invite
 
 func (c *chatServiceClient) DeclineInvitation(ctx context.Context, in *DeclineInvitationRequest, opts ...grpc.CallOption) (*DeclineInvitationResponse, error) {
 	out := new(DeclineInvitationResponse)
-	err := c.cc.Invoke(ctx, "/chat.ChatService/DeclineInvitation", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/webitel.chat.server.ChatService/DeclineInvitation", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +121,7 @@ func (c *chatServiceClient) DeclineInvitation(ctx context.Context, in *DeclineIn
 
 func (c *chatServiceClient) CheckSession(ctx context.Context, in *CheckSessionRequest, opts ...grpc.CallOption) (*CheckSessionResponse, error) {
 	out := new(CheckSessionResponse)
-	err := c.cc.Invoke(ctx, "/chat.ChatService/CheckSession", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/webitel.chat.server.ChatService/CheckSession", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func (c *chatServiceClient) CheckSession(ctx context.Context, in *CheckSessionRe
 
 func (c *chatServiceClient) WaitMessage(ctx context.Context, in *WaitMessageRequest, opts ...grpc.CallOption) (*WaitMessageResponse, error) {
 	out := new(WaitMessageResponse)
-	err := c.cc.Invoke(ctx, "/chat.ChatService/WaitMessage", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/webitel.chat.server.ChatService/WaitMessage", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +139,7 @@ func (c *chatServiceClient) WaitMessage(ctx context.Context, in *WaitMessageRequ
 
 func (c *chatServiceClient) UpdateChannel(ctx context.Context, in *UpdateChannelRequest, opts ...grpc.CallOption) (*UpdateChannelResponse, error) {
 	out := new(UpdateChannelResponse)
-	err := c.cc.Invoke(ctx, "/chat.ChatService/UpdateChannel", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/webitel.chat.server.ChatService/UpdateChannel", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +148,7 @@ func (c *chatServiceClient) UpdateChannel(ctx context.Context, in *UpdateChannel
 
 func (c *chatServiceClient) GetConversations(ctx context.Context, in *GetConversationsRequest, opts ...grpc.CallOption) (*GetConversationsResponse, error) {
 	out := new(GetConversationsResponse)
-	err := c.cc.Invoke(ctx, "/chat.ChatService/GetConversations", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/webitel.chat.server.ChatService/GetConversations", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +157,7 @@ func (c *chatServiceClient) GetConversations(ctx context.Context, in *GetConvers
 
 func (c *chatServiceClient) GetConversationByID(ctx context.Context, in *GetConversationByIDRequest, opts ...grpc.CallOption) (*GetConversationByIDResponse, error) {
 	out := new(GetConversationByIDResponse)
-	err := c.cc.Invoke(ctx, "/chat.ChatService/GetConversationByID", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/webitel.chat.server.ChatService/GetConversationByID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +166,7 @@ func (c *chatServiceClient) GetConversationByID(ctx context.Context, in *GetConv
 
 func (c *chatServiceClient) GetHistoryMessages(ctx context.Context, in *GetHistoryMessagesRequest, opts ...grpc.CallOption) (*GetHistoryMessagesResponse, error) {
 	out := new(GetHistoryMessagesResponse)
-	err := c.cc.Invoke(ctx, "/chat.ChatService/GetHistoryMessages", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/webitel.chat.server.ChatService/GetHistoryMessages", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -175,7 +175,7 @@ func (c *chatServiceClient) GetHistoryMessages(ctx context.Context, in *GetHisto
 
 func (c *chatServiceClient) SetVariables(ctx context.Context, in *SetVariablesRequest, opts ...grpc.CallOption) (*ChatVariablesResponse, error) {
 	out := new(ChatVariablesResponse)
-	err := c.cc.Invoke(ctx, "/chat.ChatService/SetVariables", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/webitel.chat.server.ChatService/SetVariables", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -184,7 +184,7 @@ func (c *chatServiceClient) SetVariables(ctx context.Context, in *SetVariablesRe
 
 func (c *chatServiceClient) BlindTransfer(ctx context.Context, in *ChatTransferRequest, opts ...grpc.CallOption) (*ChatTransferResponse, error) {
 	out := new(ChatTransferResponse)
-	err := c.cc.Invoke(ctx, "/chat.ChatService/BlindTransfer", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/webitel.chat.server.ChatService/BlindTransfer", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -294,7 +294,7 @@ func _ChatService_SendMessage_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chat.ChatService/SendMessage",
+		FullMethod: "/webitel.chat.server.ChatService/SendMessage",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ChatServiceServer).SendMessage(ctx, req.(*SendMessageRequest))
@@ -312,7 +312,7 @@ func _ChatService_StartConversation_Handler(srv interface{}, ctx context.Context
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chat.ChatService/StartConversation",
+		FullMethod: "/webitel.chat.server.ChatService/StartConversation",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ChatServiceServer).StartConversation(ctx, req.(*StartConversationRequest))
@@ -330,7 +330,7 @@ func _ChatService_CloseConversation_Handler(srv interface{}, ctx context.Context
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chat.ChatService/CloseConversation",
+		FullMethod: "/webitel.chat.server.ChatService/CloseConversation",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ChatServiceServer).CloseConversation(ctx, req.(*CloseConversationRequest))
@@ -348,7 +348,7 @@ func _ChatService_JoinConversation_Handler(srv interface{}, ctx context.Context,
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chat.ChatService/JoinConversation",
+		FullMethod: "/webitel.chat.server.ChatService/JoinConversation",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ChatServiceServer).JoinConversation(ctx, req.(*JoinConversationRequest))
@@ -366,7 +366,7 @@ func _ChatService_LeaveConversation_Handler(srv interface{}, ctx context.Context
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chat.ChatService/LeaveConversation",
+		FullMethod: "/webitel.chat.server.ChatService/LeaveConversation",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ChatServiceServer).LeaveConversation(ctx, req.(*LeaveConversationRequest))
@@ -384,7 +384,7 @@ func _ChatService_InviteToConversation_Handler(srv interface{}, ctx context.Cont
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chat.ChatService/InviteToConversation",
+		FullMethod: "/webitel.chat.server.ChatService/InviteToConversation",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ChatServiceServer).InviteToConversation(ctx, req.(*InviteToConversationRequest))
@@ -402,7 +402,7 @@ func _ChatService_DeclineInvitation_Handler(srv interface{}, ctx context.Context
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chat.ChatService/DeclineInvitation",
+		FullMethod: "/webitel.chat.server.ChatService/DeclineInvitation",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ChatServiceServer).DeclineInvitation(ctx, req.(*DeclineInvitationRequest))
@@ -420,7 +420,7 @@ func _ChatService_CheckSession_Handler(srv interface{}, ctx context.Context, dec
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chat.ChatService/CheckSession",
+		FullMethod: "/webitel.chat.server.ChatService/CheckSession",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ChatServiceServer).CheckSession(ctx, req.(*CheckSessionRequest))
@@ -438,7 +438,7 @@ func _ChatService_WaitMessage_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chat.ChatService/WaitMessage",
+		FullMethod: "/webitel.chat.server.ChatService/WaitMessage",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ChatServiceServer).WaitMessage(ctx, req.(*WaitMessageRequest))
@@ -456,7 +456,7 @@ func _ChatService_UpdateChannel_Handler(srv interface{}, ctx context.Context, de
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chat.ChatService/UpdateChannel",
+		FullMethod: "/webitel.chat.server.ChatService/UpdateChannel",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ChatServiceServer).UpdateChannel(ctx, req.(*UpdateChannelRequest))
@@ -474,7 +474,7 @@ func _ChatService_GetConversations_Handler(srv interface{}, ctx context.Context,
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chat.ChatService/GetConversations",
+		FullMethod: "/webitel.chat.server.ChatService/GetConversations",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ChatServiceServer).GetConversations(ctx, req.(*GetConversationsRequest))
@@ -492,7 +492,7 @@ func _ChatService_GetConversationByID_Handler(srv interface{}, ctx context.Conte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chat.ChatService/GetConversationByID",
+		FullMethod: "/webitel.chat.server.ChatService/GetConversationByID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ChatServiceServer).GetConversationByID(ctx, req.(*GetConversationByIDRequest))
@@ -510,7 +510,7 @@ func _ChatService_GetHistoryMessages_Handler(srv interface{}, ctx context.Contex
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chat.ChatService/GetHistoryMessages",
+		FullMethod: "/webitel.chat.server.ChatService/GetHistoryMessages",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ChatServiceServer).GetHistoryMessages(ctx, req.(*GetHistoryMessagesRequest))
@@ -528,7 +528,7 @@ func _ChatService_SetVariables_Handler(srv interface{}, ctx context.Context, dec
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chat.ChatService/SetVariables",
+		FullMethod: "/webitel.chat.server.ChatService/SetVariables",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ChatServiceServer).SetVariables(ctx, req.(*SetVariablesRequest))
@@ -546,7 +546,7 @@ func _ChatService_BlindTransfer_Handler(srv interface{}, ctx context.Context, de
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chat.ChatService/BlindTransfer",
+		FullMethod: "/webitel.chat.server.ChatService/BlindTransfer",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ChatServiceServer).BlindTransfer(ctx, req.(*ChatTransferRequest))
@@ -558,7 +558,7 @@ func _ChatService_BlindTransfer_Handler(srv interface{}, ctx context.Context, de
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ChatService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "chat.ChatService",
+	ServiceName: "webitel.chat.server.ChatService",
 	HandlerType: (*ChatServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
