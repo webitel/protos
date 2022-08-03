@@ -83,7 +83,6 @@ chat:
 	-I ./chat \
 	--go_opt=paths=source_relative --go_out=chat \
 	--go-grpc_out=paths=source_relative:chat \
-	--micro_out=plugins=grpc,paths=source_relative:chat \
 	\
 	./chat/*.proto
 
