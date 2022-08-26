@@ -52,19 +52,36 @@ service RoutingSchemaService {
             delete: "/routing/schema/{id}"
         };
     }
+
+    // List RoutingSchemaTags
+    rpc SearchRoutingSchemaTags(SearchRoutingSchemaTagsRequest) returns (ListRoutingSchemaTags) {
+        option (google.api.http) = {
+            get: "/routing/schema/tags"
+        };
+    }
 }
+
+enum RoutingSchemaType {
+    default = 0;
+    voice = 1;
+    chat = 2;
+    processing = 3;
+    service = 4;
+}
+
 
 message PatchRoutingSchemaRequest {
     int64 id = 1;
 
     string name = 2;
     string description = 3;
-    string type = 4;
+    RoutingSchemaType type = 4;
     google.protobuf.Value schema = 5;
     google.protobuf.Value payload = 6;
     bool debug = 7;
     repeated string fields = 8;
     bool editor = 9;
+    repeated string tags = 10;
 }
 
 message DeleteRoutingSchemaRequest {
@@ -77,12 +94,13 @@ message UpdateRoutingSchemaRequest {
 
     string name = 2;
     string description = 3;
-    string type = 4;
+    RoutingSchemaType type = 4;
     google.protobuf.Value schema = 5;
     google.protobuf.Value payload = 6;
     bool debug = 7;
 
     bool editor = 8;
+    repeated string tags = 9;
 }
 
 message ReadRoutingSchemaRequest {
@@ -101,18 +119,20 @@ message SearchRoutingSchemaRequest {
 
     repeated uint32 id = 6;
     string name = 7;
-    repeated string type = 8;
+    repeated RoutingSchemaType type = 8;
     bool editor = 9;
+    repeated string tags = 10;
 }
 
 message CreateRoutingSchemaRequest {
     string name = 1;
     string description = 2;
-    string type = 3;
+    RoutingSchemaType type = 3;
     google.protobuf.Value schema = 4;
     google.protobuf.Value payload = 5;
     bool debug = 6;
     bool editor = 7;
+    repeated string tags = 8;
 }
 
 message RoutingSchema {
@@ -124,14 +144,35 @@ message RoutingSchema {
     Lookup updated_by = 5;
     string name = 6;
     string description = 7;
-    string type = 8;
+    RoutingSchemaType type = 8;
     google.protobuf.Value schema = 9;
     google.protobuf.Value payload = 10;
     bool debug = 11;
     bool editor = 12;
+    repeated string tags = 13;
 }
 
 message ListRoutingSchema {
     bool next = 1;
     repeated RoutingSchema items = 2;
+}
+
+message RoutingSchemaTag {
+    string name = 1;
+    uint32 count = 2;
+}
+
+message ListRoutingSchemaTags {
+    bool next = 1;
+    repeated RoutingSchemaTag items = 2;
+}
+
+message SearchRoutingSchemaTagsRequest {
+    int32 page = 1;
+    int32 size = 2;
+    string q = 3;
+
+    string sort = 4;
+    repeated string fields = 5;
+    repeated RoutingSchemaType type = 6;
 }

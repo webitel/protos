@@ -34,6 +34,8 @@ type RoutingSchemaServiceClient interface {
 	PatchRoutingSchema(ctx context.Context, in *PatchRoutingSchemaRequest, opts ...grpc.CallOption) (*RoutingSchema, error)
 	// Remove RoutingSchema
 	DeleteRoutingSchema(ctx context.Context, in *DeleteRoutingSchemaRequest, opts ...grpc.CallOption) (*RoutingSchema, error)
+	// List RoutingSchemaTags
+	SearchRoutingSchemaTags(ctx context.Context, in *SearchRoutingSchemaTagsRequest, opts ...grpc.CallOption) (*ListRoutingSchemaTags, error)
 }
 
 type routingSchemaServiceClient struct {
@@ -98,6 +100,15 @@ func (c *routingSchemaServiceClient) DeleteRoutingSchema(ctx context.Context, in
 	return out, nil
 }
 
+func (c *routingSchemaServiceClient) SearchRoutingSchemaTags(ctx context.Context, in *SearchRoutingSchemaTagsRequest, opts ...grpc.CallOption) (*ListRoutingSchemaTags, error) {
+	out := new(ListRoutingSchemaTags)
+	err := c.cc.Invoke(ctx, "/engine.RoutingSchemaService/SearchRoutingSchemaTags", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RoutingSchemaServiceServer is the server API for RoutingSchemaService service.
 // All implementations must embed UnimplementedRoutingSchemaServiceServer
 // for forward compatibility
@@ -114,6 +125,8 @@ type RoutingSchemaServiceServer interface {
 	PatchRoutingSchema(context.Context, *PatchRoutingSchemaRequest) (*RoutingSchema, error)
 	// Remove RoutingSchema
 	DeleteRoutingSchema(context.Context, *DeleteRoutingSchemaRequest) (*RoutingSchema, error)
+	// List RoutingSchemaTags
+	SearchRoutingSchemaTags(context.Context, *SearchRoutingSchemaTagsRequest) (*ListRoutingSchemaTags, error)
 	mustEmbedUnimplementedRoutingSchemaServiceServer()
 }
 
@@ -138,6 +151,9 @@ func (UnimplementedRoutingSchemaServiceServer) PatchRoutingSchema(context.Contex
 }
 func (UnimplementedRoutingSchemaServiceServer) DeleteRoutingSchema(context.Context, *DeleteRoutingSchemaRequest) (*RoutingSchema, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteRoutingSchema not implemented")
+}
+func (UnimplementedRoutingSchemaServiceServer) SearchRoutingSchemaTags(context.Context, *SearchRoutingSchemaTagsRequest) (*ListRoutingSchemaTags, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchRoutingSchemaTags not implemented")
 }
 func (UnimplementedRoutingSchemaServiceServer) mustEmbedUnimplementedRoutingSchemaServiceServer() {}
 
@@ -260,6 +276,24 @@ func _RoutingSchemaService_DeleteRoutingSchema_Handler(srv interface{}, ctx cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RoutingSchemaService_SearchRoutingSchemaTags_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchRoutingSchemaTagsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RoutingSchemaServiceServer).SearchRoutingSchemaTags(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/engine.RoutingSchemaService/SearchRoutingSchemaTags",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RoutingSchemaServiceServer).SearchRoutingSchemaTags(ctx, req.(*SearchRoutingSchemaTagsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // RoutingSchemaService_ServiceDesc is the grpc.ServiceDesc for RoutingSchemaService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -290,6 +324,10 @@ var RoutingSchemaService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteRoutingSchema",
 			Handler:    _RoutingSchemaService_DeleteRoutingSchema_Handler,
+		},
+		{
+			MethodName: "SearchRoutingSchemaTags",
+			Handler:    _RoutingSchemaService_SearchRoutingSchemaTags_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

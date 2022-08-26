@@ -10386,7 +10386,14 @@
             "required": false,
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "default",
+                "voice",
+                "chat",
+                "processing",
+                "service"
+              ]
             },
             "collectionFormat": "multi"
           },
@@ -10396,6 +10403,16 @@
             "required": false,
             "type": "boolean",
             "format": "boolean"
+          },
+          {
+            "name": "tags",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -10432,6 +10449,89 @@
             "schema": {
               "$ref": "#/definitions/engineCreateRoutingSchemaRequest"
             }
+          }
+        ],
+        "tags": [
+          "RoutingSchemaService"
+        ]
+      }
+    },
+    "/routing/schema/tags": {
+      "get": {
+        "summary": "List RoutingSchemaTags",
+        "operationId": "SearchRoutingSchemaTags",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineListRoutingSchemaTags"
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {}
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "default",
+                "voice",
+                "chat",
+                "processing",
+                "service"
+              ]
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -13557,7 +13657,7 @@
           "type": "string"
         },
         "type": {
-          "type": "string"
+          "$ref": "#/definitions/engineRoutingSchemaType"
         },
         "schema": {
           "type": "object"
@@ -13572,6 +13672,12 @@
         "editor": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -14733,6 +14839,21 @@
         }
       }
     },
+    "engineListRoutingSchemaTags": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/engineRoutingSchemaTag"
+          }
+        }
+      }
+    },
     "engineListRoutingVariable": {
       "type": "object",
       "properties": {
@@ -15879,7 +16000,7 @@
           "type": "string"
         },
         "type": {
-          "type": "string"
+          "$ref": "#/definitions/engineRoutingSchemaType"
         },
         "schema": {
           "type": "object"
@@ -15900,6 +16021,12 @@
         "editor": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -16426,7 +16553,7 @@
           "type": "string"
         },
         "type": {
-          "type": "string"
+          "$ref": "#/definitions/engineRoutingSchemaType"
         },
         "schema": {
           "type": "object"
@@ -16441,8 +16568,37 @@
         "editor": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
+    },
+    "engineRoutingSchemaTag": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "count": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "engineRoutingSchemaType": {
+      "type": "string",
+      "enum": [
+        "default",
+        "voice",
+        "chat",
+        "processing",
+        "service"
+      ],
+      "default": "default"
     },
     "engineRoutingVariable": {
       "type": "object",
@@ -17397,7 +17553,7 @@
           "type": "string"
         },
         "type": {
-          "type": "string"
+          "$ref": "#/definitions/engineRoutingSchemaType"
         },
         "schema": {
           "type": "object"
@@ -17412,6 +17568,12 @@
         "editor": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },

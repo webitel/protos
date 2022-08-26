@@ -9934,6 +9934,13 @@
           {
             "type": "array",
             "items": {
+              "enum": [
+                "default",
+                "voice",
+                "chat",
+                "processing",
+                "service"
+              ],
               "type": "string"
             },
             "collectionFormat": "multi",
@@ -9944,6 +9951,15 @@
             "type": "boolean",
             "format": "boolean",
             "name": "editor",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "tags",
             "in": "query"
           }
         ],
@@ -9988,6 +10004,83 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/engineRoutingSchema"
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {}
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        }
+      }
+    },
+    "/routing/schema/tags": {
+      "get": {
+        "tags": [
+          "RoutingSchemaService"
+        ],
+        "summary": "List RoutingSchemaTags",
+        "operationId": "SearchRoutingSchemaTags",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "enum": [
+                "default",
+                "voice",
+                "chat",
+                "processing",
+                "service"
+              ],
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "type",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineListRoutingSchemaTags"
             }
           },
           "403": {
@@ -14022,8 +14115,14 @@
         "schema": {
           "type": "object"
         },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "type": {
-          "type": "string"
+          "$ref": "#/definitions/engineRoutingSchemaType"
         }
       }
     },
@@ -15177,6 +15276,21 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/engineRoutingSchema"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "engineListRoutingSchemaTags": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/engineRoutingSchemaTag"
           }
         },
         "next": {
@@ -16350,8 +16464,14 @@
         "schema": {
           "type": "object"
         },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "type": {
-          "type": "string"
+          "$ref": "#/definitions/engineRoutingSchemaType"
         }
       }
     },
@@ -16884,8 +17004,14 @@
         "schema": {
           "type": "object"
         },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "type": {
-          "type": "string"
+          "$ref": "#/definitions/engineRoutingSchemaType"
         },
         "updated_at": {
           "type": "string",
@@ -16895,6 +17021,29 @@
           "$ref": "#/definitions/engineLookup"
         }
       }
+    },
+    "engineRoutingSchemaTag": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "engineRoutingSchemaType": {
+      "type": "string",
+      "default": "default",
+      "enum": [
+        "default",
+        "voice",
+        "chat",
+        "processing",
+        "service"
+      ]
     },
     "engineRoutingVariable": {
       "type": "object",
@@ -17862,8 +18011,14 @@
         "schema": {
           "type": "object"
         },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "type": {
-          "type": "string"
+          "$ref": "#/definitions/engineRoutingSchemaType"
         }
       }
     },
