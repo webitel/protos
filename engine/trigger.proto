@@ -1,0 +1,134 @@
+syntax = "proto3";
+
+package engine;
+
+option go_package = "github.com/webitel/protos/engine";
+
+import "google/api/annotations.proto";
+import "const.proto";
+
+service TriggerService {
+  // Create Trigger
+  rpc CreateTrigger(CreateTriggerRequest) returns (Trigger) {
+    option (google.api.http) = {
+      post: "/trigger"
+      body: "*"
+    };
+  }
+  // List of Trigger
+  rpc SearchTrigger(SearchTriggerRequest) returns (ListTrigger) {
+    option (google.api.http) = {
+      get: "/trigger"
+    };
+  }
+  // Trigger item
+  rpc ReadTrigger(ReadTriggerRequest) returns (Trigger) {
+    option (google.api.http) = {
+      get: "/trigger/{id}"
+    };
+  }
+  // Update Trigger
+  rpc UpdateTrigger(UpdateTriggerRequest) returns (Trigger) {
+    option (google.api.http) = {
+      put: "/trigger/{id}"
+      body: "*"
+    };
+  }
+
+  rpc PatchTrigger(PatchTriggerRequest) returns (Trigger) {
+    option (google.api.http) = {
+      patch: "/trigger/{id}"
+      body: "*"
+    };
+  }
+
+  // Remove Trigger
+  rpc DeleteTrigger(DeleteTriggerRequest) returns (Trigger) {
+    option (google.api.http) = {
+      delete: "/trigger/{id}"
+    };
+  }
+}
+
+enum TriggerType {
+  default_trigger_type = 0;
+  cron = 1;
+}
+
+message Trigger {
+  int32 id = 1;
+  string name = 2;
+  bool enabled = 3;
+  TriggerType type = 4;
+  Lookup schema = 5;
+  map<string,string> variables = 6;
+  string description = 7;
+  string expression = 8;
+  Lookup timezone = 9;
+  int32 timeout = 10;
+}
+
+message CreateTriggerRequest {
+  string name = 1;
+  bool enabled = 2;
+  TriggerType type = 3;
+  Lookup schema = 4;
+  map<string,string> variables = 5;
+  string description = 6;
+  string expression = 7;
+  Lookup timezone = 8;
+  int32 timeout = 9;
+}
+
+message ListTrigger {
+  bool next = 1;
+  repeated Trigger items = 2;
+}
+
+message SearchTriggerRequest {
+  int32 page = 1;
+  int32 size = 2;
+  string q = 3;
+
+  string sort = 5;
+  repeated string fields = 6;
+
+  repeated int32 id = 7;
+  repeated int32 schema_id = 8;
+}
+
+message ReadTriggerRequest {
+  int32 id = 1;
+}
+
+message UpdateTriggerRequest {
+  int32 id = 1;
+  string name = 2;
+  bool enabled = 3;
+  TriggerType type = 4;
+  Lookup schema = 5;
+  map<string,string> variables = 6;
+  string description = 7;
+  string expression = 8;
+  Lookup timezone = 9;
+  int32 timeout = 10;
+}
+
+message PatchTriggerRequest {
+  repeated string fields = 1;
+  int32 id = 2;
+
+  string name = 3;
+  bool enabled = 4;
+  TriggerType type = 5;
+  Lookup schema = 6;
+  map<string,string> variables = 7;
+  string description = 8;
+  string expression = 9;
+  Lookup timezone = 10;
+  int32 timeout = 11;
+}
+
+message DeleteTriggerRequest {
+  int32 id = 1;
+}
