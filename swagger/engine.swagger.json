@@ -11208,6 +11208,134 @@
         ]
       }
     },
+    "/trigger/{trigger_id}/job": {
+      "get": {
+        "operationId": "SearchTriggerJob",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineListTriggerJob"
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {}
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "trigger_id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "created_at.from",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "created_at.to",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "TriggerService"
+        ]
+      },
+      "post": {
+        "operationId": "CreateTriggerJob",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineTriggerJob"
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {}
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "trigger_id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engineCreateTriggerJobRequest"
+            }
+          }
+        ],
+        "tags": [
+          "TriggerService"
+        ]
+      }
+    },
     "/user/device/config/{type}": {
       "get": {
         "operationId": "DefaultDeviceConfig",
@@ -13992,6 +14120,21 @@
         }
       }
     },
+    "engineCreateTriggerJobRequest": {
+      "type": "object",
+      "properties": {
+        "trigger_id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "variables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "engineCreateTriggerRequest": {
       "type": "object",
       "properties": {
@@ -15224,6 +15367,21 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/engineTrigger"
+          }
+        }
+      }
+    },
+    "engineListTriggerJob": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/engineTriggerJob"
           }
         }
       }
@@ -17112,6 +17270,52 @@
           "format": "int32"
         }
       }
+    },
+    "engineTriggerJob": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "trigger": {
+          "$ref": "#/definitions/engineLookup"
+        },
+        "state": {
+          "$ref": "#/definitions/engineTriggerJobState"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "started_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "stopped_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "parameters": {
+          "type": "object"
+        },
+        "error": {
+          "type": "string"
+        },
+        "result": {
+          "type": "object"
+        }
+      }
+    },
+    "engineTriggerJobState": {
+      "type": "string",
+      "enum": [
+        "idle",
+        "active",
+        "done",
+        "error"
+      ],
+      "default": "idle"
     },
     "engineTriggerType": {
       "type": "string",

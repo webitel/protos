@@ -33,6 +33,8 @@ type TriggerServiceClient interface {
 	PatchTrigger(ctx context.Context, in *PatchTriggerRequest, opts ...grpc.CallOption) (*Trigger, error)
 	// Remove Trigger
 	DeleteTrigger(ctx context.Context, in *DeleteTriggerRequest, opts ...grpc.CallOption) (*Trigger, error)
+	CreateTriggerJob(ctx context.Context, in *CreateTriggerJobRequest, opts ...grpc.CallOption) (*TriggerJob, error)
+	SearchTriggerJob(ctx context.Context, in *SearchTriggerJobRequest, opts ...grpc.CallOption) (*ListTriggerJob, error)
 }
 
 type triggerServiceClient struct {
@@ -97,6 +99,24 @@ func (c *triggerServiceClient) DeleteTrigger(ctx context.Context, in *DeleteTrig
 	return out, nil
 }
 
+func (c *triggerServiceClient) CreateTriggerJob(ctx context.Context, in *CreateTriggerJobRequest, opts ...grpc.CallOption) (*TriggerJob, error) {
+	out := new(TriggerJob)
+	err := c.cc.Invoke(ctx, "/engine.TriggerService/CreateTriggerJob", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *triggerServiceClient) SearchTriggerJob(ctx context.Context, in *SearchTriggerJobRequest, opts ...grpc.CallOption) (*ListTriggerJob, error) {
+	out := new(ListTriggerJob)
+	err := c.cc.Invoke(ctx, "/engine.TriggerService/SearchTriggerJob", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TriggerServiceServer is the server API for TriggerService service.
 // All implementations must embed UnimplementedTriggerServiceServer
 // for forward compatibility
@@ -112,6 +132,8 @@ type TriggerServiceServer interface {
 	PatchTrigger(context.Context, *PatchTriggerRequest) (*Trigger, error)
 	// Remove Trigger
 	DeleteTrigger(context.Context, *DeleteTriggerRequest) (*Trigger, error)
+	CreateTriggerJob(context.Context, *CreateTriggerJobRequest) (*TriggerJob, error)
+	SearchTriggerJob(context.Context, *SearchTriggerJobRequest) (*ListTriggerJob, error)
 	mustEmbedUnimplementedTriggerServiceServer()
 }
 
@@ -136,6 +158,12 @@ func (UnimplementedTriggerServiceServer) PatchTrigger(context.Context, *PatchTri
 }
 func (UnimplementedTriggerServiceServer) DeleteTrigger(context.Context, *DeleteTriggerRequest) (*Trigger, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteTrigger not implemented")
+}
+func (UnimplementedTriggerServiceServer) CreateTriggerJob(context.Context, *CreateTriggerJobRequest) (*TriggerJob, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateTriggerJob not implemented")
+}
+func (UnimplementedTriggerServiceServer) SearchTriggerJob(context.Context, *SearchTriggerJobRequest) (*ListTriggerJob, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchTriggerJob not implemented")
 }
 func (UnimplementedTriggerServiceServer) mustEmbedUnimplementedTriggerServiceServer() {}
 
@@ -258,6 +286,42 @@ func _TriggerService_DeleteTrigger_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TriggerService_CreateTriggerJob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateTriggerJobRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TriggerServiceServer).CreateTriggerJob(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/engine.TriggerService/CreateTriggerJob",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TriggerServiceServer).CreateTriggerJob(ctx, req.(*CreateTriggerJobRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TriggerService_SearchTriggerJob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchTriggerJobRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TriggerServiceServer).SearchTriggerJob(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/engine.TriggerService/SearchTriggerJob",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TriggerServiceServer).SearchTriggerJob(ctx, req.(*SearchTriggerJobRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TriggerService_ServiceDesc is the grpc.ServiceDesc for TriggerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -288,6 +352,14 @@ var TriggerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteTrigger",
 			Handler:    _TriggerService_DeleteTrigger_Handler,
+		},
+		{
+			MethodName: "CreateTriggerJob",
+			Handler:    _TriggerService_CreateTriggerJob_Handler,
+		},
+		{
+			MethodName: "SearchTriggerJob",
+			Handler:    _TriggerService_SearchTriggerJob_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

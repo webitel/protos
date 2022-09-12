@@ -11605,6 +11605,127 @@
         }
       }
     },
+    "/trigger/{trigger_id}/job": {
+      "get": {
+        "tags": [
+          "TriggerService"
+        ],
+        "operationId": "SearchTriggerJob",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "trigger_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "created_at.from",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "created_at.to",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineListTriggerJob"
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {}
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "TriggerService"
+        ],
+        "operationId": "CreateTriggerJob",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "trigger_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engineCreateTriggerJobRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineTriggerJob"
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {}
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        }
+      }
+    },
     "/user/device/config/{type}": {
       "get": {
         "tags": [
@@ -14430,6 +14551,21 @@
         }
       }
     },
+    "engineCreateTriggerJobRequest": {
+      "type": "object",
+      "properties": {
+        "trigger_id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "variables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "engineCreateTriggerRequest": {
       "type": "object",
       "properties": {
@@ -15658,6 +15794,21 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/engineTrigger"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "engineListTriggerJob": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/engineTriggerJob"
           }
         },
         "next": {
@@ -17550,6 +17701,52 @@
           }
         }
       }
+    },
+    "engineTriggerJob": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "error": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "parameters": {
+          "type": "object"
+        },
+        "result": {
+          "type": "object"
+        },
+        "started_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "state": {
+          "$ref": "#/definitions/engineTriggerJobState"
+        },
+        "stopped_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "trigger": {
+          "$ref": "#/definitions/engineLookup"
+        }
+      }
+    },
+    "engineTriggerJobState": {
+      "type": "string",
+      "default": "idle",
+      "enum": [
+        "idle",
+        "active",
+        "done",
+        "error"
+      ]
     },
     "engineTriggerType": {
       "type": "string",

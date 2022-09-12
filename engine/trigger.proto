@@ -5,6 +5,7 @@ package engine;
 option go_package = "github.com/webitel/protos/engine";
 
 import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
 import "const.proto";
 
 service TriggerService {
@@ -48,11 +49,66 @@ service TriggerService {
       delete: "/trigger/{id}"
     };
   }
+
+
+  rpc CreateTriggerJob(CreateTriggerJobRequest) returns (TriggerJob) {
+    option (google.api.http) = {
+      post: "/trigger/{trigger_id}/job"
+      body: "*"
+    };
+  }
+
+  rpc SearchTriggerJob(SearchTriggerJobRequest) returns (ListTriggerJob) {
+    option (google.api.http) = {
+      get: "/trigger/{trigger_id}/job"
+    };
+  }
 }
 
 enum TriggerType {
   default_trigger_type = 0;
   cron = 1;
+}
+
+enum TriggerJobState {
+  idle = 0;
+  active = 1;
+  done = 2;
+  error = 3;
+}
+
+message CreateTriggerJobRequest {
+  int32 trigger_id = 1;
+  map<string,string> variables = 2;
+}
+
+message TriggerJob {
+  int64 id = 1;
+  Lookup trigger = 2;
+  TriggerJobState state = 3;
+  int64 created_at = 4;
+  int64 started_at = 5;
+  int64 stopped_at = 6;
+  google.protobuf.Value parameters = 7;
+  string error = 8;
+  google.protobuf.Value result = 9;
+}
+
+message SearchTriggerJobRequest {
+  int32 page = 1;
+  int32 size = 2;
+  string q = 3;
+  string sort = 4;
+  repeated string fields = 5;
+
+  int32 trigger_id = 6;
+  FilterBetween created_at = 7;
+}
+
+
+message ListTriggerJob {
+  bool next = 1;
+  repeated TriggerJob items = 2;
 }
 
 message Trigger {
