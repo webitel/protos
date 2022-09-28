@@ -8986,6 +8986,43 @@
         }
       }
     },
+    "/email/profile/{id}/test": {
+      "get": {
+        "tags": [
+          "EmailProfileService"
+        ],
+        "summary": "EmailProfile check login",
+        "operationId": "TestEmailProfile",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineTestEmailProfileResponse"
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {}
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        }
+      }
+    },
     "/regions": {
       "get": {
         "tags": [
@@ -13957,11 +13994,13 @@
       "required": [
         "name",
         "schema",
-        "host",
+        "smtp_host",
+        "imap_host",
         "login",
         "mailbox",
         "smtp_port",
-        "imap_port"
+        "imap_port",
+        "fetch_interval"
       ],
       "properties": {
         "description": {
@@ -13971,7 +14010,11 @@
           "type": "boolean",
           "format": "boolean"
         },
-        "host": {
+        "fetch_interval": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "imap_host": {
           "type": "string"
         },
         "imap_port": {
@@ -13992,6 +14035,9 @@
         },
         "schema": {
           "$ref": "#/definitions/engineLookup"
+        },
+        "smtp_host": {
+          "type": "string"
         },
         "smtp_port": {
           "type": "integer",
@@ -14761,6 +14807,10 @@
     "engineEmailProfile": {
       "type": "object",
       "properties": {
+        "activity_at": {
+          "type": "string",
+          "format": "int64"
+        },
         "created_at": {
           "type": "string",
           "format": "int64"
@@ -14775,12 +14825,19 @@
           "type": "boolean",
           "format": "boolean"
         },
-        "host": {
+        "fetch_error": {
           "type": "string"
+        },
+        "fetch_interval": {
+          "type": "integer",
+          "format": "int32"
         },
         "id": {
           "type": "string",
           "format": "int64"
+        },
+        "imap_host": {
+          "type": "string"
         },
         "imap_port": {
           "type": "integer",
@@ -14801,9 +14858,15 @@
         "schema": {
           "$ref": "#/definitions/engineLookup"
         },
+        "smtp_host": {
+          "type": "string"
+        },
         "smtp_port": {
           "type": "integer",
           "format": "int32"
+        },
+        "state": {
+          "type": "string"
         },
         "updated_at": {
           "type": "string",
@@ -16477,18 +16540,22 @@
           "type": "boolean",
           "format": "boolean"
         },
+        "fetch_interval": {
+          "type": "integer",
+          "format": "int32"
+        },
         "fields": {
           "type": "array",
           "items": {
             "type": "string"
           }
         },
-        "host": {
-          "type": "string"
-        },
         "id": {
           "type": "string",
           "format": "int64"
+        },
+        "imap_host": {
+          "type": "string"
         },
         "imap_port": {
           "type": "integer",
@@ -16508,6 +16575,9 @@
         },
         "schema": {
           "$ref": "#/definitions/engineLookup"
+        },
+        "smtp_host": {
+          "type": "string"
         },
         "smtp_port": {
           "type": "integer",
@@ -17651,6 +17721,14 @@
         }
       }
     },
+    "engineTestEmailProfileResponse": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        }
+      }
+    },
     "engineTimezone": {
       "type": "object",
       "properties": {
@@ -18081,14 +18159,15 @@
       "type": "object",
       "title": "Update email profile request body",
       "required": [
-        "id",
         "name",
         "schema",
-        "host",
+        "smtp_host",
+        "imap_host",
         "login",
         "mailbox",
         "smtp_port",
-        "imap_port"
+        "imap_port",
+        "fetch_interval"
       ],
       "properties": {
         "description": {
@@ -18098,12 +18177,16 @@
           "type": "boolean",
           "format": "boolean"
         },
-        "host": {
-          "type": "string"
+        "fetch_interval": {
+          "type": "integer",
+          "format": "int32"
         },
         "id": {
           "type": "string",
           "format": "int64"
+        },
+        "imap_host": {
+          "type": "string"
         },
         "imap_port": {
           "type": "integer",
@@ -18123,6 +18206,9 @@
         },
         "schema": {
           "$ref": "#/definitions/engineLookup"
+        },
+        "smtp_host": {
+          "type": "string"
         },
         "smtp_port": {
           "type": "integer",

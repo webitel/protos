@@ -9385,6 +9385,43 @@
         ]
       }
     },
+    "/email/profile/{id}/test": {
+      "get": {
+        "summary": "EmailProfile check login",
+        "operationId": "TestEmailProfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineTestEmailProfileResponse"
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {}
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "EmailProfileService"
+        ]
+      }
+    },
     "/regions": {
       "get": {
         "operationId": "SearchRegion",
@@ -13537,7 +13574,7 @@
           "type": "boolean",
           "format": "boolean"
         },
-        "host": {
+        "smtp_host": {
           "type": "string"
         },
         "login": {
@@ -13556,6 +13593,13 @@
         "imap_port": {
           "type": "integer",
           "format": "int32"
+        },
+        "imap_host": {
+          "type": "string"
+        },
+        "fetch_interval": {
+          "type": "integer",
+          "format": "int32"
         }
       },
       "description": "Create email profile for gateway",
@@ -13563,11 +13607,13 @@
       "required": [
         "name",
         "schema",
-        "host",
+        "smtp_host",
+        "imap_host",
         "login",
         "mailbox",
         "smtp_port",
-        "imap_port"
+        "imap_port",
+        "fetch_interval"
       ]
     },
     "engineCreateListCommunicationRequest": {
@@ -14363,7 +14409,7 @@
           "type": "boolean",
           "format": "boolean"
         },
-        "host": {
+        "imap_host": {
           "type": "string"
         },
         "login": {
@@ -14382,6 +14428,23 @@
         },
         "password": {
           "type": "string"
+        },
+        "smtp_host": {
+          "type": "string"
+        },
+        "fetch_interval": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "fetch_error": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "activity_at": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -16053,7 +16116,7 @@
           "type": "boolean",
           "format": "boolean"
         },
-        "host": {
+        "imap_host": {
           "type": "string"
         },
         "login": {
@@ -16072,6 +16135,13 @@
         },
         "password": {
           "type": "string"
+        },
+        "smtp_host": {
+          "type": "string"
+        },
+        "fetch_interval": {
+          "type": "integer",
+          "format": "int32"
         },
         "fields": {
           "type": "array",
@@ -17222,6 +17292,14 @@
         }
       }
     },
+    "engineTestEmailProfileResponse": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        }
+      }
+    },
     "engineTimezone": {
       "type": "object",
       "properties": {
@@ -17667,7 +17745,7 @@
           "type": "boolean",
           "format": "boolean"
         },
-        "host": {
+        "imap_host": {
           "type": "string"
         },
         "login": {
@@ -17686,19 +17764,27 @@
         },
         "password": {
           "type": "string"
+        },
+        "smtp_host": {
+          "type": "string"
+        },
+        "fetch_interval": {
+          "type": "integer",
+          "format": "int32"
         }
       },
       "description": "Update email profile for gateway",
       "title": "Update email profile request body",
       "required": [
-        "id",
         "name",
         "schema",
-        "host",
+        "smtp_host",
+        "imap_host",
         "login",
         "mailbox",
         "smtp_port",
-        "imap_port"
+        "imap_port",
+        "fetch_interval"
       ]
     },
     "engineUpdateListCommunicationRequest": {

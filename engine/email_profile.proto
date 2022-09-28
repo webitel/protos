@@ -24,6 +24,13 @@ service EmailProfileService {
         };
     }
 
+    // EmailProfile check login
+    rpc TestEmailProfile(TestEmailProfileRequest) returns (TestEmailProfileResponse) {
+        option (google.api.http) = {
+            get: "/email/profile/{id}/test"
+        };
+    }
+
     // EmailProfile item
     rpc ReadEmailProfile(ReadEmailProfileRequest) returns (EmailProfile) {
         option (google.api.http) = {
@@ -54,6 +61,14 @@ service EmailProfileService {
     }
 }
 
+message TestEmailProfileRequest {
+    int32 id = 1;
+}
+
+message TestEmailProfileResponse {
+    string error = 1;
+}
+
 message ReadEmailProfileRequest {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
         json_schema: {
@@ -81,7 +96,7 @@ message UpdateEmailProfileRequest {
         json_schema: {
             title: "Update email profile request body"
             description: "Update email profile for gateway"
-            required: ["id", "name", "schema", "host", "login", "mailbox", "smtp_port", "imap_port"]
+            required: ["name", "schema", "smtp_host", "imap_host", "login", "mailbox", "smtp_port", "imap_port", "fetch_interval"]
         }
     };
     int64 id = 1;
@@ -90,12 +105,14 @@ message UpdateEmailProfileRequest {
     string description = 3;
     Lookup schema = 4;
     bool enabled = 5;
-    string host = 6;
+    string imap_host = 6;
     string login = 7;
     string mailbox = 8;
     int32 smtp_port = 9;
     int32 imap_port = 10;
     string password = 11;
+    string smtp_host = 12;
+    int32 fetch_interval = 13;
 }
 
 message SearchEmailProfileRequest {
@@ -122,12 +139,17 @@ message EmailProfile {
     string description = 8;
     Lookup schema = 9;
     bool enabled = 10;
-    string host = 11;
+    string imap_host = 11;
     string login = 12;
     string mailbox = 13;
     int32 smtp_port = 14;
     int32 imap_port = 15;
     string password = 16;
+    string smtp_host = 17;
+    int32  fetch_interval = 18;
+    string fetch_error = 19;
+    string state = 20;
+    int64 activity_at = 21;
 }
 
 message CreateEmailProfileRequest {
@@ -135,19 +157,21 @@ message CreateEmailProfileRequest {
         json_schema: {
             title: "Create email profile request body"
             description: "Create email profile for gateway"
-            required: ["name", "schema", "host", "login", "mailbox", "smtp_port", "imap_port"]
+            required: ["name", "schema", "smtp_host", "imap_host", "login", "mailbox", "smtp_port", "imap_port", "fetch_interval"]
         }
     };
     string name = 2;
     string description = 3;
     Lookup schema = 4;
     bool enabled = 5;
-    string host = 6;
+    string smtp_host = 6;
     string login = 7;
     string password = 8;
     string mailbox = 9;
     int32 smtp_port = 10;
     int32 imap_port = 11;
+    string imap_host = 12;
+    int32 fetch_interval = 13;
 }
 
 message PatchEmailProfileRequest {
@@ -164,12 +188,14 @@ message PatchEmailProfileRequest {
     string description = 3;
     Lookup schema = 4;
     bool enabled = 5;
-    string host = 6;
+    string imap_host = 6;
     string login = 7;
     string mailbox = 8;
     int32 smtp_port = 9;
     int32 imap_port = 10;
     string password = 11;
+    string smtp_host = 12;
+    int32 fetch_interval = 13;
 
     repeated string fields = 50;
 }
