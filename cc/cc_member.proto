@@ -22,12 +22,22 @@ service MemberService {
     rpc CallJoinToQueue(CallJoinToQueueRequest) returns (stream QueueEvent) {}
     rpc ChatJoinToQueue(ChatJoinToQueueRequest) returns (stream QueueEvent) {}
     rpc CallJoinToAgent(CallJoinToAgentRequest) returns (stream QueueEvent) {}
+    rpc CancelAttempt(CancelAttemptRequest) returns (CancelAttemptResponse) {}
     rpc CancelAgentDistribute(CancelAgentDistributeRequest) returns (CancelAgentDistributeResponse) {}
 
     rpc EmailJoinToQueue(EmailJoinToQueueRequest) returns (EmailJoinToQueueResponse) {}
     rpc DirectAgentToMember(DirectAgentToMemberRequest) returns (DirectAgentToMemberResponse) {}
 
     rpc ProcessingFormAction(ProcessingFormActionRequest) returns (ProcessingFormActionResponse) {}
+}
+
+message CancelAttemptRequest {
+    int64 attempt_id = 1;
+    string result = 2;
+}
+
+message CancelAttemptResponse {
+
 }
 
 message ProcessingFormActionRequest {
@@ -91,6 +101,11 @@ message AttemptRenewalResultResponse {
 message QueueEvent {
     string name = 1;
 
+    message JoinedData {
+        int64 attempt_id = 1;
+        string app_id = 2;
+    }
+
     message OfferingData {
         int32 agent_id = 1;
         string agent_call_id = 2;
@@ -114,6 +129,7 @@ message QueueEvent {
         BridgedData bridged = 3;
         MissedAgent missed = 4;
         LeavingData leaving = 5;
+        JoinedData joined = 6;
     }
 }
 

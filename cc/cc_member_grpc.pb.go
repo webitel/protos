@@ -27,6 +27,7 @@ type MemberServiceClient interface {
 	CallJoinToQueue(ctx context.Context, in *CallJoinToQueueRequest, opts ...grpc.CallOption) (MemberService_CallJoinToQueueClient, error)
 	ChatJoinToQueue(ctx context.Context, in *ChatJoinToQueueRequest, opts ...grpc.CallOption) (MemberService_ChatJoinToQueueClient, error)
 	CallJoinToAgent(ctx context.Context, in *CallJoinToAgentRequest, opts ...grpc.CallOption) (MemberService_CallJoinToAgentClient, error)
+	CancelAttempt(ctx context.Context, in *CancelAttemptRequest, opts ...grpc.CallOption) (*CancelAttemptResponse, error)
 	CancelAgentDistribute(ctx context.Context, in *CancelAgentDistributeRequest, opts ...grpc.CallOption) (*CancelAgentDistributeResponse, error)
 	EmailJoinToQueue(ctx context.Context, in *EmailJoinToQueueRequest, opts ...grpc.CallOption) (*EmailJoinToQueueResponse, error)
 	DirectAgentToMember(ctx context.Context, in *DirectAgentToMemberRequest, opts ...grpc.CallOption) (*DirectAgentToMemberResponse, error)
@@ -155,6 +156,15 @@ func (x *memberServiceCallJoinToAgentClient) Recv() (*QueueEvent, error) {
 	return m, nil
 }
 
+func (c *memberServiceClient) CancelAttempt(ctx context.Context, in *CancelAttemptRequest, opts ...grpc.CallOption) (*CancelAttemptResponse, error) {
+	out := new(CancelAttemptResponse)
+	err := c.cc.Invoke(ctx, "/cc.MemberService/CancelAttempt", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *memberServiceClient) CancelAgentDistribute(ctx context.Context, in *CancelAgentDistributeRequest, opts ...grpc.CallOption) (*CancelAgentDistributeResponse, error) {
 	out := new(CancelAgentDistributeResponse)
 	err := c.cc.Invoke(ctx, "/cc.MemberService/CancelAgentDistribute", in, out, opts...)
@@ -200,6 +210,7 @@ type MemberServiceServer interface {
 	CallJoinToQueue(*CallJoinToQueueRequest, MemberService_CallJoinToQueueServer) error
 	ChatJoinToQueue(*ChatJoinToQueueRequest, MemberService_ChatJoinToQueueServer) error
 	CallJoinToAgent(*CallJoinToAgentRequest, MemberService_CallJoinToAgentServer) error
+	CancelAttempt(context.Context, *CancelAttemptRequest) (*CancelAttemptResponse, error)
 	CancelAgentDistribute(context.Context, *CancelAgentDistributeRequest) (*CancelAgentDistributeResponse, error)
 	EmailJoinToQueue(context.Context, *EmailJoinToQueueRequest) (*EmailJoinToQueueResponse, error)
 	DirectAgentToMember(context.Context, *DirectAgentToMemberRequest) (*DirectAgentToMemberResponse, error)
@@ -225,6 +236,9 @@ func (UnimplementedMemberServiceServer) ChatJoinToQueue(*ChatJoinToQueueRequest,
 }
 func (UnimplementedMemberServiceServer) CallJoinToAgent(*CallJoinToAgentRequest, MemberService_CallJoinToAgentServer) error {
 	return status.Errorf(codes.Unimplemented, "method CallJoinToAgent not implemented")
+}
+func (UnimplementedMemberServiceServer) CancelAttempt(context.Context, *CancelAttemptRequest) (*CancelAttemptResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CancelAttempt not implemented")
 }
 func (UnimplementedMemberServiceServer) CancelAgentDistribute(context.Context, *CancelAgentDistributeRequest) (*CancelAgentDistributeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CancelAgentDistribute not implemented")
@@ -350,6 +364,24 @@ func (x *memberServiceCallJoinToAgentServer) Send(m *QueueEvent) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _MemberService_CancelAttempt_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CancelAttemptRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MemberServiceServer).CancelAttempt(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cc.MemberService/CancelAttempt",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MemberServiceServer).CancelAttempt(ctx, req.(*CancelAttemptRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _MemberService_CancelAgentDistribute_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CancelAgentDistributeRequest)
 	if err := dec(in); err != nil {
@@ -436,6 +468,10 @@ var MemberService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AttemptRenewalResult",
 			Handler:    _MemberService_AttemptRenewalResult_Handler,
+		},
+		{
+			MethodName: "CancelAttempt",
+			Handler:    _MemberService_CancelAttempt_Handler,
 		},
 		{
 			MethodName: "CancelAgentDistribute",
