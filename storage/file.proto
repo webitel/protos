@@ -8,7 +8,9 @@ import "google/api/annotations.proto";
 
 service FileService {
     rpc UploadFile (stream UploadFileRequest) returns (UploadFileResponse) {}
+    rpc DownloadFile (DownloadFileRequest) returns (stream StreamFile) {}
     rpc UploadFileUrl (UploadFileUrlRequest) returns (UploadFileUrlResponse) {}
+
     rpc DeleteFiles (DeleteFilesRequest) returns (DeleteFilesResponse) {
         option (google.api.http) = {
             delete: "/storage/file"
@@ -21,6 +23,29 @@ enum UploadStatusCode {
     Unknown = 0;
     Ok = 1;
     Failed = 2;
+}
+
+message DownloadFileRequest {
+    int64 id = 1;
+    int64 domain_id = 2;
+    bool metadata = 3;
+}
+
+message StreamFile {
+
+    message Metadata {
+        int64 id = 1;
+        string name = 2;
+        string mime_type = 3;
+        string uuid = 4;
+        int64 size = 5;
+    }
+
+    oneof data {
+        Metadata metadata = 1;
+        bytes chunk = 2;
+    };
+
 }
 
 message DeleteFilesRequest {
@@ -54,6 +79,7 @@ message UploadFileRequest {
         string name = 2;
         string mime_type = 3;
         string uuid = 4;
+        bool stream_response = 5;
     }
 
     oneof data {
