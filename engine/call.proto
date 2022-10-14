@@ -159,6 +159,7 @@ message SearchHistoryCallRequest {
     BoolFilter has_transcript = 33;
     string agent_description = 34;
     repeated int64 owner_id = 35;
+    repeated int64 grantee_id = 36;
 }
 
 message AggregateRequest {
@@ -370,9 +371,18 @@ message HistoryCall {
     repeated HistoryFileJob files_job = 49;
     repeated TranscriptLookup transcripts = 50;
     int32 talk_sec = 51;
+    Lookup grantee = 52;
 }
 
 message EavesdropCallRequest {
+    message EndpointRequest {
+        string app_id = 1;
+        string type = 2;
+        int64 id = 3;
+        string extension = 4;
+    }
+
+
     string id = 1;
     string app_id = 2;
 
@@ -381,8 +391,7 @@ message EavesdropCallRequest {
     bool listen_b = 5;
     bool whisper_a = 6;
     bool whisper_b = 7;
-
-    int64 domain_id = 8;
+    EndpointRequest from = 9;
 }
 
 message BlindTransferCallRequest {
