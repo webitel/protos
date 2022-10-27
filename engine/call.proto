@@ -91,6 +91,13 @@ service CallService {
         };
     }
 
+    rpc SetVariablesCall (SetVariablesCallRequest) returns (SetVariablesCallResponse) {
+        option (google.api.http) = {
+            patch: "/calls/active/{id}/variables"
+            body: "*"
+        };
+    }
+
     rpc CreateCallAnnotation (CreateCallAnnotationRequest) returns (CallAnnotation) {
         option (google.api.http) = {
             post: "/calls/history/{call_id}/annotation"
@@ -110,6 +117,15 @@ service CallService {
             delete: "/calls/history/{call_id}/annotation/{id}"
         };
     }
+}
+
+message SetVariablesCallRequest {
+    string id = 1;
+    map<string,string> variables = 2;
+}
+
+message SetVariablesCallResponse {
+
 }
 
 message ConfirmPushRequest {
