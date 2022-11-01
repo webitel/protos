@@ -9687,6 +9687,56 @@
         }
       }
     },
+    "/chat/bots/{profile_id}/broadcast": {
+      "post": {
+        "tags": [
+          "ChatHelperService"
+        ],
+        "operationId": "ChatHelperService_Broadcast",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "profile_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engineBroadcastRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineBroadcastResponse"
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {}
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        }
+      }
+    },
     "/email/profile": {
       "get": {
         "tags": [
@@ -14639,6 +14689,27 @@
         "true",
         "false"
       ]
+    },
+    "engineBroadcastRequest": {
+      "type": "object",
+      "properties": {
+        "peer": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "profile_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    },
+    "engineBroadcastResponse": {
+      "type": "object"
     },
     "engineBucket": {
       "type": "object",
