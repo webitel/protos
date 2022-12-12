@@ -28,6 +28,7 @@ type EmailProfileServiceClient interface {
 	SearchEmailProfile(ctx context.Context, in *SearchEmailProfileRequest, opts ...grpc.CallOption) (*ListEmailProfile, error)
 	// EmailProfile check login
 	TestEmailProfile(ctx context.Context, in *TestEmailProfileRequest, opts ...grpc.CallOption) (*TestEmailProfileResponse, error)
+	LoginEmailProfile(ctx context.Context, in *LoginEmailProfileRequest, opts ...grpc.CallOption) (*LoginEmailProfileResponse, error)
 	// EmailProfile item
 	ReadEmailProfile(ctx context.Context, in *ReadEmailProfileRequest, opts ...grpc.CallOption) (*EmailProfile, error)
 	PatchEmailProfile(ctx context.Context, in *PatchEmailProfileRequest, opts ...grpc.CallOption) (*EmailProfile, error)
@@ -66,6 +67,15 @@ func (c *emailProfileServiceClient) SearchEmailProfile(ctx context.Context, in *
 func (c *emailProfileServiceClient) TestEmailProfile(ctx context.Context, in *TestEmailProfileRequest, opts ...grpc.CallOption) (*TestEmailProfileResponse, error) {
 	out := new(TestEmailProfileResponse)
 	err := c.cc.Invoke(ctx, "/engine.EmailProfileService/TestEmailProfile", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *emailProfileServiceClient) LoginEmailProfile(ctx context.Context, in *LoginEmailProfileRequest, opts ...grpc.CallOption) (*LoginEmailProfileResponse, error) {
+	out := new(LoginEmailProfileResponse)
+	err := c.cc.Invoke(ctx, "/engine.EmailProfileService/LoginEmailProfile", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -118,6 +128,7 @@ type EmailProfileServiceServer interface {
 	SearchEmailProfile(context.Context, *SearchEmailProfileRequest) (*ListEmailProfile, error)
 	// EmailProfile check login
 	TestEmailProfile(context.Context, *TestEmailProfileRequest) (*TestEmailProfileResponse, error)
+	LoginEmailProfile(context.Context, *LoginEmailProfileRequest) (*LoginEmailProfileResponse, error)
 	// EmailProfile item
 	ReadEmailProfile(context.Context, *ReadEmailProfileRequest) (*EmailProfile, error)
 	PatchEmailProfile(context.Context, *PatchEmailProfileRequest) (*EmailProfile, error)
@@ -140,6 +151,9 @@ func (UnimplementedEmailProfileServiceServer) SearchEmailProfile(context.Context
 }
 func (UnimplementedEmailProfileServiceServer) TestEmailProfile(context.Context, *TestEmailProfileRequest) (*TestEmailProfileResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TestEmailProfile not implemented")
+}
+func (UnimplementedEmailProfileServiceServer) LoginEmailProfile(context.Context, *LoginEmailProfileRequest) (*LoginEmailProfileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LoginEmailProfile not implemented")
 }
 func (UnimplementedEmailProfileServiceServer) ReadEmailProfile(context.Context, *ReadEmailProfileRequest) (*EmailProfile, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReadEmailProfile not implemented")
@@ -216,6 +230,24 @@ func _EmailProfileService_TestEmailProfile_Handler(srv interface{}, ctx context.
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(EmailProfileServiceServer).TestEmailProfile(ctx, req.(*TestEmailProfileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _EmailProfileService_LoginEmailProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginEmailProfileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EmailProfileServiceServer).LoginEmailProfile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/engine.EmailProfileService/LoginEmailProfile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EmailProfileServiceServer).LoginEmailProfile(ctx, req.(*LoginEmailProfileRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -310,6 +342,10 @@ var EmailProfileService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "TestEmailProfile",
 			Handler:    _EmailProfileService_TestEmailProfile_Handler,
+		},
+		{
+			MethodName: "LoginEmailProfile",
+			Handler:    _EmailProfileService_LoginEmailProfile_Handler,
 		},
 		{
 			MethodName: "ReadEmailProfile",

@@ -31,6 +31,12 @@ service EmailProfileService {
         };
     }
 
+    rpc LoginEmailProfile(LoginEmailProfileRequest) returns (LoginEmailProfileResponse) {
+        option (google.api.http) = {
+            get: "/email/profile/{id}/login"
+        };
+    }
+
     // EmailProfile item
     rpc ReadEmailProfile(ReadEmailProfileRequest) returns (EmailProfile) {
         option (google.api.http) = {
@@ -59,6 +65,17 @@ service EmailProfileService {
             delete: "/email/profile/{id}"
         };
     }
+}
+
+message LoginEmailProfileRequest {
+    int32 id = 1;
+}
+
+
+message LoginEmailProfileResponse {
+    string auth_type = 1;
+    string redirect_url = 2;
+    map<string,string> cookie = 3;
 }
 
 message TestEmailProfileRequest {
@@ -113,6 +130,8 @@ message UpdateEmailProfileRequest {
     string password = 11;
     string smtp_host = 12;
     int32 fetch_interval = 13;
+    string auth_type = 14;
+    bool listen = 15;
 }
 
 message SearchEmailProfileRequest {
@@ -150,6 +169,8 @@ message EmailProfile {
     string fetch_error = 19;
     string state = 20;
     int64 activity_at = 21;
+    string auth_type = 22;
+    bool listen = 23;
 }
 
 message CreateEmailProfileRequest {
@@ -172,6 +193,8 @@ message CreateEmailProfileRequest {
     int32 imap_port = 11;
     string imap_host = 12;
     int32 fetch_interval = 13;
+    string auth_type = 14;
+    bool listen = 15;
 }
 
 message PatchEmailProfileRequest {
@@ -196,6 +219,7 @@ message PatchEmailProfileRequest {
     string password = 11;
     string smtp_host = 12;
     int32 fetch_interval = 13;
+    bool listen = 14;
 
     repeated string fields = 50;
 }
