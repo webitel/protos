@@ -7,10 +7,10 @@
 package engine
 
 import (
+	_struct "github.com/golang/protobuf/ptypes/struct"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	structpb "google.golang.org/protobuf/types/known/structpb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -186,9 +186,9 @@ type TriggerJob struct {
 	CreatedAt  int64           `protobuf:"varint,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	StartedAt  int64           `protobuf:"varint,5,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
 	StoppedAt  int64           `protobuf:"varint,6,opt,name=stopped_at,json=stoppedAt,proto3" json:"stopped_at,omitempty"`
-	Parameters *structpb.Value `protobuf:"bytes,7,opt,name=parameters,proto3" json:"parameters,omitempty"`
+	Parameters *_struct.Value  `protobuf:"bytes,7,opt,name=parameters,proto3" json:"parameters,omitempty"`
 	Error      string          `protobuf:"bytes,8,opt,name=error,proto3" json:"error,omitempty"`
-	Result     *structpb.Value `protobuf:"bytes,9,opt,name=result,proto3" json:"result,omitempty"`
+	Result     *_struct.Value  `protobuf:"bytes,9,opt,name=result,proto3" json:"result,omitempty"`
 }
 
 func (x *TriggerJob) Reset() {
@@ -265,7 +265,7 @@ func (x *TriggerJob) GetStoppedAt() int64 {
 	return 0
 }
 
-func (x *TriggerJob) GetParameters() *structpb.Value {
+func (x *TriggerJob) GetParameters() *_struct.Value {
 	if x != nil {
 		return x.Parameters
 	}
@@ -279,7 +279,7 @@ func (x *TriggerJob) GetError() string {
 	return ""
 }
 
-func (x *TriggerJob) GetResult() *structpb.Value {
+func (x *TriggerJob) GetResult() *_struct.Value {
 	if x != nil {
 		return x.Result
 	}
@@ -1474,7 +1474,7 @@ var file_trigger_proto_goTypes = []interface{}{
 	nil,                             // 17: engine.UpdateTriggerRequest.VariablesEntry
 	nil,                             // 18: engine.PatchTriggerRequest.VariablesEntry
 	(*Lookup)(nil),                  // 19: engine.Lookup
-	(*structpb.Value)(nil),          // 20: google.protobuf.Value
+	(*_struct.Value)(nil),           // 20: google.protobuf.Value
 	(*FilterBetween)(nil),           // 21: engine.FilterBetween
 }
 var file_trigger_proto_depIdxs = []int32{

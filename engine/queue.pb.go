@@ -7,10 +7,10 @@
 package engine
 
 import (
+	_struct "github.com/golang/protobuf/ptypes/struct"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	structpb "google.golang.org/protobuf/types/known/structpb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -474,7 +474,7 @@ type PatchQueueRequest struct {
 	Id                   int64             `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Strategy             string            `protobuf:"bytes,2,opt,name=strategy,proto3" json:"strategy,omitempty"`
 	Enabled              bool              `protobuf:"varint,3,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	Payload              *structpb.Value   `protobuf:"bytes,4,opt,name=payload,proto3" json:"payload,omitempty"`
+	Payload              *_struct.Value    `protobuf:"bytes,4,opt,name=payload,proto3" json:"payload,omitempty"`
 	Calendar             *Lookup           `protobuf:"bytes,5,opt,name=calendar,proto3" json:"calendar,omitempty"`
 	Priority             int32             `protobuf:"varint,6,opt,name=priority,proto3" json:"priority,omitempty"`
 	Name                 string            `protobuf:"bytes,7,opt,name=name,proto3" json:"name,omitempty"`
@@ -553,7 +553,7 @@ func (x *PatchQueueRequest) GetEnabled() bool {
 	return false
 }
 
-func (x *PatchQueueRequest) GetPayload() *structpb.Value {
+func (x *PatchQueueRequest) GetPayload() *_struct.Value {
 	if x != nil {
 		return x.Payload
 	}
@@ -784,7 +784,7 @@ type UpdateQueueRequest struct {
 	Id                   int64             `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Strategy             string            `protobuf:"bytes,2,opt,name=strategy,proto3" json:"strategy,omitempty"`
 	Enabled              bool              `protobuf:"varint,3,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	Payload              *structpb.Value   `protobuf:"bytes,4,opt,name=payload,proto3" json:"payload,omitempty"`
+	Payload              *_struct.Value    `protobuf:"bytes,4,opt,name=payload,proto3" json:"payload,omitempty"`
 	Calendar             *Lookup           `protobuf:"bytes,5,opt,name=calendar,proto3" json:"calendar,omitempty"`
 	Priority             int32             `protobuf:"varint,6,opt,name=priority,proto3" json:"priority,omitempty"`
 	Name                 string            `protobuf:"bytes,7,opt,name=name,proto3" json:"name,omitempty"`
@@ -862,7 +862,7 @@ func (x *UpdateQueueRequest) GetEnabled() bool {
 	return false
 }
 
-func (x *UpdateQueueRequest) GetPayload() *structpb.Value {
+func (x *UpdateQueueRequest) GetPayload() *_struct.Value {
 	if x != nil {
 		return x.Payload
 	}
@@ -1251,7 +1251,7 @@ type CreateQueueRequest struct {
 
 	Strategy             string            `protobuf:"bytes,1,opt,name=strategy,proto3" json:"strategy,omitempty"`
 	Enabled              bool              `protobuf:"varint,2,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	Payload              *structpb.Value   `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"`
+	Payload              *_struct.Value    `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"`
 	Calendar             *Lookup           `protobuf:"bytes,4,opt,name=calendar,proto3" json:"calendar,omitempty"`
 	Priority             int32             `protobuf:"varint,5,opt,name=priority,proto3" json:"priority,omitempty"`
 	Name                 string            `protobuf:"bytes,6,opt,name=name,proto3" json:"name,omitempty"`
@@ -1322,7 +1322,7 @@ func (x *CreateQueueRequest) GetEnabled() bool {
 	return false
 }
 
-func (x *CreateQueueRequest) GetPayload() *structpb.Value {
+func (x *CreateQueueRequest) GetPayload() *_struct.Value {
 	if x != nil {
 		return x.Payload
 	}
@@ -1496,7 +1496,7 @@ type Queue struct {
 	UpdatedBy            *Lookup           `protobuf:"bytes,6,opt,name=updated_by,json=updatedBy,proto3" json:"updated_by,omitempty"`
 	Strategy             string            `protobuf:"bytes,7,opt,name=strategy,proto3" json:"strategy,omitempty"`
 	Enabled              bool              `protobuf:"varint,8,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	Payload              *structpb.Value   `protobuf:"bytes,9,opt,name=payload,proto3" json:"payload,omitempty"`
+	Payload              *_struct.Value    `protobuf:"bytes,9,opt,name=payload,proto3" json:"payload,omitempty"`
 	Calendar             *Lookup           `protobuf:"bytes,10,opt,name=calendar,proto3" json:"calendar,omitempty"`
 	Priority             int32             `protobuf:"varint,11,opt,name=priority,proto3" json:"priority,omitempty"`
 	Name                 string            `protobuf:"bytes,12,opt,name=name,proto3" json:"name,omitempty"`
@@ -1611,7 +1611,7 @@ func (x *Queue) GetEnabled() bool {
 	return false
 }
 
-func (x *Queue) GetPayload() *structpb.Value {
+func (x *Queue) GetPayload() *_struct.Value {
 	if x != nil {
 		return x.Payload
 	}
@@ -2459,7 +2459,7 @@ var file_queue_proto_goTypes = []interface{}{
 	nil,                                                    // 18: engine.Queue.VariablesEntry
 	(*FilterBetween)(nil),                                  // 19: engine.FilterBetween
 	(*Lookup)(nil),                                         // 20: engine.Lookup
-	(*structpb.Value)(nil),                                 // 21: google.protobuf.Value
+	(*_struct.Value)(nil),                                  // 21: google.protobuf.Value
 }
 var file_queue_proto_depIdxs = []int32{
 	19, // 0: engine.SearchQueueReportGeneralRequest.joined_at:type_name -> engine.FilterBetween
