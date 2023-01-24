@@ -36,6 +36,7 @@ type ApiClient interface {
 	UnHold(ctx context.Context, in *UnHoldRequest, opts ...grpc.CallOption) (*UnHoldResponse, error)
 	SetProfileVar(ctx context.Context, in *SetProfileVarRequest, opts ...grpc.CallOption) (*SetProfileVarResponse, error)
 	ConfirmPush(ctx context.Context, in *ConfirmPushRequest, opts ...grpc.CallOption) (*ConfirmPushResponse, error)
+	Broadcast(ctx context.Context, in *BroadcastRequest, opts ...grpc.CallOption) (*BroadcastResponse, error)
 }
 
 type apiClient struct {
@@ -172,6 +173,15 @@ func (c *apiClient) ConfirmPush(ctx context.Context, in *ConfirmPushRequest, opt
 	return out, nil
 }
 
+func (c *apiClient) Broadcast(ctx context.Context, in *BroadcastRequest, opts ...grpc.CallOption) (*BroadcastResponse, error) {
+	out := new(BroadcastResponse)
+	err := c.cc.Invoke(ctx, "/fs.Api/Broadcast", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ApiServer is the server API for Api service.
 // All implementations must embed UnimplementedApiServer
 // for forward compatibility
@@ -190,6 +200,7 @@ type ApiServer interface {
 	UnHold(context.Context, *UnHoldRequest) (*UnHoldResponse, error)
 	SetProfileVar(context.Context, *SetProfileVarRequest) (*SetProfileVarResponse, error)
 	ConfirmPush(context.Context, *ConfirmPushRequest) (*ConfirmPushResponse, error)
+	Broadcast(context.Context, *BroadcastRequest) (*BroadcastResponse, error)
 	mustEmbedUnimplementedApiServer()
 }
 
@@ -238,6 +249,9 @@ func (UnimplementedApiServer) SetProfileVar(context.Context, *SetProfileVarReque
 }
 func (UnimplementedApiServer) ConfirmPush(context.Context, *ConfirmPushRequest) (*ConfirmPushResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ConfirmPush not implemented")
+}
+func (UnimplementedApiServer) Broadcast(context.Context, *BroadcastRequest) (*BroadcastResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Broadcast not implemented")
 }
 func (UnimplementedApiServer) mustEmbedUnimplementedApiServer() {}
 
@@ -504,6 +518,24 @@ func _Api_ConfirmPush_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Api_Broadcast_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BroadcastRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApiServer).Broadcast(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/fs.Api/Broadcast",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApiServer).Broadcast(ctx, req.(*BroadcastRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Api_ServiceDesc is the grpc.ServiceDesc for Api service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -566,6 +598,10 @@ var Api_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ConfirmPush",
 			Handler:    _Api_ConfirmPush_Handler,
+		},
+		{
+			MethodName: "Broadcast",
+			Handler:    _Api_Broadcast_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
