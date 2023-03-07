@@ -16,6 +16,13 @@ service AgentSkillService {
             body: "*"
         };
     }
+
+    rpc CreateAgentSkills(CreateAgentSkillsRequest) returns (CreateAgentSkillsResponse) {
+        option (google.api.http) = {
+            post: "/call_center/agents/{agent_id}/skills/bulk"
+            body: "*"
+        };
+    }
     // List of AgentSkill
     rpc SearchAgentSkill(SearchAgentSkillRequest) returns (ListAgentSkill) {
         option (google.api.http) = {
@@ -43,10 +50,23 @@ service AgentSkillService {
         };
     }
 
+    rpc PatchAgentSkills(PatchAgentSkillsRequest) returns (ListAgentSkill) {
+        option (google.api.http) = {
+            patch: "/call_center/agents/{agent_id}/skills"
+            body: "*"
+        };
+    }
+
     // Remove AgentSkill
     rpc DeleteAgentSkill(DeleteAgentSkillRequest) returns (AgentSkill) {
         option (google.api.http) = {
             delete: "/call_center/agents/{agent_id}/skills/{id}"
+        };
+    }
+
+    rpc DeleteAgentSkills(DeleteAgentSkillsRequest) returns (ListAgentSkill) {
+        option (google.api.http) = {
+            delete: "/call_center/agents/{agent_id}/skills"
         };
     }
 
@@ -58,6 +78,38 @@ service AgentSkillService {
     }
 }
 
+message PatchAgentSkillsRequest {
+    int64 agent_id = 1;
+    repeated string fields = 2;
+
+    repeated uint32 id = 3;
+    repeated uint32 skill_id = 4;
+
+    int32 capacity = 5;
+    bool enabled = 6;
+}
+
+message DeleteAgentSkillsRequest {
+    int64 agent_id = 1;
+    repeated uint32 id = 7;
+    repeated uint32 skill_id = 8;
+}
+
+message CreateAgentSkillsRequest {
+    int64 agent_id = 1;
+    repeated CreateAgentSkillBulkItem items = 2;
+}
+
+message CreateAgentSkillBulkItem {
+    Lookup skill = 1;
+    int32 capacity = 2;
+    int64 domain_id = 3;
+    bool enabled = 4;
+}
+
+message CreateAgentSkillsResponse {
+    repeated int64 ids = 1;
+}
 
 message SearchLookupAgentNotExistsSkillRequest {
     int64 agent_id = 1;
@@ -100,6 +152,7 @@ message SearchAgentSkillRequest {
     repeated string fields = 6;
 
     repeated uint32 id = 7;
+    repeated uint32 skill_id = 8;
 }
 
 message CreateAgentSkillRequest {

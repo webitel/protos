@@ -109,7 +109,7 @@ bot:
 .PHONY: swagger_mix
 
 swagger_mix:
-	swagger-mixin ./swagger/engine.swagger.json ./swagger/storage.swagger.json  > ./swagger/api.json | true
+	/home/igor/programs/golib/bin/swagger-mixin ./swagger/engine.swagger.json ./swagger/storage.swagger.json  > ./swagger/api.json | true
 
 
 .PHONY: clean
