@@ -1,0 +1,114 @@
+syntax = "proto3";
+
+package engine;
+
+option go_package = "github.com/webitel/protos/engine";
+
+import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
+
+enum PresetQuerySection {
+  section_default = 0;
+  section_calls = 1;
+}
+
+service PresetQueryService {
+  rpc CreatePresetQuery (CreatePresetQueryRequest) returns (PresetQuery) {
+    option (google.api.http) = {
+      post: "/call_center/preset/query"
+      body: "*"
+    };
+  }
+
+  rpc SearchPresetQuery(SearchPresetQueryRequest) returns (ListPresetQuery) {
+    option (google.api.http) = {
+      get: "/call_center/preset/query"
+    };
+  }
+
+  rpc ReadPresetQuery(ReadPresetQueryRequest) returns (PresetQuery) {
+    option (google.api.http) = {
+      get: "/call_center/preset/query/{id}"
+    };
+  }
+
+  rpc UpdatePresetQuery(UpdatePresetQueryRequest) returns (PresetQuery) {
+    option (google.api.http) = {
+      put: "/call_center/preset/query/{id}"
+      body: "*"
+    };
+  }
+
+  rpc PatchPresetQuery(PatchPresetQueryRequest) returns (PresetQuery) {
+    option (google.api.http) = {
+      patch: "/call_center/preset/query/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeletePresetQuery(DeletePresetQueryRequest) returns (PresetQuery) {
+    option (google.api.http) = {
+      delete: "/call_center/preset/query/{id}"
+    };
+  }
+}
+
+message DeletePresetQueryRequest {
+  int32 id = 1;
+}
+
+message PatchPresetQueryRequest {
+  int32 id = 1;
+  repeated string fields = 2;
+
+  string name = 3;
+  string description = 4;
+  google.protobuf.Value preset = 5;
+  PresetQuerySection section = 6;
+}
+
+message UpdatePresetQueryRequest {
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  google.protobuf.Value preset = 4;
+  PresetQuerySection section = 5;
+}
+
+message ReadPresetQueryRequest {
+  int32 id = 1;
+}
+
+message SearchPresetQueryRequest {
+  int32 page = 1;
+  int32 size = 2;
+  string q = 3;
+
+  string sort = 4;
+  repeated string fields = 5;
+
+  repeated int32 id = 6;
+  repeated PresetQuerySection section = 7;
+}
+
+message ListPresetQuery {
+  bool next = 1;
+  repeated PresetQuery items = 2;
+}
+
+message CreatePresetQueryRequest {
+  string name = 1;
+  string description = 2;
+  google.protobuf.Value preset = 3;
+  PresetQuerySection section = 4;
+}
+
+message PresetQuery {
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  google.protobuf.Value preset = 4;
+  int64 created_at = 5;
+  int64 updated_at = 6;
+  PresetQuerySection section = 7;
+}
