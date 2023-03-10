@@ -48,8 +48,36 @@ service AuditFormService {
   }
 }
 
-message DeleteAuditFormRequest {
-  int32 id = 1;
+message QuestionResult {
+  string type = 1;
+  bool required = 2;
+  string question = 3;
+  float score = 4;
+}
+
+message QuestionOptions {
+  message Option {
+    string name = 1;
+    int32 score = 2;
+  }
+  bool required = 1;
+  string question = 2;
+  repeated Option options = 3;
+
+}
+
+message QuestionScore {
+  bool required = 1;
+  string question = 2;
+  int32 min = 3;
+  int32 max = 4;
+}
+
+message Questions {
+  oneof to {
+    QuestionOptions options = 1;
+    QuestionScore score = 2;
+  }
 }
 
 message PatchAuditFormRequest {
@@ -59,9 +87,13 @@ message PatchAuditFormRequest {
   string name = 3;
   string description = 4;
   bool enabled = 5;
-  string questions = 6;
+  repeated Questions questions = 6;
   repeated Lookup teams = 7;
 
+}
+
+message DeleteAuditFormRequest {
+  int32 id = 1;
 }
 
 message UpdateAuditFormRequest {
@@ -69,7 +101,7 @@ message UpdateAuditFormRequest {
   string name = 2;
   string description = 3;
   bool enabled = 4;
-  string questions = 5;
+  repeated Questions questions = 5;
   repeated Lookup teams = 6;
 }
 
@@ -81,7 +113,7 @@ message CreateAuditFormRequest {
   string name = 1;
   string description = 2;
   bool enabled = 3;
-  string questions = 4;
+  repeated Questions questions = 4;
   repeated Lookup teams = 5;
 }
 
@@ -95,7 +127,7 @@ message AuditForm {
   string name = 6;
   string description = 7;
   bool enabled = 8;
-  string questions = 9;
+  repeated Questions questions = 9;
   repeated Lookup teams = 10;
 }
 
