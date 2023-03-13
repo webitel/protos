@@ -69,6 +69,11 @@ service AuditFormService {
   }
 }
 
+enum AuditQuestionType {
+  question_score = 0;
+  question_option = 1;
+}
+
 message SearchAuditRateRequest {
   int32 page = 1;
   int32 size = 2;
@@ -110,7 +115,7 @@ message AuditRate {
   int64 updated_at = 4;
   Lookup updated_by = 5;
   Lookup form = 6;
-  repeated Questions questions = 7;
+  repeated Question questions = 7;
   repeated QuestionAnswer answers = 8;
 
   float score_required = 9;
@@ -120,29 +125,18 @@ message AuditRate {
   Lookup rated_user = 12;
 }
 
-message QuestionOptions {
+message Question {
   message Option {
     string name = 1;
     int32 score = 2;
   }
-  bool required = 1;
-  string question = 2;
-  repeated Option options = 3;
 
-}
-
-message QuestionScore {
-  bool required = 1;
-  string question = 2;
-  int32 min = 3;
-  int32 max = 4;
-}
-
-message Questions {
-  oneof to {
-    QuestionOptions option = 1;
-    QuestionScore score = 2;
-  }
+  AuditQuestionType type = 1;
+  bool required = 2;
+  string question = 3;
+  int32 min = 4;
+  int32 max = 5;
+  repeated Option options = 6;
 }
 
 message PatchAuditFormRequest {
@@ -152,7 +146,7 @@ message PatchAuditFormRequest {
   string name = 3;
   string description = 4;
   bool enabled = 5;
-  repeated Questions questions = 6;
+  repeated Question questions = 6;
   repeated Lookup teams = 7;
   bool archive = 8;
 }
@@ -166,7 +160,7 @@ message UpdateAuditFormRequest {
   string name = 2;
   string description = 3;
   bool enabled = 4;
-  repeated Questions questions = 5;
+  repeated Question questions = 5;
   repeated Lookup teams = 6;
   bool archive = 7;
 }
@@ -179,7 +173,7 @@ message CreateAuditFormRequest {
   string name = 1;
   string description = 2;
   bool enabled = 3;
-  repeated Questions questions = 4;
+  repeated Question questions = 4;
   repeated Lookup teams = 5;
 }
 
@@ -193,7 +187,7 @@ message AuditForm {
   string name = 6;
   string description = 7;
   bool enabled = 8;
-  repeated Questions questions = 9;
+  repeated Question questions = 9;
   repeated Lookup teams = 10;
   bool archive = 11;
   bool editable = 12;
@@ -212,6 +206,7 @@ message SearchAuditFormRequest {
   bool enabled = 8;
   bool archive = 9;
   bool editable = 10;
+  bool active = 11; // not archive
 }
 
 message ListAuditForm {

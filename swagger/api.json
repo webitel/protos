@@ -2276,6 +2276,11 @@
             "type": "boolean",
             "name": "editable",
             "in": "query"
+          },
+          {
+            "type": "boolean",
+            "name": "active",
+            "in": "query"
           }
         ],
         "responses": {
@@ -10468,6 +10473,67 @@
             "collectionFormat": "multi",
             "name": "amd_ai_result",
             "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "talk.from",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "talk.to",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "name": "rated",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "name": "rated_by",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "score_required.from",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "score_required.to",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "score_optional.from",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "score_optional.to",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "name": "rated_user",
+            "in": "query"
           }
         ],
         "responses": {
@@ -14502,7 +14568,7 @@
         "error"
       ]
     },
-    "QuestionOptionsOption": {
+    "QuestionOption": {
       "type": "object",
       "properties": {
         "name": {
@@ -15938,7 +16004,7 @@
         "questions": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/engineQuestions"
+            "$ref": "#/definitions/engineQuestion"
           }
         },
         "teams": {
@@ -15955,6 +16021,14 @@
           "$ref": "#/definitions/engineLookup"
         }
       }
+    },
+    "engineAuditQuestionType": {
+      "type": "string",
+      "default": "question_score",
+      "enum": [
+        "question_score",
+        "question_option"
+      ]
     },
     "engineAuditRate": {
       "type": "object",
@@ -15985,7 +16059,7 @@
         "questions": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/engineQuestions"
+            "$ref": "#/definitions/engineQuestion"
           }
         },
         "rated_user": {
@@ -16536,7 +16610,7 @@
         "questions": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/engineQuestions"
+            "$ref": "#/definitions/engineQuestion"
           }
         },
         "teams": {
@@ -17847,6 +17921,16 @@
           "type": "integer",
           "format": "int32"
         },
+        "rate_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "rated_by": {
+          "$ref": "#/definitions/engineLookup"
+        },
+        "rated_user": {
+          "$ref": "#/definitions/engineLookup"
+        },
         "reporting_at": {
           "type": "string",
           "format": "int64"
@@ -17857,6 +17941,14 @@
         },
         "result": {
           "type": "string"
+        },
+        "score_optional": {
+          "type": "number",
+          "format": "float"
+        },
+        "score_required": {
+          "type": "number",
+          "format": "float"
         },
         "sip_code": {
           "type": "integer",
@@ -19305,7 +19397,7 @@
         "questions": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/engineQuestions"
+            "$ref": "#/definitions/engineQuestion"
           }
         },
         "teams": {
@@ -19960,33 +20052,7 @@
         "section_calls"
       ]
     },
-    "engineQuestionAnswer": {
-      "type": "object",
-      "properties": {
-        "score": {
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "engineQuestionOptions": {
-      "type": "object",
-      "properties": {
-        "options": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/QuestionOptionsOption"
-          }
-        },
-        "question": {
-          "type": "string"
-        },
-        "required": {
-          "type": "boolean"
-        }
-      }
-    },
-    "engineQuestionScore": {
+    "engineQuestion": {
       "type": "object",
       "properties": {
         "max": {
@@ -19997,22 +20063,29 @@
           "type": "integer",
           "format": "int32"
         },
+        "options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/QuestionOption"
+          }
+        },
         "question": {
           "type": "string"
         },
         "required": {
           "type": "boolean"
+        },
+        "type": {
+          "$ref": "#/definitions/engineAuditQuestionType"
         }
       }
     },
-    "engineQuestions": {
+    "engineQuestionAnswer": {
       "type": "object",
       "properties": {
-        "option": {
-          "$ref": "#/definitions/engineQuestionOptions"
-        },
         "score": {
-          "$ref": "#/definitions/engineQuestionScore"
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -20979,7 +21052,7 @@
         "questions": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/engineQuestions"
+            "$ref": "#/definitions/engineQuestion"
           }
         },
         "teams": {
