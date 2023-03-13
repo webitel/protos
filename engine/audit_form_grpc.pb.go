@@ -28,6 +28,9 @@ type AuditFormServiceClient interface {
 	UpdateAuditForm(ctx context.Context, in *UpdateAuditFormRequest, opts ...grpc.CallOption) (*AuditForm, error)
 	PatchAuditForm(ctx context.Context, in *PatchAuditFormRequest, opts ...grpc.CallOption) (*AuditForm, error)
 	DeleteAuditForm(ctx context.Context, in *DeleteAuditFormRequest, opts ...grpc.CallOption) (*AuditForm, error)
+	CreateAuditFormRate(ctx context.Context, in *CreateAuditFormRateRequest, opts ...grpc.CallOption) (*AuditRate, error)
+	SearchAuditRate(ctx context.Context, in *SearchAuditRateRequest, opts ...grpc.CallOption) (*ListAuditRate, error)
+	ReadAuditRate(ctx context.Context, in *ReadAuditRateRequest, opts ...grpc.CallOption) (*AuditRate, error)
 }
 
 type auditFormServiceClient struct {
@@ -92,6 +95,33 @@ func (c *auditFormServiceClient) DeleteAuditForm(ctx context.Context, in *Delete
 	return out, nil
 }
 
+func (c *auditFormServiceClient) CreateAuditFormRate(ctx context.Context, in *CreateAuditFormRateRequest, opts ...grpc.CallOption) (*AuditRate, error) {
+	out := new(AuditRate)
+	err := c.cc.Invoke(ctx, "/engine.AuditFormService/CreateAuditFormRate", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *auditFormServiceClient) SearchAuditRate(ctx context.Context, in *SearchAuditRateRequest, opts ...grpc.CallOption) (*ListAuditRate, error) {
+	out := new(ListAuditRate)
+	err := c.cc.Invoke(ctx, "/engine.AuditFormService/SearchAuditRate", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *auditFormServiceClient) ReadAuditRate(ctx context.Context, in *ReadAuditRateRequest, opts ...grpc.CallOption) (*AuditRate, error) {
+	out := new(AuditRate)
+	err := c.cc.Invoke(ctx, "/engine.AuditFormService/ReadAuditRate", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuditFormServiceServer is the server API for AuditFormService service.
 // All implementations must embed UnimplementedAuditFormServiceServer
 // for forward compatibility
@@ -102,6 +132,9 @@ type AuditFormServiceServer interface {
 	UpdateAuditForm(context.Context, *UpdateAuditFormRequest) (*AuditForm, error)
 	PatchAuditForm(context.Context, *PatchAuditFormRequest) (*AuditForm, error)
 	DeleteAuditForm(context.Context, *DeleteAuditFormRequest) (*AuditForm, error)
+	CreateAuditFormRate(context.Context, *CreateAuditFormRateRequest) (*AuditRate, error)
+	SearchAuditRate(context.Context, *SearchAuditRateRequest) (*ListAuditRate, error)
+	ReadAuditRate(context.Context, *ReadAuditRateRequest) (*AuditRate, error)
 	mustEmbedUnimplementedAuditFormServiceServer()
 }
 
@@ -126,6 +159,15 @@ func (UnimplementedAuditFormServiceServer) PatchAuditForm(context.Context, *Patc
 }
 func (UnimplementedAuditFormServiceServer) DeleteAuditForm(context.Context, *DeleteAuditFormRequest) (*AuditForm, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteAuditForm not implemented")
+}
+func (UnimplementedAuditFormServiceServer) CreateAuditFormRate(context.Context, *CreateAuditFormRateRequest) (*AuditRate, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateAuditFormRate not implemented")
+}
+func (UnimplementedAuditFormServiceServer) SearchAuditRate(context.Context, *SearchAuditRateRequest) (*ListAuditRate, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchAuditRate not implemented")
+}
+func (UnimplementedAuditFormServiceServer) ReadAuditRate(context.Context, *ReadAuditRateRequest) (*AuditRate, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadAuditRate not implemented")
 }
 func (UnimplementedAuditFormServiceServer) mustEmbedUnimplementedAuditFormServiceServer() {}
 
@@ -248,6 +290,60 @@ func _AuditFormService_DeleteAuditForm_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuditFormService_CreateAuditFormRate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateAuditFormRateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuditFormServiceServer).CreateAuditFormRate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/engine.AuditFormService/CreateAuditFormRate",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuditFormServiceServer).CreateAuditFormRate(ctx, req.(*CreateAuditFormRateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuditFormService_SearchAuditRate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchAuditRateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuditFormServiceServer).SearchAuditRate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/engine.AuditFormService/SearchAuditRate",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuditFormServiceServer).SearchAuditRate(ctx, req.(*SearchAuditRateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuditFormService_ReadAuditRate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReadAuditRateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuditFormServiceServer).ReadAuditRate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/engine.AuditFormService/ReadAuditRate",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuditFormServiceServer).ReadAuditRate(ctx, req.(*ReadAuditRateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuditFormService_ServiceDesc is the grpc.ServiceDesc for AuditFormService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -278,6 +374,18 @@ var AuditFormService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteAuditForm",
 			Handler:    _AuditFormService_DeleteAuditForm_Handler,
+		},
+		{
+			MethodName: "CreateAuditFormRate",
+			Handler:    _AuditFormService_CreateAuditFormRate_Handler,
+		},
+		{
+			MethodName: "SearchAuditRate",
+			Handler:    _AuditFormService_SearchAuditRate_Handler,
+		},
+		{
+			MethodName: "ReadAuditRate",
+			Handler:    _AuditFormService_ReadAuditRate_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

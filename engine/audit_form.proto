@@ -10,49 +10,114 @@ import "google/api/annotations.proto";
 service AuditFormService {
   rpc CreateAuditForm(CreateAuditFormRequest) returns (AuditForm) {
     option (google.api.http) = {
-      post: "/call_center/forms"
+      post: "/call_center/audit/forms"
       body: "*"
     };
   }
 
   rpc SearchAuditForm(SearchAuditFormRequest) returns (ListAuditForm) {
     option (google.api.http) = {
-      get: "/call_center/forms"
+      get: "/call_center/audit/forms"
     };
   }
 
   rpc ReadAuditForm(ReadAuditFormRequest) returns (AuditForm) {
     option (google.api.http) = {
-      get: "/call_center/forms/{id}"
+      get: "/call_center/audit/forms/{id}"
     };
   }
 
   rpc UpdateAuditForm(UpdateAuditFormRequest) returns (AuditForm) {
     option (google.api.http) = {
-      put: "/call_center/forms/{id}"
+      put: "/call_center/audit/forms/{id}"
       body: "*"
     };
   }
 
   rpc PatchAuditForm(PatchAuditFormRequest) returns (AuditForm) {
     option (google.api.http) = {
-      patch: "/call_center/forms/{id}"
+      patch: "/call_center/audit/forms/{id}"
       body: "*"
     };
   }
 
   rpc DeleteAuditForm(DeleteAuditFormRequest) returns (AuditForm) {
     option (google.api.http) = {
-      delete: "/call_center/forms/{id}"
+      delete: "/call_center/audit/forms/{id}"
+    };
+  }
+
+  /* Audit rate */
+
+  rpc CreateAuditFormRate(CreateAuditFormRateRequest) returns (AuditRate) {
+    option (google.api.http) = {
+      post: "/call_center/audit/rate"
+      body: "*"
+    };
+  }
+
+  rpc SearchAuditRate(SearchAuditRateRequest) returns (ListAuditRate) {
+    option (google.api.http) = {
+      get: "/call_center/audit/forms/{form_id}/rate"
+    };
+  }
+
+  rpc ReadAuditRate(ReadAuditRateRequest) returns (AuditRate) {
+    option (google.api.http) = {
+      get: "/call_center/audit/rate/{id}"
     };
   }
 }
 
-message QuestionResult {
-  string type = 1;
-  bool required = 2;
-  string question = 3;
-  float score = 4;
+message SearchAuditRateRequest {
+  int32 page = 1;
+  int32 size = 2;
+  string q = 3;
+  string sort = 4;
+  repeated string fields = 5;
+
+  FilterBetween created_at = 6;
+  repeated int32 id = 7;
+  repeated string call_id = 8;
+  int32 form_id = 9;
+  repeated int64 rated_user = 10;
+}
+
+message ListAuditRate {
+  bool next = 1;
+  repeated AuditRate items = 2;
+}
+
+message CreateAuditFormRateRequest {
+  Lookup form = 1;
+  repeated QuestionAnswer answers = 2;
+  string comment = 3;
+  string call_id = 4;
+}
+
+message ReadAuditRateRequest {
+  int64 id = 1;
+}
+
+message QuestionAnswer {
+  int32 score = 4;
+}
+
+message AuditRate {
+  int64 id = 1;
+  int64 created_at = 2;
+  Lookup created_by = 3;
+  int64 updated_at = 4;
+  Lookup updated_by = 5;
+  Lookup form = 6;
+  repeated Questions questions = 7;
+  repeated QuestionAnswer answers = 8;
+
+  float score_required = 9;
+  float score_optional = 10;
+
+  string comment = 11;
+  Lookup rated_user = 12;
 }
 
 message QuestionOptions {
@@ -89,7 +154,7 @@ message PatchAuditFormRequest {
   bool enabled = 5;
   repeated Questions questions = 6;
   repeated Lookup teams = 7;
-
+  bool archive = 8;
 }
 
 message DeleteAuditFormRequest {
@@ -103,6 +168,7 @@ message UpdateAuditFormRequest {
   bool enabled = 4;
   repeated Questions questions = 5;
   repeated Lookup teams = 6;
+  bool archive = 7;
 }
 
 message ReadAuditFormRequest {
@@ -129,6 +195,8 @@ message AuditForm {
   bool enabled = 8;
   repeated Questions questions = 9;
   repeated Lookup teams = 10;
+  bool archive = 11;
+  bool editable = 12;
 }
 
 message SearchAuditFormRequest {
@@ -141,6 +209,9 @@ message SearchAuditFormRequest {
 
   repeated int32 id = 6;
   repeated int32 team_id = 7;
+  bool enabled = 8;
+  bool archive = 9;
+  bool editable = 10;
 }
 
 message ListAuditForm {
