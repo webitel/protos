@@ -9027,6 +9027,58 @@
           "OutboundResourceService"
         ]
       },
+      "delete": {
+        "summary": "Remove ResourceDisplays",
+        "operationId": "OutboundResourceService_DeleteOutboundResourceDisplays",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineEmptyResponse"
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {}
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "resource_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "items",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "OutboundResourceService"
+        ]
+      },
       "post": {
         "summary": "Create CreateOutboundResourceDisplay",
         "operationId": "OutboundResourceService_CreateOutboundResourceDisplay",
@@ -9069,6 +9121,57 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/engineCreateOutboundResourceDisplayRequest"
+            }
+          }
+        ],
+        "tags": [
+          "OutboundResourceService"
+        ]
+      }
+    },
+    "/call_center/resources/{resource_id}/display/bulk": {
+      "post": {
+        "summary": "Create CreateOutboundResourceDisplay",
+        "operationId": "OutboundResourceService_CreateOutboundResourceDisplayBulk",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineListResourceDisplay"
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {}
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "resource_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engineCreateOutboundResourceDisplayBulkRequest"
             }
           }
         ],
@@ -16500,6 +16603,21 @@
         }
       }
     },
+    "engineCreateOutboundResourceDisplayBulkRequest": {
+      "type": "object",
+      "properties": {
+        "resource_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/engineCreateOutboundResourceDisplayRequest"
+          }
+        }
+      }
+    },
     "engineCreateOutboundResourceDisplayRequest": {
       "type": "object",
       "properties": {
@@ -17208,6 +17326,9 @@
           "type": "boolean"
         }
       }
+    },
+    "engineEmptyResponse": {
+      "type": "object"
     },
     "engineEndpoint": {
       "type": "object",
@@ -18145,6 +18266,18 @@
         },
         "aggs": {
           "$ref": "#/definitions/engineQueueReportGeneralAgentStatus"
+        }
+      }
+    },
+    "engineListResourceDisplay": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
         }
       }
     },

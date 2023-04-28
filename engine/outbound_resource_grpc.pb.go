@@ -36,6 +36,8 @@ type OutboundResourceServiceClient interface {
 	DeleteOutboundResource(ctx context.Context, in *DeleteOutboundResourceRequest, opts ...grpc.CallOption) (*OutboundResource, error)
 	// Create CreateOutboundResourceDisplay
 	CreateOutboundResourceDisplay(ctx context.Context, in *CreateOutboundResourceDisplayRequest, opts ...grpc.CallOption) (*ResourceDisplay, error)
+	// Create CreateOutboundResourceDisplay
+	CreateOutboundResourceDisplayBulk(ctx context.Context, in *CreateOutboundResourceDisplayBulkRequest, opts ...grpc.CallOption) (*ListResourceDisplay, error)
 	// List of ResourceDisplay
 	SearchOutboundResourceDisplay(ctx context.Context, in *SearchOutboundResourceDisplayRequest, opts ...grpc.CallOption) (*ListOutboundResourceDisplay, error)
 	// ResourceDisplay item
@@ -44,6 +46,8 @@ type OutboundResourceServiceClient interface {
 	UpdateOutboundResourceDisplay(ctx context.Context, in *UpdateOutboundResourceDisplayRequest, opts ...grpc.CallOption) (*ResourceDisplay, error)
 	// Remove ResourceDisplay
 	DeleteOutboundResourceDisplay(ctx context.Context, in *DeleteOutboundResourceDisplayRequest, opts ...grpc.CallOption) (*ResourceDisplay, error)
+	//Remove ResourceDisplays
+	DeleteOutboundResourceDisplays(ctx context.Context, in *DeleteOutboundResourceDisplaysRequest, opts ...grpc.CallOption) (*EmptyResponse, error)
 }
 
 type outboundResourceServiceClient struct {
@@ -117,6 +121,15 @@ func (c *outboundResourceServiceClient) CreateOutboundResourceDisplay(ctx contex
 	return out, nil
 }
 
+func (c *outboundResourceServiceClient) CreateOutboundResourceDisplayBulk(ctx context.Context, in *CreateOutboundResourceDisplayBulkRequest, opts ...grpc.CallOption) (*ListResourceDisplay, error) {
+	out := new(ListResourceDisplay)
+	err := c.cc.Invoke(ctx, "/engine.OutboundResourceService/CreateOutboundResourceDisplayBulk", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *outboundResourceServiceClient) SearchOutboundResourceDisplay(ctx context.Context, in *SearchOutboundResourceDisplayRequest, opts ...grpc.CallOption) (*ListOutboundResourceDisplay, error) {
 	out := new(ListOutboundResourceDisplay)
 	err := c.cc.Invoke(ctx, "/engine.OutboundResourceService/SearchOutboundResourceDisplay", in, out, opts...)
@@ -153,6 +166,15 @@ func (c *outboundResourceServiceClient) DeleteOutboundResourceDisplay(ctx contex
 	return out, nil
 }
 
+func (c *outboundResourceServiceClient) DeleteOutboundResourceDisplays(ctx context.Context, in *DeleteOutboundResourceDisplaysRequest, opts ...grpc.CallOption) (*EmptyResponse, error) {
+	out := new(EmptyResponse)
+	err := c.cc.Invoke(ctx, "/engine.OutboundResourceService/DeleteOutboundResourceDisplays", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // OutboundResourceServiceServer is the server API for OutboundResourceService service.
 // All implementations must embed UnimplementedOutboundResourceServiceServer
 // for forward compatibility
@@ -171,6 +193,8 @@ type OutboundResourceServiceServer interface {
 	DeleteOutboundResource(context.Context, *DeleteOutboundResourceRequest) (*OutboundResource, error)
 	// Create CreateOutboundResourceDisplay
 	CreateOutboundResourceDisplay(context.Context, *CreateOutboundResourceDisplayRequest) (*ResourceDisplay, error)
+	// Create CreateOutboundResourceDisplay
+	CreateOutboundResourceDisplayBulk(context.Context, *CreateOutboundResourceDisplayBulkRequest) (*ListResourceDisplay, error)
 	// List of ResourceDisplay
 	SearchOutboundResourceDisplay(context.Context, *SearchOutboundResourceDisplayRequest) (*ListOutboundResourceDisplay, error)
 	// ResourceDisplay item
@@ -179,6 +203,8 @@ type OutboundResourceServiceServer interface {
 	UpdateOutboundResourceDisplay(context.Context, *UpdateOutboundResourceDisplayRequest) (*ResourceDisplay, error)
 	// Remove ResourceDisplay
 	DeleteOutboundResourceDisplay(context.Context, *DeleteOutboundResourceDisplayRequest) (*ResourceDisplay, error)
+	//Remove ResourceDisplays
+	DeleteOutboundResourceDisplays(context.Context, *DeleteOutboundResourceDisplaysRequest) (*EmptyResponse, error)
 	mustEmbedUnimplementedOutboundResourceServiceServer()
 }
 
@@ -207,6 +233,9 @@ func (UnimplementedOutboundResourceServiceServer) DeleteOutboundResource(context
 func (UnimplementedOutboundResourceServiceServer) CreateOutboundResourceDisplay(context.Context, *CreateOutboundResourceDisplayRequest) (*ResourceDisplay, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateOutboundResourceDisplay not implemented")
 }
+func (UnimplementedOutboundResourceServiceServer) CreateOutboundResourceDisplayBulk(context.Context, *CreateOutboundResourceDisplayBulkRequest) (*ListResourceDisplay, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateOutboundResourceDisplayBulk not implemented")
+}
 func (UnimplementedOutboundResourceServiceServer) SearchOutboundResourceDisplay(context.Context, *SearchOutboundResourceDisplayRequest) (*ListOutboundResourceDisplay, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SearchOutboundResourceDisplay not implemented")
 }
@@ -218,6 +247,9 @@ func (UnimplementedOutboundResourceServiceServer) UpdateOutboundResourceDisplay(
 }
 func (UnimplementedOutboundResourceServiceServer) DeleteOutboundResourceDisplay(context.Context, *DeleteOutboundResourceDisplayRequest) (*ResourceDisplay, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteOutboundResourceDisplay not implemented")
+}
+func (UnimplementedOutboundResourceServiceServer) DeleteOutboundResourceDisplays(context.Context, *DeleteOutboundResourceDisplaysRequest) (*EmptyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteOutboundResourceDisplays not implemented")
 }
 func (UnimplementedOutboundResourceServiceServer) mustEmbedUnimplementedOutboundResourceServiceServer() {
 }
@@ -359,6 +391,24 @@ func _OutboundResourceService_CreateOutboundResourceDisplay_Handler(srv interfac
 	return interceptor(ctx, in, info, handler)
 }
 
+func _OutboundResourceService_CreateOutboundResourceDisplayBulk_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateOutboundResourceDisplayBulkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OutboundResourceServiceServer).CreateOutboundResourceDisplayBulk(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/engine.OutboundResourceService/CreateOutboundResourceDisplayBulk",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OutboundResourceServiceServer).CreateOutboundResourceDisplayBulk(ctx, req.(*CreateOutboundResourceDisplayBulkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _OutboundResourceService_SearchOutboundResourceDisplay_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SearchOutboundResourceDisplayRequest)
 	if err := dec(in); err != nil {
@@ -431,6 +481,24 @@ func _OutboundResourceService_DeleteOutboundResourceDisplay_Handler(srv interfac
 	return interceptor(ctx, in, info, handler)
 }
 
+func _OutboundResourceService_DeleteOutboundResourceDisplays_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteOutboundResourceDisplaysRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OutboundResourceServiceServer).DeleteOutboundResourceDisplays(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/engine.OutboundResourceService/DeleteOutboundResourceDisplays",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OutboundResourceServiceServer).DeleteOutboundResourceDisplays(ctx, req.(*DeleteOutboundResourceDisplaysRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // OutboundResourceService_ServiceDesc is the grpc.ServiceDesc for OutboundResourceService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -467,6 +535,10 @@ var OutboundResourceService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _OutboundResourceService_CreateOutboundResourceDisplay_Handler,
 		},
 		{
+			MethodName: "CreateOutboundResourceDisplayBulk",
+			Handler:    _OutboundResourceService_CreateOutboundResourceDisplayBulk_Handler,
+		},
+		{
 			MethodName: "SearchOutboundResourceDisplay",
 			Handler:    _OutboundResourceService_SearchOutboundResourceDisplay_Handler,
 		},
@@ -481,6 +553,10 @@ var OutboundResourceService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteOutboundResourceDisplay",
 			Handler:    _OutboundResourceService_DeleteOutboundResourceDisplay_Handler,
+		},
+		{
+			MethodName: "DeleteOutboundResourceDisplays",
+			Handler:    _OutboundResourceService_DeleteOutboundResourceDisplays_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

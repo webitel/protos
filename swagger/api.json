@@ -8737,6 +8737,108 @@
             }
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "OutboundResourceService"
+        ],
+        "summary": "Remove ResourceDisplays",
+        "operationId": "OutboundResourceService_DeleteOutboundResourceDisplays",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "resource_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "name": "items",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineEmptyResponse"
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {}
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        }
+      }
+    },
+    "/call_center/resources/{resource_id}/display/bulk": {
+      "post": {
+        "tags": [
+          "OutboundResourceService"
+        ],
+        "summary": "Create CreateOutboundResourceDisplay",
+        "operationId": "OutboundResourceService_CreateOutboundResourceDisplayBulk",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "resource_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engineCreateOutboundResourceDisplayBulkRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineListResourceDisplay"
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {}
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        }
       }
     },
     "/call_center/resources/{resource_id}/display/{id}": {
@@ -17012,6 +17114,21 @@
         }
       }
     },
+    "engineCreateOutboundResourceDisplayBulkRequest": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/engineCreateOutboundResourceDisplayRequest"
+          }
+        },
+        "resource_id": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "engineCreateOutboundResourceDisplayRequest": {
       "type": "object",
       "properties": {
@@ -17720,6 +17837,9 @@
           "$ref": "#/definitions/engineLookup"
         }
       }
+    },
+    "engineEmptyResponse": {
+      "type": "object"
     },
     "engineEndpoint": {
       "type": "object",
@@ -18657,6 +18777,18 @@
         },
         "next": {
           "type": "boolean"
+        }
+      }
+    },
+    "engineListResourceDisplay": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
         }
       }
     },
