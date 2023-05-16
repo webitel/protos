@@ -32,6 +32,12 @@ type SkillServiceClient interface {
 	UpdateSkill(ctx context.Context, in *UpdateSkillRequest, opts ...grpc.CallOption) (*Skill, error)
 	// Remove Skill
 	DeleteSkill(ctx context.Context, in *DeleteSkillRequest, opts ...grpc.CallOption) (*Skill, error)
+	// For agents
+	// SearchSkillAgent
+	SearchSkillAgent(ctx context.Context, in *SearchSkillAgentRequest, opts ...grpc.CallOption) (*ListSkillAgent, error)
+	CreateSkillAgent(ctx context.Context, in *CreateSkillAgentRequest, opts ...grpc.CallOption) (*CreateSkillAgentResponse, error)
+	PatchSkillAgent(ctx context.Context, in *PatchSkillAgentRequest, opts ...grpc.CallOption) (*PatchSkillAgentResponse, error)
+	DeleteSkillAgent(ctx context.Context, in *DeleteSkillAgentRequest, opts ...grpc.CallOption) (*DeleteSkillAgentResponse, error)
 }
 
 type skillServiceClient struct {
@@ -87,6 +93,42 @@ func (c *skillServiceClient) DeleteSkill(ctx context.Context, in *DeleteSkillReq
 	return out, nil
 }
 
+func (c *skillServiceClient) SearchSkillAgent(ctx context.Context, in *SearchSkillAgentRequest, opts ...grpc.CallOption) (*ListSkillAgent, error) {
+	out := new(ListSkillAgent)
+	err := c.cc.Invoke(ctx, "/engine.SkillService/SearchSkillAgent", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *skillServiceClient) CreateSkillAgent(ctx context.Context, in *CreateSkillAgentRequest, opts ...grpc.CallOption) (*CreateSkillAgentResponse, error) {
+	out := new(CreateSkillAgentResponse)
+	err := c.cc.Invoke(ctx, "/engine.SkillService/CreateSkillAgent", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *skillServiceClient) PatchSkillAgent(ctx context.Context, in *PatchSkillAgentRequest, opts ...grpc.CallOption) (*PatchSkillAgentResponse, error) {
+	out := new(PatchSkillAgentResponse)
+	err := c.cc.Invoke(ctx, "/engine.SkillService/PatchSkillAgent", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *skillServiceClient) DeleteSkillAgent(ctx context.Context, in *DeleteSkillAgentRequest, opts ...grpc.CallOption) (*DeleteSkillAgentResponse, error) {
+	out := new(DeleteSkillAgentResponse)
+	err := c.cc.Invoke(ctx, "/engine.SkillService/DeleteSkillAgent", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SkillServiceServer is the server API for SkillService service.
 // All implementations must embed UnimplementedSkillServiceServer
 // for forward compatibility
@@ -101,6 +143,12 @@ type SkillServiceServer interface {
 	UpdateSkill(context.Context, *UpdateSkillRequest) (*Skill, error)
 	// Remove Skill
 	DeleteSkill(context.Context, *DeleteSkillRequest) (*Skill, error)
+	// For agents
+	// SearchSkillAgent
+	SearchSkillAgent(context.Context, *SearchSkillAgentRequest) (*ListSkillAgent, error)
+	CreateSkillAgent(context.Context, *CreateSkillAgentRequest) (*CreateSkillAgentResponse, error)
+	PatchSkillAgent(context.Context, *PatchSkillAgentRequest) (*PatchSkillAgentResponse, error)
+	DeleteSkillAgent(context.Context, *DeleteSkillAgentRequest) (*DeleteSkillAgentResponse, error)
 	mustEmbedUnimplementedSkillServiceServer()
 }
 
@@ -122,6 +170,18 @@ func (UnimplementedSkillServiceServer) UpdateSkill(context.Context, *UpdateSkill
 }
 func (UnimplementedSkillServiceServer) DeleteSkill(context.Context, *DeleteSkillRequest) (*Skill, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteSkill not implemented")
+}
+func (UnimplementedSkillServiceServer) SearchSkillAgent(context.Context, *SearchSkillAgentRequest) (*ListSkillAgent, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchSkillAgent not implemented")
+}
+func (UnimplementedSkillServiceServer) CreateSkillAgent(context.Context, *CreateSkillAgentRequest) (*CreateSkillAgentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateSkillAgent not implemented")
+}
+func (UnimplementedSkillServiceServer) PatchSkillAgent(context.Context, *PatchSkillAgentRequest) (*PatchSkillAgentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PatchSkillAgent not implemented")
+}
+func (UnimplementedSkillServiceServer) DeleteSkillAgent(context.Context, *DeleteSkillAgentRequest) (*DeleteSkillAgentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteSkillAgent not implemented")
 }
 func (UnimplementedSkillServiceServer) mustEmbedUnimplementedSkillServiceServer() {}
 
@@ -226,6 +286,78 @@ func _SkillService_DeleteSkill_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SkillService_SearchSkillAgent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchSkillAgentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SkillServiceServer).SearchSkillAgent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/engine.SkillService/SearchSkillAgent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SkillServiceServer).SearchSkillAgent(ctx, req.(*SearchSkillAgentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SkillService_CreateSkillAgent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateSkillAgentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SkillServiceServer).CreateSkillAgent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/engine.SkillService/CreateSkillAgent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SkillServiceServer).CreateSkillAgent(ctx, req.(*CreateSkillAgentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SkillService_PatchSkillAgent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PatchSkillAgentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SkillServiceServer).PatchSkillAgent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/engine.SkillService/PatchSkillAgent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SkillServiceServer).PatchSkillAgent(ctx, req.(*PatchSkillAgentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SkillService_DeleteSkillAgent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteSkillAgentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SkillServiceServer).DeleteSkillAgent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/engine.SkillService/DeleteSkillAgent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SkillServiceServer).DeleteSkillAgent(ctx, req.(*DeleteSkillAgentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SkillService_ServiceDesc is the grpc.ServiceDesc for SkillService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -252,6 +384,22 @@ var SkillService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteSkill",
 			Handler:    _SkillService_DeleteSkill_Handler,
+		},
+		{
+			MethodName: "SearchSkillAgent",
+			Handler:    _SkillService_SearchSkillAgent_Handler,
+		},
+		{
+			MethodName: "CreateSkillAgent",
+			Handler:    _SkillService_CreateSkillAgent_Handler,
+		},
+		{
+			MethodName: "PatchSkillAgent",
+			Handler:    _SkillService_PatchSkillAgent_Handler,
+		},
+		{
+			MethodName: "DeleteSkillAgent",
+			Handler:    _SkillService_DeleteSkillAgent_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
