@@ -16,6 +16,13 @@ service CallService {
         };
     }
 
+    rpc PatchHistoryCall(PatchHistoryCallRequest) returns (HistoryCall) {
+        option (google.api.http) = {
+            patch: "/calls/history/{id}"
+            body: "*"
+        };
+    }
+
     rpc AggregateHistoryCall(AggregateHistoryCallRequest) returns (ListAggregate) {
         option (google.api.http) = {
             post: "/calls/history/aggregate"
@@ -117,6 +124,11 @@ service CallService {
             delete: "/calls/history/{call_id}/annotation/{id}"
         };
     }
+}
+
+message PatchHistoryCallRequest {
+    string id = 1;
+    map<string,string> variables = 2;
 }
 
 message SetVariablesCallRequest {
@@ -407,6 +419,7 @@ message HistoryCall {
     float score_required = 59;
     int64 attempt_id = 60;
     bool allow_evaluation = 61;
+    google.protobuf.Value form_fields = 62;
 }
 
 message EavesdropCallRequest {

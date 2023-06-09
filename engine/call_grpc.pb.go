@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type CallServiceClient interface {
 	// List of call
 	SearchHistoryCall(ctx context.Context, in *SearchHistoryCallRequest, opts ...grpc.CallOption) (*ListHistoryCall, error)
+	PatchHistoryCall(ctx context.Context, in *PatchHistoryCallRequest, opts ...grpc.CallOption) (*HistoryCall, error)
 	AggregateHistoryCall(ctx context.Context, in *AggregateHistoryCallRequest, opts ...grpc.CallOption) (*ListAggregate, error)
 	SearchActiveCall(ctx context.Context, in *SearchCallRequest, opts ...grpc.CallOption) (*ListCall, error)
 	// Call item
@@ -54,6 +55,15 @@ func NewCallServiceClient(cc grpc.ClientConnInterface) CallServiceClient {
 func (c *callServiceClient) SearchHistoryCall(ctx context.Context, in *SearchHistoryCallRequest, opts ...grpc.CallOption) (*ListHistoryCall, error) {
 	out := new(ListHistoryCall)
 	err := c.cc.Invoke(ctx, "/engine.CallService/SearchHistoryCall", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *callServiceClient) PatchHistoryCall(ctx context.Context, in *PatchHistoryCallRequest, opts ...grpc.CallOption) (*HistoryCall, error) {
+	out := new(HistoryCall)
+	err := c.cc.Invoke(ctx, "/engine.CallService/PatchHistoryCall", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -201,6 +211,7 @@ func (c *callServiceClient) DeleteCallAnnotation(ctx context.Context, in *Delete
 type CallServiceServer interface {
 	// List of call
 	SearchHistoryCall(context.Context, *SearchHistoryCallRequest) (*ListHistoryCall, error)
+	PatchHistoryCall(context.Context, *PatchHistoryCallRequest) (*HistoryCall, error)
 	AggregateHistoryCall(context.Context, *AggregateHistoryCallRequest) (*ListAggregate, error)
 	SearchActiveCall(context.Context, *SearchCallRequest) (*ListCall, error)
 	// Call item
@@ -227,6 +238,9 @@ type UnimplementedCallServiceServer struct {
 
 func (UnimplementedCallServiceServer) SearchHistoryCall(context.Context, *SearchHistoryCallRequest) (*ListHistoryCall, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SearchHistoryCall not implemented")
+}
+func (UnimplementedCallServiceServer) PatchHistoryCall(context.Context, *PatchHistoryCallRequest) (*HistoryCall, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PatchHistoryCall not implemented")
 }
 func (UnimplementedCallServiceServer) AggregateHistoryCall(context.Context, *AggregateHistoryCallRequest) (*ListAggregate, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AggregateHistoryCall not implemented")
@@ -300,6 +314,24 @@ func _CallService_SearchHistoryCall_Handler(srv interface{}, ctx context.Context
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CallServiceServer).SearchHistoryCall(ctx, req.(*SearchHistoryCallRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CallService_PatchHistoryCall_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PatchHistoryCallRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CallServiceServer).PatchHistoryCall(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/engine.CallService/PatchHistoryCall",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CallServiceServer).PatchHistoryCall(ctx, req.(*PatchHistoryCallRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -584,6 +616,10 @@ var CallService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SearchHistoryCall",
 			Handler:    _CallService_SearchHistoryCall_Handler,
+		},
+		{
+			MethodName: "PatchHistoryCall",
+			Handler:    _CallService_PatchHistoryCall_Handler,
 		},
 		{
 			MethodName: "AggregateHistoryCall",

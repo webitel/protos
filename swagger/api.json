@@ -11108,6 +11108,55 @@
         }
       }
     },
+    "/calls/history/{id}": {
+      "patch": {
+        "tags": [
+          "CallService"
+        ],
+        "operationId": "CallService_PatchHistoryCall",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/enginePatchHistoryCallRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineHistoryCall"
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {}
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        }
+      }
+    },
     "/chat/bots/{profile_id}/broadcast": {
       "post": {
         "tags": [
@@ -18344,6 +18393,9 @@
             "$ref": "#/definitions/engineHistoryFileJob"
           }
         },
+        "form_fields": {
+          "type": "object"
+        },
         "from": {
           "$ref": "#/definitions/engineEndpoint"
         },
@@ -20017,6 +20069,20 @@
         "smtp_port": {
           "type": "integer",
           "format": "int32"
+        }
+      }
+    },
+    "enginePatchHistoryCallRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "variables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
         }
       }
     },
