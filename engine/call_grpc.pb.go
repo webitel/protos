@@ -20,7 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	CallService_SearchHistoryCall_FullMethodName     = "/engine.CallService/SearchHistoryCall"
-	CallService_SearchHistoryCallPast_FullMethodName = "/engine.CallService/SearchHistoryCallPast"
+	CallService_SearchHistoryCallPost_FullMethodName = "/engine.CallService/SearchHistoryCallPost"
 	CallService_PatchHistoryCall_FullMethodName      = "/engine.CallService/PatchHistoryCall"
 	CallService_AggregateHistoryCall_FullMethodName  = "/engine.CallService/AggregateHistoryCall"
 	CallService_SearchActiveCall_FullMethodName      = "/engine.CallService/SearchActiveCall"
@@ -46,7 +46,7 @@ type CallServiceClient interface {
 	// List of call
 	SearchHistoryCall(ctx context.Context, in *SearchHistoryCallRequest, opts ...grpc.CallOption) (*ListHistoryCall, error)
 	// List of call
-	SearchHistoryCallPast(ctx context.Context, in *SearchHistoryCallRequest, opts ...grpc.CallOption) (*ListHistoryCall, error)
+	SearchHistoryCallPost(ctx context.Context, in *SearchHistoryCallRequest, opts ...grpc.CallOption) (*ListHistoryCall, error)
 	PatchHistoryCall(ctx context.Context, in *PatchHistoryCallRequest, opts ...grpc.CallOption) (*HistoryCall, error)
 	AggregateHistoryCall(ctx context.Context, in *AggregateHistoryCallRequest, opts ...grpc.CallOption) (*ListAggregate, error)
 	SearchActiveCall(ctx context.Context, in *SearchCallRequest, opts ...grpc.CallOption) (*ListCall, error)
@@ -84,9 +84,9 @@ func (c *callServiceClient) SearchHistoryCall(ctx context.Context, in *SearchHis
 	return out, nil
 }
 
-func (c *callServiceClient) SearchHistoryCallPast(ctx context.Context, in *SearchHistoryCallRequest, opts ...grpc.CallOption) (*ListHistoryCall, error) {
+func (c *callServiceClient) SearchHistoryCallPost(ctx context.Context, in *SearchHistoryCallRequest, opts ...grpc.CallOption) (*ListHistoryCall, error) {
 	out := new(ListHistoryCall)
-	err := c.cc.Invoke(ctx, CallService_SearchHistoryCallPast_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, CallService_SearchHistoryCallPost_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -244,7 +244,7 @@ type CallServiceServer interface {
 	// List of call
 	SearchHistoryCall(context.Context, *SearchHistoryCallRequest) (*ListHistoryCall, error)
 	// List of call
-	SearchHistoryCallPast(context.Context, *SearchHistoryCallRequest) (*ListHistoryCall, error)
+	SearchHistoryCallPost(context.Context, *SearchHistoryCallRequest) (*ListHistoryCall, error)
 	PatchHistoryCall(context.Context, *PatchHistoryCallRequest) (*HistoryCall, error)
 	AggregateHistoryCall(context.Context, *AggregateHistoryCallRequest) (*ListAggregate, error)
 	SearchActiveCall(context.Context, *SearchCallRequest) (*ListCall, error)
@@ -273,8 +273,8 @@ type UnimplementedCallServiceServer struct {
 func (UnimplementedCallServiceServer) SearchHistoryCall(context.Context, *SearchHistoryCallRequest) (*ListHistoryCall, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SearchHistoryCall not implemented")
 }
-func (UnimplementedCallServiceServer) SearchHistoryCallPast(context.Context, *SearchHistoryCallRequest) (*ListHistoryCall, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SearchHistoryCallPast not implemented")
+func (UnimplementedCallServiceServer) SearchHistoryCallPost(context.Context, *SearchHistoryCallRequest) (*ListHistoryCall, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchHistoryCallPost not implemented")
 }
 func (UnimplementedCallServiceServer) PatchHistoryCall(context.Context, *PatchHistoryCallRequest) (*HistoryCall, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PatchHistoryCall not implemented")
@@ -355,20 +355,20 @@ func _CallService_SearchHistoryCall_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CallService_SearchHistoryCallPast_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _CallService_SearchHistoryCallPost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SearchHistoryCallRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CallServiceServer).SearchHistoryCallPast(ctx, in)
+		return srv.(CallServiceServer).SearchHistoryCallPost(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: CallService_SearchHistoryCallPast_FullMethodName,
+		FullMethod: CallService_SearchHistoryCallPost_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CallServiceServer).SearchHistoryCallPast(ctx, req.(*SearchHistoryCallRequest))
+		return srv.(CallServiceServer).SearchHistoryCallPost(ctx, req.(*SearchHistoryCallRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -673,8 +673,8 @@ var CallService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _CallService_SearchHistoryCall_Handler,
 		},
 		{
-			MethodName: "SearchHistoryCallPast",
-			Handler:    _CallService_SearchHistoryCallPast_Handler,
+			MethodName: "SearchHistoryCallPost",
+			Handler:    _CallService_SearchHistoryCallPost_Handler,
 		},
 		{
 			MethodName: "PatchHistoryCall",
