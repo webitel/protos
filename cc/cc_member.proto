@@ -3,6 +3,7 @@ syntax = "proto3";
 option go_package = "github.com/webitel/protos/cc";
 
 import "google/api/annotations.proto";
+import "const.proto";
 
 package cc;
 
@@ -209,6 +210,18 @@ message CallJoinToQueueResponse {
     string status = 1;
 }
 
+message MemberCommunicationCreateRequest {
+    string destination = 1;
+    engine.Lookup type = 2;
+    int32 priority = 3;
+    string description = 4;
+
+    engine.Lookup resource = 5;
+    string display = 6;
+    int64 stop_at = 7;
+    string dtmf = 8;
+}
+
 message AttemptResultRequest {
     int64 attempt_id = 1;
     string status = 2; // SUCCESS / CANCEL - абонент виключається з черги з цим статусом, якщо пусто то: якщо остання спроба то ABANDONED або буде очікувати наступний дзвінок
@@ -223,6 +236,8 @@ message AttemptResultRequest {
     int32 agent_id = 9;
     bool exclude_current_communication = 10;
     bool redial = 11;
+    repeated MemberCommunicationCreateRequest add_communications = 12;
+
 }
 
 message AttemptResultResponse {
