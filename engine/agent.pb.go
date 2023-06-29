@@ -3609,25 +3609,25 @@ type Agent struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id               int64         `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	User             *Lookup       `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
-	Status           string        `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
-	Description      string        `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
-	LastStatusChange int64         `protobuf:"varint,5,opt,name=last_status_change,json=lastStatusChange,proto3" json:"last_status_change,omitempty"`
-	ProgressiveCount int32         `protobuf:"varint,6,opt,name=progressive_count,json=progressiveCount,proto3" json:"progressive_count,omitempty"`
-	Name             string        `protobuf:"bytes,7,opt,name=name,proto3" json:"name,omitempty"`
-	Channel          *AgentChannel `protobuf:"bytes,8,opt,name=channel,proto3" json:"channel,omitempty"`
-	StatusDuration   int64         `protobuf:"varint,9,opt,name=status_duration,json=statusDuration,proto3" json:"status_duration,omitempty"`
-	GreetingMedia    *Lookup       `protobuf:"bytes,10,opt,name=greeting_media,json=greetingMedia,proto3" json:"greeting_media,omitempty"`
-	AllowChannels    []string      `protobuf:"bytes,11,rep,name=allow_channels,json=allowChannels,proto3" json:"allow_channels,omitempty"`
-	ChatCount        uint32        `protobuf:"varint,12,opt,name=chat_count,json=chatCount,proto3" json:"chat_count,omitempty"`
-	Supervisor       []*Lookup     `protobuf:"bytes,13,rep,name=supervisor,proto3" json:"supervisor,omitempty"`
-	Team             *Lookup       `protobuf:"bytes,14,opt,name=team,proto3" json:"team,omitempty"`
-	Region           *Lookup       `protobuf:"bytes,15,opt,name=region,proto3" json:"region,omitempty"`
-	Auditor          []*Lookup     `protobuf:"bytes,16,rep,name=auditor,proto3" json:"auditor,omitempty"`
-	IsSupervisor     bool          `protobuf:"varint,17,opt,name=is_supervisor,json=isSupervisor,proto3" json:"is_supervisor,omitempty"`
-	Skills           []*Lookup     `protobuf:"bytes,18,rep,name=skills,proto3" json:"skills,omitempty"`
-	Extension        string        `protobuf:"bytes,19,opt,name=extension,proto3" json:"extension,omitempty"`
+	Id               int64           `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	User             *Lookup         `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
+	Status           string          `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
+	Description      string          `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
+	LastStatusChange int64           `protobuf:"varint,5,opt,name=last_status_change,json=lastStatusChange,proto3" json:"last_status_change,omitempty"`
+	ProgressiveCount int32           `protobuf:"varint,6,opt,name=progressive_count,json=progressiveCount,proto3" json:"progressive_count,omitempty"`
+	Name             string          `protobuf:"bytes,7,opt,name=name,proto3" json:"name,omitempty"`
+	Channel          []*AgentChannel `protobuf:"bytes,8,rep,name=channel,proto3" json:"channel,omitempty"`
+	StatusDuration   int64           `protobuf:"varint,9,opt,name=status_duration,json=statusDuration,proto3" json:"status_duration,omitempty"`
+	GreetingMedia    *Lookup         `protobuf:"bytes,10,opt,name=greeting_media,json=greetingMedia,proto3" json:"greeting_media,omitempty"`
+	AllowChannels    []string        `protobuf:"bytes,11,rep,name=allow_channels,json=allowChannels,proto3" json:"allow_channels,omitempty"`
+	ChatCount        uint32          `protobuf:"varint,12,opt,name=chat_count,json=chatCount,proto3" json:"chat_count,omitempty"`
+	Supervisor       []*Lookup       `protobuf:"bytes,13,rep,name=supervisor,proto3" json:"supervisor,omitempty"`
+	Team             *Lookup         `protobuf:"bytes,14,opt,name=team,proto3" json:"team,omitempty"`
+	Region           *Lookup         `protobuf:"bytes,15,opt,name=region,proto3" json:"region,omitempty"`
+	Auditor          []*Lookup       `protobuf:"bytes,16,rep,name=auditor,proto3" json:"auditor,omitempty"`
+	IsSupervisor     bool            `protobuf:"varint,17,opt,name=is_supervisor,json=isSupervisor,proto3" json:"is_supervisor,omitempty"`
+	Skills           []*Lookup       `protobuf:"bytes,18,rep,name=skills,proto3" json:"skills,omitempty"`
+	Extension        string          `protobuf:"bytes,19,opt,name=extension,proto3" json:"extension,omitempty"`
 }
 
 func (x *Agent) Reset() {
@@ -3711,7 +3711,7 @@ func (x *Agent) GetName() string {
 	return ""
 }
 
-func (x *Agent) GetChannel() *AgentChannel {
+func (x *Agent) GetChannel() []*AgentChannel {
 	if x != nil {
 		return x.Channel
 	}
@@ -4588,7 +4588,7 @@ var file_agent_proto_rawDesc = []byte{
 	0x18, 0x06, 0x20, 0x01, 0x28, 0x05, 0x52, 0x10, 0x70, 0x72, 0x6f, 0x67, 0x72, 0x65, 0x73, 0x73,
 	0x69, 0x76, 0x65, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65,
 	0x18, 0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x2e, 0x0a, 0x07,
-	0x63, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x18, 0x08, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x14, 0x2e,
+	0x63, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x18, 0x08, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x14, 0x2e,
 	0x65, 0x6e, 0x67, 0x69, 0x6e, 0x65, 0x2e, 0x41, 0x67, 0x65, 0x6e, 0x74, 0x43, 0x68, 0x61, 0x6e,
 	0x6e, 0x65, 0x6c, 0x52, 0x07, 0x63, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x12, 0x27, 0x0a, 0x0f,
 	0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x5f, 0x64, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18,
