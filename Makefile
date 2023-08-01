@@ -80,11 +80,11 @@ workflow:
 
 chat:
 	protoc \
-	-I ./chat \
+	-I chat -I proto \
 	--go_opt=paths=source_relative --go_out=chat \
 	--go-grpc_out=paths=source_relative:chat \
 	\
-	./chat/*.proto
+	chat/*.proto
 
 	# export GO111MODULE=on  # Enable module mode
 	##### require google.golang.org/protobuf v1.25.0
@@ -105,6 +105,24 @@ bot:
 	 \
 	./bot/*.proto
 
+.PHONY: messages
+
+messages:
+	protoc \
+	-I . -I proto \
+	--go_opt=paths=source_relative --go_out=. \
+	--go-grpc_out=paths=source_relative:. \
+	\
+	chat/messages/*.proto
+
+.PHONY: messages_swagger
+
+messages_swagger:
+	protoc \
+	-I . -I proto \
+	--openapiv2_out=merge_file_name=messages,allow_merge=true,openapi_naming_strategy=fqn,json_names_for_fields=false,disable_default_errors=true,repeated_path_param_separator=csv,logtostderr=true:swagger \
+	chat/messages/openapiv2.proto \
+	chat/messages/catalog.proto
 
 .PHONY: swagger_mix
 

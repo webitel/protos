@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package webitel.chat; 
+
+option go_package = "github.com/webitel/protos/chat/messages";
+
+// Peer Contact.
+message Peer {
+  // Contact unique **ID**entifier.
+  // Contact **type**-specific string.
+  string id = 1;
+  
+  // Type of contact provider.
+  // [internal]
+  // -- user; (agent)
+  // -- flow; (schema/bot)
+  // [external]
+  // -- viber
+  // -- telegram
+  // -- facebook
+  // -- whatsapp
+  // -- instagram
+  // . . .
+  
+  // Contact **type** provider.
+  string type = 2;
+  
+  // Contact display **name**.
+  string name = 3;
+}
+
+// InputPeer Identity.
+message InputPeer {
+  // Type of the input peer.
+  oneof input {
+    // Unique chat identifier.
+    string chat_id = 1;
+    // Unique peer member of the chat.
+    Peer peer = 2;
+  }
+}
