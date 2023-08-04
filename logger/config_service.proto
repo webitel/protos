@@ -1,0 +1,117 @@
+syntax = "proto3";
+
+package webitel_logger;
+
+option go_package = "webitel_logger/proto";
+
+import "logger_service.proto";
+import "google/api/annotations.proto";
+
+
+service ConfigService {
+  rpc UpdateConfig(UpdateConfigRequest) returns (Config) {
+    option (google.api.http) = {
+      put: "/logger/config/{config_id}"
+      body: "*"
+    };
+  }
+  rpc PatchUpdateConfig(PatchUpdateConfigRequest) returns (Config) {
+    option (google.api.http) = {
+      patch: "/logger/config/{config_id}"
+      body: "*"
+    };
+  }
+  rpc InsertConfig(InsertConfigRequest) returns (Config) {
+    option (google.api.http) = {
+      post: "/logger/config"
+      body: "*"
+    };
+  }
+  rpc GetConfigByObjectId(GetConfigByObjectIdRequest) returns (Config) {
+  }
+  rpc GetConfigById(GetConfigByIdRequest) returns (Config) {
+    option (google.api.http) = {
+      get: "/logger/config/{id}"
+    };
+  }
+  rpc GetAllConfigs(GetAllConfigsRequest) returns (Configs) {
+    option (google.api.http) = {
+      get: "/logger/config"
+    };
+  }
+}
+
+
+message Configs {
+  int32 page = 1;
+  bool next = 2;
+  repeated Config items = 3;
+}
+message Config {
+  int32 id = 1;
+  Lookup	object = 2;
+  bool enabled = 3;
+  int32 days_to_store = 4;
+  string period = 5;
+  Lookup storage = 6;
+}
+
+message GetConfigByObjectIdRequest {
+  //  int32 page = 1;
+  //  int32 size = 2;
+  //  string q = 3;
+  //
+  //  string sort = 5;
+  //  repeated string fields = 6;
+
+  int32 object_id = 1;
+  int32 domain_id = 2;
+}
+
+message GetConfigByIdRequest {
+  //  int32 page = 1;
+  //  int32 size = 2;
+  //  string q = 3;
+  //
+  //  string sort = 5;
+  //  repeated string fields = 6;
+
+  int32 id = 1;
+  //  int32 domainId = 8;
+}
+
+message GetAllConfigsRequest {
+  int32 page = 1;
+  int32 size = 2;
+  string q = 3;
+
+  string sort = 4;
+  repeated string fields = 5;
+
+  //  int32 domainId = 7;
+}
+
+message UpdateConfigRequest {
+  int32 config_id = 1;
+  bool enabled = 2;
+  int32 days_to_store = 3;
+  string period = 4;
+  int32 storage_id = 5;
+}
+
+message PatchUpdateConfigRequest {
+  int32 config_id = 1;
+  bool enabled = 2;
+  int32 days_to_store = 3;
+  string period = 4;
+  int32 storage_id = 5;
+  repeated string fields = 6;
+}
+
+message InsertConfigRequest {
+  int32 object_id = 1;
+  bool enabled = 2;
+  int32 days_to_store = 3;
+  string period = 4;
+  int32 storage_id = 5;
+}
