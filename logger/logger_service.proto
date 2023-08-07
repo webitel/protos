@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package logger;
+
+option go_package = "webitel_logger/proto";
+import "google/api/annotations.proto";
+
+service LoggerService {
+  rpc GetLogsByUserId(GetLogsByUserIdRequest) returns (Logs) {
+    option (google.api.http) = {
+      get: "/logger/user/{user_id}/logs"
+    };
+  }
+  rpc GetLogsByConfigId(GetLogsByConfigIdRequest) returns (Logs) {
+    option (google.api.http) = {
+      get: "/logger/config/{config_id}/logs"
+    };
+  }
+}
+
+message GetLogsByConfigIdRequest {
+  int32 page = 1;
+  int32 size = 2;
+  string q = 3;
+
+  string sort = 5;
+  repeated string fields = 6;
+
+  int32 config_id = 7;
+}
+
+message GetLogsByUserIdRequest {
+  int32 page = 1;
+  int32 size = 2;
+  string q = 3;
+
+  string sort = 5;
+  repeated string fields = 6;
+
+  int32 user_id = 7;
+}
+
+message Logs {
+  int32 page = 1;
+  bool next = 2;
+  repeated Log items = 3;
+}
+
+message Log {
+  int32 id = 1;
+  string action = 2;
+  string date = 3;
+  Lookup user = 4;
+  string user_ip = 5;
+  string new_state = 6;
+  int32 config_id = 7;
+}
+
+message Lookup {
+  int32 id = 1;
+  string name = 2;
+}

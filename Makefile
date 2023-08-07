@@ -1,7 +1,7 @@
 
 .PHONY: all
 
-all: engine_swagger engine_proto fs storage_swagger storage_proto workflow chat bot call_center swagger_mix
+all: engine_swagger engine_proto fs storage_swagger storage_proto logger_swagger logger_proto workflow chat bot call_center swagger_mix
 
 
 .PHONY: engine_swagger
@@ -75,6 +75,23 @@ workflow:
       --go-grpc_out=. --go-grpc_opt=paths=source_relative \
       --go_opt=paths=source_relative \
       --go_out=. ./workflow/*.proto
+
+.PHONY: logger_swagger
+
+logger_swagger:
+	protoc -I/usr/local/include -I./logger -I${GRPC_GATEWAY}/third_party/googleapis  \
+      -I${GRPC_GATEWAY} \
+      --swagger_out=version=false,json_names_for_fields=false,allow_delete_body=true,allow_repeated_fields_in_body=false,fqn_for_swagger_name=false,merge_file_name=engine,allow_merge=true:./swagger \
+      ./logger/*.proto
+
+.PHONY: logger_proto
+
+logger_proto:
+	protoc -I/usr/local/include -I./logger -I${GRPC_GATEWAY}/third_party/googleapis  \
+      -I${GRPC_GATEWAY}  \
+      --go-grpc_out=./logger --go-grpc_opt=paths=source_relative \
+      --go_opt=paths=source_relative \
+      --go_out=./logger ./logger/*.proto
 
 .PHONY: chat
 
