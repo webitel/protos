@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "Webitel Contacts ReSTfull API",
-    "version": "v23.07",
+    "version": "v23.10",
     "contact": {
       "name": "Webitel LLC",
       "url": "https://www.webitel.com",
@@ -21,6 +21,9 @@
     },
     {
       "name": "Emails"
+    },
+    {
+      "name": "Variables"
     }
   ],
   "host": "nx.webitel.org",
@@ -987,6 +990,434 @@
         ],
         "tags": [
           "Labels"
+        ]
+      }
+    },
+    "/contacts/{contact_id}/variables": {
+      "get": {
+        "summary": "List variables of the contact",
+        "operationId": "Variables_ListVariables",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.VariableList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "description": "Contact ID associated with.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "description": "Page number of result. offset = ((page-1)*size)",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "description": "Size of result page. limit = (size++)",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "q",
+            "description": "Search term: variable key;\n`?` - matches any one character\n`*` - matches 0 or more characters",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort",
+            "description": "Sort the result according to fields.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved as a result.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "id",
+            "description": "Record(s) with unique ID only.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Variables"
+        ]
+      },
+      "delete": {
+        "summary": "Remove variable(s) of the contact",
+        "operationId": "Variables_DeleteVariables",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.VariableList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "description": "Contact ID associated with.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved as a result.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "etag",
+            "description": "Set of unique ID(s) to remove.",
+            "in": "query",
+            "required": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^.+$",
+              "uniqueItems": true
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Variables"
+        ]
+      },
+      "post": {
+        "summary": "Update or append variables to the contact",
+        "operationId": "Variables_MergeVariables",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.VariableList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "description": "Link contact ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "input",
+            "description": "Fixed object of unique variables to associate with a Contact.\nEach individual key of an object represents a separate variable.\nVariable{key} already linked with the Contact and listed here will be updated.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/webitel.contacts.InputVariable",
+                "uniqueItems": true
+              },
+              "minItems": 1
+            }
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved as a result.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Variables"
+        ]
+      },
+      "put": {
+        "summary": "Reset all variables of the contact",
+        "operationId": "Variables_ResetVariables",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.VariableList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "description": "Contact ID associated with.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "input",
+            "description": "Fixed object of unique variables to associate with a Contact.\nEach individual key of an object represents a separate variable.\nVariable{key} already linked with the Contact but not listed here will be removed.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/webitel.contacts.InputVariable",
+                "uniqueItems": true
+              },
+              "minItems": 1
+            }
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved into result of changes.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Variables"
+        ]
+      }
+    },
+    "/contacts/{contact_id}/variables/{etag}": {
+      "delete": {
+        "summary": "Remove the contact's variable by etag",
+        "operationId": "Variables_DeleteVariable",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.Variable"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "description": "Contact ID associated with.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "etag",
+            "description": "Unique ID to remove.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved as a result.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Variables"
+        ]
+      },
+      "put": {
+        "summary": "Update contact variable",
+        "operationId": "Variables_UpdateVariable",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.VariableList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "description": "Contact ID associated with.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "etag",
+            "description": "Unique ID of the latest version of an existing resorce.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "input",
+            "description": "NEW Variable update.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "example": {
+                "key": "var_rename",
+                "value": [
+                  "string_item",
+                  [
+                    3,
+                    7
+                  ],
+                  false,
+                  null
+                ]
+              },
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "description": "NEW Key.",
+                  "pattern": "^\\w+$"
+                },
+                "value": {
+                  "description": "NEW Value."
+                }
+              },
+              "title": "NEW Variable update.",
+              "required": [
+                "key"
+              ]
+            }
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved into result of changes.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Variables"
+        ]
+      },
+      "patch": {
+        "summary": "Update contact variable",
+        "operationId": "Variables_UpdateVariable2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.VariableList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "description": "Contact ID associated with.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "etag",
+            "description": "Unique ID of the latest version of an existing resorce.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "input",
+            "description": "NEW Variable update.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "example": {
+                "key": "var_rename",
+                "value": [
+                  "string_item",
+                  [
+                    3,
+                    7
+                  ],
+                  false,
+                  null
+                ]
+              },
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "description": "NEW Key.",
+                  "pattern": "^\\w+$"
+                },
+                "value": {
+                  "description": "NEW Value."
+                }
+              },
+              "title": "NEW Variable update.",
+              "required": [
+                "key"
+              ]
+            }
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved into result of changes.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Variables"
         ]
       }
     },
