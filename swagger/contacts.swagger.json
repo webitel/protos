@@ -84,7 +84,7 @@
             "items": {
               "type": "string",
               "default": "id",
-              "pattern": "^(+|-|!)?\\w+$",
+              "pattern": "^[+|-|!]?\\w+$",
               "uniqueItems": true
             },
             "collectionFormat": "multi"
@@ -1422,6 +1422,54 @@
       }
     },
     "/contacts/{etag}": {
+      "get": {
+        "summary": "Locate Contact source",
+        "operationId": "Contacts_LocateContact",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.Contact"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "etag",
+            "description": "The Contact source IDentifier.\nAccept: `etag` (obsolete+) or `id`.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "description": "Source Fields to return into result.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "mode",
+            "description": "The requirement of a special access mode to the Source.\n\n - READ: Can `fetch` record. [GET]\n - WRITE: Can `update` record. [PUT|PATCH]\n - DELETE: Can `delete` record. [DELETE]",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "READ",
+              "WRITE",
+              "DELETE"
+            ],
+            "default": "READ"
+          }
+        ],
+        "tags": [
+          "Contacts"
+        ]
+      },
       "delete": {
         "summary": "Remove Contact source",
         "operationId": "Contacts_DeleteContact",
@@ -1587,56 +1635,6 @@
               "type": "string"
             },
             "collectionFormat": "multi"
-          }
-        ],
-        "tags": [
-          "Contacts"
-        ]
-      }
-    },
-    "/contacts/{id}": {
-      "get": {
-        "summary": "Locate Contact source",
-        "operationId": "Contacts_LocateContact",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.contacts.Contact"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "description": "The Contact source IDentifier.\nAccept: `etag` (obsolete+) or `id`.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "fields",
-            "description": "Source Fields to return into result.",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          },
-          {
-            "name": "mode",
-            "description": "The requirement of a special access mode to the Source.\n\n - READ: Can `fetch` record. [GET]\n - WRITE: Can `update` record. [PUT|PATCH]\n - DELETE: Can `delete` record. [DELETE]",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "READ",
-              "WRITE",
-              "DELETE"
-            ],
-            "default": "READ"
           }
         ],
         "tags": [

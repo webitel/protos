@@ -1,22 +1,9 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "Webitel logger API",
-    "version": "23.07.0",
-    "contact": {
-      "name": "Webitel",
-      "url": "https://webitel.com",
-      "email": "support@webitel.com"
-    },
-    "license": {
-      "name": "MIT"
-    }
+    "title": "config_service.proto",
+    "version": "version not set"
   },
-  "host": "dev.webitel.com",
-  "basePath": "/api",
-  "schemes": [
-    "https"
-  ],
   "consumes": [
     "application/json"
   ],
@@ -26,7 +13,7 @@
   "paths": {
     "/logger/config": {
       "get": {
-        "operationId": "GetAllConfigs",
+        "operationId": "ConfigService_GetAllConfigs",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -34,14 +21,10 @@
               "$ref": "#/definitions/loggerConfigs"
             }
           },
-          "403": {
-            "description": "Returned when the user does not have permission to access the resource.",
-            "schema": {}
-          },
-          "404": {
-            "description": "Returned when the resource does not exist.",
+          "default": {
+            "description": "An unexpected error response.",
             "schema": {
-              "format": "string"
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -79,7 +62,8 @@
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -87,7 +71,7 @@
         ]
       },
       "delete": {
-        "operationId": "DeleteConfigs",
+        "operationId": "ConfigService_DeleteConfigs",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -95,14 +79,10 @@
               "$ref": "#/definitions/loggerEmpty"
             }
           },
-          "403": {
-            "description": "Returned when the user does not have permission to access the resource.",
-            "schema": {}
-          },
-          "404": {
-            "description": "Returned when the resource does not exist.",
+          "default": {
+            "description": "An unexpected error response.",
             "schema": {
-              "format": "string"
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -121,7 +101,7 @@
         ]
       },
       "post": {
-        "operationId": "InsertConfig",
+        "operationId": "ConfigService_InsertConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -129,14 +109,10 @@
               "$ref": "#/definitions/loggerConfig"
             }
           },
-          "403": {
-            "description": "Returned when the user does not have permission to access the resource.",
-            "schema": {}
-          },
-          "404": {
-            "description": "Returned when the resource does not exist.",
+          "default": {
+            "description": "An unexpected error response.",
             "schema": {
-              "format": "string"
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -156,8 +132,8 @@
       }
     },
     "/logger/config/{config_id}": {
-      "put": {
-        "operationId": "UpdateConfig",
+      "get": {
+        "operationId": "ConfigService_GetConfigById",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -165,14 +141,76 @@
               "$ref": "#/definitions/loggerConfig"
             }
           },
-          "403": {
-            "description": "Returned when the user does not have permission to access the resource.",
-            "schema": {}
-          },
-          "404": {
-            "description": "Returned when the resource does not exist.",
+          "default": {
+            "description": "An unexpected error response.",
             "schema": {
-              "format": "string"
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "config_id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "ConfigService"
+        ]
+      },
+      "delete": {
+        "operationId": "ConfigService_DeleteConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/loggerEmpty"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "config_id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/loggerDeleteConfigRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ConfigService"
+        ]
+      },
+      "put": {
+        "operationId": "ConfigService_UpdateConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/loggerConfig"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -198,7 +236,7 @@
         ]
       },
       "patch": {
-        "operationId": "PatchUpdateConfig",
+        "operationId": "ConfigService_PatchUpdateConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -206,14 +244,10 @@
               "$ref": "#/definitions/loggerConfig"
             }
           },
-          "403": {
-            "description": "Returned when the user does not have permission to access the resource.",
-            "schema": {}
-          },
-          "404": {
-            "description": "Returned when the resource does not exist.",
+          "default": {
+            "description": "An unexpected error response.",
             "schema": {
-              "format": "string"
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -241,7 +275,7 @@
     },
     "/logger/config/{config_id}/logs": {
       "get": {
-        "operationId": "GetLogsByConfigId",
+        "operationId": "LoggerService_GetLogsByConfigId",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -249,14 +283,10 @@
               "$ref": "#/definitions/loggerLogs"
             }
           },
-          "403": {
-            "description": "Returned when the user does not have permission to access the resource.",
-            "schema": {}
-          },
-          "404": {
-            "description": "Returned when the resource does not exist.",
+          "default": {
+            "description": "An unexpected error response.",
             "schema": {
-              "format": "string"
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -301,7 +331,8 @@
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -309,77 +340,9 @@
         ]
       }
     },
-    "/logger/config/{id}": {
-      "get": {
-        "operationId": "GetConfigById",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/loggerConfig"
-            }
-          },
-          "403": {
-            "description": "Returned when the user does not have permission to access the resource.",
-            "schema": {}
-          },
-          "404": {
-            "description": "Returned when the resource does not exist.",
-            "schema": {
-              "format": "string"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "integer",
-            "format": "int32"
-          }
-        ],
-        "tags": [
-          "ConfigService"
-        ]
-      },
-      "delete": {
-        "operationId": "DeleteConfig",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/loggerEmpty"
-            }
-          },
-          "403": {
-            "description": "Returned when the user does not have permission to access the resource.",
-            "schema": {}
-          },
-          "404": {
-            "description": "Returned when the resource does not exist.",
-            "schema": {
-              "format": "string"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "integer",
-            "format": "int32"
-          }
-        ],
-        "tags": [
-          "ConfigService"
-        ]
-      }
-    },
     "/logger/user/{user_id}/logs": {
       "get": {
-        "operationId": "GetLogsByUserId",
+        "operationId": "LoggerService_GetLogsByUserId",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -387,14 +350,10 @@
               "$ref": "#/definitions/loggerLogs"
             }
           },
-          "403": {
-            "description": "Returned when the user does not have permission to access the resource.",
-            "schema": {}
-          },
-          "404": {
-            "description": "Returned when the resource does not exist.",
+          "default": {
+            "description": "An unexpected error response.",
             "schema": {
-              "format": "string"
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -439,7 +398,8 @@
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -460,8 +420,7 @@
           "$ref": "#/definitions/loggerLookup"
         },
         "enabled": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "days_to_store": {
           "type": "integer",
@@ -483,14 +442,22 @@
           "format": "int32"
         },
         "next": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "items": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/loggerConfig"
           }
+        }
+      }
+    },
+    "loggerDeleteConfigRequest": {
+      "type": "object",
+      "properties": {
+        "config_id": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -517,8 +484,7 @@
           "format": "int32"
         },
         "enabled": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "days_to_store": {
           "type": "integer",
@@ -569,8 +535,7 @@
           "format": "int32"
         },
         "next": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "items": {
           "type": "array",
@@ -600,8 +565,7 @@
           "format": "int32"
         },
         "enabled": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "days_to_store": {
           "type": "integer",
@@ -630,8 +594,7 @@
           "format": "int32"
         },
         "enabled": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "days_to_store": {
           "type": "integer",
@@ -645,18 +608,39 @@
           "format": "int32"
         }
       }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "runtimeError": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
     }
-  },
-  "securityDefinitions": {
-    "AccessToken": {
-      "type": "apiKey",
-      "name": "X-Webitel-Access",
-      "in": "header"
-    }
-  },
-  "security": [
-    {
-      "AccessToken": []
-    }
-  ]
+  }
 }

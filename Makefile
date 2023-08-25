@@ -73,7 +73,7 @@ workflow:
 
 logger_swagger:
 	protoc -I/usr/local/include -I./logger -I./  \
-      --swagger_out=version=false,json_names_for_fields=false,allow_delete_body=true,allow_repeated_fields_in_body=false,fqn_for_swagger_name=false,merge_file_name=engine,allow_merge=true:./swagger \
+      --swagger_out=version=false,json_names_for_fields=false,allow_delete_body=true,include_package_in_tags=false,allow_repeated_fields_in_body=false,fqn_for_swagger_name=false,merge_file_name=logger,allow_merge=true:./swagger \
       ./logger/*.proto
 
 .PHONY: logger_proto
@@ -135,7 +135,7 @@ messages_swagger:
 .PHONY: swagger_mix
 
 swagger_mix:
-	/home/igor/programs/golib/bin/swagger-mixin ./swagger/engine.swagger.json ./swagger/storage.swagger.json  > ./swagger/api.json | true
+	swagger-mixin ./swagger/engine.swagger.json ./swagger/storage.swagger.json ./swagger/logger.swagger.json ./swagger/contacts.swagger.json  > ./swagger/api.json | true
 
 
 .PHONY: clean
