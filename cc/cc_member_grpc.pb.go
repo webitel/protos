@@ -29,6 +29,7 @@ const (
 	MemberService_EmailJoinToQueue_FullMethodName      = "/cc.MemberService/EmailJoinToQueue"
 	MemberService_DirectAgentToMember_FullMethodName   = "/cc.MemberService/DirectAgentToMember"
 	MemberService_ProcessingFormAction_FullMethodName  = "/cc.MemberService/ProcessingFormAction"
+	MemberService_InterceptAttempt_FullMethodName      = "/cc.MemberService/InterceptAttempt"
 )
 
 // MemberServiceClient is the client API for MemberService service.
@@ -45,6 +46,7 @@ type MemberServiceClient interface {
 	EmailJoinToQueue(ctx context.Context, in *EmailJoinToQueueRequest, opts ...grpc.CallOption) (*EmailJoinToQueueResponse, error)
 	DirectAgentToMember(ctx context.Context, in *DirectAgentToMemberRequest, opts ...grpc.CallOption) (*DirectAgentToMemberResponse, error)
 	ProcessingFormAction(ctx context.Context, in *ProcessingFormActionRequest, opts ...grpc.CallOption) (*ProcessingFormActionResponse, error)
+	InterceptAttempt(ctx context.Context, in *InterceptAttemptRequest, opts ...grpc.CallOption) (*InterceptAttemptResponse, error)
 }
 
 type memberServiceClient struct {
@@ -214,6 +216,15 @@ func (c *memberServiceClient) ProcessingFormAction(ctx context.Context, in *Proc
 	return out, nil
 }
 
+func (c *memberServiceClient) InterceptAttempt(ctx context.Context, in *InterceptAttemptRequest, opts ...grpc.CallOption) (*InterceptAttemptResponse, error) {
+	out := new(InterceptAttemptResponse)
+	err := c.cc.Invoke(ctx, MemberService_InterceptAttempt_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MemberServiceServer is the server API for MemberService service.
 // All implementations must embed UnimplementedMemberServiceServer
 // for forward compatibility
@@ -228,6 +239,7 @@ type MemberServiceServer interface {
 	EmailJoinToQueue(context.Context, *EmailJoinToQueueRequest) (*EmailJoinToQueueResponse, error)
 	DirectAgentToMember(context.Context, *DirectAgentToMemberRequest) (*DirectAgentToMemberResponse, error)
 	ProcessingFormAction(context.Context, *ProcessingFormActionRequest) (*ProcessingFormActionResponse, error)
+	InterceptAttempt(context.Context, *InterceptAttemptRequest) (*InterceptAttemptResponse, error)
 	mustEmbedUnimplementedMemberServiceServer()
 }
 
@@ -264,6 +276,9 @@ func (UnimplementedMemberServiceServer) DirectAgentToMember(context.Context, *Di
 }
 func (UnimplementedMemberServiceServer) ProcessingFormAction(context.Context, *ProcessingFormActionRequest) (*ProcessingFormActionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ProcessingFormAction not implemented")
+}
+func (UnimplementedMemberServiceServer) InterceptAttempt(context.Context, *InterceptAttemptRequest) (*InterceptAttemptResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InterceptAttempt not implemented")
 }
 func (UnimplementedMemberServiceServer) mustEmbedUnimplementedMemberServiceServer() {}
 
@@ -467,6 +482,24 @@ func _MemberService_ProcessingFormAction_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MemberService_InterceptAttempt_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InterceptAttemptRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MemberServiceServer).InterceptAttempt(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MemberService_InterceptAttempt_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MemberServiceServer).InterceptAttempt(ctx, req.(*InterceptAttemptRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // MemberService_ServiceDesc is the grpc.ServiceDesc for MemberService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -501,6 +534,10 @@ var MemberService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ProcessingFormAction",
 			Handler:    _MemberService_ProcessingFormAction_Handler,
+		},
+		{
+			MethodName: "InterceptAttempt",
+			Handler:    _MemberService_InterceptAttempt_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
