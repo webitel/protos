@@ -13199,7 +13199,7 @@
         "tags": [
           "ConfigService"
         ],
-        "operationId": "ConfigService_GetSystemObjects",
+        "operationId": "ConfigService_ReadSystemObjects",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -13221,7 +13221,7 @@
         "tags": [
           "ConfigService"
         ],
-        "operationId": "ConfigService_GetAll",
+        "operationId": "ConfigService_SearchConfig",
         "parameters": [
           {
             "type": "integer",
@@ -13274,14 +13274,14 @@
         "tags": [
           "ConfigService"
         ],
-        "operationId": "ConfigService_Insert",
+        "operationId": "ConfigService_CreateConfig",
         "parameters": [
           {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/loggerInsertConfigRequest"
+              "$ref": "#/definitions/loggerCreateConfigRequest"
             }
           }
         ],
@@ -13304,14 +13304,14 @@
         "tags": [
           "ConfigService"
         ],
-        "operationId": "ConfigService_DeleteBulk",
+        "operationId": "ConfigService_DeleteConfigBulk",
         "parameters": [
           {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/loggerDeleteConfigsRequest"
+              "$ref": "#/definitions/loggerDeleteConfigBulkRequest"
             }
           }
         ],
@@ -13336,7 +13336,7 @@
         "tags": [
           "ConfigService"
         ],
-        "operationId": "ConfigService_GetById",
+        "operationId": "ConfigService_ReadConfig",
         "parameters": [
           {
             "type": "integer",
@@ -13365,7 +13365,7 @@
         "tags": [
           "ConfigService"
         ],
-        "operationId": "ConfigService_Update",
+        "operationId": "ConfigService_UpdateConfig",
         "parameters": [
           {
             "type": "integer",
@@ -13402,7 +13402,7 @@
         "tags": [
           "ConfigService"
         ],
-        "operationId": "ConfigService_Delete",
+        "operationId": "ConfigService_DeleteConfig",
         "parameters": [
           {
             "type": "integer",
@@ -13431,7 +13431,7 @@
         "tags": [
           "ConfigService"
         ],
-        "operationId": "ConfigService_PatchUpdate",
+        "operationId": "ConfigService_PatchConfig",
         "parameters": [
           {
             "type": "integer",
@@ -13445,7 +13445,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/loggerPatchUpdateConfigRequest"
+              "$ref": "#/definitions/loggerPatchConfigRequest"
             }
           }
         ],
@@ -13470,11 +13470,12 @@
         "tags": [
           "LoggerService"
         ],
-        "operationId": "LoggerService_GetByConfigId",
+        "operationId": "LoggerService_SearchLogByConfigId",
         "parameters": [
           {
             "type": "integer",
             "format": "int32",
+            "description": "REQUIRED filter",
             "name": "config_id",
             "in": "path",
             "required": true
@@ -13509,6 +13510,48 @@
             "collectionFormat": "multi",
             "name": "fields",
             "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "user.id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "user.name",
+            "in": "query"
+          },
+          {
+            "enum": [
+              "DEFAULT_NO_ACTION",
+              "CREATE",
+              "UPDATE",
+              "READ",
+              "DELETE"
+            ],
+            "type": "string",
+            "default": "DEFAULT_NO_ACTION",
+            "description": "GENERAL filters.",
+            "name": "action",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "userIp",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "dateFrom",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "dateTo",
+            "in": "query"
           }
         ],
         "responses": {
@@ -13532,11 +13575,12 @@
         "tags": [
           "LoggerService"
         ],
-        "operationId": "LoggerService_GetByUserId",
+        "operationId": "LoggerService_SearchLogByUserId",
         "parameters": [
           {
             "type": "integer",
             "format": "int32",
+            "description": "REQUIRED filter",
             "name": "user_id",
             "in": "path",
             "required": true
@@ -13570,6 +13614,48 @@
             },
             "collectionFormat": "multi",
             "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "object.id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "object.name",
+            "in": "query"
+          },
+          {
+            "enum": [
+              "DEFAULT_NO_ACTION",
+              "CREATE",
+              "UPDATE",
+              "READ",
+              "DELETE"
+            ],
+            "type": "string",
+            "default": "DEFAULT_NO_ACTION",
+            "description": "GENERAL filters.",
+            "name": "action",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "userIp",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "dateFrom",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "dateTo",
             "in": "query"
           }
         ],
@@ -24850,12 +24936,26 @@
         "NULL_VALUE"
       ]
     },
+    "loggerACTION": {
+      "type": "string",
+      "default": "DEFAULT_NO_ACTION",
+      "enum": [
+        "DEFAULT_NO_ACTION",
+        "CREATE",
+        "UPDATE",
+        "READ",
+        "DELETE"
+      ]
+    },
     "loggerConfig": {
       "type": "object",
       "properties": {
         "days_to_store": {
           "type": "integer",
           "format": "int32"
+        },
+        "description": {
+          "type": "string"
         },
         "enabled": {
           "type": "boolean"
@@ -24894,27 +24994,15 @@
         }
       }
     },
-    "loggerDeleteConfigsRequest": {
-      "type": "object",
-      "properties": {
-        "ids": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "int32"
-          }
-        }
-      }
-    },
-    "loggerEmpty": {
-      "type": "object"
-    },
-    "loggerInsertConfigRequest": {
+    "loggerCreateConfigRequest": {
       "type": "object",
       "properties": {
         "days_to_store": {
           "type": "integer",
           "format": "int32"
+        },
+        "description": {
+          "type": "string"
         },
         "enabled": {
           "type": "boolean"
@@ -24931,6 +25019,21 @@
         }
       }
     },
+    "loggerDeleteConfigBulkRequest": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      }
+    },
+    "loggerEmpty": {
+      "type": "object"
+    },
     "loggerLog": {
       "type": "object",
       "properties": {
@@ -24942,7 +25045,8 @@
           "format": "int32"
         },
         "date": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         },
         "id": {
           "type": "integer",
@@ -24950,6 +25054,9 @@
         },
         "new_state": {
           "type": "string"
+        },
+        "record": {
+          "$ref": "#/definitions/loggerLookup"
         },
         "user": {
           "$ref": "#/definitions/loggerLookup"
@@ -24989,7 +25096,7 @@
         }
       }
     },
-    "loggerPatchUpdateConfigRequest": {
+    "loggerPatchConfigRequest": {
       "type": "object",
       "properties": {
         "config_id": {
@@ -24999,6 +25106,9 @@
         "days_to_store": {
           "type": "integer",
           "format": "int32"
+        },
+        "description": {
+          "type": "string"
         },
         "enabled": {
           "type": "boolean"
@@ -25039,6 +25149,9 @@
         "days_to_store": {
           "type": "integer",
           "format": "int32"
+        },
+        "description": {
+          "type": "string"
         },
         "enabled": {
           "type": "boolean"

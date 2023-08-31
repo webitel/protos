@@ -13,7 +13,7 @@
   "paths": {
     "/logger/available_objects": {
       "get": {
-        "operationId": "ConfigService_GetSystemObjects",
+        "operationId": "ConfigService_ReadSystemObjects",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -35,7 +35,7 @@
     },
     "/logger/config": {
       "get": {
-        "operationId": "ConfigService_GetAll",
+        "operationId": "ConfigService_SearchConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -93,7 +93,7 @@
         ]
       },
       "delete": {
-        "operationId": "ConfigService_DeleteBulk",
+        "operationId": "ConfigService_DeleteConfigBulk",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -114,7 +114,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/loggerDeleteConfigsRequest"
+              "$ref": "#/definitions/loggerDeleteConfigBulkRequest"
             }
           }
         ],
@@ -123,7 +123,7 @@
         ]
       },
       "post": {
-        "operationId": "ConfigService_Insert",
+        "operationId": "ConfigService_CreateConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -144,7 +144,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/loggerInsertConfigRequest"
+              "$ref": "#/definitions/loggerCreateConfigRequest"
             }
           }
         ],
@@ -155,7 +155,7 @@
     },
     "/logger/config/{config_id}": {
       "get": {
-        "operationId": "ConfigService_GetById",
+        "operationId": "ConfigService_ReadConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -184,7 +184,7 @@
         ]
       },
       "delete": {
-        "operationId": "ConfigService_Delete",
+        "operationId": "ConfigService_DeleteConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -213,7 +213,7 @@
         ]
       },
       "put": {
-        "operationId": "ConfigService_Update",
+        "operationId": "ConfigService_UpdateConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -250,7 +250,7 @@
         ]
       },
       "patch": {
-        "operationId": "ConfigService_PatchUpdate",
+        "operationId": "ConfigService_PatchConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -278,7 +278,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/loggerPatchUpdateConfigRequest"
+              "$ref": "#/definitions/loggerPatchConfigRequest"
             }
           }
         ],
@@ -289,7 +289,7 @@
     },
     "/logger/config/{config_id}/logs": {
       "get": {
-        "operationId": "LoggerService_GetByConfigId",
+        "operationId": "LoggerService_SearchLogByConfigId",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -307,6 +307,7 @@
         "parameters": [
           {
             "name": "config_id",
+            "description": "REQUIRED filter",
             "in": "path",
             "required": true,
             "type": "integer",
@@ -347,6 +348,54 @@
               "type": "string"
             },
             "collectionFormat": "multi"
+          },
+          {
+            "name": "user.id",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "user.name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "action",
+            "description": "GENERAL filters.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DEFAULT_NO_ACTION",
+              "CREATE",
+              "UPDATE",
+              "READ",
+              "DELETE"
+            ],
+            "default": "DEFAULT_NO_ACTION"
+          },
+          {
+            "name": "userIp",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "dateFrom",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "dateTo",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
           }
         ],
         "tags": [
@@ -356,7 +405,7 @@
     },
     "/logger/user/{user_id}/logs": {
       "get": {
-        "operationId": "LoggerService_GetByUserId",
+        "operationId": "LoggerService_SearchLogByUserId",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -374,6 +423,7 @@
         "parameters": [
           {
             "name": "user_id",
+            "description": "REQUIRED filter",
             "in": "path",
             "required": true,
             "type": "integer",
@@ -414,6 +464,54 @@
               "type": "string"
             },
             "collectionFormat": "multi"
+          },
+          {
+            "name": "object.id",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "object.name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "action",
+            "description": "GENERAL filters.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DEFAULT_NO_ACTION",
+              "CREATE",
+              "UPDATE",
+              "READ",
+              "DELETE"
+            ],
+            "default": "DEFAULT_NO_ACTION"
+          },
+          {
+            "name": "userIp",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "dateFrom",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "dateTo",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
           }
         ],
         "tags": [
@@ -423,6 +521,17 @@
     }
   },
   "definitions": {
+    "loggerACTION": {
+      "type": "string",
+      "enum": [
+        "DEFAULT_NO_ACTION",
+        "CREATE",
+        "UPDATE",
+        "READ",
+        "DELETE"
+      ],
+      "default": "DEFAULT_NO_ACTION"
+    },
     "loggerConfig": {
       "type": "object",
       "properties": {
@@ -446,6 +555,9 @@
         },
         "storage": {
           "$ref": "#/definitions/loggerLookup"
+        },
+        "description": {
+          "type": "string"
         }
       }
     },
@@ -467,22 +579,7 @@
         }
       }
     },
-    "loggerDeleteConfigsRequest": {
-      "type": "object",
-      "properties": {
-        "ids": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "int32"
-          }
-        }
-      }
-    },
-    "loggerEmpty": {
-      "type": "object"
-    },
-    "loggerInsertConfigRequest": {
+    "loggerCreateConfigRequest": {
       "type": "object",
       "properties": {
         "object": {
@@ -501,8 +598,26 @@
         },
         "storage": {
           "$ref": "#/definitions/loggerLookup"
+        },
+        "description": {
+          "type": "string"
         }
       }
+    },
+    "loggerDeleteConfigBulkRequest": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      }
+    },
+    "loggerEmpty": {
+      "type": "object"
     },
     "loggerLog": {
       "type": "object",
@@ -515,7 +630,8 @@
           "type": "string"
         },
         "date": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         },
         "user": {
           "$ref": "#/definitions/loggerLookup"
@@ -529,6 +645,9 @@
         "config_id": {
           "type": "integer",
           "format": "int32"
+        },
+        "record": {
+          "$ref": "#/definitions/loggerLookup"
         }
       }
     },
@@ -562,7 +681,7 @@
         }
       }
     },
-    "loggerPatchUpdateConfigRequest": {
+    "loggerPatchConfigRequest": {
       "type": "object",
       "properties": {
         "config_id": {
@@ -582,6 +701,9 @@
         },
         "storage": {
           "$ref": "#/definitions/loggerLookup"
+        },
+        "description": {
+          "type": "string"
         },
         "fields": {
           "type": "array",
@@ -622,6 +744,9 @@
         },
         "storage": {
           "$ref": "#/definitions/loggerLookup"
+        },
+        "description": {
+          "type": "string"
         }
       }
     },
