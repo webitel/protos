@@ -25,6 +25,7 @@ const (
 	ConfigService_DeleteConfig_FullMethodName         = "/logger.ConfigService/DeleteConfig"
 	ConfigService_DeleteConfigBulk_FullMethodName     = "/logger.ConfigService/DeleteConfigBulk"
 	ConfigService_ReadConfigByObjectId_FullMethodName = "/logger.ConfigService/ReadConfigByObjectId"
+	ConfigService_CheckConfigStatus_FullMethodName    = "/logger.ConfigService/CheckConfigStatus"
 	ConfigService_ReadSystemObjects_FullMethodName    = "/logger.ConfigService/ReadSystemObjects"
 	ConfigService_ReadConfig_FullMethodName           = "/logger.ConfigService/ReadConfig"
 	ConfigService_SearchConfig_FullMethodName         = "/logger.ConfigService/SearchConfig"
@@ -40,7 +41,8 @@ type ConfigServiceClient interface {
 	DeleteConfig(ctx context.Context, in *DeleteConfigRequest, opts ...grpc.CallOption) (*Empty, error)
 	DeleteConfigBulk(ctx context.Context, in *DeleteConfigBulkRequest, opts ...grpc.CallOption) (*Empty, error)
 	ReadConfigByObjectId(ctx context.Context, in *ReadConfigByObjectIdRequest, opts ...grpc.CallOption) (*Config, error)
-	ReadSystemObjects(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*SystemObjects, error)
+	CheckConfigStatus(ctx context.Context, in *CheckConfigStatusRequest, opts ...grpc.CallOption) (*ConfigStatus, error)
+	ReadSystemObjects(ctx context.Context, in *ReadSystemObjectsRequest, opts ...grpc.CallOption) (*SystemObjects, error)
 	ReadConfig(ctx context.Context, in *ReadConfigRequest, opts ...grpc.CallOption) (*Config, error)
 	SearchConfig(ctx context.Context, in *SearchConfigRequest, opts ...grpc.CallOption) (*Configs, error)
 }
@@ -107,7 +109,16 @@ func (c *configServiceClient) ReadConfigByObjectId(ctx context.Context, in *Read
 	return out, nil
 }
 
-func (c *configServiceClient) ReadSystemObjects(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*SystemObjects, error) {
+func (c *configServiceClient) CheckConfigStatus(ctx context.Context, in *CheckConfigStatusRequest, opts ...grpc.CallOption) (*ConfigStatus, error) {
+	out := new(ConfigStatus)
+	err := c.cc.Invoke(ctx, ConfigService_CheckConfigStatus_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *configServiceClient) ReadSystemObjects(ctx context.Context, in *ReadSystemObjectsRequest, opts ...grpc.CallOption) (*SystemObjects, error) {
 	out := new(SystemObjects)
 	err := c.cc.Invoke(ctx, ConfigService_ReadSystemObjects_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -144,7 +155,8 @@ type ConfigServiceServer interface {
 	DeleteConfig(context.Context, *DeleteConfigRequest) (*Empty, error)
 	DeleteConfigBulk(context.Context, *DeleteConfigBulkRequest) (*Empty, error)
 	ReadConfigByObjectId(context.Context, *ReadConfigByObjectIdRequest) (*Config, error)
-	ReadSystemObjects(context.Context, *Empty) (*SystemObjects, error)
+	CheckConfigStatus(context.Context, *CheckConfigStatusRequest) (*ConfigStatus, error)
+	ReadSystemObjects(context.Context, *ReadSystemObjectsRequest) (*SystemObjects, error)
 	ReadConfig(context.Context, *ReadConfigRequest) (*Config, error)
 	SearchConfig(context.Context, *SearchConfigRequest) (*Configs, error)
 	mustEmbedUnimplementedConfigServiceServer()
@@ -172,7 +184,10 @@ func (UnimplementedConfigServiceServer) DeleteConfigBulk(context.Context, *Delet
 func (UnimplementedConfigServiceServer) ReadConfigByObjectId(context.Context, *ReadConfigByObjectIdRequest) (*Config, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReadConfigByObjectId not implemented")
 }
-func (UnimplementedConfigServiceServer) ReadSystemObjects(context.Context, *Empty) (*SystemObjects, error) {
+func (UnimplementedConfigServiceServer) CheckConfigStatus(context.Context, *CheckConfigStatusRequest) (*ConfigStatus, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckConfigStatus not implemented")
+}
+func (UnimplementedConfigServiceServer) ReadSystemObjects(context.Context, *ReadSystemObjectsRequest) (*SystemObjects, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReadSystemObjects not implemented")
 }
 func (UnimplementedConfigServiceServer) ReadConfig(context.Context, *ReadConfigRequest) (*Config, error) {
@@ -302,8 +317,26 @@ func _ConfigService_ReadConfigByObjectId_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ConfigService_CheckConfigStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckConfigStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConfigServiceServer).CheckConfigStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConfigService_CheckConfigStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConfigServiceServer).CheckConfigStatus(ctx, req.(*CheckConfigStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ConfigService_ReadSystemObjects_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
+	in := new(ReadSystemObjectsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -315,7 +348,7 @@ func _ConfigService_ReadSystemObjects_Handler(srv interface{}, ctx context.Conte
 		FullMethod: ConfigService_ReadSystemObjects_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ConfigServiceServer).ReadSystemObjects(ctx, req.(*Empty))
+		return srv.(ConfigServiceServer).ReadSystemObjects(ctx, req.(*ReadSystemObjectsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -386,6 +419,10 @@ var ConfigService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ReadConfigByObjectId",
 			Handler:    _ConfigService_ReadConfigByObjectId_Handler,
+		},
+		{
+			MethodName: "CheckConfigStatus",
+			Handler:    _ConfigService_CheckConfigStatus_Handler,
 		},
 		{
 			MethodName: "ReadSystemObjects",
