@@ -11326,7 +11326,7 @@
           {
             "type": "array",
             "items": {
-              "pattern": "^[+|-|!]?\\w+$",
+              "pattern": "^(+|-|!)?\\w+$",
               "uniqueItems": true,
               "type": "string",
               "default": "id"
@@ -12210,6 +12210,464 @@
         }
       }
     },
+    "/contacts/{contact_id}/managers": {
+      "get": {
+        "tags": [
+          "Managers"
+        ],
+        "summary": "Search the Contact's Managers.",
+        "operationId": "Managers_ListManagers",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Contact ID associated with.",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page number of result. offset = ((page-1)*size)",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Size of result page. limit = (size++)",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Search term: user name;\n`?` - matches any one character\n`*` - matches 0 or more characters",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Sort the result according to fields.",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved as a result.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Record(s) with unique ID only.",
+            "name": "id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.ManagerList"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Managers"
+        ],
+        "summary": "Reset Managers to fit the specified final set.",
+        "operationId": "Managers_ResetManagers",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Contact ID associated with.",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Final set of unique User(s) to be linked with the Contact.\nUser(s) that are already linked with the Contact\nbut not listed here will be removed.\nThe first element will become `primary` if no other specified.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "uniqueItems": true,
+                "$ref": "#/definitions/webitel.contacts.InputManager"
+              }
+            }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved as a result.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.ManagerList"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Managers"
+        ],
+        "summary": "Associate new Managers to the Contact.",
+        "operationId": "Managers_MergeManagers",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Link contact ID.",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Array of the unique User(s) to associate with the Contact.\nAny duplicate of an already linked user{id} will result in an error.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/webitel.contacts.InputManager"
+              },
+              "example": [
+                {
+                  "primary": true,
+                  "user": {
+                    "id": "357",
+                    "name": "Bruce Wayne"
+                  }
+                },
+                {
+                  "user": {
+                    "id": "354",
+                    "name": "Johnny Doe"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved as a result.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.ManagerList"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Managers"
+        ],
+        "summary": "Remove Contact Managers associations.",
+        "operationId": "Managers_DeleteManagers",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Contact ID associated with.",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved as a result.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "uniqueItems": true,
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Set of unique ID(s) to remove.",
+            "name": "etag",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Manager dataset page.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/webitel.contacts.Manager"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contacts/{contact_id}/managers/{etag}": {
+      "get": {
+        "tags": [
+          "Managers"
+        ],
+        "summary": "Locate the manager address link.",
+        "operationId": "Managers_LocateManager",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Contact source ID.",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "\\w+",
+            "description": "Unique manager link IDentifier.\nAccept: `etag` (obsolete+) or `id`.",
+            "name": "etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved into result.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.Manager"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Managers"
+        ],
+        "summary": "Update the contact's manager address link details",
+        "operationId": "Managers_UpdateManager",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Link contact ID.",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Unique ID of the latest version of an existing resource.",
+            "name": "etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "NEW Update of the manager link.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "title": "NEW Update of the manager link.",
+              "properties": {
+                "primary": {
+                  "description": "Indicates whether this association must be default among others.",
+                  "type": "boolean"
+                },
+                "user": {
+                  "description": "Responsible User.",
+                  "$ref": "#/definitions/webitel.contacts.Lookup"
+                }
+              },
+              "example": {
+                "primary": true,
+                "user": {
+                  "id": "357",
+                  "name": "Bruce Wayne"
+                }
+              }
+            }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved into result of changes.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.ManagerList"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Managers"
+        ],
+        "summary": "Remove the contact's manager address link",
+        "operationId": "Managers_DeleteManager",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Contact ID associated with.",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Unique ID to remove.",
+            "name": "etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved as a result.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.Manager"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Managers"
+        ],
+        "summary": "Update the contact's manager address link details",
+        "operationId": "Managers_UpdateManager2",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Link contact ID.",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Unique ID of the latest version of an existing resource.",
+            "name": "etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "NEW Update of the manager link.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "title": "NEW Update of the manager link.",
+              "properties": {
+                "primary": {
+                  "description": "Indicates whether this association must be default among others.",
+                  "type": "boolean"
+                },
+                "user": {
+                  "description": "Responsible User.",
+                  "$ref": "#/definitions/webitel.contacts.Lookup"
+                }
+              },
+              "example": {
+                "primary": true,
+                "user": {
+                  "id": "357",
+                  "name": "Bruce Wayne"
+                }
+              }
+            }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved into result of changes.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.ManagerList"
+            }
+          }
+        }
+      }
+    },
     "/contacts/{contact_id}/variables": {
       "get": {
         "tags": [
@@ -12627,52 +13085,6 @@
       }
     },
     "/contacts/{etag}": {
-      "get": {
-        "tags": [
-          "Contacts"
-        ],
-        "summary": "Locate Contact source",
-        "operationId": "Contacts_LocateContact",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "The Contact source IDentifier.\nAccept: `etag` (obsolete+) or `id`.",
-            "name": "etag",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
-            "description": "Source Fields to return into result.",
-            "name": "fields",
-            "in": "query"
-          },
-          {
-            "enum": [
-              "READ",
-              "WRITE",
-              "DELETE"
-            ],
-            "type": "string",
-            "default": "READ",
-            "description": "The requirement of a special access mode to the Source.\n\n - READ: Can `fetch` record. [GET]\n - WRITE: Can `update` record. [PUT|PATCH]\n - DELETE: Can `delete` record. [DELETE]",
-            "name": "mode",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.contacts.Contact"
-            }
-          }
-        }
-      },
       "delete": {
         "tags": [
           "Contacts"
@@ -12830,6 +13242,54 @@
             "collectionFormat": "multi",
             "description": "Source Fields to return into result.",
             "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.Contact"
+            }
+          }
+        }
+      }
+    },
+    "/contacts/{id}": {
+      "get": {
+        "tags": [
+          "Contacts"
+        ],
+        "summary": "Locate Contact source",
+        "operationId": "Contacts_LocateContact",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "The Contact source IDentifier.\nAccept: `etag` (obsolete+) or `id`.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Source Fields to return into result.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "enum": [
+              "READ",
+              "WRITE",
+              "DELETE"
+            ],
+            "type": "string",
+            "default": "READ",
+            "description": "The requirement of a special access mode to the Source.\n\n - READ: Can `fetch` record. [GET]\n - WRITE: Can `update` record. [PUT|PATCH]\n - DELETE: Can `delete` record. [DELETE]",
+            "name": "mode",
             "in": "query"
           }
         ],
@@ -13554,14 +14014,14 @@
           },
           {
             "enum": [
-              "DEFAULT_NO_ACTION",
-              "CREATE",
-              "UPDATE",
-              "READ",
-              "DELETE"
+              "default_no_action",
+              "create",
+              "update",
+              "read",
+              "delete"
             ],
             "type": "string",
-            "default": "DEFAULT_NO_ACTION",
+            "default": "default_no_action",
             "name": "action",
             "in": "query"
           },
@@ -13658,14 +14118,14 @@
           },
           {
             "enum": [
-              "DEFAULT_NO_ACTION",
-              "CREATE",
-              "UPDATE",
-              "READ",
-              "DELETE"
+              "default_no_action",
+              "create",
+              "update",
+              "read",
+              "delete"
             ],
             "type": "string",
-            "default": "DEFAULT_NO_ACTION",
+            "default": "default_no_action",
             "description": "GENERAL filters.",
             "name": "action",
             "in": "query"
@@ -24973,15 +25433,15 @@
         "NULL_VALUE"
       ]
     },
-    "loggerACTION": {
+    "loggerAction": {
       "type": "string",
-      "default": "DEFAULT_NO_ACTION",
+      "default": "default_no_action",
       "enum": [
-        "DEFAULT_NO_ACTION",
-        "CREATE",
-        "UPDATE",
-        "READ",
-        "DELETE"
+        "default_no_action",
+        "create",
+        "update",
+        "read",
+        "delete"
       ]
     },
     "loggerConfig": {
