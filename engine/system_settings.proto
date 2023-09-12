@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+package engine;
+
+option go_package = "github.com/webitel/protos/engine";
+
+import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
+
+service SystemSettingService {
+  rpc CreateSystemSetting(CreateSystemSettingRequest) returns (SystemSetting) {
+    option (google.api.http) = {
+      post: "/settings"
+      body: "*"
+    };
+  }
+
+  rpc SearchSystemSetting(SearchSystemSettingRequest) returns (ListSystemSetting) {
+    option (google.api.http) = {
+      get: "/settings"
+    };
+  }
+
+  rpc ReadSystemSetting(ReadSystemSettingRequest) returns (SystemSetting) {
+    option (google.api.http) = {
+      get: "/settings/{id}"
+    };
+  }
+
+  rpc UpdateSystemSetting(UpdateSystemSettingRequest) returns (SystemSetting) {
+    option (google.api.http) = {
+      put: "/settings/{id}"
+      body: "*"
+    };
+  }
+
+  rpc PatchSystemSetting(PatchSystemSettingRequest) returns (SystemSetting) {
+    option (google.api.http) = {
+      patch: "/settings/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteSystemSetting(DeleteSystemSettingRequest) returns (SystemSetting) {
+    option (google.api.http) = {
+      delete: "/settings/{id}"
+    };
+  }
+}
+
+message DeleteSystemSettingRequest {
+  int32 id = 1;
+}
+
+message PatchSystemSettingRequest {
+  repeated string fields = 1;
+  int32 id = 2;
+  google.protobuf.Value value = 3;
+}
+
+message UpdateSystemSettingRequest {
+  int32 id = 1;
+  google.protobuf.Value value = 2;
+}
+
+message ReadSystemSettingRequest {
+  int32 id = 1;
+}
+
+message CreateSystemSettingRequest {
+  string name = 1;
+  google.protobuf.Value value = 2;
+}
+
+message SystemSetting {
+  int32 id = 1;
+  string name = 2;
+  google.protobuf.Value value = 3;
+}
+
+message SearchSystemSettingRequest {
+  int32 page = 1;
+  int32 size = 2;
+  string q = 3;
+
+  string sort = 5;
+  repeated string fields = 6;
+}
+
+message ListSystemSetting {
+  bool next = 1;
+  repeated SystemSetting items = 2;
+}
