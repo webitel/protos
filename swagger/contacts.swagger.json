@@ -27,12 +27,15 @@
     },
     {
       "name": "Managers"
+    },
+    {
+      "name": "Phones"
     }
   ],
-  "host": "10.10.10.162:2205",
-  "basePath": "/",
+  "host": "nx.webitel.org",
+  "basePath": "/api",
   "schemes": [
-    "http"
+    "https"
   ],
   "consumes": [
     "application/json"
@@ -87,7 +90,7 @@
             "items": {
               "type": "string",
               "default": "id",
-              "pattern": "^(+|-|!)?\\w+$",
+              "pattern": "^[+|-|!]?\\w+$",
               "uniqueItems": true
             },
             "collectionFormat": "multi"
@@ -1467,6 +1470,538 @@
         ]
       }
     },
+    "/contacts/{contact_id}/phones": {
+      "get": {
+        "summary": "Search phone number(s)",
+        "operationId": "Phones_ListPhones",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.PhoneList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "description": "The Contact ID associated with.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "description": "Page number of result dataset records. offset = (page*size)",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "description": "Size count of records on result page. limit = (size++)",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "q",
+            "description": "Search term: phone number.\n`?` - matches any one character\n`*` - matches 0 or more characters",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort",
+            "description": "Sort the result according to fields.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved into result.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "id",
+            "description": "Link(s) with unique ID only.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "primary",
+            "description": "Primary phone  only.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "verified",
+            "description": "Verified phone only.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "type.id",
+            "description": "Reference Object unique ID.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "type.type",
+            "description": "Reference Object well-known type.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "type.name",
+            "description": "Reference Object display name.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Phones"
+        ]
+      },
+      "delete": {
+        "summary": "Remove the Contact's phone number association(s)",
+        "operationId": "Phones_DeletePhones",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.PhoneList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "description": "The Contact ID associated with.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved into result.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "etag",
+            "description": "Set of linked ID(s) to be removed.",
+            "in": "query",
+            "required": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "uniqueItems": true
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Phones"
+        ]
+      },
+      "post": {
+        "summary": "Associate phone number(s) with the Contact",
+        "operationId": "Phones_MergePhones",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.PhoneList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "description": "Link contact ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "input",
+            "description": "Fixed set of phone number(s) to be linked with the Contact.\nPhone number(s) that conflicts with already linked will be updated.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "example": [
+                {
+                  "verified": false,
+                  "primary": true,
+                  "number": "+38 (099) 672-23-54",
+                  "type": {
+                    "name": "mobile"
+                  }
+                }
+              ],
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/webitel.contacts.InputPhoneNumber"
+              }
+            }
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved into result of changes.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Phones"
+        ]
+      },
+      "put": {
+        "summary": "Reset the Contact's phone numbers to fit given data set.",
+        "operationId": "Phones_ResetPhones",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.PhoneList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "description": "Link contact ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "input",
+            "description": "Final set of phone number(s) to be linked with the contact.\nPhone number(s) that are already linked with the contact\nbut not given in here will be removed.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "example": [
+                {
+                  "etag": "1679792219687",
+                  "verified": true,
+                  "primary": true,
+                  "number": "+38 (099) 672-23-54",
+                  "type": {
+                    "name": "personal"
+                  }
+                },
+                {
+                  "phone": "+1 482 555-36558",
+                  "type": {
+                    "name": "business"
+                  }
+                }
+              ],
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/webitel.contacts.InputPhoneNumber",
+                "uniqueItems": true
+              },
+              "minItems": 1
+            }
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved into result of changes.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Phones"
+        ]
+      }
+    },
+    "/contacts/{contact_id}/phones/{etag}": {
+      "delete": {
+        "summary": "Remove the Contact's phone number",
+        "operationId": "Phones_DeletePhone",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.PhoneNumber"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "description": "Link contact ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "etag",
+            "description": "Unique link ID to be removed.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved into result.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Phones"
+        ]
+      },
+      "put": {
+        "summary": "Update the Contact's phone number association details",
+        "operationId": "Phones_UpdatePhone",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.PhoneList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "description": "The Contact ID to be associated with.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "etag",
+            "description": "Unique ID of the latest version of an existing resorce.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "input",
+            "description": "NEW Update of the phone number details.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "primary": {
+                  "type": "boolean",
+                  "description": "Indicates whether this phone number is default within other channels of the same type(phone)."
+                },
+                "verified": {
+                  "type": "boolean",
+                  "title": "Indicate whether Contact, as a Person, realy owns this associated phone number.\nIn other words: whether Contact is reachable thru this 'phone' communication channel ?"
+                },
+                "number": {
+                  "type": "string",
+                  "description": "The phone number."
+                },
+                "type": {
+                  "$ref": "#/definitions/webitel.contacts.Lookup",
+                  "title": "The type of the phone number.\nReference on CommunicationType dictionary.\nUsed for outbound routing while dialup a phone number.\nThe type can be custom or one of these predefined values:\n- home\n- work\n- mobile\n- homeFax\n- workFax\n- otherFax\n- pager\n- workMobile\n- workPager\n- main\n- googleVoice\n- other"
+                }
+              },
+              "title": "NEW Update of the phone number details.",
+              "required": [
+                "number"
+              ]
+            }
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved into result of changes.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Phones"
+        ]
+      },
+      "patch": {
+        "summary": "Update the Contact's phone number association details",
+        "operationId": "Phones_UpdatePhone2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.PhoneList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "description": "The Contact ID to be associated with.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "etag",
+            "description": "Unique ID of the latest version of an existing resorce.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "input",
+            "description": "NEW Update of the phone number details.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "primary": {
+                  "type": "boolean",
+                  "description": "Indicates whether this phone number is default within other channels of the same type(phone)."
+                },
+                "verified": {
+                  "type": "boolean",
+                  "title": "Indicate whether Contact, as a Person, realy owns this associated phone number.\nIn other words: whether Contact is reachable thru this 'phone' communication channel ?"
+                },
+                "number": {
+                  "type": "string",
+                  "description": "The phone number."
+                },
+                "type": {
+                  "$ref": "#/definitions/webitel.contacts.Lookup",
+                  "title": "The type of the phone number.\nReference on CommunicationType dictionary.\nUsed for outbound routing while dialup a phone number.\nThe type can be custom or one of these predefined values:\n- home\n- work\n- mobile\n- homeFax\n- workFax\n- otherFax\n- pager\n- workMobile\n- workPager\n- main\n- googleVoice\n- other"
+                }
+              },
+              "title": "NEW Update of the phone number details.",
+              "required": [
+                "number"
+              ]
+            }
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved into result of changes.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Phones"
+        ]
+      }
+    },
+    "/contacts/{contact_id}/phones/{id}": {
+      "get": {
+        "summary": "Locate the Contact's phone number association.",
+        "operationId": "Phones_LocatePhone",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.PhoneNumber"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "description": "Reference Contact unique ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "description": "Association Record unique ID.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "fields",
+            "description": "Fields [Q]uery to build result record.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "etag",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "\\w+"
+          }
+        ],
+        "tags": [
+          "Phones"
+        ]
+      }
+    },
     "/contacts/{contact_id}/variables": {
       "get": {
         "summary": "List variables of the contact",
@@ -1896,6 +2431,54 @@
       }
     },
     "/contacts/{etag}": {
+      "get": {
+        "summary": "Locate Contact source",
+        "operationId": "Contacts_LocateContact",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.Contact"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "etag",
+            "description": "The Contact source IDentifier.\nAccept: `etag` (obsolete+) or `id`.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "description": "Source Fields to return into result.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "mode",
+            "description": "The requirement of a special access mode to the Source.\n\n - READ: Can `fetch` record. [GET]\n - WRITE: Can `update` record. [PUT|PATCH]\n - DELETE: Can `delete` record. [DELETE]",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "READ",
+              "WRITE",
+              "DELETE"
+            ],
+            "default": "READ"
+          }
+        ],
+        "tags": [
+          "Contacts"
+        ]
+      },
       "delete": {
         "summary": "Remove Contact source",
         "operationId": "Contacts_DeleteContact",
@@ -2061,56 +2644,6 @@
               "type": "string"
             },
             "collectionFormat": "multi"
-          }
-        ],
-        "tags": [
-          "Contacts"
-        ]
-      }
-    },
-    "/contacts/{id}": {
-      "get": {
-        "summary": "Locate Contact source",
-        "operationId": "Contacts_LocateContact",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.contacts.Contact"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "description": "The Contact source IDentifier.\nAccept: `etag` (obsolete+) or `id`.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "fields",
-            "description": "Source Fields to return into result.",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          },
-          {
-            "name": "mode",
-            "description": "The requirement of a special access mode to the Source.\n\n - READ: Can `fetch` record. [GET]\n - WRITE: Can `update` record. [PUT|PATCH]\n - DELETE: Can `delete` record. [DELETE]",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "READ",
-              "WRITE",
-              "DELETE"
-            ],
-            "default": "READ"
           }
         ],
         "tags": [
