@@ -35,6 +35,7 @@ const (
 	Api_ConfirmPush_FullMethodName        = "/fs.Api/ConfirmPush"
 	Api_Broadcast_FullMethodName          = "/fs.Api/Broadcast"
 	Api_SetEavesdropState_FullMethodName  = "/fs.Api/SetEavesdropState"
+	Api_BlindTransfer_FullMethodName      = "/fs.Api/BlindTransfer"
 )
 
 // ApiClient is the client API for Api service.
@@ -57,6 +58,7 @@ type ApiClient interface {
 	ConfirmPush(ctx context.Context, in *ConfirmPushRequest, opts ...grpc.CallOption) (*ConfirmPushResponse, error)
 	Broadcast(ctx context.Context, in *BroadcastRequest, opts ...grpc.CallOption) (*BroadcastResponse, error)
 	SetEavesdropState(ctx context.Context, in *SetEavesdropStateRequest, opts ...grpc.CallOption) (*SetEavesdropStateResponse, error)
+	BlindTransfer(ctx context.Context, in *BlindTransferRequest, opts ...grpc.CallOption) (*BlindTransferResponse, error)
 }
 
 type apiClient struct {
@@ -211,6 +213,15 @@ func (c *apiClient) SetEavesdropState(ctx context.Context, in *SetEavesdropState
 	return out, nil
 }
 
+func (c *apiClient) BlindTransfer(ctx context.Context, in *BlindTransferRequest, opts ...grpc.CallOption) (*BlindTransferResponse, error) {
+	out := new(BlindTransferResponse)
+	err := c.cc.Invoke(ctx, Api_BlindTransfer_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ApiServer is the server API for Api service.
 // All implementations must embed UnimplementedApiServer
 // for forward compatibility
@@ -231,6 +242,7 @@ type ApiServer interface {
 	ConfirmPush(context.Context, *ConfirmPushRequest) (*ConfirmPushResponse, error)
 	Broadcast(context.Context, *BroadcastRequest) (*BroadcastResponse, error)
 	SetEavesdropState(context.Context, *SetEavesdropStateRequest) (*SetEavesdropStateResponse, error)
+	BlindTransfer(context.Context, *BlindTransferRequest) (*BlindTransferResponse, error)
 	mustEmbedUnimplementedApiServer()
 }
 
@@ -285,6 +297,9 @@ func (UnimplementedApiServer) Broadcast(context.Context, *BroadcastRequest) (*Br
 }
 func (UnimplementedApiServer) SetEavesdropState(context.Context, *SetEavesdropStateRequest) (*SetEavesdropStateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetEavesdropState not implemented")
+}
+func (UnimplementedApiServer) BlindTransfer(context.Context, *BlindTransferRequest) (*BlindTransferResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BlindTransfer not implemented")
 }
 func (UnimplementedApiServer) mustEmbedUnimplementedApiServer() {}
 
@@ -587,6 +602,24 @@ func _Api_SetEavesdropState_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Api_BlindTransfer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BlindTransferRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApiServer).BlindTransfer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Api_BlindTransfer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApiServer).BlindTransfer(ctx, req.(*BlindTransferRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Api_ServiceDesc is the grpc.ServiceDesc for Api service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -657,6 +690,10 @@ var Api_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetEavesdropState",
 			Handler:    _Api_SetEavesdropState_Handler,
+		},
+		{
+			MethodName: "BlindTransfer",
+			Handler:    _Api_BlindTransfer_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
