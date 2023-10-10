@@ -10,7 +10,7 @@
   ],
   "swagger": "2.0",
   "info": {
-    "title": "Webitel engine API",
+    "title": "Webitel API",
     "contact": {
       "name": "Webitel",
       "url": "https://webitel.com",
@@ -19,7 +19,7 @@
     "license": {
       "name": "MIT"
     },
-    "version": "23.07.0"
+    "version": "23.09.0"
   },
   "host": "dev.webitel.com",
   "basePath": "/api",
@@ -10930,6 +10930,16 @@
             "collectionFormat": "multi",
             "name": "rated_user",
             "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "name": "contact_id",
+            "in": "query"
           }
         ],
         "responses": {
@@ -11294,6 +11304,525 @@
         }
       }
     },
+    "/chat/customers": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Query of external chat customers",
+        "operationId": "Catalog_GetCustomers",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page number to return. **default**: 1.",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page records limit. **default**: 16.",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Search term: peer{id,name}",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Sort records by { fields } specification.",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields [Q]uery to build result dataset record.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Set of unique contact **ID**entifier(s).",
+            "name": "id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "The type of contact to filter.",
+            "name": "type",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Contact unique **ID**entifier.\nContact **type**-specific string.",
+            "name": "via.id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Contact **type** provider.",
+            "name": "via.type",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Contact display **name**.",
+            "name": "via.name",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.chat.ChatCustomers"
+            }
+          }
+        }
+      }
+    },
+    "/chat/dialogs": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Query of chat conversations",
+        "operationId": "Catalog_GetDialogs",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page number to return. **default**: 1.",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page records limit. **default**: 16.",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Search term: peer.name",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Sort records by { fields } specification.",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields [Q]uery to build result dataset record.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Set of unique chat IDentifier(s).\nAccept: dialog -or- member ID.",
+            "name": "id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Contact unique **ID**entifier.\nContact **type**-specific string.",
+            "name": "via.id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Contact **type** provider.",
+            "name": "via.type",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Contact display **name**.",
+            "name": "via.name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Contact unique **ID**entifier.\nContact **type**-specific string.",
+            "name": "peer.id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Contact **type** provider.",
+            "name": "peer.type",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Contact display **name**.",
+            "name": "peer.name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Since epochtime (milli).\n**Match**: greater than ..",
+            "name": "date.since",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Until epochtime (milli).\n**Match**: less or equal ..",
+            "name": "date.until",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Dialogs ONLY that are currently [not] active( closed: ? ).",
+            "name": "online",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.chat.ChatDialogs"
+            }
+          }
+        }
+      }
+    },
+    "/chat/dialogs/{chat_id}/members": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Query of chat participants",
+        "operationId": "Catalog_GetMembers",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "ID of the chat dialog.",
+            "name": "chat_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page number to return. **default**: 1.",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page records limit. **default**: 16.",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Search term: peer(type;name)",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Sort records by { fields } specification.",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields [Q]uery to build result dataset record.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Set of unique chat member ID.",
+            "name": "id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Contact unique **ID**entifier.\nContact **type**-specific string.",
+            "name": "via.id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Contact **type** provider.",
+            "name": "via.type",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Contact display **name**.",
+            "name": "via.name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Contact unique **ID**entifier.\nContact **type**-specific string.",
+            "name": "peer.id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Contact **type** provider.",
+            "name": "peer.type",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Contact display **name**.",
+            "name": "peer.name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Since epochtime (milli).\n**Match**: greater than ..",
+            "name": "date.since",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Until epochtime (milli).\n**Match**: less or equal ..",
+            "name": "date.until",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Participants ONLY who are currently [not] connected to the chat.\n( left: ( 0 ? online : offline ) )",
+            "name": "online",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Participants ONLY who have [not] been connected to the chat.\n( join: ( 0 ? [request|abandoned] : connected ) )",
+            "name": "joined",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.chat.ChatMembers"
+            }
+          }
+        }
+      }
+    },
+    "/chat/dialogs/{chat_id}/messages": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Query of chat messages history",
+        "operationId": "Catalog_GetHistory",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Unique chat dialog",
+            "name": "chat_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Messages ONLY starting from the specified message ID",
+            "name": "offset.id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Messages ONLY been sent before the specified epochtime(milli).",
+            "name": "offset.date",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of messages to return.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Search term: message.text",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to return into result.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Contact unique **ID**entifier.\nContact **type**-specific string.",
+            "name": "peer.id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Contact **type** provider.",
+            "name": "peer.type",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Contact display **name**.",
+            "name": "peer.name",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.chat.ChatMessages"
+            }
+          }
+        }
+      }
+    },
+    "/chat/{peer.type}/{peer.id}/messages": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Query of chat messages history",
+        "operationId": "Catalog_GetHistory2",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Contact **type** provider.",
+            "name": "peer.type",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Contact unique **ID**entifier.\nContact **type**-specific string.",
+            "name": "peer.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Messages ONLY starting from the specified message ID",
+            "name": "offset.id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Messages ONLY been sent before the specified epochtime(milli).",
+            "name": "offset.date",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of messages to return.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Search term: message.text",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to return into result.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Unique chat dialog",
+            "name": "chat_id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Contact display **name**.",
+            "name": "peer.name",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.chat.ChatMessages"
+            }
+          }
+        }
+      }
+    },
     "/contacts": {
       "get": {
         "description": "| Field       | Type \n| ----------- | ---- \n| **----------- READ-ONLY -----------** | \n| `id`        | int64 \n| `ver`       | int32 \n| `etag`      | string \n| **---------- OPERATIONAL ----------** | \n| `created_at` | int64(epoch:milli) \n| `created_by` | lookup(user) \n| `updated_at` | int64(epoch:milli) \n| `updated_by` | lookup(user) \n| **---------- ATTRIBUTES -----------** | \n| `name`      | name! \n| `about`     | string \n| `labels`    | list[label!] \n| `emails`    | list[email!] \n| `photos`    | list[photo!] \n| `phones`    | list[phone!] \n| `managers`  | list[manager!] \n| `comments`  | list[comment!] \n| `addresses` | list[address!] \n| `languages` | list[language!] \n| `timezones` | list[timezone!] \n| `variables` | list[variable!] \n| `imclients` | list[imClient!] \n",
@@ -11326,7 +11855,7 @@
           {
             "type": "array",
             "items": {
-              "pattern": "^(+|-|!)?\\w+$",
+              "pattern": "^[+|-|!]?\\w+$",
               "uniqueItems": true,
               "type": "string",
               "default": "id"
@@ -12668,6 +13197,949 @@
         }
       }
     },
+    "/contacts/{contact_id}/phones": {
+      "get": {
+        "tags": [
+          "Phones"
+        ],
+        "summary": "Search phone number(s)",
+        "operationId": "Phones_ListPhones",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "The Contact ID associated with.",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page number of result dataset records. offset = (page*size)",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Size count of records on result page. limit = (size++)",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Search term: phone number.\n`?` - matches any one character\n`*` - matches 0 or more characters",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Sort the result according to fields.",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved into result.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Link(s) with unique ID only.",
+            "name": "id",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Primary phone  only.",
+            "name": "primary",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Verified phone only.",
+            "name": "verified",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Reference Object unique ID.",
+            "name": "type.id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Reference Object well-known type.",
+            "name": "type.type",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Reference Object display name.",
+            "name": "type.name",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.PhoneList"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Phones"
+        ],
+        "summary": "Reset the Contact's phone numbers to fit given data set.",
+        "operationId": "Phones_ResetPhones",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Link contact ID.",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Final set of phone number(s) to be linked with the contact.\nPhone number(s) that are already linked with the contact\nbut not given in here will be removed.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "uniqueItems": true,
+                "$ref": "#/definitions/webitel.contacts.InputPhoneNumber"
+              },
+              "example": [
+                {
+                  "etag": "1679792219687",
+                  "number": "+38 (099) 672-23-54",
+                  "primary": true,
+                  "type": {
+                    "name": "personal"
+                  },
+                  "verified": true
+                },
+                {
+                  "number": "+1 482 555-36558",
+                  "type": {
+                    "name": "business"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved into result of changes.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.PhoneList"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Phones"
+        ],
+        "summary": "Associate phone number(s) with the Contact",
+        "operationId": "Phones_MergePhones",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Link contact ID.",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Fixed set of phone number(s) to be linked with the Contact.\nPhone number(s) that conflicts with already linked will be updated.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/webitel.contacts.InputPhoneNumber"
+              },
+              "example": [
+                {
+                  "number": "+38 (099) 672-23-54",
+                  "primary": true,
+                  "type": {
+                    "name": "mobile"
+                  },
+                  "verified": false
+                }
+              ]
+            }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved into result of changes.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.PhoneList"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Phones"
+        ],
+        "summary": "Remove the Contact's phone number association(s)",
+        "operationId": "Phones_DeletePhones",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "The Contact ID associated with.",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved into result.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "uniqueItems": true,
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Set of linked ID(s) to be removed.",
+            "name": "etag",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.PhoneList"
+            }
+          }
+        }
+      }
+    },
+    "/contacts/{contact_id}/phones/{etag}": {
+      "get": {
+        "tags": [
+          "Phones"
+        ],
+        "summary": "Locate the Contact's phone number association.",
+        "operationId": "Phones_LocatePhone",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Reference Contact unique ID.",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "\\w+",
+            "name": "etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields [Q]uery to build result record.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Association Record unique ID.",
+            "name": "id",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.PhoneNumber"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Phones"
+        ],
+        "summary": "Update the Contact's phone number association details",
+        "operationId": "Phones_UpdatePhone",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "The Contact ID to be associated with.",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Unique ID of the latest version of an existing resorce.",
+            "name": "etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "NEW Update of the phone number details.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "title": "NEW Update of the phone number details.",
+              "required": [
+                "number"
+              ],
+              "properties": {
+                "number": {
+                  "description": "The phone number.",
+                  "type": "string"
+                },
+                "primary": {
+                  "description": "Indicates whether this phone number is default within other channels of the same type(phone).",
+                  "type": "boolean"
+                },
+                "type": {
+                  "title": "The type of the phone number.\nReference on CommunicationType dictionary.\nUsed for outbound routing while dialup a phone number.\nThe type can be custom or one of these predefined values:\n- home\n- work\n- mobile\n- homeFax\n- workFax\n- otherFax\n- pager\n- workMobile\n- workPager\n- main\n- googleVoice\n- other",
+                  "$ref": "#/definitions/webitel.contacts.Lookup"
+                },
+                "verified": {
+                  "type": "boolean",
+                  "title": "Indicate whether Contact, as a Person, realy owns this associated phone number.\nIn other words: whether Contact is reachable thru this 'phone' communication channel ?"
+                }
+              }
+            }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved into result of changes.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.PhoneList"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Phones"
+        ],
+        "summary": "Remove the Contact's phone number",
+        "operationId": "Phones_DeletePhone",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Link contact ID.",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Unique link ID to be removed.",
+            "name": "etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved into result.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.PhoneNumber"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Phones"
+        ],
+        "summary": "Update the Contact's phone number association details",
+        "operationId": "Phones_UpdatePhone2",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "The Contact ID to be associated with.",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Unique ID of the latest version of an existing resorce.",
+            "name": "etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "NEW Update of the phone number details.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "title": "NEW Update of the phone number details.",
+              "required": [
+                "number"
+              ],
+              "properties": {
+                "number": {
+                  "description": "The phone number.",
+                  "type": "string"
+                },
+                "primary": {
+                  "description": "Indicates whether this phone number is default within other channels of the same type(phone).",
+                  "type": "boolean"
+                },
+                "type": {
+                  "title": "The type of the phone number.\nReference on CommunicationType dictionary.\nUsed for outbound routing while dialup a phone number.\nThe type can be custom or one of these predefined values:\n- home\n- work\n- mobile\n- homeFax\n- workFax\n- otherFax\n- pager\n- workMobile\n- workPager\n- main\n- googleVoice\n- other",
+                  "$ref": "#/definitions/webitel.contacts.Lookup"
+                },
+                "verified": {
+                  "type": "boolean",
+                  "title": "Indicate whether Contact, as a Person, realy owns this associated phone number.\nIn other words: whether Contact is reachable thru this 'phone' communication channel ?"
+                }
+              }
+            }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved into result of changes.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.PhoneList"
+            }
+          }
+        }
+      }
+    },
+    "/contacts/{contact_id}/timezones": {
+      "get": {
+        "tags": [
+          "Timezones"
+        ],
+        "summary": "List of the Contact's timezone(s).",
+        "operationId": "Timezones_ListTimezones",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Contact ID associated with.",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page number of result dataset records. offset = (page*size)",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Size count of records on result page. limit = (size++)",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Search term: location name;\n`?` - matches any one character\n`*` - matches 0 or more characters",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Sort the result according to fields.",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved as a result.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Record(s) with unique ID only.",
+            "name": "id",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Primary timezone only.",
+            "name": "primary",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.TimezoneList"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Timezones"
+        ],
+        "summary": "Resets all timezones of the contact according to the input dataset.",
+        "operationId": "Timezones_ResetTimezones",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Link contact ID.",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Final set of timezone(s) to be linked with the contact.\nTimezone(s) that are already linked with the contact\nbut not given in here will be removed.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "uniqueItems": true,
+                "$ref": "#/definitions/webitel.contacts.InputTimezone"
+              }
+            }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved into result of changes.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.TimezoneList"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Timezones"
+        ],
+        "summary": "Associate more timezone(s) with the Contact.",
+        "operationId": "Timezones_MergeTimezones",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Link contact ID.",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Array of the unique User(s) to associate with the Contact.\nAny duplicate of an already linked user{id} will result in an error.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/webitel.contacts.InputTimezone"
+              }
+            }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved as a result.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.TimezoneList"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Timezones"
+        ],
+        "summary": "Remove the Contact's timezone(s).",
+        "operationId": "Timezones_DeleteTimezones",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Contact ID associated with.",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved as a result.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "uniqueItems": true,
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Set of unique ID(s) to remove.",
+            "name": "etag",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.TimezoneList"
+            }
+          }
+        }
+      }
+    },
+    "/contacts/{contact_id}/timezones/{etag}": {
+      "get": {
+        "tags": [
+          "Timezones"
+        ],
+        "summary": "Locate the Contact's timezone association.",
+        "operationId": "Timezones_LocateTimezone",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Contact source ID.",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "\\w+",
+            "description": "Unique timezone link IDentifier.\nAccept: `etag` (obsolete+) or `id`.",
+            "name": "etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved into result.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.Timezone"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Timezones"
+        ],
+        "summary": "Update the Contact's timezone details.",
+        "operationId": "Timezones_UpdateTimezone",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Link contact ID.",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Unique ID of the latest version of an existing resource.",
+            "name": "etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "NEW Update of the timezone link.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "title": "NEW Update of the timezone link.",
+              "properties": {
+                "primary": {
+                  "description": "Indicates whether this association must be default among others.",
+                  "type": "boolean"
+                },
+                "timezone": {
+                  "description": "Timezone dictionary reference value associated.",
+                  "$ref": "#/definitions/webitel.contacts.Lookup"
+                }
+              }
+            }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved into result of changes.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.TimezoneList"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Timezones"
+        ],
+        "summary": "Remove the Contact's timezone association.",
+        "operationId": "Timezones_DeleteTimezone",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Contact ID associated with.",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Unique ID to remove.",
+            "name": "etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved as a result.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.Timezone"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Timezones"
+        ],
+        "summary": "Update the Contact's timezone details.",
+        "operationId": "Timezones_UpdateTimezone2",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Link contact ID.",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Unique ID of the latest version of an existing resource.",
+            "name": "etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "NEW Update of the timezone link.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "title": "NEW Update of the timezone link.",
+              "properties": {
+                "primary": {
+                  "description": "Indicates whether this association must be default among others.",
+                  "type": "boolean"
+                },
+                "timezone": {
+                  "description": "Timezone dictionary reference value associated.",
+                  "$ref": "#/definitions/webitel.contacts.Lookup"
+                }
+              }
+            }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved into result of changes.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.TimezoneList"
+            }
+          }
+        }
+      }
+    },
     "/contacts/{contact_id}/variables": {
       "get": {
         "tags": [
@@ -13085,6 +14557,52 @@
       }
     },
     "/contacts/{etag}": {
+      "get": {
+        "tags": [
+          "Contacts"
+        ],
+        "summary": "Locate Contact source",
+        "operationId": "Contacts_LocateContact",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "The Contact source IDentifier.\nAccept: `etag` (obsolete+) or `id`.",
+            "name": "etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Source Fields to return into result.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "enum": [
+              "READ",
+              "WRITE",
+              "DELETE"
+            ],
+            "type": "string",
+            "default": "READ",
+            "description": "The requirement of a special access mode to the Source.\n\n - READ: Can `fetch` record. [GET]\n - WRITE: Can `update` record. [PUT|PATCH]\n - DELETE: Can `delete` record. [DELETE]",
+            "name": "mode",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.Contact"
+            }
+          }
+        }
+      },
       "delete": {
         "tags": [
           "Contacts"
@@ -13242,54 +14760,6 @@
             "collectionFormat": "multi",
             "description": "Source Fields to return into result.",
             "name": "fields",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.contacts.Contact"
-            }
-          }
-        }
-      }
-    },
-    "/contacts/{id}": {
-      "get": {
-        "tags": [
-          "Contacts"
-        ],
-        "summary": "Locate Contact source",
-        "operationId": "Contacts_LocateContact",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "The Contact source IDentifier.\nAccept: `etag` (obsolete+) or `id`.",
-            "name": "id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
-            "description": "Source Fields to return into result.",
-            "name": "fields",
-            "in": "query"
-          },
-          {
-            "enum": [
-              "READ",
-              "WRITE",
-              "DELETE"
-            ],
-            "type": "string",
-            "default": "READ",
-            "description": "The requirement of a special access mode to the Source.\n\n - READ: Can `fetch` record. [GET]\n - WRITE: Can `update` record. [PUT|PATCH]\n - DELETE: Can `delete` record. [DELETE]",
-            "name": "mode",
             "in": "query"
           }
         ],
@@ -14018,6 +15488,16 @@
           {
             "type": "array",
             "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "name": "user_id",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
               "enum": [
                 "default_no_action",
                 "create",
@@ -14109,6 +15589,17 @@
             },
             "collectionFormat": "multi",
             "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "description": "SPECIFIC filter.",
+            "name": "object_id",
             "in": "query"
           },
           {
@@ -18844,6 +20335,13 @@
             "type": "string"
           }
         },
+        "contact_id": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
         "created_at": {
           "$ref": "#/definitions/engineFilterBetween"
         },
@@ -20938,6 +22436,13 @@
           "type": "string",
           "format": "int64"
         },
+        "size": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "sort": {
+          "type": "string"
+        },
         "stop_cause": {
           "type": "array",
           "items": {
@@ -21292,6 +22797,9 @@
         },
         "cause": {
           "type": "string"
+        },
+        "contact": {
+          "$ref": "#/definitions/engineLookup"
         },
         "created_at": {
           "type": "string",
@@ -24323,6 +25831,13 @@
             "type": "string"
           }
         },
+        "contact_id": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
         "created_at": {
           "$ref": "#/definitions/engineFilterBetween"
         },
@@ -26882,6 +28397,393 @@
         "Failed"
       ]
     },
+    "webitel.chat.Chat": {
+      "description": "The Chat info.\nAlias: participant, subscriber, member, peer, leg.",
+      "type": "object",
+      "properties": {
+        "context": {
+          "description": "Context. Variables.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "dc": {
+          "description": "[D]omain[C]omponent primary ID.",
+          "type": "string",
+          "format": "int64"
+        },
+        "id": {
+          "description": "Unique identifier for this chat.\n[FROM] Member / Channel ID.\n\n// [TO] Group. Conversation ID.\n string chat_id = 2;",
+          "type": "string"
+        },
+        "invite": {
+          "description": "OPTIONAL. Invite[d] BY member info.",
+          "$ref": "#/definitions/webitel.chat.Chat.Invite"
+        },
+        "join": {
+          "description": "OPTIONAL. A non-zero value indicates that\nthe participant has joined the chat.",
+          "type": "string",
+          "format": "int64"
+        },
+        "left": {
+          "type": "string",
+          "format": "int64",
+          "title": "OPTIONAL. A non-zero value indicates that\nthe participant has left the chat. OFFLINE(!)"
+        },
+        "peer": {
+          "description": "[FROM]: User identity. Seed.",
+          "$ref": "#/definitions/webitel.chat.Peer"
+        },
+        "title": {
+          "description": "[TO]: Chat title.",
+          "type": "string"
+        },
+        "via": {
+          "description": "[FROM] VIA text gateway profile.",
+          "$ref": "#/definitions/webitel.chat.Peer"
+        }
+      }
+    },
+    "webitel.chat.Chat.Invite": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "int64",
+          "title": "Timestamp when the invitation to join the chat was sent"
+        },
+        "from": {
+          "type": "string",
+          "title": "Chat member ID who invited to join the chat"
+        }
+      }
+    },
+    "webitel.chat.ChatCustomers": {
+      "type": "object",
+      "title": "ChatCustomers dataset",
+      "properties": {
+        "next": {
+          "type": "boolean",
+          "title": "Next page is available ?"
+        },
+        "page": {
+          "description": "Page number of results.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "peers": {
+          "description": "Dataset page of Customer(s).",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.Customer"
+          }
+        },
+        "vias": {
+          "type": "array",
+          "title": "List of unique text gateways, mentioned in peers. [VIA]",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.Peer"
+          }
+        }
+      }
+    },
+    "webitel.chat.ChatDialogs": {
+      "type": "object",
+      "title": "ChatDialogs dataset",
+      "properties": {
+        "data": {
+          "description": "Dataset page of Dialog(s).",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.Dialog"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "title": "Next page available ?"
+        },
+        "page": {
+          "description": "Page number of results.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "webitel.chat.ChatMembers": {
+      "type": "object",
+      "title": "ChatMembers dataset",
+      "properties": {
+        "data": {
+          "description": "Page of the chat participants.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.Chat"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "title": "Next page available ?"
+        },
+        "page": {
+          "description": "Page number of results.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "webitel.chat.ChatMessages": {
+      "type": "object",
+      "title": "ChatMessages dataset",
+      "properties": {
+        "chats": {
+          "type": "array",
+          "title": "List of chats mentioned in messages. [FROM]",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.Chat"
+          }
+        },
+        "messages": {
+          "description": "Dataset page of messages.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.Message"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "title": "Next page is available ?"
+        },
+        "page": {
+          "description": "Dataset page number.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "peers": {
+          "type": "array",
+          "title": "List of peers mentioned in messages. [FROM]",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.Peer"
+          }
+        }
+      }
+    },
+    "webitel.chat.ChatMessagesRequest.Offset": {
+      "type": "object",
+      "title": "Offset options",
+      "properties": {
+        "date": {
+          "description": "Messages ONLY been sent before the specified epochtime(milli).",
+          "type": "string",
+          "format": "int64"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "title": "Messages ONLY starting from the specified message ID"
+        }
+      }
+    },
+    "webitel.chat.Customer": {
+      "description": "Customer is external chat contact.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Customer unique **ID**entifier.\nAccount **type**-specific string.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Customer account **name**.",
+          "type": "string"
+        },
+        "type": {
+          "description": "Customer account **type**.",
+          "type": "string"
+        },
+        "via": {
+          "description": "[VIA] Text gateway associations.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.Peer"
+          }
+        }
+      }
+    },
+    "webitel.chat.Dialog": {
+      "description": "Chat Dialog. Conversation info.",
+      "type": "object",
+      "properties": {
+        "closed": {
+          "type": "string",
+          "format": "int64",
+          "title": "Timestamp when dialog was closed.\nZero value means - connected (online)\nOtherwise - disconnected (offline)"
+        },
+        "context": {
+          "description": "Context. Variables. Environment.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "date": {
+          "description": "Timestamp of the latest activity.",
+          "type": "string",
+          "format": "int64"
+        },
+        "dc": {
+          "description": "[D]omain[C]omponent primary ID.",
+          "type": "string",
+          "format": "int64"
+        },
+        "from": {
+          "description": "[FROM]: Originator.\nLeg[A]. Contact / User.",
+          "$ref": "#/definitions/webitel.chat.Peer"
+        },
+        "id": {
+          "description": "The Conversation thread unique ID.",
+          "type": "string"
+        },
+        "members": {
+          "description": "[TO]: Participants.\nLeg[A+]. Schema / Agent.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.Chat"
+          }
+        },
+        "message": {
+          "description": "The latest (top) message.",
+          "$ref": "#/definitions/webitel.chat.Message"
+        },
+        "started": {
+          "description": "Timestamp when dialog started.",
+          "type": "string",
+          "format": "int64"
+        },
+        "title": {
+          "description": "Title of the dialog.",
+          "type": "string"
+        },
+        "via": {
+          "description": "[VIA] Text gateway [FROM] originated thru ...",
+          "$ref": "#/definitions/webitel.chat.Peer"
+        }
+      }
+    },
+    "webitel.chat.File": {
+      "description": "Media File.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique media file identifier.",
+          "type": "string",
+          "format": "int64"
+        },
+        "name": {
+          "description": "Filename.",
+          "type": "string"
+        },
+        "size": {
+          "type": "string",
+          "format": "int64",
+          "title": "Size of the media file. Bytes"
+        },
+        "type": {
+          "description": "MIME-Type of the media content.",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.chat.Message": {
+      "description": "Chat Message.",
+      "type": "object",
+      "properties": {
+        "chat": {
+          "description": "Conversation the message belongs to ..",
+          "$ref": "#/definitions/webitel.chat.Chat"
+        },
+        "context": {
+          "description": "Context. Variables. Environment.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "date": {
+          "description": "Timestamp when this message was sent (published).",
+          "type": "string",
+          "format": "int64"
+        },
+        "edit": {
+          "description": "Timestamp when this message was last edited.",
+          "type": "string",
+          "format": "int64"
+        },
+        "file": {
+          "description": "Message Media. Attachment.",
+          "$ref": "#/definitions/webitel.chat.File"
+        },
+        "from": {
+          "description": "Sender of the message.",
+          "$ref": "#/definitions/webitel.chat.Peer"
+        },
+        "id": {
+          "description": "Unique message identifier inside this chat.",
+          "type": "string",
+          "format": "int64"
+        },
+        "sender": {
+          "description": "Chat Sender of the message, sent on behalf of a chat (member).",
+          "$ref": "#/definitions/webitel.chat.Chat"
+        },
+        "text": {
+          "description": "Message Text.",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.chat.Peer": {
+      "description": "Peer Contact.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Contact unique **ID**entifier.\nContact **type**-specific string.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Contact display **name**.",
+          "type": "string"
+        },
+        "type": {
+          "description": "Contact **type** provider.",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.chat.Timerange": {
+      "description": "Timerange filter value.",
+      "type": "object",
+      "properties": {
+        "since": {
+          "description": "Since epochtime (milli).\n**Match**: greater than ..",
+          "type": "string",
+          "format": "int64"
+        },
+        "until": {
+          "description": "Until epochtime (milli).\n**Match**: less or equal ..",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "webitel.contacts.AccessMode": {
       "type": "string",
       "title": "- READ: Can `fetch` record. [GET]\n - WRITE: Can `update` record. [PUT|PATCH]\n - DELETE: Can `delete` record. [DELETE]",
@@ -27696,7 +29598,7 @@
       }
     },
     "webitel.contacts.InputTimezone": {
-      "description": "An input of the Contact's language.",
+      "description": "An input of the Contact's timezones.",
       "type": "object",
       "required": [
         "etag"
@@ -27706,23 +29608,14 @@
           "description": "Unique ID of the latest version of an existing resource.",
           "type": "string"
         },
-        "location": {
-          "description": "The Location name corresponding to a file\nin the IANA Time Zone database, such as \"Europe/Kyiv\" or custom.",
-          "type": "string"
-        },
-        "offset": {
-          "description": "Custom location name with offset (seconds east of UTC).",
-          "type": "string",
-          "format": "int64"
-        },
         "primary": {
           "description": "Indicates whether this association must be default among others.",
           "type": "boolean"
+        },
+        "timezone": {
+          "description": "Timezone dictionary reference value associated.",
+          "$ref": "#/definitions/webitel.contacts.Lookup"
         }
-      },
-      "example": {
-        "location": "Europe/Dublin",
-        "primary": false
       }
     },
     "webitel.contacts.InputVariable": {
@@ -27803,21 +29696,9 @@
       "type": "object",
       "title": "LabelInfo about the Label's tag",
       "properties": {
-        "count": {
-          "description": "Count of sources.",
-          "type": "integer",
-          "format": "int32"
-        },
         "label": {
-          "description": "Label tag.",
+          "description": "Label tag.\n\nCount of sources.\nint32 count = 2;\n Sources of Contacts assigned.\nrepeated string sources = 3;",
           "type": "string"
-        },
-        "sources": {
-          "description": "Sources of Contacts assigned.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
         }
       }
     },
@@ -28272,22 +30153,13 @@
           "description": "The unique ID of the association. Never changes.",
           "type": "string"
         },
-        "location": {
-          "description": "The Location name corresponding to a file\nin the IANA Time Zone database, such as \"Europe/Kyiv\".",
-          "type": "string"
-        },
-        "offset": {
-          "description": "Custom location offset (seconds east of UTC).",
-          "type": "string",
-          "format": "int64"
-        },
         "primary": {
           "description": "Indicates whether this association is the default\namong others of the same type.",
           "type": "boolean"
         },
-        "time": {
-          "type": "string",
-          "title": "Current time at this time zone location.\nQuery: `?fields=location{time.format(DateTime)}`"
+        "timezone": {
+          "description": "Timezone dictionary reference value associated.",
+          "$ref": "#/definitions/webitel.contacts.Lookup"
         },
         "updated_at": {
           "description": "Timestamp(milli) of the last Field update.\nTake part in Etag generation.",
@@ -28303,26 +30175,10 @@
           "type": "integer",
           "format": "int32"
         }
-      },
-      "example": {
-        "created_at": "1680268507698",
-        "created_by": {
-          "id": "34",
-          "name": "John Doe"
-        },
-        "etag": "FqaTCDLbhpaoUreL",
-        "id": "7",
-        "location": "Europe/Kyiv",
-        "primary": true,
-        "updated_at": "1680516785357",
-        "updated_by": {
-          "name": "Jane Lee (deleted)"
-        },
-        "ver": "3"
       }
     },
     "webitel.contacts.TimezoneList": {
-      "description": "Timezone dataset.\nNOTE: Edge represents connection between two nodes.\nSo this ContactLabels.data are always subordinate to some contact.id.",
+      "description": "Timezone dataset.\nNOTE: Edge represents connection between two nodes.\nSo this ContactTimezones.data are always subordinate to some contact.id.",
       "type": "object",
       "properties": {
         "data": {
@@ -28342,28 +30198,6 @@
           "type": "integer",
           "format": "int32"
         }
-      },
-      "example": {
-        "data": [
-          {
-            "created_at": "1680268507698",
-            "created_by": {
-              "id": "34",
-              "name": "John Doe"
-            },
-            "etag": "FqaTCDLbhpaoUreL",
-            "id": "7",
-            "location": "Europe/Kyiv",
-            "primary": true,
-            "updated_at": "1680516785357",
-            "updated_by": {
-              "name": "Jane Lee (deleted)"
-            },
-            "ver": "3"
-          }
-        ],
-        "next": true,
-        "page": 1
       }
     },
     "webitel.contacts.Variable": {
