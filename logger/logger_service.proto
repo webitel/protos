@@ -4,6 +4,7 @@ package logger;
 
 option go_package = "webitel_logger/proto";
 import "google/api/annotations.proto";
+import "import.proto";
 
 service LoggerService {
   rpc SearchLogByUserId(SearchLogByUserIdRequest) returns (Logs) {
@@ -71,6 +72,29 @@ message SearchLogByUserIdRequest {
   int64 date_to = 12;
 }
 
+message SearchLogByRecordIdRequest {
+  int32 page = 1;
+  int32 size = 2;
+  string q = 3;
+
+  string sort = 5;
+  repeated string fields = 6;
+
+  // REQUIRED filter
+  int32 record_id = 7;
+
+
+  // SPECIFIC filter
+  AvailableSystemObjects object = 8;
+
+  // GENERAL filters
+  repeated Action action = 10;
+  repeated int64 user_id = 9;
+  string user_ip = 11;
+  int64 date_from = 12;
+  int64 date_to = 13;
+}
+
 message Logs {
   int32 page = 1;
   bool next = 2;
@@ -89,7 +113,3 @@ message Log {
   Lookup object = 9;
 }
 
-message Lookup {
-  int32 id = 1;
-  string name = 2;
-}
