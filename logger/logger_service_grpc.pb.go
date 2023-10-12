@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion7
 const (
 	LoggerService_SearchLogByUserId_FullMethodName   = "/logger.LoggerService/SearchLogByUserId"
 	LoggerService_SearchLogByConfigId_FullMethodName = "/logger.LoggerService/SearchLogByConfigId"
+	LoggerService_SearchLogByRecordId_FullMethodName = "/logger.LoggerService/SearchLogByRecordId"
 )
 
 // LoggerServiceClient is the client API for LoggerService service.
@@ -29,6 +30,7 @@ const (
 type LoggerServiceClient interface {
 	SearchLogByUserId(ctx context.Context, in *SearchLogByUserIdRequest, opts ...grpc.CallOption) (*Logs, error)
 	SearchLogByConfigId(ctx context.Context, in *SearchLogByConfigIdRequest, opts ...grpc.CallOption) (*Logs, error)
+	SearchLogByRecordId(ctx context.Context, in *SearchLogByRecordIdRequest, opts ...grpc.CallOption) (*Logs, error)
 }
 
 type loggerServiceClient struct {
@@ -57,12 +59,22 @@ func (c *loggerServiceClient) SearchLogByConfigId(ctx context.Context, in *Searc
 	return out, nil
 }
 
+func (c *loggerServiceClient) SearchLogByRecordId(ctx context.Context, in *SearchLogByRecordIdRequest, opts ...grpc.CallOption) (*Logs, error) {
+	out := new(Logs)
+	err := c.cc.Invoke(ctx, LoggerService_SearchLogByRecordId_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LoggerServiceServer is the server API for LoggerService service.
 // All implementations must embed UnimplementedLoggerServiceServer
 // for forward compatibility
 type LoggerServiceServer interface {
 	SearchLogByUserId(context.Context, *SearchLogByUserIdRequest) (*Logs, error)
 	SearchLogByConfigId(context.Context, *SearchLogByConfigIdRequest) (*Logs, error)
+	SearchLogByRecordId(context.Context, *SearchLogByRecordIdRequest) (*Logs, error)
 	mustEmbedUnimplementedLoggerServiceServer()
 }
 
@@ -75,6 +87,9 @@ func (UnimplementedLoggerServiceServer) SearchLogByUserId(context.Context, *Sear
 }
 func (UnimplementedLoggerServiceServer) SearchLogByConfigId(context.Context, *SearchLogByConfigIdRequest) (*Logs, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SearchLogByConfigId not implemented")
+}
+func (UnimplementedLoggerServiceServer) SearchLogByRecordId(context.Context, *SearchLogByRecordIdRequest) (*Logs, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchLogByRecordId not implemented")
 }
 func (UnimplementedLoggerServiceServer) mustEmbedUnimplementedLoggerServiceServer() {}
 
@@ -125,6 +140,24 @@ func _LoggerService_SearchLogByConfigId_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _LoggerService_SearchLogByRecordId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchLogByRecordIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LoggerServiceServer).SearchLogByRecordId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LoggerService_SearchLogByRecordId_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LoggerServiceServer).SearchLogByRecordId(ctx, req.(*SearchLogByRecordIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // LoggerService_ServiceDesc is the grpc.ServiceDesc for LoggerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -139,6 +172,10 @@ var LoggerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SearchLogByConfigId",
 			Handler:    _LoggerService_SearchLogByConfigId_Handler,
+		},
+		{
+			MethodName: "SearchLogByRecordId",
+			Handler:    _LoggerService_SearchLogByRecordId_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
