@@ -19,12 +19,13 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	SystemSettingService_CreateSystemSetting_FullMethodName = "/engine.SystemSettingService/CreateSystemSetting"
-	SystemSettingService_SearchSystemSetting_FullMethodName = "/engine.SystemSettingService/SearchSystemSetting"
-	SystemSettingService_ReadSystemSetting_FullMethodName   = "/engine.SystemSettingService/ReadSystemSetting"
-	SystemSettingService_UpdateSystemSetting_FullMethodName = "/engine.SystemSettingService/UpdateSystemSetting"
-	SystemSettingService_PatchSystemSetting_FullMethodName  = "/engine.SystemSettingService/PatchSystemSetting"
-	SystemSettingService_DeleteSystemSetting_FullMethodName = "/engine.SystemSettingService/DeleteSystemSetting"
+	SystemSettingService_CreateSystemSetting_FullMethodName          = "/engine.SystemSettingService/CreateSystemSetting"
+	SystemSettingService_SearchSystemSetting_FullMethodName          = "/engine.SystemSettingService/SearchSystemSetting"
+	SystemSettingService_SearchAvailableSystemSetting_FullMethodName = "/engine.SystemSettingService/SearchAvailableSystemSetting"
+	SystemSettingService_ReadSystemSetting_FullMethodName            = "/engine.SystemSettingService/ReadSystemSetting"
+	SystemSettingService_UpdateSystemSetting_FullMethodName          = "/engine.SystemSettingService/UpdateSystemSetting"
+	SystemSettingService_PatchSystemSetting_FullMethodName           = "/engine.SystemSettingService/PatchSystemSetting"
+	SystemSettingService_DeleteSystemSetting_FullMethodName          = "/engine.SystemSettingService/DeleteSystemSetting"
 )
 
 // SystemSettingServiceClient is the client API for SystemSettingService service.
@@ -33,6 +34,7 @@ const (
 type SystemSettingServiceClient interface {
 	CreateSystemSetting(ctx context.Context, in *CreateSystemSettingRequest, opts ...grpc.CallOption) (*SystemSetting, error)
 	SearchSystemSetting(ctx context.Context, in *SearchSystemSettingRequest, opts ...grpc.CallOption) (*ListSystemSetting, error)
+	SearchAvailableSystemSetting(ctx context.Context, in *SearchAvailableSystemSettingRequest, opts ...grpc.CallOption) (*ListAvailableSystemSetting, error)
 	ReadSystemSetting(ctx context.Context, in *ReadSystemSettingRequest, opts ...grpc.CallOption) (*SystemSetting, error)
 	UpdateSystemSetting(ctx context.Context, in *UpdateSystemSettingRequest, opts ...grpc.CallOption) (*SystemSetting, error)
 	PatchSystemSetting(ctx context.Context, in *PatchSystemSettingRequest, opts ...grpc.CallOption) (*SystemSetting, error)
@@ -59,6 +61,15 @@ func (c *systemSettingServiceClient) CreateSystemSetting(ctx context.Context, in
 func (c *systemSettingServiceClient) SearchSystemSetting(ctx context.Context, in *SearchSystemSettingRequest, opts ...grpc.CallOption) (*ListSystemSetting, error) {
 	out := new(ListSystemSetting)
 	err := c.cc.Invoke(ctx, SystemSettingService_SearchSystemSetting_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *systemSettingServiceClient) SearchAvailableSystemSetting(ctx context.Context, in *SearchAvailableSystemSettingRequest, opts ...grpc.CallOption) (*ListAvailableSystemSetting, error) {
+	out := new(ListAvailableSystemSetting)
+	err := c.cc.Invoke(ctx, SystemSettingService_SearchAvailableSystemSetting_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -107,6 +118,7 @@ func (c *systemSettingServiceClient) DeleteSystemSetting(ctx context.Context, in
 type SystemSettingServiceServer interface {
 	CreateSystemSetting(context.Context, *CreateSystemSettingRequest) (*SystemSetting, error)
 	SearchSystemSetting(context.Context, *SearchSystemSettingRequest) (*ListSystemSetting, error)
+	SearchAvailableSystemSetting(context.Context, *SearchAvailableSystemSettingRequest) (*ListAvailableSystemSetting, error)
 	ReadSystemSetting(context.Context, *ReadSystemSettingRequest) (*SystemSetting, error)
 	UpdateSystemSetting(context.Context, *UpdateSystemSettingRequest) (*SystemSetting, error)
 	PatchSystemSetting(context.Context, *PatchSystemSettingRequest) (*SystemSetting, error)
@@ -123,6 +135,9 @@ func (UnimplementedSystemSettingServiceServer) CreateSystemSetting(context.Conte
 }
 func (UnimplementedSystemSettingServiceServer) SearchSystemSetting(context.Context, *SearchSystemSettingRequest) (*ListSystemSetting, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SearchSystemSetting not implemented")
+}
+func (UnimplementedSystemSettingServiceServer) SearchAvailableSystemSetting(context.Context, *SearchAvailableSystemSettingRequest) (*ListAvailableSystemSetting, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchAvailableSystemSetting not implemented")
 }
 func (UnimplementedSystemSettingServiceServer) ReadSystemSetting(context.Context, *ReadSystemSettingRequest) (*SystemSetting, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReadSystemSetting not implemented")
@@ -181,6 +196,24 @@ func _SystemSettingService_SearchSystemSetting_Handler(srv interface{}, ctx cont
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(SystemSettingServiceServer).SearchSystemSetting(ctx, req.(*SearchSystemSettingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SystemSettingService_SearchAvailableSystemSetting_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchAvailableSystemSettingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SystemSettingServiceServer).SearchAvailableSystemSetting(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SystemSettingService_SearchAvailableSystemSetting_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SystemSettingServiceServer).SearchAvailableSystemSetting(ctx, req.(*SearchAvailableSystemSettingRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -271,6 +304,10 @@ var SystemSettingService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SearchSystemSetting",
 			Handler:    _SystemSettingService_SearchSystemSetting_Handler,
+		},
+		{
+			MethodName: "SearchAvailableSystemSetting",
+			Handler:    _SystemSettingService_SearchAvailableSystemSetting_Handler,
 		},
 		{
 			MethodName: "ReadSystemSetting",

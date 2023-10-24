@@ -21,6 +21,12 @@ service SystemSettingService {
     };
   }
 
+  rpc SearchAvailableSystemSetting(SearchAvailableSystemSettingRequest) returns (ListAvailableSystemSetting) {
+    option (google.api.http) = {
+      get: "/settings/available"
+    };
+  }
+
   rpc ReadSystemSetting(ReadSystemSettingRequest) returns (SystemSetting) {
     option (google.api.http) = {
       get: "/settings/{id}"
@@ -52,6 +58,18 @@ enum SystemSettingName {
   empty_system_settings_name = 0;
   enable_omnichannel = 1;
   member_chunk_size = 2;
+}
+
+message SearchAvailableSystemSettingRequest {
+}
+
+message AvailableSystemSetting {
+  string name = 1;
+}
+
+message ListAvailableSystemSetting {
+  bool next = 1;
+  repeated AvailableSystemSetting items = 2;
 }
 
 message DeleteSystemSettingRequest {
@@ -91,8 +109,6 @@ message SearchSystemSettingRequest {
 
   string sort = 5;
   repeated string fields = 6;
-
-  bool available = 7;
 }
 
 message ListSystemSetting {
