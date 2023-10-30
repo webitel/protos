@@ -38,6 +38,7 @@ const (
 	AgentService_SearchAgentStatusStatistic_FullMethodName      = "/engine.AgentService/SearchAgentStatusStatistic"
 	AgentService_SearchAgentStatusStatisticItem_FullMethodName  = "/engine.AgentService/SearchAgentStatusStatisticItem"
 	AgentService_SearchLookupUsersAgentNotExists_FullMethodName = "/engine.AgentService/SearchLookupUsersAgentNotExists"
+	AgentService_SearchUserStatus_FullMethodName                = "/engine.AgentService/SearchUserStatus"
 )
 
 // AgentServiceClient is the client API for AgentService service.
@@ -72,6 +73,8 @@ type AgentServiceClient interface {
 	SearchAgentStatusStatisticItem(ctx context.Context, in *SearchAgentStatusStatisticItemRequest, opts ...grpc.CallOption) (*AgentStatusStatisticItem, error)
 	// SearchLookupAgentNotExistsUser
 	SearchLookupUsersAgentNotExists(ctx context.Context, in *SearchLookupUsersAgentNotExistsRequest, opts ...grpc.CallOption) (*ListAgentUser, error)
+	// List of UserStatus
+	SearchUserStatus(ctx context.Context, in *SearchUserStatusRequest, opts ...grpc.CallOption) (*ListUserStatus, error)
 }
 
 type agentServiceClient struct {
@@ -253,6 +256,15 @@ func (c *agentServiceClient) SearchLookupUsersAgentNotExists(ctx context.Context
 	return out, nil
 }
 
+func (c *agentServiceClient) SearchUserStatus(ctx context.Context, in *SearchUserStatusRequest, opts ...grpc.CallOption) (*ListUserStatus, error) {
+	out := new(ListUserStatus)
+	err := c.cc.Invoke(ctx, AgentService_SearchUserStatus_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AgentServiceServer is the server API for AgentService service.
 // All implementations must embed UnimplementedAgentServiceServer
 // for forward compatibility
@@ -285,6 +297,8 @@ type AgentServiceServer interface {
 	SearchAgentStatusStatisticItem(context.Context, *SearchAgentStatusStatisticItemRequest) (*AgentStatusStatisticItem, error)
 	// SearchLookupAgentNotExistsUser
 	SearchLookupUsersAgentNotExists(context.Context, *SearchLookupUsersAgentNotExistsRequest) (*ListAgentUser, error)
+	// List of UserStatus
+	SearchUserStatus(context.Context, *SearchUserStatusRequest) (*ListUserStatus, error)
 	mustEmbedUnimplementedAgentServiceServer()
 }
 
@@ -348,6 +362,9 @@ func (UnimplementedAgentServiceServer) SearchAgentStatusStatisticItem(context.Co
 }
 func (UnimplementedAgentServiceServer) SearchLookupUsersAgentNotExists(context.Context, *SearchLookupUsersAgentNotExistsRequest) (*ListAgentUser, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SearchLookupUsersAgentNotExists not implemented")
+}
+func (UnimplementedAgentServiceServer) SearchUserStatus(context.Context, *SearchUserStatusRequest) (*ListUserStatus, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchUserStatus not implemented")
 }
 func (UnimplementedAgentServiceServer) mustEmbedUnimplementedAgentServiceServer() {}
 
@@ -704,6 +721,24 @@ func _AgentService_SearchLookupUsersAgentNotExists_Handler(srv interface{}, ctx 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AgentService_SearchUserStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchUserStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).SearchUserStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_SearchUserStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).SearchUserStatus(ctx, req.(*SearchUserStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AgentService_ServiceDesc is the grpc.ServiceDesc for AgentService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -786,6 +821,10 @@ var AgentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SearchLookupUsersAgentNotExists",
 			Handler:    _AgentService_SearchLookupUsersAgentNotExists_Handler,
+		},
+		{
+			MethodName: "SearchUserStatus",
+			Handler:    _AgentService_SearchUserStatus_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

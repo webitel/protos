@@ -134,7 +134,36 @@ service AgentService {
             get: "/call_center/lookups/agents/users"
         };
     }
+
+    // List of UserStatus
+    rpc SearchUserStatus(SearchUserStatusRequest) returns (ListUserStatus) {
+        option (google.api.http) = {
+            get: "/call_center/users"
+        };
+    }
     
+}
+
+message UserStatus {
+    int64 id = 1;
+    string name = 2;
+    string extension = 3;
+    repeated string presence = 4;
+    string status = 5;
+}
+
+message SearchUserStatusRequest {
+    int32 page = 1;
+    int32 size = 2;
+    string q = 3;
+
+    string sort = 5;
+    repeated string fields = 6;
+}
+
+message ListUserStatus {
+    repeated UserStatus items = 1;
+    bool next = 2;
 }
 
 message AgentTodayStatisticsRequest {

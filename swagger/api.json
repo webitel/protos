@@ -9841,6 +9841,73 @@
         }
       }
     },
+    "/call_center/users": {
+      "get": {
+        "tags": [
+          "AgentService"
+        ],
+        "summary": "List of UserStatus",
+        "operationId": "AgentService_SearchUserStatus",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineListUserStatus"
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {}
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        }
+      }
+    },
     "/calls": {
       "post": {
         "tags": [
@@ -23928,6 +23995,20 @@
         }
       }
     },
+    "engineListUserStatus": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/engineUserStatus"
+          }
+        },
+        "next": {
+          "type": "boolean"
+        }
+      }
+    },
     "engineLoginEmailProfileResponse": {
       "type": "object",
       "properties": {
@@ -27479,6 +27560,30 @@
           "format": "int64"
         },
         "id": {
+          "type": "string"
+        }
+      }
+    },
+    "engineUserStatus": {
+      "type": "object",
+      "properties": {
+        "extension": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        },
+        "presence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "status": {
           "type": "string"
         }
       }
