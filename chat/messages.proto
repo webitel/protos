@@ -8,8 +8,37 @@ import "message.proto";
 import "google/rpc/status.proto";
 
 service Messages {
+  // Sends a current user action event to a conversation partners.
+  rpc SendUserAction(SendUserActionRequest) returns (SendUserActionResponse) {}
   // Broadcast message `from` given bot profile to `peer` recipient(s)
   rpc BroadcastMessage(BroadcastMessageRequest) returns (BroadcastMessageResponse) {}
+}
+
+// User actions. Use this to provide users with detailed info
+// about their chat partner's actions: typing or sending attachments of all kinds.
+enum UserAction {
+  // User is typing.
+  Typing = 0;
+  // Invalidate all previous action updates.
+  // E.g. when user deletes entered text or aborts a video upload.
+  Cancel	= 1;
+
+  reserved 2 to 17;
+}
+
+message SendUserActionRequest {
+  // [FROM] Sender peer channel id.
+  string channel_id = 1;
+  // Type of action.
+  UserAction action = 2;
+
+  // [TO] partner identification ..
+  reserved 3, 4;
+}
+
+message SendUserActionResponse {
+  // Affected ?
+  bool ok = 1;
 }
 
 message BroadcastMessageRequest {
