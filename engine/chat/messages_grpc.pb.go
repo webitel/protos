@@ -19,6 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
+	Messages_SendUserAction_FullMethodName   = "/webitel.chat.server.Messages/SendUserAction"
 	Messages_BroadcastMessage_FullMethodName = "/webitel.chat.server.Messages/BroadcastMessage"
 )
 
@@ -26,6 +27,8 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MessagesClient interface {
+	// Sends a current user action event to a conversation partners.
+	SendUserAction(ctx context.Context, in *SendUserActionRequest, opts ...grpc.CallOption) (*SendUserActionResponse, error)
 	// Broadcast message `from` given bot profile to `peer` recipient(s)
 	BroadcastMessage(ctx context.Context, in *BroadcastMessageRequest, opts ...grpc.CallOption) (*BroadcastMessageResponse, error)
 }
@@ -36,6 +39,15 @@ type messagesClient struct {
 
 func NewMessagesClient(cc grpc.ClientConnInterface) MessagesClient {
 	return &messagesClient{cc}
+}
+
+func (c *messagesClient) SendUserAction(ctx context.Context, in *SendUserActionRequest, opts ...grpc.CallOption) (*SendUserActionResponse, error) {
+	out := new(SendUserActionResponse)
+	err := c.cc.Invoke(ctx, Messages_SendUserAction_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *messagesClient) BroadcastMessage(ctx context.Context, in *BroadcastMessageRequest, opts ...grpc.CallOption) (*BroadcastMessageResponse, error) {
@@ -51,6 +63,8 @@ func (c *messagesClient) BroadcastMessage(ctx context.Context, in *BroadcastMess
 // All implementations must embed UnimplementedMessagesServer
 // for forward compatibility
 type MessagesServer interface {
+	// Sends a current user action event to a conversation partners.
+	SendUserAction(context.Context, *SendUserActionRequest) (*SendUserActionResponse, error)
 	// Broadcast message `from` given bot profile to `peer` recipient(s)
 	BroadcastMessage(context.Context, *BroadcastMessageRequest) (*BroadcastMessageResponse, error)
 	mustEmbedUnimplementedMessagesServer()
@@ -60,6 +74,9 @@ type MessagesServer interface {
 type UnimplementedMessagesServer struct {
 }
 
+func (UnimplementedMessagesServer) SendUserAction(context.Context, *SendUserActionRequest) (*SendUserActionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendUserAction not implemented")
+}
 func (UnimplementedMessagesServer) BroadcastMessage(context.Context, *BroadcastMessageRequest) (*BroadcastMessageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BroadcastMessage not implemented")
 }
@@ -74,6 +91,24 @@ type UnsafeMessagesServer interface {
 
 func RegisterMessagesServer(s grpc.ServiceRegistrar, srv MessagesServer) {
 	s.RegisterService(&Messages_ServiceDesc, srv)
+}
+
+func _Messages_SendUserAction_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendUserActionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MessagesServer).SendUserAction(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Messages_SendUserAction_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MessagesServer).SendUserAction(ctx, req.(*SendUserActionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Messages_BroadcastMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -101,6 +136,10 @@ var Messages_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "webitel.chat.server.Messages",
 	HandlerType: (*MessagesServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "SendUserAction",
+			Handler:    _Messages_SendUserAction_Handler,
+		},
 		{
 			MethodName: "BroadcastMessage",
 			Handler:    _Messages_BroadcastMessage_Handler,
