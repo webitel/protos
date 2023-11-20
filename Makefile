@@ -135,7 +135,7 @@ messages_swagger:
 .PHONY: swagger_mix
 
 swagger_mix:
-	swagger-mixin ./swagger/engine.swagger.json ./swagger/storage.swagger.json \
+	/home/igor/programs/golib/bin/swagger-mixin ./swagger/engine.swagger.json ./swagger/storage.swagger.json \
  	 ./swagger/messages.swagger.json ./swagger/logger.swagger.json ./swagger/contacts.swagger.json  > ./swagger/api.json | true
 
 
