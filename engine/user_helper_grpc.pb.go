@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	UserHelperService_DefaultDeviceConfig_FullMethodName = "/engine.UserHelperService/DefaultDeviceConfig"
+	UserHelperService_DefaultDeviceConfig_FullMethodName     = "/engine.UserHelperService/DefaultDeviceConfig"
+	UserHelperService_ActivityWorkspaceWidget_FullMethodName = "/engine.UserHelperService/ActivityWorkspaceWidget"
 )
 
 // UserHelperServiceClient is the client API for UserHelperService service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserHelperServiceClient interface {
 	DefaultDeviceConfig(ctx context.Context, in *DefaultDeviceConfigRequest, opts ...grpc.CallOption) (*DefaultDeviceConfigResponse, error)
+	ActivityWorkspaceWidget(ctx context.Context, in *ActivityWorkspaceWidgetRequest, opts ...grpc.CallOption) (*ActivityWorkspaceWidgetResponse, error)
 }
 
 type userHelperServiceClient struct {
@@ -46,11 +48,21 @@ func (c *userHelperServiceClient) DefaultDeviceConfig(ctx context.Context, in *D
 	return out, nil
 }
 
+func (c *userHelperServiceClient) ActivityWorkspaceWidget(ctx context.Context, in *ActivityWorkspaceWidgetRequest, opts ...grpc.CallOption) (*ActivityWorkspaceWidgetResponse, error) {
+	out := new(ActivityWorkspaceWidgetResponse)
+	err := c.cc.Invoke(ctx, UserHelperService_ActivityWorkspaceWidget_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserHelperServiceServer is the server API for UserHelperService service.
 // All implementations must embed UnimplementedUserHelperServiceServer
 // for forward compatibility
 type UserHelperServiceServer interface {
 	DefaultDeviceConfig(context.Context, *DefaultDeviceConfigRequest) (*DefaultDeviceConfigResponse, error)
+	ActivityWorkspaceWidget(context.Context, *ActivityWorkspaceWidgetRequest) (*ActivityWorkspaceWidgetResponse, error)
 	mustEmbedUnimplementedUserHelperServiceServer()
 }
 
@@ -60,6 +72,9 @@ type UnimplementedUserHelperServiceServer struct {
 
 func (UnimplementedUserHelperServiceServer) DefaultDeviceConfig(context.Context, *DefaultDeviceConfigRequest) (*DefaultDeviceConfigResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DefaultDeviceConfig not implemented")
+}
+func (UnimplementedUserHelperServiceServer) ActivityWorkspaceWidget(context.Context, *ActivityWorkspaceWidgetRequest) (*ActivityWorkspaceWidgetResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ActivityWorkspaceWidget not implemented")
 }
 func (UnimplementedUserHelperServiceServer) mustEmbedUnimplementedUserHelperServiceServer() {}
 
@@ -92,6 +107,24 @@ func _UserHelperService_DefaultDeviceConfig_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserHelperService_ActivityWorkspaceWidget_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ActivityWorkspaceWidgetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserHelperServiceServer).ActivityWorkspaceWidget(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserHelperService_ActivityWorkspaceWidget_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserHelperServiceServer).ActivityWorkspaceWidget(ctx, req.(*ActivityWorkspaceWidgetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserHelperService_ServiceDesc is the grpc.ServiceDesc for UserHelperService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -102,6 +135,10 @@ var UserHelperService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DefaultDeviceConfig",
 			Handler:    _UserHelperService_DefaultDeviceConfig_Handler,
+		},
+		{
+			MethodName: "ActivityWorkspaceWidget",
+			Handler:    _UserHelperService_ActivityWorkspaceWidget_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
