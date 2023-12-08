@@ -88,7 +88,7 @@ logger_proto:
 
 chat:
 	protoc \
-	-I chat -I proto \
+	-I chat -I . \
 	--go_opt=paths=source_relative --go_out=chat \
 	--go-grpc_out=paths=source_relative:chat \
 	\
@@ -116,8 +116,7 @@ bot:
 .PHONY: messages
 
 messages:
-	protoc \
-	-I . -I proto \
+	protoc -I . \
 	--go_opt=paths=source_relative --go_out=. \
 	--go-grpc_out=paths=source_relative:. \
 	\
@@ -126,8 +125,7 @@ messages:
 .PHONY: messages_swagger
 
 messages_swagger:
-	protoc \
-	-I . -I proto \
+	protoc -I . \
 	--openapiv2_out=merge_file_name=messages,allow_merge=true,openapi_naming_strategy=fqn,json_names_for_fields=false,disable_default_errors=true,repeated_path_param_separator=csv,logtostderr=true:swagger \
 	chat/messages/openapiv2.proto \
 	chat/messages/catalog.proto
