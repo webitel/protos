@@ -19,10 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	FileService_UploadFile_FullMethodName    = "/storage.FileService/UploadFile"
-	FileService_DownloadFile_FullMethodName  = "/storage.FileService/DownloadFile"
-	FileService_UploadFileUrl_FullMethodName = "/storage.FileService/UploadFileUrl"
-	FileService_DeleteFiles_FullMethodName   = "/storage.FileService/DeleteFiles"
+	FileService_UploadFile_FullMethodName       = "/storage.FileService/UploadFile"
+	FileService_DownloadFile_FullMethodName     = "/storage.FileService/DownloadFile"
+	FileService_UploadFileUrl_FullMethodName    = "/storage.FileService/UploadFileUrl"
+	FileService_GenerateFileLink_FullMethodName = "/storage.FileService/GenerateFileLink"
+	FileService_DeleteFiles_FullMethodName      = "/storage.FileService/DeleteFiles"
 )
 
 // FileServiceClient is the client API for FileService service.
@@ -32,6 +33,7 @@ type FileServiceClient interface {
 	UploadFile(ctx context.Context, opts ...grpc.CallOption) (FileService_UploadFileClient, error)
 	DownloadFile(ctx context.Context, in *DownloadFileRequest, opts ...grpc.CallOption) (FileService_DownloadFileClient, error)
 	UploadFileUrl(ctx context.Context, in *UploadFileUrlRequest, opts ...grpc.CallOption) (*UploadFileUrlResponse, error)
+	GenerateFileLink(ctx context.Context, in *GenerateFileLinkRequest, opts ...grpc.CallOption) (*GenerateFileLinkResponse, error)
 	DeleteFiles(ctx context.Context, in *DeleteFilesRequest, opts ...grpc.CallOption) (*DeleteFilesResponse, error)
 }
 
@@ -118,6 +120,15 @@ func (c *fileServiceClient) UploadFileUrl(ctx context.Context, in *UploadFileUrl
 	return out, nil
 }
 
+func (c *fileServiceClient) GenerateFileLink(ctx context.Context, in *GenerateFileLinkRequest, opts ...grpc.CallOption) (*GenerateFileLinkResponse, error) {
+	out := new(GenerateFileLinkResponse)
+	err := c.cc.Invoke(ctx, FileService_GenerateFileLink_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *fileServiceClient) DeleteFiles(ctx context.Context, in *DeleteFilesRequest, opts ...grpc.CallOption) (*DeleteFilesResponse, error) {
 	out := new(DeleteFilesResponse)
 	err := c.cc.Invoke(ctx, FileService_DeleteFiles_FullMethodName, in, out, opts...)
@@ -134,6 +145,7 @@ type FileServiceServer interface {
 	UploadFile(FileService_UploadFileServer) error
 	DownloadFile(*DownloadFileRequest, FileService_DownloadFileServer) error
 	UploadFileUrl(context.Context, *UploadFileUrlRequest) (*UploadFileUrlResponse, error)
+	GenerateFileLink(context.Context, *GenerateFileLinkRequest) (*GenerateFileLinkResponse, error)
 	DeleteFiles(context.Context, *DeleteFilesRequest) (*DeleteFilesResponse, error)
 	mustEmbedUnimplementedFileServiceServer()
 }
@@ -150,6 +162,9 @@ func (UnimplementedFileServiceServer) DownloadFile(*DownloadFileRequest, FileSer
 }
 func (UnimplementedFileServiceServer) UploadFileUrl(context.Context, *UploadFileUrlRequest) (*UploadFileUrlResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UploadFileUrl not implemented")
+}
+func (UnimplementedFileServiceServer) GenerateFileLink(context.Context, *GenerateFileLinkRequest) (*GenerateFileLinkResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GenerateFileLink not implemented")
 }
 func (UnimplementedFileServiceServer) DeleteFiles(context.Context, *DeleteFilesRequest) (*DeleteFilesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteFiles not implemented")
@@ -232,6 +247,24 @@ func _FileService_UploadFileUrl_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _FileService_GenerateFileLink_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GenerateFileLinkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FileServiceServer).GenerateFileLink(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FileService_GenerateFileLink_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FileServiceServer).GenerateFileLink(ctx, req.(*GenerateFileLinkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _FileService_DeleteFiles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteFilesRequest)
 	if err := dec(in); err != nil {
@@ -260,6 +293,10 @@ var FileService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UploadFileUrl",
 			Handler:    _FileService_UploadFileUrl_Handler,
+		},
+		{
+			MethodName: "GenerateFileLink",
+			Handler:    _FileService_GenerateFileLink_Handler,
 		},
 		{
 			MethodName: "DeleteFiles",
