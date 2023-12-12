@@ -3313,6 +3313,54 @@
             }
           }
         }
+      },
+      "patch": {
+        "tags": [
+          "CommunicationTypeService"
+        ],
+        "operationId": "CommunicationTypeService_PatchCommunicationType",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/enginePatchCommunicationTypeRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineCommunicationType"
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {}
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        }
       }
     },
     "/call_center/list": {
@@ -24918,6 +24966,36 @@
         }
       }
     },
+    "enginePatchCommunicationTypeRequest": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "$ref": "#/definitions/engineCommunicationChannels"
+        },
+        "code": {
+          "type": "string"
+        },
+        "default": {
+          "type": "boolean"
+        },
+        "description": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
     "enginePatchEmailProfileRequest": {
       "description": "Update email profile for gateway",
       "type": "object",
@@ -29174,22 +29252,21 @@
       "type": "object",
       "properties": {
         "id": {
-          "description": "Unique media file identifier.",
           "type": "string",
-          "format": "int64"
+          "title": "File location"
         },
         "name": {
-          "description": "Filename.",
-          "type": "string"
+          "type": "string",
+          "title": "Filename"
         },
         "size": {
           "type": "string",
           "format": "int64",
-          "title": "Size of the media file. Bytes"
+          "title": "Size in bytes"
         },
         "type": {
-          "description": "MIME-Type of the media content.",
-          "type": "string"
+          "type": "string",
+          "title": "MIME media type"
         }
       }
     },

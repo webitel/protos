@@ -23,6 +23,7 @@ const (
 	CommunicationTypeService_SearchCommunicationType_FullMethodName = "/engine.CommunicationTypeService/SearchCommunicationType"
 	CommunicationTypeService_ReadCommunicationType_FullMethodName   = "/engine.CommunicationTypeService/ReadCommunicationType"
 	CommunicationTypeService_UpdateCommunicationType_FullMethodName = "/engine.CommunicationTypeService/UpdateCommunicationType"
+	CommunicationTypeService_PatchCommunicationType_FullMethodName  = "/engine.CommunicationTypeService/PatchCommunicationType"
 	CommunicationTypeService_DeleteCommunicationType_FullMethodName = "/engine.CommunicationTypeService/DeleteCommunicationType"
 )
 
@@ -38,6 +39,7 @@ type CommunicationTypeServiceClient interface {
 	ReadCommunicationType(ctx context.Context, in *ReadCommunicationTypeRequest, opts ...grpc.CallOption) (*CommunicationType, error)
 	// Update CommunicationType
 	UpdateCommunicationType(ctx context.Context, in *UpdateCommunicationTypeRequest, opts ...grpc.CallOption) (*CommunicationType, error)
+	PatchCommunicationType(ctx context.Context, in *PatchCommunicationTypeRequest, opts ...grpc.CallOption) (*CommunicationType, error)
 	// Remove CommunicationType
 	DeleteCommunicationType(ctx context.Context, in *DeleteCommunicationTypeRequest, opts ...grpc.CallOption) (*CommunicationType, error)
 }
@@ -86,6 +88,15 @@ func (c *communicationTypeServiceClient) UpdateCommunicationType(ctx context.Con
 	return out, nil
 }
 
+func (c *communicationTypeServiceClient) PatchCommunicationType(ctx context.Context, in *PatchCommunicationTypeRequest, opts ...grpc.CallOption) (*CommunicationType, error) {
+	out := new(CommunicationType)
+	err := c.cc.Invoke(ctx, CommunicationTypeService_PatchCommunicationType_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *communicationTypeServiceClient) DeleteCommunicationType(ctx context.Context, in *DeleteCommunicationTypeRequest, opts ...grpc.CallOption) (*CommunicationType, error) {
 	out := new(CommunicationType)
 	err := c.cc.Invoke(ctx, CommunicationTypeService_DeleteCommunicationType_FullMethodName, in, out, opts...)
@@ -107,6 +118,7 @@ type CommunicationTypeServiceServer interface {
 	ReadCommunicationType(context.Context, *ReadCommunicationTypeRequest) (*CommunicationType, error)
 	// Update CommunicationType
 	UpdateCommunicationType(context.Context, *UpdateCommunicationTypeRequest) (*CommunicationType, error)
+	PatchCommunicationType(context.Context, *PatchCommunicationTypeRequest) (*CommunicationType, error)
 	// Remove CommunicationType
 	DeleteCommunicationType(context.Context, *DeleteCommunicationTypeRequest) (*CommunicationType, error)
 	mustEmbedUnimplementedCommunicationTypeServiceServer()
@@ -127,6 +139,9 @@ func (UnimplementedCommunicationTypeServiceServer) ReadCommunicationType(context
 }
 func (UnimplementedCommunicationTypeServiceServer) UpdateCommunicationType(context.Context, *UpdateCommunicationTypeRequest) (*CommunicationType, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateCommunicationType not implemented")
+}
+func (UnimplementedCommunicationTypeServiceServer) PatchCommunicationType(context.Context, *PatchCommunicationTypeRequest) (*CommunicationType, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PatchCommunicationType not implemented")
 }
 func (UnimplementedCommunicationTypeServiceServer) DeleteCommunicationType(context.Context, *DeleteCommunicationTypeRequest) (*CommunicationType, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteCommunicationType not implemented")
@@ -217,6 +232,24 @@ func _CommunicationTypeService_UpdateCommunicationType_Handler(srv interface{}, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CommunicationTypeService_PatchCommunicationType_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PatchCommunicationTypeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommunicationTypeServiceServer).PatchCommunicationType(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CommunicationTypeService_PatchCommunicationType_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommunicationTypeServiceServer).PatchCommunicationType(ctx, req.(*PatchCommunicationTypeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _CommunicationTypeService_DeleteCommunicationType_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteCommunicationTypeRequest)
 	if err := dec(in); err != nil {
@@ -257,6 +290,10 @@ var CommunicationTypeService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateCommunicationType",
 			Handler:    _CommunicationTypeService_UpdateCommunicationType_Handler,
+		},
+		{
+			MethodName: "PatchCommunicationType",
+			Handler:    _CommunicationTypeService_PatchCommunicationType_Handler,
 		},
 		{
 			MethodName: "DeleteCommunicationType",
