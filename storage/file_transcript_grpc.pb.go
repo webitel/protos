@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	FileTranscriptService_CreateFileTranscript_FullMethodName     = "/storage.FileTranscriptService/CreateFileTranscript"
+	FileTranscriptService_FileTranscriptSafe_FullMethodName       = "/storage.FileTranscriptService/FileTranscriptSafe"
 	FileTranscriptService_GetFileTranscriptPhrases_FullMethodName = "/storage.FileTranscriptService/GetFileTranscriptPhrases"
 	FileTranscriptService_DeleteFileTranscript_FullMethodName     = "/storage.FileTranscriptService/DeleteFileTranscript"
 )
@@ -29,6 +30,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FileTranscriptServiceClient interface {
 	CreateFileTranscript(ctx context.Context, in *StartFileTranscriptRequest, opts ...grpc.CallOption) (*StartFileTranscriptResponse, error)
+	FileTranscriptSafe(ctx context.Context, in *FileTranscriptSafeRequest, opts ...grpc.CallOption) (*FileTranscriptSafeResponse, error)
 	GetFileTranscriptPhrases(ctx context.Context, in *GetFileTranscriptPhrasesRequest, opts ...grpc.CallOption) (*ListPhrases, error)
 	DeleteFileTranscript(ctx context.Context, in *DeleteFileTranscriptRequest, opts ...grpc.CallOption) (*DeleteFileTranscriptResponse, error)
 }
@@ -44,6 +46,15 @@ func NewFileTranscriptServiceClient(cc grpc.ClientConnInterface) FileTranscriptS
 func (c *fileTranscriptServiceClient) CreateFileTranscript(ctx context.Context, in *StartFileTranscriptRequest, opts ...grpc.CallOption) (*StartFileTranscriptResponse, error) {
 	out := new(StartFileTranscriptResponse)
 	err := c.cc.Invoke(ctx, FileTranscriptService_CreateFileTranscript_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *fileTranscriptServiceClient) FileTranscriptSafe(ctx context.Context, in *FileTranscriptSafeRequest, opts ...grpc.CallOption) (*FileTranscriptSafeResponse, error) {
+	out := new(FileTranscriptSafeResponse)
+	err := c.cc.Invoke(ctx, FileTranscriptService_FileTranscriptSafe_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -73,6 +84,7 @@ func (c *fileTranscriptServiceClient) DeleteFileTranscript(ctx context.Context, 
 // for forward compatibility
 type FileTranscriptServiceServer interface {
 	CreateFileTranscript(context.Context, *StartFileTranscriptRequest) (*StartFileTranscriptResponse, error)
+	FileTranscriptSafe(context.Context, *FileTranscriptSafeRequest) (*FileTranscriptSafeResponse, error)
 	GetFileTranscriptPhrases(context.Context, *GetFileTranscriptPhrasesRequest) (*ListPhrases, error)
 	DeleteFileTranscript(context.Context, *DeleteFileTranscriptRequest) (*DeleteFileTranscriptResponse, error)
 	mustEmbedUnimplementedFileTranscriptServiceServer()
@@ -84,6 +96,9 @@ type UnimplementedFileTranscriptServiceServer struct {
 
 func (UnimplementedFileTranscriptServiceServer) CreateFileTranscript(context.Context, *StartFileTranscriptRequest) (*StartFileTranscriptResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateFileTranscript not implemented")
+}
+func (UnimplementedFileTranscriptServiceServer) FileTranscriptSafe(context.Context, *FileTranscriptSafeRequest) (*FileTranscriptSafeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FileTranscriptSafe not implemented")
 }
 func (UnimplementedFileTranscriptServiceServer) GetFileTranscriptPhrases(context.Context, *GetFileTranscriptPhrasesRequest) (*ListPhrases, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFileTranscriptPhrases not implemented")
@@ -118,6 +133,24 @@ func _FileTranscriptService_CreateFileTranscript_Handler(srv interface{}, ctx co
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(FileTranscriptServiceServer).CreateFileTranscript(ctx, req.(*StartFileTranscriptRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FileTranscriptService_FileTranscriptSafe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FileTranscriptSafeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FileTranscriptServiceServer).FileTranscriptSafe(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FileTranscriptService_FileTranscriptSafe_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FileTranscriptServiceServer).FileTranscriptSafe(ctx, req.(*FileTranscriptSafeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -168,6 +201,10 @@ var FileTranscriptService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateFileTranscript",
 			Handler:    _FileTranscriptService_CreateFileTranscript_Handler,
+		},
+		{
+			MethodName: "FileTranscriptSafe",
+			Handler:    _FileTranscriptService_FileTranscriptSafe_Handler,
 		},
 		{
 			MethodName: "GetFileTranscriptPhrases",
