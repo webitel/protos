@@ -4019,6 +4019,30 @@
             "collectionFormat": "multi",
             "name": "type",
             "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "collectionFormat": "multi",
+            "name": "team_id",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "tags",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "name": "enabled",
+            "in": "query"
           }
         ],
         "responses": {
@@ -4525,6 +4549,62 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/engineListReportGeneral"
+            }
+          },
+          "default": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/engineApiError"
+            }
+          }
+        }
+      }
+    },
+    "/call_center/queues/tags": {
+      "get": {
+        "tags": [
+          "QueueService"
+        ],
+        "summary": "List RoutingSchemaTags",
+        "operationId": "QueueService_SearchQueueTags",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineListTags"
             }
           },
           "default": {
@@ -19964,6 +20044,12 @@
         "strategy": {
           "type": "string"
         },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/engineTag"
+          }
+        },
         "task_processing": {
           "$ref": "#/definitions/engineTaskProcessing"
         },
@@ -21590,6 +21676,20 @@
         }
       }
     },
+    "engineListTags": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/engineTag"
+          }
+        },
+        "next": {
+          "type": "boolean"
+        }
+      }
+    },
     "engineListTimezoneResponse": {
       "type": "object",
       "properties": {
@@ -22780,6 +22880,12 @@
         "strategy": {
           "type": "string"
         },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/engineTag"
+          }
+        },
         "task_processing": {
           "$ref": "#/definitions/engineTaskProcessing"
         },
@@ -23219,6 +23325,12 @@
         },
         "strategy": {
           "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/engineTag"
+          }
         },
         "task_processing": {
           "$ref": "#/definitions/engineTaskProcessing"
@@ -24029,6 +24141,14 @@
         "enable_omnichannel",
         "member_chunk_size"
       ]
+    },
+    "engineTag": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
     },
     "engineTaskProcessing": {
       "type": "object",
@@ -24961,6 +25081,12 @@
         },
         "strategy": {
           "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/engineTag"
+          }
         },
         "task_processing": {
           "$ref": "#/definitions/engineTaskProcessing"

@@ -26,6 +26,7 @@ const (
 	QueueService_UpdateQueue_FullMethodName              = "/engine.QueueService/UpdateQueue"
 	QueueService_DeleteQueue_FullMethodName              = "/engine.QueueService/DeleteQueue"
 	QueueService_SearchQueueReportGeneral_FullMethodName = "/engine.QueueService/SearchQueueReportGeneral"
+	QueueService_SearchQueueTags_FullMethodName          = "/engine.QueueService/SearchQueueTags"
 )
 
 // QueueServiceClient is the client API for QueueService service.
@@ -45,6 +46,8 @@ type QueueServiceClient interface {
 	// Remove Queue
 	DeleteQueue(ctx context.Context, in *DeleteQueueRequest, opts ...grpc.CallOption) (*Queue, error)
 	SearchQueueReportGeneral(ctx context.Context, in *SearchQueueReportGeneralRequest, opts ...grpc.CallOption) (*ListReportGeneral, error)
+	// List RoutingSchemaTags
+	SearchQueueTags(ctx context.Context, in *SearchQueueTagsRequest, opts ...grpc.CallOption) (*ListTags, error)
 }
 
 type queueServiceClient struct {
@@ -118,6 +121,15 @@ func (c *queueServiceClient) SearchQueueReportGeneral(ctx context.Context, in *S
 	return out, nil
 }
 
+func (c *queueServiceClient) SearchQueueTags(ctx context.Context, in *SearchQueueTagsRequest, opts ...grpc.CallOption) (*ListTags, error) {
+	out := new(ListTags)
+	err := c.cc.Invoke(ctx, QueueService_SearchQueueTags_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueueServiceServer is the server API for QueueService service.
 // All implementations must embed UnimplementedQueueServiceServer
 // for forward compatibility
@@ -135,6 +147,8 @@ type QueueServiceServer interface {
 	// Remove Queue
 	DeleteQueue(context.Context, *DeleteQueueRequest) (*Queue, error)
 	SearchQueueReportGeneral(context.Context, *SearchQueueReportGeneralRequest) (*ListReportGeneral, error)
+	// List RoutingSchemaTags
+	SearchQueueTags(context.Context, *SearchQueueTagsRequest) (*ListTags, error)
 	mustEmbedUnimplementedQueueServiceServer()
 }
 
@@ -162,6 +176,9 @@ func (UnimplementedQueueServiceServer) DeleteQueue(context.Context, *DeleteQueue
 }
 func (UnimplementedQueueServiceServer) SearchQueueReportGeneral(context.Context, *SearchQueueReportGeneralRequest) (*ListReportGeneral, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SearchQueueReportGeneral not implemented")
+}
+func (UnimplementedQueueServiceServer) SearchQueueTags(context.Context, *SearchQueueTagsRequest) (*ListTags, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchQueueTags not implemented")
 }
 func (UnimplementedQueueServiceServer) mustEmbedUnimplementedQueueServiceServer() {}
 
@@ -302,6 +319,24 @@ func _QueueService_SearchQueueReportGeneral_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _QueueService_SearchQueueTags_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchQueueTagsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueueServiceServer).SearchQueueTags(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: QueueService_SearchQueueTags_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueueServiceServer).SearchQueueTags(ctx, req.(*SearchQueueTagsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // QueueService_ServiceDesc is the grpc.ServiceDesc for QueueService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -336,6 +371,10 @@ var QueueService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SearchQueueReportGeneral",
 			Handler:    _QueueService_SearchQueueReportGeneral_Handler,
+		},
+		{
+			MethodName: "SearchQueueTags",
+			Handler:    _QueueService_SearchQueueTags_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
