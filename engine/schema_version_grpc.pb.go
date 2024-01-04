@@ -19,14 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	SchemaVersionService_Search_FullMethodName = "/engine.SchemaVersionService/Search"
+	SchemaVersionService_SearchSchemaVersion_FullMethodName = "/engine.SchemaVersionService/SearchSchemaVersion"
 )
 
 // SchemaVersionServiceClient is the client API for SchemaVersionService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SchemaVersionServiceClient interface {
-	Search(ctx context.Context, in *SearchSchemaVersionRequest, opts ...grpc.CallOption) (*SearchSchemaVersionResponse, error)
+	SearchSchemaVersion(ctx context.Context, in *SearchSchemaVersionRequest, opts ...grpc.CallOption) (*SearchSchemaVersionResponse, error)
 }
 
 type schemaVersionServiceClient struct {
@@ -37,9 +37,9 @@ func NewSchemaVersionServiceClient(cc grpc.ClientConnInterface) SchemaVersionSer
 	return &schemaVersionServiceClient{cc}
 }
 
-func (c *schemaVersionServiceClient) Search(ctx context.Context, in *SearchSchemaVersionRequest, opts ...grpc.CallOption) (*SearchSchemaVersionResponse, error) {
+func (c *schemaVersionServiceClient) SearchSchemaVersion(ctx context.Context, in *SearchSchemaVersionRequest, opts ...grpc.CallOption) (*SearchSchemaVersionResponse, error) {
 	out := new(SearchSchemaVersionResponse)
-	err := c.cc.Invoke(ctx, SchemaVersionService_Search_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, SchemaVersionService_SearchSchemaVersion_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func (c *schemaVersionServiceClient) Search(ctx context.Context, in *SearchSchem
 // All implementations must embed UnimplementedSchemaVersionServiceServer
 // for forward compatibility
 type SchemaVersionServiceServer interface {
-	Search(context.Context, *SearchSchemaVersionRequest) (*SearchSchemaVersionResponse, error)
+	SearchSchemaVersion(context.Context, *SearchSchemaVersionRequest) (*SearchSchemaVersionResponse, error)
 	mustEmbedUnimplementedSchemaVersionServiceServer()
 }
 
@@ -58,8 +58,8 @@ type SchemaVersionServiceServer interface {
 type UnimplementedSchemaVersionServiceServer struct {
 }
 
-func (UnimplementedSchemaVersionServiceServer) Search(context.Context, *SearchSchemaVersionRequest) (*SearchSchemaVersionResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Search not implemented")
+func (UnimplementedSchemaVersionServiceServer) SearchSchemaVersion(context.Context, *SearchSchemaVersionRequest) (*SearchSchemaVersionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchSchemaVersion not implemented")
 }
 func (UnimplementedSchemaVersionServiceServer) mustEmbedUnimplementedSchemaVersionServiceServer() {}
 
@@ -74,20 +74,20 @@ func RegisterSchemaVersionServiceServer(s grpc.ServiceRegistrar, srv SchemaVersi
 	s.RegisterService(&SchemaVersionService_ServiceDesc, srv)
 }
 
-func _SchemaVersionService_Search_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _SchemaVersionService_SearchSchemaVersion_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SearchSchemaVersionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SchemaVersionServiceServer).Search(ctx, in)
+		return srv.(SchemaVersionServiceServer).SearchSchemaVersion(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: SchemaVersionService_Search_FullMethodName,
+		FullMethod: SchemaVersionService_SearchSchemaVersion_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SchemaVersionServiceServer).Search(ctx, req.(*SearchSchemaVersionRequest))
+		return srv.(SchemaVersionServiceServer).SearchSchemaVersion(ctx, req.(*SearchSchemaVersionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -100,8 +100,8 @@ var SchemaVersionService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*SchemaVersionServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Search",
-			Handler:    _SchemaVersionService_Search_Handler,
+			MethodName: "SearchSchemaVersion",
+			Handler:    _SchemaVersionService_SearchSchemaVersion_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
