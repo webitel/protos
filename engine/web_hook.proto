@@ -1,0 +1,126 @@
+syntax = "proto3";
+
+package engine;
+
+option go_package = "github.com/webitel/protos/engine";
+
+import "const.proto";
+import "google/api/annotations.proto";
+
+service WebHookService {
+  // Create WebHook
+  rpc CreateWebHook(CreateWebHookRequest) returns (WebHook) {
+    option (google.api.http) = {
+      post: "/hook"
+      body: "*"
+    };
+  }
+
+  // List of WebHook
+  rpc SearchWebHook(SearchWebHookRequest) returns (ListWebHook) {
+    option (google.api.http) = {
+      get: "/hook"
+    };
+  }
+
+  // WebHook item
+  rpc ReadWebHook(ReadWebHookRequest) returns (WebHook) {
+    option (google.api.http) = {
+      get: "/hook/{id}"
+    };
+  }
+
+  // Patch WebHook
+  rpc PatchWebHook(PatchWebHookRequest) returns (WebHook) {
+    option (google.api.http) = {
+      patch: "/hook/{id}"
+      body: "*"
+    };
+  }
+
+  // Update WebHook
+  rpc UpdateWebHook(UpdateWebHookRequest) returns (WebHook) {
+    option (google.api.http) = {
+      put: "/hook/{id}"
+      body: "*"
+    };
+  }
+
+  // Remove WebHook
+  rpc DeleteWebHook(DeleteWebHookRequest) returns (WebHook) {
+    option (google.api.http) = {
+      delete: "/hook/{id}"
+    };
+  }
+}
+
+message DeleteWebHookRequest {
+  int32 id = 1;
+}
+
+message UpdateWebHookRequest {
+  int32 id = 1;
+
+  string name = 2;
+  string description = 3;
+  repeated string origin = 4;
+  Lookup schema = 5;
+  bool enabled = 6;
+  string authorization = 7;
+}
+
+message PatchWebHookRequest {
+  int32 id = 1;
+  repeated string fields = 2;
+
+  string name = 3;
+  string description = 4;
+  repeated string origin = 5;
+  Lookup schema = 6;
+  bool enabled = 7;
+  string authorization = 8;
+}
+
+message ReadWebHookRequest {
+  int32 id = 1;
+}
+
+message SearchWebHookRequest {
+  int32 page = 1;
+  int32 size = 2;
+  string q = 3;
+  string sort = 4;
+  repeated string fields = 5;
+
+  repeated int32 id = 6;
+}
+
+message ListWebHook {
+  bool next = 1;
+  repeated WebHook items = 2;
+}
+
+message CreateWebHookRequest {
+  string name = 1;
+  string description = 2;
+  repeated string origin = 3;
+  Lookup schema = 4;
+  bool enabled = 5;
+  string authorization = 6;
+}
+
+message WebHook {
+  int32 id = 1;
+  string key = 2;
+  int64 created_at = 3;
+  Lookup created_by = 4;
+  int64 updated_at = 5;
+  Lookup updated_by = 6;
+
+  string name = 7;
+  string description = 8;
+  repeated string origin = 9;
+  Lookup schema = 10;
+  bool enabled = 11;
+  string authorization = 12;
+}
