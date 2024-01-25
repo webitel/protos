@@ -37,6 +37,7 @@ const (
 	CallService_CreateCallAnnotation_FullMethodName  = "/engine.CallService/CreateCallAnnotation"
 	CallService_UpdateCallAnnotation_FullMethodName  = "/engine.CallService/UpdateCallAnnotation"
 	CallService_DeleteCallAnnotation_FullMethodName  = "/engine.CallService/DeleteCallAnnotation"
+	CallService_RedialCall_FullMethodName            = "/engine.CallService/RedialCall"
 )
 
 // CallServiceClient is the client API for CallService service.
@@ -65,6 +66,7 @@ type CallServiceClient interface {
 	CreateCallAnnotation(ctx context.Context, in *CreateCallAnnotationRequest, opts ...grpc.CallOption) (*CallAnnotation, error)
 	UpdateCallAnnotation(ctx context.Context, in *UpdateCallAnnotationRequest, opts ...grpc.CallOption) (*CallAnnotation, error)
 	DeleteCallAnnotation(ctx context.Context, in *DeleteCallAnnotationRequest, opts ...grpc.CallOption) (*CallAnnotation, error)
+	RedialCall(ctx context.Context, in *RedialCallRequest, opts ...grpc.CallOption) (*CreateCallResponse, error)
 }
 
 type callServiceClient struct {
@@ -237,6 +239,15 @@ func (c *callServiceClient) DeleteCallAnnotation(ctx context.Context, in *Delete
 	return out, nil
 }
 
+func (c *callServiceClient) RedialCall(ctx context.Context, in *RedialCallRequest, opts ...grpc.CallOption) (*CreateCallResponse, error) {
+	out := new(CreateCallResponse)
+	err := c.cc.Invoke(ctx, CallService_RedialCall_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CallServiceServer is the server API for CallService service.
 // All implementations must embed UnimplementedCallServiceServer
 // for forward compatibility
@@ -263,6 +274,7 @@ type CallServiceServer interface {
 	CreateCallAnnotation(context.Context, *CreateCallAnnotationRequest) (*CallAnnotation, error)
 	UpdateCallAnnotation(context.Context, *UpdateCallAnnotationRequest) (*CallAnnotation, error)
 	DeleteCallAnnotation(context.Context, *DeleteCallAnnotationRequest) (*CallAnnotation, error)
+	RedialCall(context.Context, *RedialCallRequest) (*CreateCallResponse, error)
 	mustEmbedUnimplementedCallServiceServer()
 }
 
@@ -323,6 +335,9 @@ func (UnimplementedCallServiceServer) UpdateCallAnnotation(context.Context, *Upd
 }
 func (UnimplementedCallServiceServer) DeleteCallAnnotation(context.Context, *DeleteCallAnnotationRequest) (*CallAnnotation, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteCallAnnotation not implemented")
+}
+func (UnimplementedCallServiceServer) RedialCall(context.Context, *RedialCallRequest) (*CreateCallResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RedialCall not implemented")
 }
 func (UnimplementedCallServiceServer) mustEmbedUnimplementedCallServiceServer() {}
 
@@ -661,6 +676,24 @@ func _CallService_DeleteCallAnnotation_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CallService_RedialCall_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RedialCallRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CallServiceServer).RedialCall(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CallService_RedialCall_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CallServiceServer).RedialCall(ctx, req.(*RedialCallRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CallService_ServiceDesc is the grpc.ServiceDesc for CallService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -739,6 +772,10 @@ var CallService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteCallAnnotation",
 			Handler:    _CallService_DeleteCallAnnotation_Handler,
+		},
+		{
+			MethodName: "RedialCall",
+			Handler:    _CallService_RedialCall_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
