@@ -9890,6 +9890,44 @@
         ]
       }
     },
+    "/calls/history/{call_id}/redial": {
+      "post": {
+        "operationId": "CallService_RedialCall",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineCreateCallResponse"
+            }
+          },
+          "default": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/engineApiError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "call_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engineRedialCallRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CallService"
+        ]
+      }
+    },
     "/calls/history/{id}": {
       "patch": {
         "operationId": "CallService_PatchHistoryCall",
@@ -16174,6 +16212,9 @@
         },
         "sort": {
           "type": "string"
+        },
+        "without_members": {
+          "type": "boolean"
         }
       }
     },
@@ -16392,6 +16433,17 @@
         },
         "disabled": {
           "type": "boolean"
+        },
+        "working": {
+          "type": "boolean"
+        },
+        "work_start": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "work_stop": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -18347,6 +18399,9 @@
           "additionalProperties": {
             "type": "string"
           }
+        },
+        "hide_missed": {
+          "type": "boolean"
         }
       }
     },
@@ -18829,6 +18884,9 @@
           "items": {
             "$ref": "#/definitions/engineSchemaTag"
           }
+        },
+        "note": {
+          "type": "string"
         }
       }
     },
@@ -19373,6 +19431,14 @@
         },
         "enabled": {
           "type": "boolean"
+        }
+      }
+    },
+    "engineRedialCallRequest": {
+      "type": "object",
+      "properties": {
+        "call_id": {
+          "type": "string"
         }
       }
     },
@@ -20002,7 +20068,8 @@
       "enum": [
         "empty_system_settings_name",
         "enable_omnichannel",
-        "member_chunk_size"
+        "member_chunk_size",
+        "amd_cancel_not_human"
       ],
       "default": "empty_system_settings_name"
     },
@@ -21110,6 +21177,9 @@
           "items": {
             "$ref": "#/definitions/engineSchemaTag"
           }
+        },
+        "note": {
+          "type": "string"
         }
       }
     },

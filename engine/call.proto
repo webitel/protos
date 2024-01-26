@@ -7,6 +7,7 @@ option go_package = "github.com/webitel/protos/engine";
 import "const.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/struct.proto";
+import "google/protobuf/wrappers.proto";
 
 service CallService {
     // List of call
@@ -132,11 +133,23 @@ service CallService {
             delete: "/calls/history/{call_id}/annotation/{id}"
         };
     }
+
+    rpc RedialCall (RedialCallRequest) returns (CreateCallResponse) {
+        option (google.api.http) = {
+            post: "/calls/history/{call_id}/redial"
+            body: "*"
+        };
+    }
+}
+
+message RedialCallRequest {
+    string call_id = 1;
 }
 
 message PatchHistoryCallRequest {
     string id = 1;
     map<string,string> variables = 2;
+    google.protobuf.BoolValue hide_missed = 3;
 }
 
 message SetVariablesCallRequest {
