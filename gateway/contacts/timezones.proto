@@ -1,0 +1,442 @@
+syntax = "proto3";
+package webitel.contacts;
+option go_package = "webitel.go/api/contacts;contacts";
+
+import "gateway/contacts/fields.proto";
+import "google/protobuf/wrappers.proto";
+
+import "google/api/visibility.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+message TimeLocation {
+
+  // The Location name corresponding to
+  // a file in the IANA Time Zone database,
+  // such as "Europe/Kyiv".
+  string name = 1;
+  // Custom location offset (seconds east of UTC).
+  int64 offset = 2;
+  // Current time at this time zone location.
+  // Query: `?fields=location{time.format(DateTime)}`
+  string time = 3;
+}
+
+// A Contact's timezone preference.
+message Timezone {
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    // GET /contacts/{source.id}/timezones/{id}
+    // example: "{\"id\":\"7\",\"ver\":\"3\",\"etag\":\"FqaTCDLbhpaoUreL\",\"created_at\":\"1680268507698\",\"created_by\":{\"id\":\"34\",\"name\":\"John Doe\"},\"updated_at\":\"1680516785357\",\"updated_by\":{\"name\":\"Jane Lee (deleted)\"},\"primary\":true,\"location\":\"Europe/Kyiv\"}"
+  };
+
+  // [META]: --------------------------------------
+
+  // The unique ID of the association. Never changes.
+  string id = 1;
+  
+  // Version of the latest update. Numeric sequence.
+  int32 ver = 2;
+
+  // Unique ID of the latest version of the update.
+  // This ID changes after any update to the underlying value(s).
+  string etag = 3;
+
+  // // The Contact source associated with.
+  // webitel.contacts.Lookup contact = 4;
+
+  // The user who created this Field.
+  int64 created_at = 5;
+
+  // Timestamp(milli) of the Field creation.
+  webitel.contacts.Lookup created_by = 6;
+  
+  // Timestamp(milli) of the last Field update.
+  // Take part in Etag generation.
+  int64 updated_at = 7;
+  
+  // The user who performed last Update.
+  webitel.contacts.Lookup updated_by = 8;
+  
+  // [VALUE]: --------------------------------------
+
+  // Indicates whether this association is the default
+  // among others of the same type.
+  bool primary = 11;
+
+  // Timezone dictionary reference value associated.
+  webitel.contacts.Lookup timezone = 12;
+
+  // // The Location name corresponding to a file
+  // // in the IANA Time Zone database, such as "Europe/Kyiv" or custom.
+  // string location = 12;
+
+  // // Custom location name with offset (seconds east of UTC).
+  // int64 offset = 13;
+
+  // // Current time at this time zone location.
+  // // Query: `?fields=location{time.format(DateTime)}`
+  // string time = 14;
+
+}
+
+// An input of the Contact's timezones.
+message InputTimezone {
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    // PUT /contacts/{source.id}/timezones/{etag}
+    // example: "{\"primary\":false,\"timezone\":{\"id\":\"416\"}}"
+    json_schema: {
+      required: ["etag"]
+    }
+  };
+  
+  // [META]: --------------------------------------
+
+  // Unique ID of the latest version of an existing resource.
+  string etag = 1
+  [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    field_configuration: {
+      path_param_name: "etag"
+    }
+  }];
+
+  // [VALUE]: --------------------------------------
+  
+  // Indicates whether this association must be default among others.
+  bool primary = 11;
+
+  // Timezone dictionary reference value associated.
+  webitel.contacts.Lookup timezone = 12;
+
+  // // The Location name corresponding to a file
+  // // in the IANA Time Zone database, such as "Europe/Kyiv" or custom.
+  // string location = 12;
+
+  // // Custom location name with offset (seconds east of UTC).
+  // int64 offset = 13;
+
+}
+
+// Timezones service catalogs.
+service Timezones {
+
+  // ------------------ [WITH] Contact ------------------- //
+
+  // List of the Contact's timezone(s).
+  rpc ListTimezones(ListTimezonesRequest) returns (TimezoneList) {
+    option (google.api.http) = {
+      get: "/contacts/{contact_id}/timezones"
+    };
+  }
+  // Associate more timezone(s) with the Contact.
+  rpc MergeTimezones(MergeTimezonesRequest) returns (TimezoneList) {
+    option (google.api.http) = {
+      post: "/contacts/{contact_id}/timezones"
+      // response_body: "data"
+      body: "input"
+    };
+  }
+  // Resets all timezones of the contact according to the input dataset.
+  rpc ResetTimezones(ResetTimezonesRequest) returns (TimezoneList) {
+    option (google.api.http) = {
+      put: "/contacts/{contact_id}/timezones"
+      // response_body: "data"
+      body: "input"
+    };
+  }
+  // Remove the Contact's timezone(s).
+  rpc DeleteTimezones(DeleteTimezonesRequest) returns (TimezoneList) {
+    option (google.api.http) = {
+      delete: "/contacts/{contact_id}/timezones"
+      // response_body: "data"
+    };
+  }
+
+  // ------------------ [WITH] Record ------------------- //
+
+  // Locate the Contact's timezone association.
+  rpc LocateTimezone(LocateTimezoneRequest) returns (Timezone) {
+    option (google.api.http) = {
+      get: "/contacts/{contact_id}/timezones/{etag}"
+    };
+  }
+
+  // Update the Contact's timezone details.
+  rpc UpdateTimezone(UpdateTimezoneRequest) returns (TimezoneList) {
+    option (google.api.http) = {
+      put: "/contacts/{contact_id}/timezones/{input.etag}"
+      // response_body: "data"
+      body: "input"
+      additional_bindings: {
+        patch: "/contacts/{contact_id}/timezones/{input.etag}"
+        // response_body: "data"
+        body: "input"
+      }
+    };
+  }
+
+  // Remove the Contact's timezone association.
+  rpc DeleteTimezone(DeleteTimezoneRequest) returns (Timezone) {
+    option (google.api.http) = {
+      delete: "/contacts/{contact_id}/timezones/{etag}"
+    };
+  }
+}
+
+// Timezone dataset.
+// NOTE: Edge represents connection between two nodes.
+// So this ContactTimezones.data are always subordinate to some contact.id.
+message TimezoneList {
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    // example: "{\"data\":[{\"id\":\"7\",\"ver\":\"3\",\"etag\":\"FqaTCDLbhpaoUreL\",\"created_at\":\"1680268507698\",\"created_by\":{\"id\":\"34\",\"name\":\"John Doe\"},\"updated_at\":\"1680516785357\",\"updated_by\":{\"name\":\"Jane Lee (deleted)\"},\"primary\":true,\"location\":\"Europe/Kyiv\"}],\"page\":1,\"next\":true}"
+  };
+
+  // Timezone dataset page.
+  repeated Timezone data = 1;
+  // The page number of the partial result.
+  int32 page = 2;
+  // Indicates that this is a partial result.
+  // More data available upon query: ?size=${data.len}&page=${page++}
+  bool next = 3;
+
+}
+
+// Search for the Contact's Timezone(s) request.
+message ListTimezonesRequest {
+
+  // ----- Result Options ----- //
+
+  // Page number of result dataset records. offset = (page*size)
+  int32 page = 2;
+  
+  // Size count of records on result page. limit = (size++)
+  int32 size = 1;
+  
+  // Search term: location name;
+  // `?` - matches any one character
+  // `*` - matches 0 or more characters
+  string q = 6;
+
+  // Sort the result according to fields.
+  repeated string sort = 3;
+
+  // Fields to be retrieved as a result.
+  repeated string fields = 4;
+
+  // ----- Search Options ----- //
+
+  // Contact ID associated with.
+  string contact_id = 5;
+  
+  // Lookup contact = 5;
+
+  // Record(s) with unique ID only.
+  repeated string id = 7;
+
+  // Primary timezone only.
+  google.protobuf.BoolValue primary = 8;
+
+}
+
+message MergeTimezonesRequest {
+  
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: "contact_id"
+      required: "input"
+    }
+  };
+
+  // --------- PATCH Options -------- //
+
+  // JSON PATCH fields mask.
+  // List of JPath fields specified in body(input).
+  repeated string x_json_mask = 1
+  [(google.api.field_visibility) = {
+    restriction: "PREVIEW"
+  },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      read_only: true
+      pattern: "^$"
+    }];
+
+  // ------- Result Options -------
+
+  // Fields to be retrieved as a result.
+  repeated string fields = 2;
+
+  // ------- Create Options -------
+
+  // Link contact ID.
+  string contact_id = 3;
+
+  // Array of the unique User(s) to associate with the Contact.
+  // Any duplicate of an already linked user{id} will result in an error.
+  repeated InputTimezone input = 4
+  [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      // example: "[{\"primary\":true,\"timezone\":{\"id\":\"416\",\"name\":\"Europe/Nicosia 03:00\"}},{\"timezone\":{\"id\":\"414\",\"name\":\"Europe/Mariehamn 03:00\"}}]"
+    }
+  ];
+
+}
+
+message ResetTimezonesRequest {
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: "contact_id"
+      required: "input"
+    }
+  };
+
+  // --------- Result Options -------- //
+
+  // Fields to be retrieved into result of changes.
+  repeated string fields = 1;
+
+  // ------- Reference Options ------- //
+
+  // Link contact ID.
+  string contact_id = 2;
+
+  // --------- Update Options -------- //
+
+  // Final set of timezone(s) to be linked with the contact.
+  // Timezone(s) that are already linked with the contact
+  // but not given in here will be removed.
+  repeated InputTimezone input = 3
+  [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      // example: "[{\"verified\":true,\"email\":\"johndoe_43@gmail.com\",\"type\":{\"name\":\"personal\"}},{\"primary\":true,\"etag\":\"k0WqvUn4IJGnuCyG\",\"email\":\"j.doe@x-company.org\",\"type\":{\"id\":\"11\",\"name\":\"business\"}}]"
+      min_items: 1
+      unique_items: true
+    }
+  ];
+
+}
+
+message DeleteTimezonesRequest {
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: "contact_id"
+      required: "etag"
+    }
+  };
+
+  // ----- Result Options ----- //
+
+  // Fields to be retrieved as a result.
+  repeated string fields = 1;
+
+  // ----- Filter Options ----- //
+
+  // Contact ID associated with.
+  string contact_id = 2;
+  
+  // Lookup contact = 2;
+
+  // ----- Delete Options ----- //
+
+  // Set of unique ID(s) to remove.
+  repeated string etag = 3
+  [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      unique_items: true
+      min_items: 1
+    }
+  ];
+}
+
+// Locate single Link by unique IDentifier.
+message LocateTimezoneRequest {
+
+  // ------- Result Options ------
+
+  // Fields to be retrieved into result.
+  repeated string fields = 1;
+
+  // ------- Locate Options ------ //
+  
+  // Contact source ID.
+  string contact_id = 2;
+  
+  // Unique timezone link IDentifier.
+  // Accept: `etag` (obsolete+) or `id`.
+  string etag = 3
+  [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    format: "\\w+"
+  }];
+
+}
+
+message UpdateTimezoneRequest {
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: "contact_id"
+      required: "input"
+    }
+  };
+
+  // --------- PATCH Options -------- //
+
+  // JSON PATCH fields mask.
+  // List of JPath fields specified in body(input).
+  repeated string x_json_mask = 1
+  [(google.api.field_visibility) = {
+    restriction: "PREVIEW"
+  },
+  (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    read_only: true
+    pattern: "^$"
+  }];
+
+  // --------- Result Options -------- //
+
+  // Fields to be retrieved into result of changes.
+  repeated string fields = 2;
+
+  // ------- Reference Options ------- //
+
+  // Link contact ID.
+  string contact_id = 3;
+
+  // --------- Update Options -------- //
+
+  // NEW Update of the timezone link.
+  InputTimezone input = 4;
+
+}
+
+message DeleteTimezoneRequest {
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: "contact_id"
+      required: "etag"
+    }
+  };
+
+  // --------- Result Options -------- //
+
+  // Fields to be retrieved as a result.
+  repeated string fields = 1;
+
+  // ------- Delete Options ------- //
+
+  // Contact ID associated with.
+  string contact_id = 2;
+
+  // Unique ID to remove.
+  string etag = 3
+  [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      pattern: "^\\.+$"
+    }
+  ];
+
+}
