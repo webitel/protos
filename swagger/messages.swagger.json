@@ -16,6 +16,9 @@
     {
       "name": "Catalog",
       "description": "**Messages** Service"
+    },
+    {
+      "name": "ContactLinkingService"
     }
   ],
   "host": "nx.webitel.org",
@@ -266,6 +269,13 @@
             "in": "query",
             "required": false,
             "type": "boolean"
+          },
+          {
+            "name": "group[string]",
+            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -429,7 +439,7 @@
     },
     "/chat/dialogs/{chat_id}/messages": {
       "get": {
-        "summary": "Query of chat messages history",
+        "summary": "Query of the chat history",
         "operationId": "Catalog_GetHistory",
         "responses": {
           "200": {
@@ -509,6 +519,13 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "group[string]",
+            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -516,9 +533,65 @@
         ]
       }
     },
+    "/chat/{conversation_id}/contact": {
+      "post": {
+        "summary": "CreateContactFromConversation creates new contact from the data existing in the conversation and after that links this contact to the external user.",
+        "operationId": "ContactLinkingService_CreateContactFromConversation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.chat.EmptyResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "conversation_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ContactLinkingService"
+        ]
+      }
+    },
+    "/chat/{conversation_id}/link": {
+      "post": {
+        "summary": "LinkContactToClient creates connection between existing internal contact and external client.",
+        "operationId": "ContactLinkingService_LinkContactToClient",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.chat.EmptyResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "conversation_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "contact_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ContactLinkingService"
+        ]
+      }
+    },
     "/chat/{peer.type}/{peer.id}/messages": {
       "get": {
-        "summary": "Query of chat messages history",
+        "summary": "Query of the chat history",
         "operationId": "Catalog_GetHistory2",
         "responses": {
           "200": {
@@ -595,6 +668,13 @@
           {
             "name": "peer.name",
             "description": "Contact display **name**.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "group[string][string]",
+            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
             "in": "query",
             "required": false,
             "type": "string"
@@ -888,6 +968,9 @@
       },
       "description": "Chat Dialog. Conversation info."
     },
+    "webitel.chat.EmptyResponse": {
+      "type": "object"
+    },
     "webitel.chat.File": {
       "type": "object",
       "properties": {
@@ -975,7 +1058,7 @@
           "description": "Contact display **name**."
         }
       },
-      "description": "Peer Contact."
+      "description": "Peer contact."
     },
     "webitel.chat.Timerange": {
       "type": "object",
