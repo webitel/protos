@@ -33,6 +33,9 @@
     },
     {
       "name": "Timezones"
+    },
+    {
+      "name": "IMClients"
     }
   ],
   "host": "nx.webitel.org",
@@ -770,6 +773,88 @@
         ],
         "tags": [
           "Emails"
+        ]
+      }
+    },
+    "/contacts/{contact_id}/imclients": {
+      "get": {
+        "summary": "Search IM client links",
+        "operationId": "IMClients_ListIMClients",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.IMClientList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "description": "Link contact ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "description": "Page number of result dataset records. offset = (page*size)",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "description": "Size count of records on result page. limit = (size++)",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "q",
+            "description": "Search term: IMClient.\n`?` - matches any one character\n`*` - matches 0 or more characters\nSearch fields: {user,app}",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort",
+            "description": "Sort the result according to fields.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved into result.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "id",
+            "description": "Link(s) with unique ID only.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "IMClients"
         ]
       }
     },
@@ -3501,6 +3586,9 @@
       },
       "description": "Email dataset."
     },
+    "webitel.contacts.EmptyResponse": {
+      "type": "object"
+    },
     "webitel.contacts.IMClient": {
       "type": "object",
       "properties": {
@@ -3542,11 +3630,15 @@
             "type": "telegram",
             "name": "John Doe"
           },
-          "description": "End-User account used in the IM client."
+          "description": "External user which contacted to us.\nId will be from external service.\nName will be from external service."
         },
         "app": {
           "$ref": "#/definitions/webitel.contacts.Lookup",
-          "description": "App (Text-Gateway) used to connect the IM client."
+          "description": "App (Text-Gateway) used to connect the IM client.\nId will be internal id of gateway.\nName will be name of the gateway."
+        },
+        "protocol": {
+          "type": "string",
+          "description": "Protocol used to connect the IM client."
         },
         "via": {
           "type": "string",
@@ -3744,21 +3836,19 @@
     "webitel.contacts.InputIMClient": {
       "type": "object",
       "properties": {
-        "etag": {
+        "protocol": {
+          "type": "string"
+        },
+        "created_by": {
           "type": "string",
-          "description": "Unique ID of the latest version of an existing resorce."
+          "description": "Id of Agent created this IM client."
         },
-        "user": {
-          "$ref": "#/definitions/webitel.contacts.Lookup",
-          "example": {
-            "id": "596417343",
-            "type": "telegram",
-            "name": "John Doe"
-          },
-          "description": "End-User account used in the IM client."
+        "external_user": {
+          "type": "string",
+          "title": "External user id"
         },
-        "app": {
-          "$ref": "#/definitions/webitel.contacts.Lookup",
+        "gateway_id": {
+          "type": "string",
           "description": "App (Text-Gateway) used to connect the IM client."
         },
         "via": {
@@ -3766,10 +3856,7 @@
           "description": "[Via] App(-specific) peer(-id) to connect[from] the IM client."
         }
       },
-      "description": "Input of the contact IM client.",
-      "required": [
-        "user"
-      ]
+      "description": "Input of the contact IM client."
     },
     "webitel.contacts.InputLabel": {
       "type": "object",
