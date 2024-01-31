@@ -9748,6 +9748,12 @@
             "description": "Dialogs ONLY that are currently [not] active( closed: ? ).",
             "name": "online",
             "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
+            "name": "group[string]",
+            "in": "query"
           }
         ],
         "responses": {
@@ -9903,7 +9909,7 @@
         "tags": [
           "Catalog"
         ],
-        "summary": "Query of chat messages history",
+        "summary": "Query of the chat history",
         "operationId": "Catalog_GetHistory",
         "parameters": [
           {
@@ -9967,6 +9973,12 @@
             "description": "Contact display **name**.",
             "name": "peer.name",
             "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
+            "name": "group[string]",
+            "in": "query"
           }
         ],
         "responses": {
@@ -9979,12 +9991,67 @@
         }
       }
     },
+    "/chat/{conversation_id}/contact": {
+      "post": {
+        "tags": [
+          "ContactLinkingService"
+        ],
+        "summary": "CreateContactFromConversation creates new contact from the data existing in the conversation and after that links this contact to the external user.",
+        "operationId": "ContactLinkingService_CreateContactFromConversation",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "conversation_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.chat.EmptyResponse"
+            }
+          }
+        }
+      }
+    },
+    "/chat/{conversation_id}/link": {
+      "post": {
+        "tags": [
+          "ContactLinkingService"
+        ],
+        "summary": "LinkContactToClient creates connection between existing internal contact and external client.",
+        "operationId": "ContactLinkingService_LinkContactToClient",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "conversation_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "contact_id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.chat.EmptyResponse"
+            }
+          }
+        }
+      }
+    },
     "/chat/{peer.type}/{peer.id}/messages": {
       "get": {
         "tags": [
           "Catalog"
         ],
-        "summary": "Query of chat messages history",
+        "summary": "Query of the chat history",
         "operationId": "Catalog_GetHistory2",
         "parameters": [
           {
@@ -10048,6 +10115,12 @@
             "type": "string",
             "description": "Contact display **name**.",
             "name": "peer.name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
+            "name": "group[string][string]",
             "in": "query"
           }
         ],
@@ -10752,6 +10825,82 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/webitel.contacts.EmailList"
+            }
+          }
+        }
+      }
+    },
+    "/contacts/{contact_id}/imclients": {
+      "get": {
+        "tags": [
+          "IMClients"
+        ],
+        "summary": "Search IM client links",
+        "operationId": "IMClients_ListIMClients",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Link contact ID.",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page number of result dataset records. offset = (page*size)",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Size count of records on result page. limit = (size++)",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Search term: IMClient.\n`?` - matches any one character\n`*` - matches 0 or more characters\nSearch fields: {user,app}",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Sort the result according to fields.",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved into result.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Link(s) with unique ID only.",
+            "name": "id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.IMClientList"
             }
           }
         }
@@ -27334,6 +27483,9 @@
         }
       }
     },
+    "webitel.chat.EmptyResponse": {
+      "type": "object"
+    },
     "webitel.chat.File": {
       "description": "Media File.",
       "type": "object",
@@ -27406,7 +27558,7 @@
       }
     },
     "webitel.chat.Peer": {
-      "description": "Peer Contact.",
+      "description": "Peer contact.",
       "type": "object",
       "properties": {
         "id": {
@@ -27833,12 +27985,15 @@
         }
       }
     },
+    "webitel.contacts.EmptyResponse": {
+      "type": "object"
+    },
     "webitel.contacts.IMClient": {
       "description": "A contact's [I]nstant[M]essaging client.",
       "type": "object",
       "properties": {
         "app": {
-          "description": "App (Text-Gateway) used to connect the IM client.",
+          "description": "App (Text-Gateway) used to connect the IM client.\nId will be internal id of gateway.\nName will be name of the gateway.",
           "$ref": "#/definitions/webitel.contacts.Lookup"
         },
         "created_at": {
@@ -27858,6 +28013,10 @@
           "description": "The unique ID of the association. Never changes.",
           "type": "string"
         },
+        "protocol": {
+          "description": "Protocol used to connect the IM client.",
+          "type": "string"
+        },
         "updated_at": {
           "description": "Timestamp(milli) of the last Field update.\nTake part in Etag generation.",
           "type": "string",
@@ -27868,7 +28027,7 @@
           "$ref": "#/definitions/webitel.contacts.Lookup"
         },
         "user": {
-          "description": "End-User account used in the IM client.",
+          "description": "External user which contacted to us.\nId will be from external service.\nName will be from external service.",
           "$ref": "#/definitions/webitel.contacts.Lookup",
           "example": {
             "id": "596417343",
@@ -28076,26 +28235,21 @@
     "webitel.contacts.InputIMClient": {
       "description": "Input of the contact IM client.",
       "type": "object",
-      "required": [
-        "user"
-      ],
       "properties": {
-        "app": {
-          "description": "App (Text-Gateway) used to connect the IM client.",
-          "$ref": "#/definitions/webitel.contacts.Lookup"
-        },
-        "etag": {
-          "description": "Unique ID of the latest version of an existing resorce.",
+        "created_by": {
+          "description": "Id of Agent created this IM client.",
           "type": "string"
         },
-        "user": {
-          "description": "End-User account used in the IM client.",
-          "$ref": "#/definitions/webitel.contacts.Lookup",
-          "example": {
-            "id": "596417343",
-            "name": "John Doe",
-            "type": "telegram"
-          }
+        "external_user": {
+          "type": "string",
+          "title": "External user id"
+        },
+        "gateway_id": {
+          "description": "App (Text-Gateway) used to connect the IM client.",
+          "type": "string"
+        },
+        "protocol": {
+          "type": "string"
         },
         "via": {
           "description": "[Via] App(-specific) peer(-id) to connect[from] the IM client.",
