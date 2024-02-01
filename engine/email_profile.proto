@@ -67,13 +67,19 @@ service EmailProfileService {
     }
 }
 
+enum EmailAuthType {
+    EmailAuthTypeUndefined = 0;
+    Plain = 1;
+    OAuth2 = 2;
+}
+
 message LoginEmailProfileRequest {
     int32 id = 1;
 }
 
 
 message LoginEmailProfileResponse {
-    string auth_type = 1;
+    EmailAuthType auth_type = 1;
     string redirect_url = 2;
     map<string,string> cookie = 3;
 }
@@ -87,35 +93,14 @@ message TestEmailProfileResponse {
 }
 
 message ReadEmailProfileRequest {
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-        json_schema: {
-            title: "Read email profile"
-            description: "Read email profile"
-            required: ["id"]
-        }
-    };
     int64 id = 1;
 }
 
 message DeleteEmailProfileRequest {
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-        json_schema: {
-            title: "Delete email profile"
-            description: "Delete email profile"
-            required: ["id"]
-        }
-    };
     int64 id = 1;
 }
 
 message UpdateEmailProfileRequest {
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-        json_schema: {
-            title: "Update email profile request body"
-            description: "Update email profile for gateway"
-            required: ["name", "schema", "smtp_host", "imap_host", "login", "mailbox", "smtp_port", "imap_port", "fetch_interval"]
-        }
-    };
     int64 id = 1;
 
     string name = 2;
@@ -130,7 +115,7 @@ message UpdateEmailProfileRequest {
     string password = 11;
     string smtp_host = 12;
     int32 fetch_interval = 13;
-    string auth_type = 14;
+    EmailAuthType auth_type = 14;
     bool listen = 15;
 }
 
@@ -169,18 +154,11 @@ message EmailProfile {
     string fetch_error = 19;
     string state = 20;
     int64 activity_at = 21;
-    string auth_type = 22;
+    EmailAuthType auth_type = 22;
     bool listen = 23;
 }
 
 message CreateEmailProfileRequest {
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-        json_schema: {
-            title: "Create email profile request body"
-            description: "Create email profile for gateway"
-            required: ["name", "schema", "smtp_host", "imap_host", "login", "mailbox", "smtp_port", "imap_port", "fetch_interval"]
-        }
-    };
     string name = 2;
     string description = 3;
     Lookup schema = 4;
@@ -193,18 +171,11 @@ message CreateEmailProfileRequest {
     int32 imap_port = 11;
     string imap_host = 12;
     int32 fetch_interval = 13;
-    string auth_type = 14;
+    EmailAuthType auth_type = 14;
     bool listen = 15;
 }
 
 message PatchEmailProfileRequest {
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-        json_schema: {
-            title: "Update email profile request body"
-            description: "Update email profile for gateway"
-            required: ["id"]
-        }
-    };
     int64 id = 1;
 
     string name = 2;
