@@ -11594,6 +11594,193 @@
         ]
       }
     },
+    "/routing/schema/variables": {
+      "get": {
+        "operationId": "SchemaVariablesService_SearchSchemaVariable",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineListSchemaVariable"
+            }
+          },
+          "default": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/engineApiError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "SchemaVariablesService"
+        ]
+      },
+      "post": {
+        "operationId": "SchemaVariablesService_CreateSchemaVariable",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineSchemaVariable"
+            }
+          },
+          "default": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/engineApiError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engineCreateSchemaVariableRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SchemaVariablesService"
+        ]
+      }
+    },
+    "/routing/schema/variables/{id}": {
+      "get": {
+        "operationId": "SchemaVariablesService_ReadSchemaVariable",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineSchemaVariable"
+            }
+          },
+          "default": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/engineApiError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "SchemaVariablesService"
+        ]
+      },
+      "delete": {
+        "operationId": "SchemaVariablesService_DeleteSchemaVariable",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineSchemaVariable"
+            }
+          },
+          "default": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/engineApiError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "SchemaVariablesService"
+        ]
+      },
+      "put": {
+        "operationId": "SchemaVariablesService_UpdateSchemaVariable",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineSchemaVariable"
+            }
+          },
+          "default": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/engineApiError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engineUpdateSchemaVariableRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SchemaVariablesService"
+        ]
+      }
+    },
     "/routing/schema/{id}": {
       "get": {
         "summary": "RoutingSchema item",
@@ -15980,6 +16167,20 @@
         }
       }
     },
+    "engineCreateSchemaVariableRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "encrypt": {
+          "type": "boolean"
+        },
+        "value": {
+          "type": "object"
+        }
+      }
+    },
     "engineCreateSkillAgentRequest": {
       "type": "object",
       "properties": {
@@ -17450,6 +17651,20 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/engineRoutingVariable"
+          }
+        }
+      }
+    },
+    "engineListSchemaVariable": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "boolean"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/engineSchemaVariable"
           }
         }
       }
@@ -19717,6 +19932,24 @@
         }
       }
     },
+    "engineSchemaVariable": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "name": {
+          "type": "string"
+        },
+        "encrypt": {
+          "type": "boolean"
+        },
+        "value": {
+          "type": "object"
+        }
+      }
+    },
     "engineSchemaVersion": {
       "type": "object",
       "properties": {
@@ -21185,6 +21418,21 @@
         "domain_id": {
           "type": "string",
           "format": "int64"
+        }
+      }
+    },
+    "engineUpdateSchemaVariableRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "object"
         }
       }
     },

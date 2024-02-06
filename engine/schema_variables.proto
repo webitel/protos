@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package engine;
+
+option go_package = "github.com/webitel/protos/engine";
+
+import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
+
+
+service SchemaVariablesService {
+  rpc CreateSchemaVariable(CreateSchemaVariableRequest) returns (SchemaVariable) {
+    option (google.api.http) = {
+      post: "/routing/schema/variables"
+      body: "*"
+    };
+  }
+
+  rpc SearchSchemaVariable(SearchSchemaVariableRequest) returns (ListSchemaVariable) {
+    option (google.api.http) = {
+      get: "/routing/schema/variables"
+    };
+  }
+
+  rpc ReadSchemaVariable(ReadSchemaVariableRequest) returns (SchemaVariable) {
+    option (google.api.http) = {
+      get: "/routing/schema/variables/{id}"
+    };
+  }
+
+  rpc UpdateSchemaVariable(UpdateSchemaVariableRequest) returns (SchemaVariable) {
+    option (google.api.http) = {
+      put: "/routing/schema/variables/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteSchemaVariable(DeleteSchemaVariableRequest) returns (SchemaVariable) {
+    option (google.api.http) = {
+      delete: "/routing/schema/variables/{id}"
+    };
+  }
+}
+
+message SchemaVariable {
+  int32 id = 1;
+  string name = 2;
+  bool encrypt = 3;
+  google.protobuf.Value value = 4;
+}
+
+message CreateSchemaVariableRequest {
+  string name = 1;
+  bool encrypt = 2;
+  google.protobuf.Value value = 3;
+}
+
+message SearchSchemaVariableRequest {
+  int32 page = 1;
+  int32 size = 2;
+  string q = 3;
+
+  string sort = 5;
+  repeated string fields = 6;
+}
+
+message ListSchemaVariable {
+  bool next = 1;
+  repeated SchemaVariable items = 2;
+}
+
+message ReadSchemaVariableRequest {
+  int32 id = 1;
+}
+
+message UpdateSchemaVariableRequest {
+  int32 id = 1;
+  string name = 2;
+  google.protobuf.Value value = 3;
+}
+
+message DeleteSchemaVariableRequest {
+  int32 id = 1;
+}
