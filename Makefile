@@ -8,7 +8,7 @@ all: engine_swagger engine_proto fs storage_swagger storage_proto logger_swagger
 
 engine_swagger:
 	protoc -I/usr/local/include -I./engine -I./  \
-      --swagger_out=version=false,disable_default_errors=true,json_names_for_fields=false,allow_delete_body=true,include_package_in_tags=false,allow_repeated_fields_in_body=false,fqn_for_swagger_name=false,merge_file_name=engine,allow_merge=true:./swagger \
+      --swagger_out=version=false,json_names_for_fields=false,allow_delete_body=true,include_package_in_tags=false,allow_repeated_fields_in_body=false,fqn_for_swagger_name=false,merge_file_name=engine,allow_merge=true:./swagger \
       ./engine/*.proto
 
 .PHONY: engine_proto
