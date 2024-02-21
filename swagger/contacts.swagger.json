@@ -36,6 +36,9 @@
     },
     {
       "name": "IMClients"
+    },
+    {
+      "name": "Timeline"
     }
   ],
   "host": "nx.webitel.org",
@@ -2088,6 +2091,84 @@
         ]
       }
     },
+    "/contacts/{contact_id}/timeline": {
+      "get": {
+        "operationId": "Timeline_GetTimeline",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.GetTimelineResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "date_from",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "date_to",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Timeline"
+        ]
+      }
+    },
+    "/contacts/{contact_id}/timeline/chats/{conversation_id}": {
+      "get": {
+        "operationId": "Timeline_GetDetailedMessageHistory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.chat.ChatMessages"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "conversation_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Timeline"
+        ]
+      }
+    },
     "/contacts/{contact_id}/timezones": {
       "get": {
         "summary": "List of the Contact's timezone(s).",
@@ -3192,6 +3273,196 @@
       "default": "NULL_VALUE",
       "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
     },
+    "webitel.chat.Chat": {
+      "type": "object",
+      "properties": {
+        "dc": {
+          "type": "string",
+          "format": "int64",
+          "description": "[D]omain[C]omponent primary ID."
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for this chat.\n[FROM] Member / Channel ID.\n\n// [TO] Group. Conversation ID.\n string chat_id = 2;"
+        },
+        "via": {
+          "$ref": "#/definitions/webitel.chat.Peer",
+          "description": "[FROM] VIA text gateway profile."
+        },
+        "peer": {
+          "$ref": "#/definitions/webitel.chat.Peer",
+          "description": "[FROM]: User identity. Seed."
+        },
+        "title": {
+          "type": "string",
+          "description": "[TO]: Chat title."
+        },
+        "left": {
+          "type": "string",
+          "format": "int64",
+          "title": "OPTIONAL. A non-zero value indicates that\nthe participant has left the chat. OFFLINE(!)"
+        },
+        "join": {
+          "type": "string",
+          "format": "int64",
+          "description": "OPTIONAL. A non-zero value indicates that\nthe participant has joined the chat."
+        },
+        "invite": {
+          "$ref": "#/definitions/webitel.chat.Chat.Invite",
+          "description": "OPTIONAL. Invite[d] BY member info."
+        },
+        "context": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Context. Variables."
+        }
+      },
+      "description": "The Chat info.\nAlias: participant, subscriber, member, peer, leg."
+    },
+    "webitel.chat.Chat.Invite": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "int64",
+          "title": "Timestamp when the invitation to join the chat was sent"
+        },
+        "from": {
+          "type": "string",
+          "title": "Chat member ID who invited to join the chat"
+        }
+      }
+    },
+    "webitel.chat.ChatMessages": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.Message"
+          },
+          "description": "Dataset page of messages."
+        },
+        "chats": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.Chat"
+          },
+          "title": "List of chats mentioned in messages. [FROM]"
+        },
+        "peers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.Peer"
+          },
+          "title": "List of peers mentioned in messages. [FROM]"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Dataset page number."
+        },
+        "next": {
+          "type": "boolean",
+          "title": "Next page is available ?"
+        }
+      },
+      "title": "ChatMessages dataset"
+    },
+    "webitel.chat.File": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "File location"
+        },
+        "size": {
+          "type": "string",
+          "format": "int64",
+          "title": "Size in bytes"
+        },
+        "type": {
+          "type": "string",
+          "title": "MIME media type"
+        },
+        "name": {
+          "type": "string",
+          "title": "Filename"
+        }
+      },
+      "description": "Media File."
+    },
+    "webitel.chat.Message": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "description": "Unique message identifier inside this chat."
+        },
+        "date": {
+          "type": "string",
+          "format": "int64",
+          "description": "Timestamp when this message was sent (published)."
+        },
+        "from": {
+          "$ref": "#/definitions/webitel.chat.Peer",
+          "description": "Sender of the message."
+        },
+        "chat": {
+          "$ref": "#/definitions/webitel.chat.Chat",
+          "description": "Conversation the message belongs to .."
+        },
+        "sender": {
+          "$ref": "#/definitions/webitel.chat.Chat",
+          "description": "Chat Sender of the message, sent on behalf of a chat (member)."
+        },
+        "edit": {
+          "type": "string",
+          "format": "int64",
+          "description": "Timestamp when this message was last edited."
+        },
+        "text": {
+          "type": "string",
+          "description": "Message Text."
+        },
+        "file": {
+          "$ref": "#/definitions/webitel.chat.File",
+          "description": "Message Media. Attachment."
+        },
+        "context": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Context. Variables. Environment."
+        }
+      },
+      "description": "Chat Message."
+    },
+    "webitel.chat.Peer": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Contact unique **ID**entifier.\nContact **type**-specific string."
+        },
+        "type": {
+          "type": "string",
+          "description": "Contact **type** provider."
+        },
+        "name": {
+          "type": "string",
+          "description": "Contact display **name**."
+        }
+      },
+      "description": "Peer contact."
+    },
     "webitel.contacts.AccessMode": {
       "type": "string",
       "enum": [
@@ -3510,6 +3781,30 @@
       },
       "description": "Contact dataset."
     },
+    "webitel.contacts.DayTimeline": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.contacts.TimelineRecord"
+          }
+        },
+        "chats_count": {
+          "type": "string",
+          "format": "int64"
+        },
+        "calls_count": {
+          "type": "string",
+          "format": "int64"
+        },
+        "day_timestamp": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "webitel.contacts.EmailAddress": {
       "type": "object",
       "properties": {
@@ -3588,6 +3883,18 @@
     },
     "webitel.contacts.EmptyResponse": {
       "type": "object"
+    },
+    "webitel.contacts.GetTimelineResponse": {
+      "type": "object",
+      "properties": {
+        "days": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.contacts.DayTimeline"
+          }
+        }
+      }
     },
     "webitel.contacts.IMClient": {
       "type": "object",
@@ -4541,6 +4848,59 @@
         }
       },
       "description": "Photo dataset."
+    },
+    "webitel.contacts.TimelineEventType": {
+      "type": "string",
+      "enum": [
+        "chat",
+        "call"
+      ],
+      "default": "chat"
+    },
+    "webitel.contacts.TimelineRecord": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "closed_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "duration": {
+          "type": "string",
+          "format": "int64"
+        },
+        "type": {
+          "$ref": "#/definitions/webitel.contacts.TimelineEventType"
+        },
+        "is_inbound": {
+          "type": "boolean"
+        },
+        "is_missed": {
+          "type": "boolean"
+        },
+        "participants": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.contacts.Lookup"
+          }
+        },
+        "gateway": {
+          "$ref": "#/definitions/webitel.contacts.Lookup"
+        },
+        "flow_scheme": {
+          "$ref": "#/definitions/webitel.contacts.Lookup"
+        },
+        "queue": {
+          "$ref": "#/definitions/webitel.contacts.Lookup"
+        }
+      }
     },
     "webitel.contacts.Timezone": {
       "type": "object",
