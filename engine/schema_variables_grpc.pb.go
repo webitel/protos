@@ -26,6 +26,7 @@ type SchemaVariablesServiceClient interface {
 	SearchSchemaVariable(ctx context.Context, in *SearchSchemaVariableRequest, opts ...grpc.CallOption) (*ListSchemaVariable, error)
 	ReadSchemaVariable(ctx context.Context, in *ReadSchemaVariableRequest, opts ...grpc.CallOption) (*SchemaVariable, error)
 	UpdateSchemaVariable(ctx context.Context, in *UpdateSchemaVariableRequest, opts ...grpc.CallOption) (*SchemaVariable, error)
+	PatchSchemaVariable(ctx context.Context, in *PatchSchemaVariableRequest, opts ...grpc.CallOption) (*SchemaVariable, error)
 	DeleteSchemaVariable(ctx context.Context, in *DeleteSchemaVariableRequest, opts ...grpc.CallOption) (*SchemaVariable, error)
 }
 
@@ -73,6 +74,15 @@ func (c *schemaVariablesServiceClient) UpdateSchemaVariable(ctx context.Context,
 	return out, nil
 }
 
+func (c *schemaVariablesServiceClient) PatchSchemaVariable(ctx context.Context, in *PatchSchemaVariableRequest, opts ...grpc.CallOption) (*SchemaVariable, error) {
+	out := new(SchemaVariable)
+	err := c.cc.Invoke(ctx, "/engine.SchemaVariablesService/PatchSchemaVariable", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *schemaVariablesServiceClient) DeleteSchemaVariable(ctx context.Context, in *DeleteSchemaVariableRequest, opts ...grpc.CallOption) (*SchemaVariable, error) {
 	out := new(SchemaVariable)
 	err := c.cc.Invoke(ctx, "/engine.SchemaVariablesService/DeleteSchemaVariable", in, out, opts...)
@@ -90,6 +100,7 @@ type SchemaVariablesServiceServer interface {
 	SearchSchemaVariable(context.Context, *SearchSchemaVariableRequest) (*ListSchemaVariable, error)
 	ReadSchemaVariable(context.Context, *ReadSchemaVariableRequest) (*SchemaVariable, error)
 	UpdateSchemaVariable(context.Context, *UpdateSchemaVariableRequest) (*SchemaVariable, error)
+	PatchSchemaVariable(context.Context, *PatchSchemaVariableRequest) (*SchemaVariable, error)
 	DeleteSchemaVariable(context.Context, *DeleteSchemaVariableRequest) (*SchemaVariable, error)
 	mustEmbedUnimplementedSchemaVariablesServiceServer()
 }
@@ -109,6 +120,9 @@ func (UnimplementedSchemaVariablesServiceServer) ReadSchemaVariable(context.Cont
 }
 func (UnimplementedSchemaVariablesServiceServer) UpdateSchemaVariable(context.Context, *UpdateSchemaVariableRequest) (*SchemaVariable, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateSchemaVariable not implemented")
+}
+func (UnimplementedSchemaVariablesServiceServer) PatchSchemaVariable(context.Context, *PatchSchemaVariableRequest) (*SchemaVariable, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PatchSchemaVariable not implemented")
 }
 func (UnimplementedSchemaVariablesServiceServer) DeleteSchemaVariable(context.Context, *DeleteSchemaVariableRequest) (*SchemaVariable, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteSchemaVariable not implemented")
@@ -199,6 +213,24 @@ func _SchemaVariablesService_UpdateSchemaVariable_Handler(srv interface{}, ctx c
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SchemaVariablesService_PatchSchemaVariable_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PatchSchemaVariableRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SchemaVariablesServiceServer).PatchSchemaVariable(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/engine.SchemaVariablesService/PatchSchemaVariable",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SchemaVariablesServiceServer).PatchSchemaVariable(ctx, req.(*PatchSchemaVariableRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _SchemaVariablesService_DeleteSchemaVariable_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteSchemaVariableRequest)
 	if err := dec(in); err != nil {
@@ -239,6 +271,10 @@ var SchemaVariablesService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateSchemaVariable",
 			Handler:    _SchemaVariablesService_UpdateSchemaVariable_Handler,
+		},
+		{
+			MethodName: "PatchSchemaVariable",
+			Handler:    _SchemaVariablesService_PatchSchemaVariable_Handler,
 		},
 		{
 			MethodName: "DeleteSchemaVariable",

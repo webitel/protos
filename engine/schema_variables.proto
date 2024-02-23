@@ -35,11 +35,27 @@ service SchemaVariablesService {
     };
   }
 
+  rpc PatchSchemaVariable(PatchSchemaVariableRequest) returns (SchemaVariable) {
+    option (google.api.http) = {
+      patch: "/routing/schema/variables/{id}"
+      body: "*"
+    };
+  }
+
   rpc DeleteSchemaVariable(DeleteSchemaVariableRequest) returns (SchemaVariable) {
     option (google.api.http) = {
       delete: "/routing/schema/variables/{id}"
     };
   }
+}
+
+message PatchSchemaVariableRequest {
+  int32 id = 1;
+  repeated string fields = 2;
+
+  string name = 3;
+  google.protobuf.Value value = 4;
+  bool encrypt = 5;
 }
 
 message SchemaVariable {
@@ -77,6 +93,7 @@ message UpdateSchemaVariableRequest {
   int32 id = 1;
   string name = 2;
   google.protobuf.Value value = 3;
+  bool encrypt = 4;
 }
 
 message DeleteSchemaVariableRequest {
