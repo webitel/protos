@@ -29,6 +29,7 @@ type EmailProfileServiceClient interface {
 	// EmailProfile check login
 	TestEmailProfile(ctx context.Context, in *TestEmailProfileRequest, opts ...grpc.CallOption) (*TestEmailProfileResponse, error)
 	LoginEmailProfile(ctx context.Context, in *LoginEmailProfileRequest, opts ...grpc.CallOption) (*LoginEmailProfileResponse, error)
+	LogoutEmailProfile(ctx context.Context, in *LogoutEmailProfileRequest, opts ...grpc.CallOption) (*LogoutEmailProfileResponse, error)
 	// EmailProfile item
 	ReadEmailProfile(ctx context.Context, in *ReadEmailProfileRequest, opts ...grpc.CallOption) (*EmailProfile, error)
 	PatchEmailProfile(ctx context.Context, in *PatchEmailProfileRequest, opts ...grpc.CallOption) (*EmailProfile, error)
@@ -82,6 +83,15 @@ func (c *emailProfileServiceClient) LoginEmailProfile(ctx context.Context, in *L
 	return out, nil
 }
 
+func (c *emailProfileServiceClient) LogoutEmailProfile(ctx context.Context, in *LogoutEmailProfileRequest, opts ...grpc.CallOption) (*LogoutEmailProfileResponse, error) {
+	out := new(LogoutEmailProfileResponse)
+	err := c.cc.Invoke(ctx, "/engine.EmailProfileService/LogoutEmailProfile", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *emailProfileServiceClient) ReadEmailProfile(ctx context.Context, in *ReadEmailProfileRequest, opts ...grpc.CallOption) (*EmailProfile, error) {
 	out := new(EmailProfile)
 	err := c.cc.Invoke(ctx, "/engine.EmailProfileService/ReadEmailProfile", in, out, opts...)
@@ -129,6 +139,7 @@ type EmailProfileServiceServer interface {
 	// EmailProfile check login
 	TestEmailProfile(context.Context, *TestEmailProfileRequest) (*TestEmailProfileResponse, error)
 	LoginEmailProfile(context.Context, *LoginEmailProfileRequest) (*LoginEmailProfileResponse, error)
+	LogoutEmailProfile(context.Context, *LogoutEmailProfileRequest) (*LogoutEmailProfileResponse, error)
 	// EmailProfile item
 	ReadEmailProfile(context.Context, *ReadEmailProfileRequest) (*EmailProfile, error)
 	PatchEmailProfile(context.Context, *PatchEmailProfileRequest) (*EmailProfile, error)
@@ -154,6 +165,9 @@ func (UnimplementedEmailProfileServiceServer) TestEmailProfile(context.Context, 
 }
 func (UnimplementedEmailProfileServiceServer) LoginEmailProfile(context.Context, *LoginEmailProfileRequest) (*LoginEmailProfileResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LoginEmailProfile not implemented")
+}
+func (UnimplementedEmailProfileServiceServer) LogoutEmailProfile(context.Context, *LogoutEmailProfileRequest) (*LogoutEmailProfileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LogoutEmailProfile not implemented")
 }
 func (UnimplementedEmailProfileServiceServer) ReadEmailProfile(context.Context, *ReadEmailProfileRequest) (*EmailProfile, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReadEmailProfile not implemented")
@@ -252,6 +266,24 @@ func _EmailProfileService_LoginEmailProfile_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _EmailProfileService_LogoutEmailProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LogoutEmailProfileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EmailProfileServiceServer).LogoutEmailProfile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/engine.EmailProfileService/LogoutEmailProfile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EmailProfileServiceServer).LogoutEmailProfile(ctx, req.(*LogoutEmailProfileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _EmailProfileService_ReadEmailProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ReadEmailProfileRequest)
 	if err := dec(in); err != nil {
@@ -346,6 +378,10 @@ var EmailProfileService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "LoginEmailProfile",
 			Handler:    _EmailProfileService_LoginEmailProfile_Handler,
+		},
+		{
+			MethodName: "LogoutEmailProfile",
+			Handler:    _EmailProfileService_LogoutEmailProfile_Handler,
 		},
 		{
 			MethodName: "ReadEmailProfile",
