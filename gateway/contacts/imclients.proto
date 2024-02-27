@@ -2,7 +2,7 @@ syntax = "proto3";
 package webitel.contacts;
 option go_package = "webitel.go/api/contacts;contacts";
 
-import "gateway/contacts/fields.proto";
+import "contacts/fields.proto";
 
 import "google/api/visibility.proto";
 import "google/api/annotations.proto";
@@ -15,12 +15,12 @@ message IMClient {
   //   // GET /contacts/{source.id}/imclients/{user.id}
   //   example: ""
   // };
-
+  
   // [META]: --------------------------------------
 
   // The unique ID of the association. Never changes.
   string id = 1;
-
+  
   // Version of the latest update. Numeric sequence.
   int32 ver = 2;
 
@@ -36,14 +36,14 @@ message IMClient {
 
   // Timestamp(milli) of the Field creation.
   webitel.contacts.Lookup created_by = 6;
-
+  
   // Timestamp(milli) of the last Field update.
   // Take part in Etag generation.
   int64 updated_at = 7;
-
+  
   // The user who performed last Update.
   webitel.contacts.Lookup updated_by = 8;
-
+  
   // [VALUE]: --------------------------------------
 
   // External user which contacted to us.
@@ -62,11 +62,11 @@ message IMClient {
   // Protocol used to connect the IM client.
   string protocol = 13;
 
-
+  
   // Can be set by self VIA IM-Account gateway only !
   // If set -- all client sensitive data is READONLY, except .type !
   // If set -- can be manualy deleted, by the user or VIA source ONLY !
-
+  
   // [Via] App(-specific) peer(-id) to connect[from] the IM client.
   string via = 14;
 
@@ -83,11 +83,11 @@ message InputIMClient {
   string gateway_id = 12;
 
 
-
+  
   // Can be set by self VIA IM-Account gateway only !
   // If set -- all client sensitive data is READONLY, except .type !
   // If set -- can be manualy deleted, by the user or VIA source ONLY !
-
+  
   // [Via] App(-specific) peer(-id) to connect[from] the IM client.
   string via = 13;
 }
@@ -104,6 +104,20 @@ service IMClients {
   }
   // Link IM client(s) with the Contact (WARNING! Only for internal use, no authentication!)
   rpc CreateIMClients(CreateIMClientsRequest) returns (EmptyResponse)  {}
+
+
+//  rpc ResetIMClient(ResetIMClientRequest) returns (IMClient) {
+//    option (google.api.http) = {
+//      put: "/contacts/{contact_id}/imclients/{id}"
+//    };
+//  }
+
+
+  rpc DeleteIMClient(DeleteIMClientRequest) returns (EmptyResponse) {
+    option (google.api.http) = {
+      delete: "/contacts/{contact_id}/imclients/{id}"
+    };
+  }
 
 }
 
@@ -123,12 +137,12 @@ message IMClientList {
 message EmptyResponse {}
 
 message ListIMClientsRequest {
-
+  
   // ------- Result Options ------ //
-
+  
   // Page number of result dataset records. offset = (page*size)
   int32 page = 2;
-
+  
   // Size count of records on result page. limit = (size++)
   int32 size = 1;
 
@@ -140,19 +154,30 @@ message ListIMClientsRequest {
 
   // Sort the result according to fields.
   repeated string sort = 3;
-
+  
   // Fields to be retrieved into result.
   repeated string fields = 4;
 
   // ------- Search Options ------ //
-
+  
   // Link contact ID.
   string contact_id = 5;
-
+  
   // Link(s) with unique ID only.
   repeated string id = 7;
 
 }
+
+message DeleteIMClientRequest {
+  int64 id = 1;
+  string contact_id = 2;
+}
+
+//message ResetIMClientRequest {
+//  InputIMClient input = 1;
+//  string contact_id = 2;
+//  int64 id = 3;
+//}
 
 message CreateIMClientsRequest {
 
