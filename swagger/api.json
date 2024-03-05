@@ -14158,10 +14158,11 @@
         "tags": [
           "ConfigService"
         ],
-        "operationId": "ConfigService_ReadSystemObjects",
+        "operationId": "ReadSystemObjects",
         "parameters": [
           {
             "type": "boolean",
+            "format": "boolean",
             "name": "include_existing",
             "in": "query"
           }
@@ -14172,12 +14173,6 @@
             "schema": {
               "$ref": "#/definitions/loggerSystemObjects"
             }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
           }
         }
       }
@@ -14187,7 +14182,7 @@
         "tags": [
           "ConfigService"
         ],
-        "operationId": "ConfigService_SearchConfig",
+        "operationId": "SearchConfig",
         "parameters": [
           {
             "type": "integer",
@@ -14216,7 +14211,6 @@
             "items": {
               "type": "string"
             },
-            "collectionFormat": "multi",
             "name": "fields",
             "in": "query"
           },
@@ -14225,11 +14219,19 @@
             "items": {
               "enum": [
                 "cc_queue",
-                "schema"
+                "schema",
+                "users",
+                "devices",
+                "calendars",
+                "cc_list",
+                "cc_team",
+                "cc_agent",
+                "cc_resource",
+                "cc_resource_group",
+                "chat_bots"
               ],
               "type": "string"
             },
-            "collectionFormat": "multi",
             "description": "NOT USED.",
             "name": "object",
             "in": "query"
@@ -14241,12 +14243,6 @@
             "schema": {
               "$ref": "#/definitions/loggerConfigs"
             }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
           }
         }
       },
@@ -14254,7 +14250,7 @@
         "tags": [
           "ConfigService"
         ],
-        "operationId": "ConfigService_CreateConfig",
+        "operationId": "CreateConfig",
         "parameters": [
           {
             "name": "body",
@@ -14271,12 +14267,6 @@
             "schema": {
               "$ref": "#/definitions/loggerConfig"
             }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
           }
         }
       },
@@ -14284,7 +14274,7 @@
         "tags": [
           "ConfigService"
         ],
-        "operationId": "ConfigService_DeleteConfigBulk",
+        "operationId": "DeleteConfigBulk",
         "parameters": [
           {
             "name": "body",
@@ -14301,12 +14291,6 @@
             "schema": {
               "$ref": "#/definitions/loggerEmpty"
             }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
           }
         }
       }
@@ -14316,7 +14300,7 @@
         "tags": [
           "ConfigService"
         ],
-        "operationId": "ConfigService_ReadConfig",
+        "operationId": "ReadConfig",
         "parameters": [
           {
             "type": "integer",
@@ -14332,12 +14316,6 @@
             "schema": {
               "$ref": "#/definitions/loggerConfig"
             }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
           }
         }
       },
@@ -14345,7 +14323,7 @@
         "tags": [
           "ConfigService"
         ],
-        "operationId": "ConfigService_UpdateConfig",
+        "operationId": "UpdateConfig",
         "parameters": [
           {
             "type": "integer",
@@ -14369,12 +14347,6 @@
             "schema": {
               "$ref": "#/definitions/loggerConfig"
             }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
           }
         }
       },
@@ -14382,7 +14354,7 @@
         "tags": [
           "ConfigService"
         ],
-        "operationId": "ConfigService_DeleteConfig",
+        "operationId": "DeleteConfig",
         "parameters": [
           {
             "type": "integer",
@@ -14398,12 +14370,6 @@
             "schema": {
               "$ref": "#/definitions/loggerEmpty"
             }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
           }
         }
       },
@@ -14411,7 +14377,7 @@
         "tags": [
           "ConfigService"
         ],
-        "operationId": "ConfigService_PatchConfig",
+        "operationId": "PatchConfig",
         "parameters": [
           {
             "type": "integer",
@@ -14435,12 +14401,6 @@
             "schema": {
               "$ref": "#/definitions/loggerConfig"
             }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
           }
         }
       }
@@ -14450,7 +14410,7 @@
         "tags": [
           "LoggerService"
         ],
-        "operationId": "LoggerService_SearchLogByConfigId",
+        "operationId": "SearchLogByConfigId",
         "parameters": [
           {
             "type": "integer",
@@ -14486,7 +14446,6 @@
             "items": {
               "type": "string"
             },
-            "collectionFormat": "multi",
             "name": "fields",
             "in": "query"
           },
@@ -14496,7 +14455,6 @@
               "type": "string",
               "format": "int64"
             },
-            "collectionFormat": "multi",
             "name": "user_id",
             "in": "query"
           },
@@ -14512,7 +14470,6 @@
               ],
               "type": "string"
             },
-            "collectionFormat": "multi",
             "name": "action",
             "in": "query"
           },
@@ -14540,11 +14497,61 @@
             "schema": {
               "$ref": "#/definitions/loggerLogs"
             }
+          }
+        }
+      }
+    },
+    "/logger/schema/record/{schema_id}/versions": {
+      "get": {
+        "tags": [
+          "SchemaVersionsService"
+        ],
+        "operationId": "Search",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "REQUIRED filter",
+            "name": "schema_id",
+            "in": "path",
+            "required": true
           },
-          "default": {
-            "description": "An unexpected error response.",
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/runtimeError"
+              "$ref": "#/definitions/loggerSchemaVersions"
             }
           }
         }
@@ -14555,7 +14562,7 @@
         "tags": [
           "LoggerService"
         ],
-        "operationId": "LoggerService_SearchLogByUserId",
+        "operationId": "SearchLogByUserId",
         "parameters": [
           {
             "type": "integer",
@@ -14592,7 +14599,6 @@
             "items": {
               "type": "string"
             },
-            "collectionFormat": "multi",
             "name": "fields",
             "in": "query"
           },
@@ -14602,7 +14608,6 @@
               "type": "string",
               "format": "int64"
             },
-            "collectionFormat": "multi",
             "description": "SPECIFIC filter.",
             "name": "object_id",
             "in": "query"
@@ -14619,7 +14624,6 @@
               ],
               "type": "string"
             },
-            "collectionFormat": "multi",
             "description": "GENERAL filters.",
             "name": "action",
             "in": "query"
@@ -14648,12 +14652,6 @@
             "schema": {
               "$ref": "#/definitions/loggerLogs"
             }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
           }
         }
       }
@@ -14663,12 +14661,21 @@
         "tags": [
           "LoggerService"
         ],
-        "operationId": "LoggerService_SearchLogByRecordId",
+        "operationId": "SearchLogByRecordId",
         "parameters": [
           {
             "enum": [
               "cc_queue",
-              "schema"
+              "schema",
+              "users",
+              "devices",
+              "calendars",
+              "cc_list",
+              "cc_team",
+              "cc_agent",
+              "cc_resource",
+              "cc_resource_group",
+              "chat_bots"
             ],
             "type": "string",
             "description": "SPECIFIC filter",
@@ -14711,7 +14718,6 @@
             "items": {
               "type": "string"
             },
-            "collectionFormat": "multi",
             "name": "fields",
             "in": "query"
           },
@@ -14727,7 +14733,6 @@
               ],
               "type": "string"
             },
-            "collectionFormat": "multi",
             "description": "GENERAL filters.",
             "name": "action",
             "in": "query"
@@ -14738,7 +14743,6 @@
               "type": "string",
               "format": "int64"
             },
-            "collectionFormat": "multi",
             "name": "user_id",
             "in": "query"
           },
@@ -14765,12 +14769,6 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerLogs"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
             }
           }
         }
@@ -27111,7 +27109,16 @@
       "default": "cc_queue",
       "enum": [
         "cc_queue",
-        "schema"
+        "schema",
+        "users",
+        "devices",
+        "calendars",
+        "cc_list",
+        "cc_team",
+        "cc_agent",
+        "cc_resource",
+        "cc_resource_group",
+        "chat_bots"
       ]
     },
     "loggerConfig": {
@@ -27125,7 +27132,8 @@
           "type": "string"
         },
         "enabled": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "id": {
           "type": "integer",
@@ -27147,7 +27155,8 @@
       "type": "object",
       "properties": {
         "is_enabled": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -27161,7 +27170,8 @@
           }
         },
         "next": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "page": {
           "type": "integer",
@@ -27180,7 +27190,8 @@
           "type": "string"
         },
         "enabled": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "object": {
           "$ref": "#/definitions/loggerLookup"
@@ -27254,7 +27265,8 @@
           }
         },
         "next": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "page": {
           "type": "integer",
@@ -27289,7 +27301,8 @@
           "type": "string"
         },
         "enabled": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "fields": {
           "type": "array",
@@ -27303,6 +27316,55 @@
         },
         "storage": {
           "$ref": "#/definitions/loggerLookup"
+        }
+      }
+    },
+    "loggerSchemaVersion": {
+      "type": "object",
+      "properties": {
+        "created_by": {
+          "$ref": "#/definitions/loggerLookup"
+        },
+        "created_on": {
+          "type": "string",
+          "format": "int64"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "note": {
+          "type": "string"
+        },
+        "schema_id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "state": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "loggerSchemaVersions": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/loggerSchemaVersion"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -27332,7 +27394,8 @@
           "type": "string"
         },
         "enabled": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "period": {
           "type": "integer",
@@ -27362,27 +27425,6 @@
       "enum": [
         "NULL_VALUE"
       ]
-    },
-    "runtimeError": {
-      "type": "object",
-      "properties": {
-        "code": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "details": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/protobufAny"
-          }
-        },
-        "error": {
-          "type": "string"
-        },
-        "message": {
-          "type": "string"
-        }
-      }
     },
     "runtimeStreamError": {
       "type": "object",
