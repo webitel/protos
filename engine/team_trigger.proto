@@ -15,6 +15,14 @@ service TeamTriggerService {
       body: "*"
     };
   }
+
+  rpc RunTeamTrigger (RunTeamTriggerRequest) returns (RunTeamTriggerResponse) {
+    option (google.api.http) = {
+      post: "/call_center/teams/triggers/{trigger_id}"
+      body: "*"
+    };
+  }
+
   rpc SearchTeamTrigger (SearchTeamTriggerRequest) returns (ListTeamTrigger) {
     option (google.api.http) = {
       get: "/call_center/teams/{team_id}/triggers"
@@ -44,6 +52,15 @@ service TeamTriggerService {
   }
 }
 
+
+message RunTeamTriggerRequest {
+  string trigger_id = 1;
+  map<string,string> variables = 2;
+}
+
+message RunTeamTriggerResponse {
+  string job_id = 1;
+}
 
 message DeleteTeamTriggerRequest {
   int64 team_id = 1;
