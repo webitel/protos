@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TeamTriggerServiceClient interface {
 	CreateTeamTrigger(ctx context.Context, in *CreateTeamTriggerRequest, opts ...grpc.CallOption) (*TeamTrigger, error)
+	RunTeamTrigger(ctx context.Context, in *RunTeamTriggerRequest, opts ...grpc.CallOption) (*RunTeamTriggerResponse, error)
 	SearchTeamTrigger(ctx context.Context, in *SearchTeamTriggerRequest, opts ...grpc.CallOption) (*ListTeamTrigger, error)
 	ReadTeamTrigger(ctx context.Context, in *ReadTeamTriggerRequest, opts ...grpc.CallOption) (*TeamTrigger, error)
 	UpdateTeamTrigger(ctx context.Context, in *UpdateTeamTriggerRequest, opts ...grpc.CallOption) (*TeamTrigger, error)
@@ -41,6 +42,15 @@ func NewTeamTriggerServiceClient(cc grpc.ClientConnInterface) TeamTriggerService
 func (c *teamTriggerServiceClient) CreateTeamTrigger(ctx context.Context, in *CreateTeamTriggerRequest, opts ...grpc.CallOption) (*TeamTrigger, error) {
 	out := new(TeamTrigger)
 	err := c.cc.Invoke(ctx, "/engine.TeamTriggerService/CreateTeamTrigger", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *teamTriggerServiceClient) RunTeamTrigger(ctx context.Context, in *RunTeamTriggerRequest, opts ...grpc.CallOption) (*RunTeamTriggerResponse, error) {
+	out := new(RunTeamTriggerResponse)
+	err := c.cc.Invoke(ctx, "/engine.TeamTriggerService/RunTeamTrigger", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -97,6 +107,7 @@ func (c *teamTriggerServiceClient) DeleteTeamTrigger(ctx context.Context, in *De
 // for forward compatibility
 type TeamTriggerServiceServer interface {
 	CreateTeamTrigger(context.Context, *CreateTeamTriggerRequest) (*TeamTrigger, error)
+	RunTeamTrigger(context.Context, *RunTeamTriggerRequest) (*RunTeamTriggerResponse, error)
 	SearchTeamTrigger(context.Context, *SearchTeamTriggerRequest) (*ListTeamTrigger, error)
 	ReadTeamTrigger(context.Context, *ReadTeamTriggerRequest) (*TeamTrigger, error)
 	UpdateTeamTrigger(context.Context, *UpdateTeamTriggerRequest) (*TeamTrigger, error)
@@ -111,6 +122,9 @@ type UnimplementedTeamTriggerServiceServer struct {
 
 func (UnimplementedTeamTriggerServiceServer) CreateTeamTrigger(context.Context, *CreateTeamTriggerRequest) (*TeamTrigger, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateTeamTrigger not implemented")
+}
+func (UnimplementedTeamTriggerServiceServer) RunTeamTrigger(context.Context, *RunTeamTriggerRequest) (*RunTeamTriggerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RunTeamTrigger not implemented")
 }
 func (UnimplementedTeamTriggerServiceServer) SearchTeamTrigger(context.Context, *SearchTeamTriggerRequest) (*ListTeamTrigger, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SearchTeamTrigger not implemented")
@@ -154,6 +168,24 @@ func _TeamTriggerService_CreateTeamTrigger_Handler(srv interface{}, ctx context.
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TeamTriggerServiceServer).CreateTeamTrigger(ctx, req.(*CreateTeamTriggerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TeamTriggerService_RunTeamTrigger_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RunTeamTriggerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TeamTriggerServiceServer).RunTeamTrigger(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/engine.TeamTriggerService/RunTeamTrigger",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TeamTriggerServiceServer).RunTeamTrigger(ctx, req.(*RunTeamTriggerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -258,6 +290,10 @@ var TeamTriggerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateTeamTrigger",
 			Handler:    _TeamTriggerService_CreateTeamTrigger_Handler,
+		},
+		{
+			MethodName: "RunTeamTrigger",
+			Handler:    _TeamTriggerService_RunTeamTrigger_Handler,
 		},
 		{
 			MethodName: "SearchTeamTrigger",
