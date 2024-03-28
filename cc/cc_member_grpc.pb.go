@@ -27,6 +27,7 @@ type MemberServiceClient interface {
 	CallJoinToQueue(ctx context.Context, in *CallJoinToQueueRequest, opts ...grpc.CallOption) (MemberService_CallJoinToQueueClient, error)
 	ChatJoinToQueue(ctx context.Context, in *ChatJoinToQueueRequest, opts ...grpc.CallOption) (MemberService_ChatJoinToQueueClient, error)
 	CallJoinToAgent(ctx context.Context, in *CallJoinToAgentRequest, opts ...grpc.CallOption) (MemberService_CallJoinToAgentClient, error)
+	TaskJoinToAgent(ctx context.Context, in *TaskJoinToAgentRequest, opts ...grpc.CallOption) (MemberService_TaskJoinToAgentClient, error)
 	CancelAttempt(ctx context.Context, in *CancelAttemptRequest, opts ...grpc.CallOption) (*CancelAttemptResponse, error)
 	CancelAgentDistribute(ctx context.Context, in *CancelAgentDistributeRequest, opts ...grpc.CallOption) (*CancelAgentDistributeResponse, error)
 	EmailJoinToQueue(ctx context.Context, in *EmailJoinToQueueRequest, opts ...grpc.CallOption) (*EmailJoinToQueueResponse, error)
@@ -157,6 +158,38 @@ func (x *memberServiceCallJoinToAgentClient) Recv() (*QueueEvent, error) {
 	return m, nil
 }
 
+func (c *memberServiceClient) TaskJoinToAgent(ctx context.Context, in *TaskJoinToAgentRequest, opts ...grpc.CallOption) (MemberService_TaskJoinToAgentClient, error) {
+	stream, err := c.cc.NewStream(ctx, &MemberService_ServiceDesc.Streams[3], "/cc.MemberService/TaskJoinToAgent", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &memberServiceTaskJoinToAgentClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type MemberService_TaskJoinToAgentClient interface {
+	Recv() (*QueueEvent, error)
+	grpc.ClientStream
+}
+
+type memberServiceTaskJoinToAgentClient struct {
+	grpc.ClientStream
+}
+
+func (x *memberServiceTaskJoinToAgentClient) Recv() (*QueueEvent, error) {
+	m := new(QueueEvent)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 func (c *memberServiceClient) CancelAttempt(ctx context.Context, in *CancelAttemptRequest, opts ...grpc.CallOption) (*CancelAttemptResponse, error) {
 	out := new(CancelAttemptResponse)
 	err := c.cc.Invoke(ctx, "/cc.MemberService/CancelAttempt", in, out, opts...)
@@ -220,6 +253,7 @@ type MemberServiceServer interface {
 	CallJoinToQueue(*CallJoinToQueueRequest, MemberService_CallJoinToQueueServer) error
 	ChatJoinToQueue(*ChatJoinToQueueRequest, MemberService_ChatJoinToQueueServer) error
 	CallJoinToAgent(*CallJoinToAgentRequest, MemberService_CallJoinToAgentServer) error
+	TaskJoinToAgent(*TaskJoinToAgentRequest, MemberService_TaskJoinToAgentServer) error
 	CancelAttempt(context.Context, *CancelAttemptRequest) (*CancelAttemptResponse, error)
 	CancelAgentDistribute(context.Context, *CancelAgentDistributeRequest) (*CancelAgentDistributeResponse, error)
 	EmailJoinToQueue(context.Context, *EmailJoinToQueueRequest) (*EmailJoinToQueueResponse, error)
@@ -247,6 +281,9 @@ func (UnimplementedMemberServiceServer) ChatJoinToQueue(*ChatJoinToQueueRequest,
 }
 func (UnimplementedMemberServiceServer) CallJoinToAgent(*CallJoinToAgentRequest, MemberService_CallJoinToAgentServer) error {
 	return status.Errorf(codes.Unimplemented, "method CallJoinToAgent not implemented")
+}
+func (UnimplementedMemberServiceServer) TaskJoinToAgent(*TaskJoinToAgentRequest, MemberService_TaskJoinToAgentServer) error {
+	return status.Errorf(codes.Unimplemented, "method TaskJoinToAgent not implemented")
 }
 func (UnimplementedMemberServiceServer) CancelAttempt(context.Context, *CancelAttemptRequest) (*CancelAttemptResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CancelAttempt not implemented")
@@ -375,6 +412,27 @@ type memberServiceCallJoinToAgentServer struct {
 }
 
 func (x *memberServiceCallJoinToAgentServer) Send(m *QueueEvent) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _MemberService_TaskJoinToAgent_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(TaskJoinToAgentRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(MemberServiceServer).TaskJoinToAgent(m, &memberServiceTaskJoinToAgentServer{stream})
+}
+
+type MemberService_TaskJoinToAgentServer interface {
+	Send(*QueueEvent) error
+	grpc.ServerStream
+}
+
+type memberServiceTaskJoinToAgentServer struct {
+	grpc.ServerStream
+}
+
+func (x *memberServiceTaskJoinToAgentServer) Send(m *QueueEvent) error {
 	return x.ServerStream.SendMsg(m)
 }
 
@@ -540,6 +598,11 @@ var MemberService_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "CallJoinToAgent",
 			Handler:       _MemberService_CallJoinToAgent_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "TaskJoinToAgent",
+			Handler:       _MemberService_TaskJoinToAgent_Handler,
 			ServerStreams: true,
 		},
 	},

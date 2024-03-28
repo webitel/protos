@@ -23,6 +23,8 @@ service MemberService {
     rpc CallJoinToQueue(CallJoinToQueueRequest) returns (stream QueueEvent) {}
     rpc ChatJoinToQueue(ChatJoinToQueueRequest) returns (stream QueueEvent) {}
     rpc CallJoinToAgent(CallJoinToAgentRequest) returns (stream QueueEvent) {}
+    rpc TaskJoinToAgent(TaskJoinToAgentRequest) returns (stream QueueEvent) {}
+
     rpc CancelAttempt(CancelAttemptRequest) returns (CancelAttemptResponse) {}
     rpc CancelAgentDistribute(CancelAgentDistributeRequest) returns (CancelAgentDistributeResponse) {}
 
@@ -74,6 +76,23 @@ message CancelAgentDistributeRequest {
 
 message CancelAgentDistributeResponse {
 
+}
+
+message TaskJoinToAgentRequest {
+    message Processing {
+        bool enabled = 1;
+        uint32 renewal_sec = 2;
+        uint32 sec = 3;
+    }
+
+    int32 agent_id = 1;
+    int32 timeout = 2;
+    map<string,string> variables = 3;
+    Processing processing = 4;
+    string queue_name = 5;
+    bool cancel_distribute = 6;
+
+    int64 domain_id = 100;
 }
 
 message CallJoinToAgentRequest {
