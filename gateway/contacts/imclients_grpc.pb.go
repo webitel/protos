@@ -21,6 +21,8 @@ const _ = grpc.SupportPackageIsVersion7
 const (
 	IMClients_ListIMClients_FullMethodName   = "/webitel.contacts.IMClients/ListIMClients"
 	IMClients_CreateIMClients_FullMethodName = "/webitel.contacts.IMClients/CreateIMClients"
+	IMClients_UpsertIMClients_FullMethodName = "/webitel.contacts.IMClients/UpsertIMClients"
+	IMClients_DeleteIMClient_FullMethodName  = "/webitel.contacts.IMClients/DeleteIMClient"
 )
 
 // IMClientsClient is the client API for IMClients service.
@@ -29,8 +31,11 @@ const (
 type IMClientsClient interface {
 	// Search IM client links
 	ListIMClients(ctx context.Context, in *ListIMClientsRequest, opts ...grpc.CallOption) (*IMClientList, error)
-	// Link IM client(s) with the Contact (WARNING! Only for internal use, no authentication!)
+	// Link IM client(s) with the Contact. (WARNING! Only for internal use, no authorization!)
 	CreateIMClients(ctx context.Context, in *CreateIMClientsRequest, opts ...grpc.CallOption) (*EmptyResponse, error)
+	// Link IM client(s) with the Contact. If conflict appears API reassigns client to the new contact. (WARNING! Only for internal use, no authorization!)
+	UpsertIMClients(ctx context.Context, in *UpsertIMClientsRequest, opts ...grpc.CallOption) (*EmptyResponse, error)
+	DeleteIMClient(ctx context.Context, in *DeleteIMClientRequest, opts ...grpc.CallOption) (*EmptyResponse, error)
 }
 
 type iMClientsClient struct {
@@ -59,14 +64,35 @@ func (c *iMClientsClient) CreateIMClients(ctx context.Context, in *CreateIMClien
 	return out, nil
 }
 
+func (c *iMClientsClient) UpsertIMClients(ctx context.Context, in *UpsertIMClientsRequest, opts ...grpc.CallOption) (*EmptyResponse, error) {
+	out := new(EmptyResponse)
+	err := c.cc.Invoke(ctx, IMClients_UpsertIMClients_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iMClientsClient) DeleteIMClient(ctx context.Context, in *DeleteIMClientRequest, opts ...grpc.CallOption) (*EmptyResponse, error) {
+	out := new(EmptyResponse)
+	err := c.cc.Invoke(ctx, IMClients_DeleteIMClient_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // IMClientsServer is the server API for IMClients service.
 // All implementations must embed UnimplementedIMClientsServer
 // for forward compatibility
 type IMClientsServer interface {
 	// Search IM client links
 	ListIMClients(context.Context, *ListIMClientsRequest) (*IMClientList, error)
-	// Link IM client(s) with the Contact (WARNING! Only for internal use, no authentication!)
+	// Link IM client(s) with the Contact. (WARNING! Only for internal use, no authorization!)
 	CreateIMClients(context.Context, *CreateIMClientsRequest) (*EmptyResponse, error)
+	// Link IM client(s) with the Contact. If conflict appears API reassigns client to the new contact. (WARNING! Only for internal use, no authorization!)
+	UpsertIMClients(context.Context, *UpsertIMClientsRequest) (*EmptyResponse, error)
+	DeleteIMClient(context.Context, *DeleteIMClientRequest) (*EmptyResponse, error)
 	mustEmbedUnimplementedIMClientsServer()
 }
 
@@ -79,6 +105,12 @@ func (UnimplementedIMClientsServer) ListIMClients(context.Context, *ListIMClient
 }
 func (UnimplementedIMClientsServer) CreateIMClients(context.Context, *CreateIMClientsRequest) (*EmptyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateIMClients not implemented")
+}
+func (UnimplementedIMClientsServer) UpsertIMClients(context.Context, *UpsertIMClientsRequest) (*EmptyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpsertIMClients not implemented")
+}
+func (UnimplementedIMClientsServer) DeleteIMClient(context.Context, *DeleteIMClientRequest) (*EmptyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteIMClient not implemented")
 }
 func (UnimplementedIMClientsServer) mustEmbedUnimplementedIMClientsServer() {}
 
@@ -129,6 +161,42 @@ func _IMClients_CreateIMClients_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _IMClients_UpsertIMClients_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpsertIMClientsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IMClientsServer).UpsertIMClients(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IMClients_UpsertIMClients_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IMClientsServer).UpsertIMClients(ctx, req.(*UpsertIMClientsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IMClients_DeleteIMClient_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteIMClientRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IMClientsServer).DeleteIMClient(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IMClients_DeleteIMClient_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IMClientsServer).DeleteIMClient(ctx, req.(*DeleteIMClientRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // IMClients_ServiceDesc is the grpc.ServiceDesc for IMClients service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -143,6 +211,14 @@ var IMClients_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateIMClients",
 			Handler:    _IMClients_CreateIMClients_Handler,
+		},
+		{
+			MethodName: "UpsertIMClients",
+			Handler:    _IMClients_UpsertIMClients_Handler,
+		},
+		{
+			MethodName: "DeleteIMClient",
+			Handler:    _IMClients_DeleteIMClient_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

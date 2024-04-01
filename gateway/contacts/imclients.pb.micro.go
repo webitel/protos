@@ -46,6 +46,13 @@ func NewIMClientsEndpoints() []*api.Endpoint {
 			Method:  []string{"GET"},
 			Handler: "rpc",
 		},
+		&api.Endpoint{
+			Name:    "IMClients.DeleteIMClient",
+			Path:    []string{"/contacts/{contact_id}/imclients/{id}"},
+			Method:  []string{"DELETE"},
+			Body:    "",
+			Handler: "rpc",
+		},
 	}
 }
 
@@ -54,8 +61,11 @@ func NewIMClientsEndpoints() []*api.Endpoint {
 type IMClientsService interface {
 	// Search IM client links
 	ListIMClients(ctx context.Context, in *ListIMClientsRequest, opts ...client.CallOption) (*IMClientList, error)
-	// Link IM client(s) with the Contact (WARNING! Only for internal use, no authentication!)
+	// Link IM client(s) with the Contact. (WARNING! Only for internal use, no authorization!)
 	CreateIMClients(ctx context.Context, in *CreateIMClientsRequest, opts ...client.CallOption) (*EmptyResponse, error)
+	// Link IM client(s) with the Contact. If conflict appears API reassigns client to the new contact. (WARNING! Only for internal use, no authorization!)
+	UpsertIMClients(ctx context.Context, in *UpsertIMClientsRequest, opts ...client.CallOption) (*EmptyResponse, error)
+	DeleteIMClient(ctx context.Context, in *DeleteIMClientRequest, opts ...client.CallOption) (*EmptyResponse, error)
 }
 
 type iMClientsService struct {
@@ -90,19 +100,44 @@ func (c *iMClientsService) CreateIMClients(ctx context.Context, in *CreateIMClie
 	return out, nil
 }
 
+func (c *iMClientsService) UpsertIMClients(ctx context.Context, in *UpsertIMClientsRequest, opts ...client.CallOption) (*EmptyResponse, error) {
+	req := c.c.NewRequest(c.name, "IMClients.UpsertIMClients", in)
+	out := new(EmptyResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iMClientsService) DeleteIMClient(ctx context.Context, in *DeleteIMClientRequest, opts ...client.CallOption) (*EmptyResponse, error) {
+	req := c.c.NewRequest(c.name, "IMClients.DeleteIMClient", in)
+	out := new(EmptyResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for IMClients service
 
 type IMClientsHandler interface {
 	// Search IM client links
 	ListIMClients(context.Context, *ListIMClientsRequest, *IMClientList) error
-	// Link IM client(s) with the Contact (WARNING! Only for internal use, no authentication!)
+	// Link IM client(s) with the Contact. (WARNING! Only for internal use, no authorization!)
 	CreateIMClients(context.Context, *CreateIMClientsRequest, *EmptyResponse) error
+	// Link IM client(s) with the Contact. If conflict appears API reassigns client to the new contact. (WARNING! Only for internal use, no authorization!)
+	UpsertIMClients(context.Context, *UpsertIMClientsRequest, *EmptyResponse) error
+	DeleteIMClient(context.Context, *DeleteIMClientRequest, *EmptyResponse) error
 }
 
 func RegisterIMClientsHandler(s server.Server, hdlr IMClientsHandler, opts ...server.HandlerOption) error {
 	type iMClients interface {
 		ListIMClients(ctx context.Context, in *ListIMClientsRequest, out *IMClientList) error
 		CreateIMClients(ctx context.Context, in *CreateIMClientsRequest, out *EmptyResponse) error
+		UpsertIMClients(ctx context.Context, in *UpsertIMClientsRequest, out *EmptyResponse) error
+		DeleteIMClient(ctx context.Context, in *DeleteIMClientRequest, out *EmptyResponse) error
 	}
 	type IMClients struct {
 		iMClients
@@ -112,6 +147,13 @@ func RegisterIMClientsHandler(s server.Server, hdlr IMClientsHandler, opts ...se
 		Name:    "IMClients.ListIMClients",
 		Path:    []string{"/contacts/{contact_id}/imclients"},
 		Method:  []string{"GET"},
+		Handler: "rpc",
+	}))
+	opts = append(opts, api.WithEndpoint(&api.Endpoint{
+		Name:    "IMClients.DeleteIMClient",
+		Path:    []string{"/contacts/{contact_id}/imclients/{id}"},
+		Method:  []string{"DELETE"},
+		Body:    "",
 		Handler: "rpc",
 	}))
 	return s.Handle(s.NewHandler(&IMClients{h}, opts...))
@@ -127,4 +169,12 @@ func (h *iMClientsHandler) ListIMClients(ctx context.Context, in *ListIMClientsR
 
 func (h *iMClientsHandler) CreateIMClients(ctx context.Context, in *CreateIMClientsRequest, out *EmptyResponse) error {
 	return h.IMClientsHandler.CreateIMClients(ctx, in, out)
+}
+
+func (h *iMClientsHandler) UpsertIMClients(ctx context.Context, in *UpsertIMClientsRequest, out *EmptyResponse) error {
+	return h.IMClientsHandler.UpsertIMClients(ctx, in, out)
+}
+
+func (h *iMClientsHandler) DeleteIMClient(ctx context.Context, in *DeleteIMClientRequest, out *EmptyResponse) error {
+	return h.IMClientsHandler.DeleteIMClient(ctx, in, out)
 }
