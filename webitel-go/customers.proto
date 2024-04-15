@@ -1,0 +1,185 @@
+syntax = "proto3";
+
+package api;
+
+option go_package = "webitel.go/api;api";
+
+import "oid.proto";
+
+service Customers {
+
+    rpc ServerInfo(ServerInfoRequest) returns (ServerInfoResponse) {}
+    // rpc GetCertificate(CertificateUsageRequest) returns (CertificateUsageResponse) {}
+    rpc GetCustomer(GetCustomerRequest) returns (GetCustomerResponse) {}
+    rpc UpdateCustomer(UpdateCustomerRequest) returns (UpdateCustomerResponse) {}
+    rpc LicenseUsage(LicenseUsageRequest) returns (LicenseUsageResponse) {}
+    rpc LicenseUsers(LicenseUsersRequest) returns (LicenseUsersResponse) {}
+    // // rpc VerifyCertificate(VerifyCertificateRequest) returns (VerifyCertificateResponse) {}
+    // rpc UpdateCertificate(UpdateCertificateRequest) returns (UpdateCertificateResponse) {}
+    // // later: rpc RevokeCertificate(RevokeCertificateRequest) returns (RevokeCertificateResponse) {}
+    // rpc SearchCertificates(SearchCertificatesRequest) returns (SearchCertificatesResponse) {}
+}
+
+message ServerInfoRequest {}
+message ServerInfoResponse {
+    // int64 time = 1; // current timestamp (ms)
+    bytes key = 1;
+}
+
+message Verification {
+    repeated string errors = 1; // invalid 
+    repeated string notify = 2; // non-fatal warnings, e.g.: 
+}
+
+// USAGE details
+message LicenseUser {
+    string id = 1; // license.id
+    string prod = 2; // license.prod
+    ObjectId user = 3; // grant to::user
+    repeated string scope = 6; // setof objclass grants
+    int64 issued_at = 4; // not before
+    int64 expires_at = 5; // not after
+}
+
+// message LicenseId {
+//     string id = 1;
+//     string product = 2;
+// }
+
+message LicenseV1 {
+
+    string id = 1; // serial number assigned (global::License-ID)
+    int64 not_before = 2; // optional
+    int64 not_after = 3; // optional
+    string product = 4; // product name, e.g.: DEVICE, MANAGER, OPERATOR
+    repeated string scope = 5; // list of known classes, &this product grants mandatory access to, e.g.: 'users', 'roles', 'cc_agent', 'calendars', ...
+    bool competitive = 6;
+    int32 limit = 7; // required: limit count (maximum allowed usage quantity)
+    // operational attributes ...
+    // remain = limit - len(users)
+    int32 remain = 8; // available 
+    repeated LicenseUser users = 9; // users.id (grantees)
+    Verification status = 10;
+}
+
+message Customer {
+
+    string id = 1; // serial number assigned (global::Customer-ID)
+    // string version = 2; // version
+    // local store details
+    int64 created_at = 2;   // local created ms
+    int64 updated_at = 3;   // last uploaded ms
+    int64 revoked_at = 4;   // local revoked ms
+    // registration name
+    string organization = 5;
+    // validity boundaries
+    int64 issued_at = 6;    // [required] issuer(CA) created at
+    int64 not_before = 7;   // [optional] valid from
+    int64 not_after = 8;    // [required] valid till
+    // signature validity
+    int64 this_update = 9;  // [optional]: issuer(CA) signed at
+    int64 next_update = 10; // [optional]: signature expires; update required after
+    // Verification status
+    Verification verify = 11; // [optional] validation results
+    // extensions granted
+    map<string,int32> limit = 12; // defines map[class]limit usage
+    // int32 competitive = 13; // zero-based competitive sessions limit ?
+    repeated LicenseV1 license = 14; // grants issued
+    repeated ObjectId dnsrv = 15; // [optional] domains
+}
+
+// GET /users/{user.id}/license
+// GET /domains/{domain.id}/license
+// GET /license/{filter=**}
+message LicenseUsageRequest {
+    // ----- Search Options ----- //
+    int32 size = 1; // default: 16
+    int32 page = 2; // default: 1
+    repeated string fields = 3; // set of output fields
+    repeated string sort = 4; // e.g.: "updated_at" - ASC; "!updated_at" - DESC;
+    // ----- Search Filters ----- //
+    ObjectId user = 5; // to user assigned
+    ObjectId domain = 6; 
+    string customer_id = 7;
+    repeated string id = 8; // by serial number(s)
+    repeated string product = 9; // by product name(s)
+    // view: all|valid|grantable
+    bool valid = 10; // show: available to be granted
+    string q = 11; // filter: term of search
+}
+
+message LicenseUsageResponse {
+    // ----- Result paging ----- //
+    int32 page = 1; // this page number !
+     bool next = 2; // next page exists ? more results ?
+    //    size = (.next ? len(items) : undef (> len(size)))
+    // ----- Result entries ----- //
+    repeated LicenseV1 items = 3;
+}
+
+// ProductUser GRANT details
+message ProductUser {
+    ObjectId user = 1; // grant to::user
+    ObjectId domain = 2; // grant to::domain
+    int64 issued_at = 3; // not before
+    int64 expires_at = 4; // not after
+    int32 sessions = 5; // User's active sessions count !
+}
+
+message LicenseUsersRequest {
+    // ----- Search Options ----- //
+    int32 size = 1; // default: 16
+    int32 page = 2; // default: 1
+    repeated string fields = 3; // set of output fields
+    repeated string sort = 4; // e.g.: "updated_at" - ASC; "!updated_at" - DESC;
+    // ----- Search Filters ----- //
+    string id = 5; // REQUIRED Product ID
+    string q = 6; // filter: term of search (username)
+}
+
+message LicenseUsersResponse {
+    // ----- Result paging ----- //
+    int32 page = 1; // this page number !
+     bool next = 2; // next page exists ? more results ?
+    //    size = (.next ? len(items) : undef (> len(size)))
+    // ----- Result entries ----- //
+    repeated ProductUser items = 3;
+}
+
+// GET /customer:sessionCustomer
+// GET /customers/{id}
+message GetCustomerRequest {
+    // Available Filters
+    string id = 1; // show by customer id; serial number (uuid)
+    bool valid = 2; // show if valid only!
+    ObjectId domain = 3; // find by domain relation
+    // Request Controls
+    repeated string fields = 10; // serial, 
+    repeated string sort = 11;
+}
+
+message GetCustomerResponse {
+    Customer customer = 1;
+}
+
+// PUT /customer
+message UpdateCustomerRequest {
+    string organization = 1; // [optional] e.g.: Example Org.
+    bytes logo_picture = 2;  // [optional] logo source image
+    bytes certificate = 3;  // [optional] raw bytes protobuf::base64.RawStdEncoding != certificate::base64.StdEncoding
+    bool revoke = 4;
+}
+
+message UpdateCustomerResponse {
+    Customer customer = 1; // detailed
+}
+
+/*/ GET /certificates
+message SearchCertificatesRequest {
+    string domain = 1;
+}
+
+message SearchCertificatesResponse {
+    repeated Customer certificates = 1;
+}
+*/

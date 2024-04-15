@@ -1,0 +1,184 @@
+syntax="proto3";
+
+package api;
+
+option go_package = "webitel.go/api;api";
+
+// option go_package = "webitel.go/auth/proto;oauth";
+
+// import "protoc-gen-swagger/options/annotations.proto";
+// import "google/protobuf/timestamp.proto";
+// import "google/api/annotations.proto";
+// import "google/rpc/status.proto";
+// import "controls.proto";
+// import "domains.proto";
+// import "roles.proto";
+// import "users.proto";
+
+import "oauth2.proto";
+
+// [A]uthorization service
+service SA {
+
+    rpc Login(LoginRequest) returns (LoginResponse) {}
+    // rpc Token(SessionRequest) returns (SessionResponse) {}
+    rpc Logout(LogoutRequest) returns (LogoutResponse) {}
+    rpc ReadSession(ReadSessionRequest) returns (ReadSessionResponse) {}
+    rpc SearchSessions(SearchSessionsRequest) returns (SearchSessionsResponse) {}
+    // Verify X-Access-Token authorization credentials
+    rpc Current(VerifyTokenRequest) returns (Authorization) {}
+    // Cluster internal USE ONLY ! DO NOT EXPOSE TO public API gateway !
+    rpc CreateSession(SessionLoginRequest) returns (Session) {}
+}
+
+
+
+message Session {
+
+    string id = 1; // session key
+
+    int64  dc = 2; // current domain.dc component
+    string domain = 3; // session domain.name
+    int64  user_id = 4; // current user.id
+    string username = 5; // session user-friendly role name
+
+    string network_ip = 6; // remote IP address; assigned while authorization
+    string user_agent = 7; // remote User-Agent; assigned while authorization
+
+    repeated string roles = 8; // group.name(s)
+    repeated string scope = 9; // permission.name(s)
+
+    int64 accessed_at = 10; // unix: last seen
+    int64 created_at = 11; // unix
+    int64 expires_at = 12; // unix
+}
+
+// AccessScope represents authorized access level
+// to object class declaration within domain namespace
+message AccessScope {
+    // Inherit::ObjectClass
+    int64  id = 1;     // class: object id
+    string class = 2;  // class: alphanumeric code name
+    uint32 access = 3; // flags: [ CREATE | SELECT | UPDATE | DELETE ]
+    // Is [?]-[b]ased [A]ccess [C]ontrol *model enabled ?
+    bool abac = 4;  // [A]ttribute-[b]ased;  not implemented; next releases ...
+    bool obac = 5;  // [O]peration-[b]ased;  Mandatory: control access to object.class (alias: collection, section, etc.)
+    bool rbac = 6;  // [R]ecord-[b]ased; Discretionary: control access to object.entry (alias: resource, record, etc.)
+}
+
+message VerifyTokenRequest {
+    string access_token = 1;
+}
+
+// Authorization. Current.
+message Authorization {
+    // current::authorization
+    int64  dc = 1; // current domain component
+    string domain = 2; // current domain name
+    int64  role_id = 3; // current role id
+    string username = 4; // current role name
+    // session::authorization (primary)
+    Session session = 5;
+    // authorization::subject(s) whose privileges extends to the current role
+    map <string, int64>  roles = 6; // map[:role]:oid
+    // MAC: set of access privileges assigned to current role::subject(s)
+    map <string, string> privs = 7; // map[:priv]:uuid { "sysadmin":1, "CALL_MANAGER":712342168, "CALL_CENTER":32435456 }
+    // DAC: set of object class(es) on which at least SELECT privilege is granted to current role::subject(s)
+    repeated AccessScope scope = 8; // [{ "id":1, "class":"queue", "obac":false, "rbac":true, "access":7 },...]
+    
+}
+
+// POST /login
+message LoginRequest {
+
+    // Authorization: Basic <client_id>:<client_secret>
+
+    string domain = 1; // domain name
+    string username = 2; // username
+    string password = 3; // user password
+    
+    repeated string scope = 6; // scope request control
+    bytes certificate = 7; // license/certificate
+    // OPTIONAL. Mobile device /login request ?
+    bool mobile = 8;
+
+    // // Set to request persistent storage save.
+    // // 
+    // // false   .save(localStorage); // default;
+    // // true    .save(clusterStorage)
+    // //
+    // bool remeber = 8; // persistent ?  e.g.: ["me","session"]; [""]
+}
+
+message SessionLoginRequest {
+
+    string sid = 1; // session id
+    int64  sub = 2; // authenticated subject (user.id)
+    int64  max_age = 3;
+
+    string token = 4;
+    int64  expires_at = 5; // unix
+    int64  authenticated_at = 6; // unix
+    int64  competitive_expires_at = 11; // unix
+
+    string user_agent = 7; // remote User-Agent; assigned while authorization
+    string network_ip = 8; // remote IP address; assigned while authorization
+    string redirect_uri = 9;
+
+    map<string,string> metadata = 10;
+}
+
+message LoginResponse {
+    AccessToken authorization = 1;
+}
+
+// // Design: this -or- extend CreateUserRequest
+// message SignupRequest {
+//     string domain = 1; // domain name
+//     string username = 2; // username
+//     string password = 3; // user password
+//     string confirm = 4; // user password
+// }
+
+// POST /logout
+message LogoutRequest {
+    int64  dc = 1;     // optional: domain.dc (component.id)
+    string domain = 2; // optional: domain.name (access::domain)
+    string uuid = 3;   // optional: session.uuid (access::any)
+}
+
+message LogoutResponse {
+}
+
+// GET /session[/{id}]
+message ReadSessionRequest {
+    int64 dc = 1; // domain.dc(component)
+    string domain = 2; // domain.name
+    string uuid = 3; // session.uuid
+}
+
+message ReadSessionResponse {
+    Session session = 1;
+}
+
+// GET /sessions
+// GET /user/{user_id}/sessions
+// GET /domain/{dc}/sessions
+message SearchSessionsRequest {
+    int64 dc = 1;       // domain.dc(component)
+    string domain = 2; // domain.name
+    int64 user_id = 3; // user.id
+
+    repeated string fields = 10; // output
+    repeated string sort = 11;
+	int64 size = 12;
+	int64 page = 13;
+}
+
+message SearchSessionsResponse {
+
+    int32 page = 1; // result: {page} number
+     bool next = 2; // result: has {next} page ?
+
+    repeated Session items = 3; // results
+}

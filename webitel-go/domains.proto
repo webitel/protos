@@ -1,0 +1,95 @@
+syntax = "proto3";
+
+package api;
+
+option go_package = "webitel.go/api;api";
+
+// import "users.proto";
+
+service Domains {
+
+	rpc ReadDomain(ReadDomainRequest) returns (ReadDomainResponse) {}
+	rpc UpdateDomain(UpdateDomainRequest) returns (UpdateDomainResponse) {}
+	rpc DeleteDomain(DeleteDomainRequest) returns (DeleteDomainResponse) {}
+	rpc CreateDomain(CreateDomainRequest) returns (CreateDomainResponse) {}
+	rpc SearchDomains(SearchDomainsRequest) returns (SearchDomainsResponse) {}
+
+}
+
+// message Domain {
+// 	int64 dc = 1; // component
+// 	string domain = 2; // FQDN
+// }
+
+message Organization {
+
+	int64 dc = 1; // component
+	string domain = 2; // FQDN
+	
+	string organization = 3;
+	string country = 4;
+	string locality = 5;
+	string stateOrProvince = 6;
+	string streetAddress = 7;
+	string postalCode = 8;
+	string postalAddress = 9;
+	string telephoneNumber = 10;
+	string email = 11;
+
+	int64  createdAt = 20; // unix
+    string createdBy = 21; // user
+    int64  updatedAt = 22; // unix
+    string updatedBy = 23; // user
+}
+
+// POST /domains
+message CreateDomainRequest {
+	Organization organization = 1;
+	string superuser = 2;
+	string password = 3;
+}
+
+message CreateDomainResponse {
+}
+
+// GET /domain[/{dc}]
+message ReadDomainRequest {
+	string domain = 1;
+	int64 dc = 2;
+}
+
+message ReadDomainResponse {
+	Organization domain = 1;
+}
+
+// PUT /domain/{domain.dc}
+message UpdateDomainRequest {
+	Organization domain = 1;
+}
+
+message UpdateDomainResponse {
+	Organization domain = 1;
+}
+
+// DELETE /domain/{dc}
+message DeleteDomainRequest {
+	string domain = 1;
+	int64 dc = 2;
+}
+
+message DeleteDomainResponse {
+}
+
+// GET /domains?fields=*&sort=createdAt&size=32
+message SearchDomainsRequest {
+	string domain = 1; // like
+	
+	repeated string fields = 10; // attrs
+	repeated string sort = 11;
+	int64 page = 12;
+	int64 size = 13;
+}
+
+message SearchDomainsResponse {
+	repeated Organization domains = 1;
+}

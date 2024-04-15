@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+package api;
+
+option go_package = "webitel.go/api;api";
+
+service CA {
+    
+    // rpc GetCertificate(CertificateUsageRequest) returns (CertificateUsageResponse) {}
+    rpc CertificateUsage(CertificateUsageRequest) returns (CertificateUsageResponse) {}
+    // rpc VerifyCertificate(VerifyCertificateRequest) returns (VerifyCertificateResponse) {}
+    rpc UpdateCertificate(UpdateCertificateRequest) returns (UpdateCertificateResponse) {}
+    // later: rpc RevokeCertificate(RevokeCertificateRequest) returns (RevokeCertificateResponse) {}
+    rpc SearchCertificates(SearchCertificatesRequest) returns (SearchCertificatesResponse) {}
+
+    rpc GrantCertificate(GrantCertificateRequest) returns (GrantCertificateResponse) {}
+    rpc RevokeCertificate(RevokeCertificateRequest) returns (RevokeCertificateResponse) {}
+}
+
+message Validity {
+
+    int64 not_before = 1; // unix
+    int64 not_after = 2; // unix
+}
+
+message License {
+
+    string serial = 1; // serial number assigned (global::License-ID)
+    string scope = 2; // mandatory privilege codename, e.g.: DEVICE, MANAGER, OPERATOR
+    uint32 limit = 3; // required: limit count (maximum allowed usage quantity)
+    Validity validity = 4; // optional
+    bool competitive = 5;
+
+    map<int64,string> users = 6; // users.id (grantees)
+    // repeated string users = 7; // users.name
+}
+
+message Certificate {
+
+    string serial = 1; // serial number assigned (global::Customer-ID)
+    string version = 2; // version
+
+    Validity validity = 3;
+    // int32 competitive = 4; // zero-based competitive sessions limit ?
+
+    repeated License license = 5; // grants issued
+    
+
+    int64 this_update = 6; // unix: issuer signed at
+    int64 next_update = 7; // unix: signature expires; update required
+
+    bool valid = 8; // validation status
+
+    map<int64,string> domains = 9;
+}
+
+// GET /certificate/{filter=**}
+// GET /user/{userId}/certificate
+// GET /domain/{domain}/certificate
+message CertificateUsageRequest {
+    string domain = 1; // domain relation
+    string serial = 2; // filter: serial
+    int64 user_id = 3;   // filter: grants.user.id grantee
+}
+
+message CertificateUsageResponse {
+    Certificate certificate = 1; // detailed
+    // repeated CertificateUsage usage = 2;
+}
+
+// PUT /certificate
+message UpdateCertificateRequest {
+    bytes certificate = 1; // raw bytes
+}
+
+message UpdateCertificateResponse {
+    Certificate certificate = 1; // detailed
+}
+
+// GET /certificates
+message SearchCertificatesRequest {
+    string domain = 1;
+}
+
+message SearchCertificatesResponse {
+    repeated Certificate certificates = 1;
+}
+
+// POST /user/{userId}/certificate/{serial}
+message GrantCertificateRequest {
+    string domain = 1;  // domain relation
+    string serial = 2;  // grants.serial
+    int64 user_id = 3; // grantee
+}
+
+message GrantCertificateResponse {
+}
+
+// DELETE /user/{userId}/certificate/{serial}
+message RevokeCertificateRequest {
+    string domain = 1;  // domain relation
+    string serial = 2;  // grants.serial
+    int64 user_id = 3; // grantee
+}
+
+message RevokeCertificateResponse {
+}

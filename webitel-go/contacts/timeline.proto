@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+package webitel.contacts;
+
+option go_package = "webitel.go/api/contacts;contacts";
+
+import "google/api/annotations.proto";
+import "contacts/fields.proto";
+import "messages/history.proto";
+
+service Timeline {
+  rpc GetTimeline(GetTimelineRequest) returns (GetTimelineResponse) {
+    option (google.api.http) = {
+      get: "/contacts/{contact_id}/timeline"
+    };
+  }
+//
+  rpc GetDetailedMessageHistory(GetDetailedMessageHistoryRequest) returns (chat.ChatMessages) {
+    option (google.api.http) = {
+      get: "/contacts/{contact_id}/timeline/chats/{conversation_id}"
+    };
+  }
+//
+//  rpc GetDetailedCallHistory(GetDetailedCallHistoryRequest) returns (GetDetailedCallHistoryResponse) {
+//    option (google.api.http) = {
+//      get: "/contacts/{contact_id}/timeline/calls/{call_id}"
+//      body: "input"
+//    };
+//  }
+}
+
+
+message GetTimelineRequest {
+  string contact_id = 1;
+  int64 date_from = 2;
+  int64 date_to = 3;
+  repeated string type = 4;
+}
+
+message GetDetailedMessageHistoryRequest {
+  string conversation_id = 1;
+  string contact_id = 2;
+}
+
+
+message GetDetailedCallHistoryRequest {
+  string call_id = 1;
+}
+
+
+message GetDetailedMessageHistoryResponse {
+
+}
+
+
+message GetDetailedCallHistoryResponse {
+
+}
+
+
+message GetTimelineResponse {
+  repeated DayTimeline days = 2;
+}
+
+message TimelineRecord {
+  string id = 1;
+  int64 created_at = 2;
+  int64 closed_at = 3;
+  int64 duration = 4;
+  TimelineEventType type = 5;
+  bool is_inbound = 6;
+  bool is_missed = 7;
+  repeated Lookup participants = 9;
+  Lookup gateway = 10;
+  Lookup flow_scheme = 11;
+  Lookup queue = 12;
+}
+
+message DayTimeline {
+  repeated TimelineRecord items = 1;
+  int64 chats_count = 2;
+  int64 calls_count = 3;
+  int64 day_timestamp = 4;
+}
+
+
+enum TimelineEventType{
+  chat = 0;
+  call = 1;
+}
+
+

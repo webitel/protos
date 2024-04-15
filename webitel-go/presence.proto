@@ -1,0 +1,137 @@
+syntax = "proto3";
+
+package api;
+
+option go_package = "webitel.go/api;api";
+
+// import "oid.proto";
+// import "customers.proto";
+import "google/api/annotations.proto";
+
+service Presence {
+
+    // // get(presence) (notify, error)
+	// rpc GetPresence(SearchPresenceRequest) returns (PresenceStatus) {
+    //     option (google.api.http) = {
+    //             get: "/{type:user}s/presence/{id}" // e.g.: /users/
+    //             additional_bindings {
+    //                 get: "/presence"
+    //             }
+    //     };
+    // }
+
+    // set(presence) (notify, error)
+	rpc SetStatus(SetStatusRequest) returns (PresenceStatus) { // (UserPresence) {
+        option (google.api.http) = {
+                patch: "/{type:user}s/{publish.id}/presence" // e.g.: /users/
+                additional_bindings {
+                    patch: "/presence"
+                }
+        };
+    }
+
+    // TODO: recalc/update cached tuples from stored data
+    // rpc PresenceDump() returns () {}
+
+    /*rpc ListPresence(SearchPresenceRequest) returns (SearchPresenceResponse) {
+        option (google.api.http) = {
+                get: "/presence/{type:user}s"
+        };
+    }
+
+    // publish(presence) (ack, error)
+    rpc Publish(PresenceStatus) returns (PresenceStatus) {
+        option (google.api.http) = {
+                post: "/presence"
+                body: "*"
+        };
+    }
+
+    // subscribe(presence) (notify, error)
+    rpc Subscribe(PresenceStatus) returns (stream PresenceStatus) {
+        option (google.api.http) = {
+                post: "/presence:subscribe" // connect:
+                body: "*"
+        };
+    }*/
+
+}
+
+message SearchPresenceRequest {
+    // ----- Basic -------------------------
+    string q = 1;
+    string id = 2; // [optional]: <oid:int64>
+    string type = 3; // [optional]: <entity:user|device|gateway>; default <user:> if omitted
+    // ----- Filter -------------------------
+    repeated string basic = 4; // [optional] <scope> requested
+    int64 since = 5; // [optional] if modified since
+    // ----- Search Options -------------------------
+    repeated string fields = 10; // select: output (fields,...)
+    repeated string sort = 11;   // select: order by (fields,...)
+    int32 page = 12;             // select: offset {page}
+    int32 size = 13;             // select: limit {size}
+}
+
+message SearchPresenceResponse {
+
+    int32 page = 10; // select: offset {page}
+    int32 size = 11; // search: limit {size}
+     bool next = 12; // search: has {next} page ?
+
+    repeated PresenceStatus items = 1;
+}
+
+message SetStatusRequest {
+    // int64 id = 1; // user.id
+    UserPresence publish = 2; // BODY: partial modifications
+    repeated string fields = 3; // PATCH: partial attributes
+}
+
+message UserPresence {
+
+    int64  id = 1;        // [required] user identity
+    string status = 2;    // [optional] set of unique 'active' presentities {dnd,dlg,sip,wss}; assume {offline} if omitted
+    string note = 3;      // [optional] human readable comment
+    int32  expires = 4;   // [optional] <note> will be cleaned up after seconds
+    int64  timestamp = 5; // [required] last activity time
+    // tracking tuples, detailed ...
+    // repeated PresenceStatus presence = 5;
+}
+
+// PresenceStatus PUBLISH
+message PresenceStatus {
+    // basic:latest
+    string id = 1;       // [required] tuple unique id; <track>
+    string app = 2;      // [optional] service node identity
+
+    string status = 3;   // [optional] unique set of <enum:dnd|call|sip|wss>; assume <offline> if blank; <scope> on request
+    string note = 4;     // [optional] human readable comment
+    int32  open = 5;     // [optional] positive value signify 'active'
+    bool   closed = 6;   // [optional] signify <status> tuple gone from user's presence; equls to (open == 0)
+
+    string contact = 7;  // [optional] communication <url>
+    int32  priority = 8; // [optional] importance level of this within presentity's
+    int64  sequence = 9; // [optional] this tuple (document) modifications version
+
+    int64  expires = 10;    // NOTE: <dnd> actualy has no expires until user manualy switch it off
+    int64  timestamp = 11; // [required] opened time
+    int64  domain_id = 12; // [hidden] for cluster purpose
+    // detailed: -registered -tracking tuples
+    repeated PresenceStatus presence = 13;
+    // // FIXME: well-known types ?
+    // repeated Dialog  call = 9;
+    // repeated Sipreg  sip = 9;
+    // repeated Websock wss = 9;
+}
+
+// message UserStatus {
+
+//     ObjectId user = 1;
+//     ObjectId domain = 2;
+
+//     string basic = 3; // [optional] unique set of <enum:dnd|call|sip|wss>; assume <offline> if blank; <scope> on request
+//     string status = 4; // [optional] human readable comment
+
+//     int64 sequence = 5; // versioning
+//     int64 timestamp = 6; // last updated
+// }

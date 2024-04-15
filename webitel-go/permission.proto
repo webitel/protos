@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package api;
+
+option go_package = "webitel.go/api;api";
+
+import "google/api/annotations.proto";
+
+// Permissions service repository
+service Permissions {
+
+    // GetPermissions list available from application
+    rpc GetPermissions(SearchPermissionRequest) returns (SearchPermissionResponse) {
+        option (google.api.http) = {
+                get: "/permissions"
+        };
+    }
+}
+
+message Permission {
+
+    string id = 1;    // [required] e.g.: 'read', 'playback_record_file', ...
+    string name = 2;  // [optional] e.g.: 'Select Any'
+    string usage = 3; // [optional] e.g.: 'Grants permission to select any objects'
+}
+
+// import "roles.proto"
+// import "users.proto"
+
+message SearchPermissionRequest {
+
+    string q = 1; // TermOfSearch
+    repeated string id = 2;  // = ANY(id)
+    repeated string not = 3; // <> ANY(not)
+
+    // controls
+    repeated string fields = 10; // output
+    repeated string sort = 11; // sort: "field" asc; "!field" desc
+    int32 page = 12; // page number
+    int32 size = 13; // page size
+}
+
+message SearchPermissionResponse {
+
+    int32 page = 10; // select: offset {page}
+    int32 size = 11; // search: limit {size}
+     bool next = 12; // search: has {next} page ?
+
+    repeated Permission items = 1; // result entries
+}

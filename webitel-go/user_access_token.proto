@@ -1,0 +1,120 @@
+syntax = "proto3";
+
+package api;
+
+option go_package = "webitel.go/api;api";
+
+import "oid.proto";
+import "google/api/annotations.proto";
+
+// TODO: design-like https://developers.google.com/admin-sdk/directory/v1/reference/tokens
+
+service UserAccessTokens {
+
+    rpc GetUserAccessToken(UserAccessTokenRequest) returns (UserAccessToken) {
+        option (google.api.http) = {
+                get: "/users/{user.id}/tokens/{id}"
+        };
+    }
+    rpc AddUserAccessToken(AddUserAccessTokenRequest) returns (UserAccessToken) {
+        option (google.api.http) = {
+                post: "/users/{token.user.id}/tokens"
+                body: "token"
+        };
+    }
+	rpc ListUserAccessToken(ListUserAccessTokenRequest) returns (UserAccessTokenList) {
+        option (google.api.http) = {
+                get: "/users/{user.id}/tokens"
+        };
+    }
+    rpc UpdateUserAccessToken(UpdateUserAccessTokenRequest) returns (UserAccessToken) {
+        option (google.api.http) = {
+                put: "/users/{update.user.id}/tokens/{update.id}"
+                body: "update"
+                additional_bindings {
+                    patch: "/users/{update.user.id}/tokens/{update.id}"
+                    body:  "update"
+                }
+        };
+    }
+    rpc DeleteUserAccessToken(DeleteUserAccessTokenRequest) returns (UserAccessToken) {
+        option (google.api.http) = {
+                delete: "/users/{user.id}/tokens/{id}"
+                // additional_bindings {
+                //     delete: "/users/{user.id}/tokens"
+                //     body:   "*"
+                // }
+        };
+    }
+	// rpc UpdatePassword(UpdatePasswordRequest) returns (UpdatePasswordResponse) {}
+}
+
+// UserId lookup value.
+message UserAccessToken {
+
+    string id = 1;     // tokenKey::token_key
+    string token = 2;  // tokenString::access_token
+    string usage = 3;  // [optional] short usage description
+    ObjectId user = 4; // [optional] output depends on API endpoint
+
+    int64 created_at = 5;     // unix::ms
+    ObjectId created_by = 6;
+    int64 updated_at = 7;     // unix::ms
+    ObjectId updated_by = 8;
+    int64 deleted_at = 9;     // [optional] disabled at
+    ObjectId deleted_by = 10; // [optional] disabled by
+}
+
+message UserAccessTokenRequest {
+
+    string   id = 1; // tokenKey::uuid
+    ObjectId user = 2; // [filter] additional
+}
+
+message AddUserAccessTokenRequest {
+    // processing
+    // ------------
+    // token.user.id // [required] authorization
+    // token.usage   // [optional] short description
+    UserAccessToken token = 1;
+    bool enable = 2;
+    // ObjectId user = 1; // [required]
+    // string usage = 2;  // [optional] usage description
+    // bool enable = 3;
+}
+
+message ListUserAccessTokenRequest {
+
+    ObjectId user = 1; // [required] manual or current otherwise
+
+    // int32 page = 2;
+    // int64 size = 3;
+    string q = 4; // .usage ILIKE :q
+    // ----- Search Options -------------------------
+    repeated string fields = 10; // select: output (fields,...)
+    repeated string sort = 11;   // select: order by (fields,...)
+    int32 page = 12;             // select: offset {page}
+    int32 size = 13;             // select: limit {size}
+}
+
+message UserAccessTokenList {
+
+    int32 page = 2;
+    int64 size = 3;
+    bool  next = 4; // is there more results ? next page is available ?
+
+    repeated UserAccessToken items = 1;
+}
+
+message UpdateUserAccessTokenRequest {
+
+    UserAccessToken update = 1; // [required] identification + modifications(about)
+    repeated string fields = 2; // [optional] PATCH implementation
+    bool enable = 3;
+}
+
+message DeleteUserAccessTokenRequest {
+
+    string   id = 1; // tokenKey::uuid
+    ObjectId user = 2; // [filter] additional
+}

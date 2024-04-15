@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package api;
+
+option go_package = "webitel.go/api;api";
+
+service Classes {
+
+    rpc ReadClass(ReadClassRequest) returns (ReadClassResponse) {}
+    rpc UpdateClass(UpdateClassRequest) returns (UpdateClassResponse) {}
+    rpc SearchClasses(SearchClassesRequest) returns (SearchClassesResponse) {}
+}
+
+message ObjectClass {
+
+    int64  id = 1;    // (class::object).id
+    string class = 2; // (class::object).name
+
+    bool abac = 3;    // [a]ttribute-[b]ased [a]ccess [c]ontrol
+    bool obac = 4;    // [o]peration-[b]ased [a]ccess [c]ontrol (from::collection.dal)
+    bool rbac = 5;    // [r]ecord-[b]ased [a]ccess [c]ontrol (from::resource.acl)
+}
+
+message ReadClassRequest {
+    string domain = 1;
+    string class = 2; // [filter]: like '%class%'
+    int64  id = 3;    // [filter]: obj.id = id
+}
+
+message ReadClassResponse {
+    ObjectClass class = 1;
+}
+
+message UpdateClassRequest {
+    string domain = 1; // TO BE REMOVED // bound to session.domain.id
+    ObjectClass class = 2;
+    repeated string fields = 3; // PATCH: partial update
+}
+
+message UpdateClassResponse {
+    ObjectClass class = 1; // updated
+}
+
+message SearchClassesRequest {
+    string domain = 1; // TO BE REMOVED // bound to session.domain.id
+    string class = 2; // [filter]: like '%class%'
+    // int64 id = 3;  // [filter]: obj.id = id
+    // controls
+    repeated string fields = 10; // output
+    repeated string sort = 11; // sort: "field" asc; "!field" desc
+    int32 page = 12; // page number
+    int32 size = 13; // page size
+}
+
+message SearchClassesResponse {
+
+    int32 page = 10; // select: offset {page}
+    int32 size = 11; // search: limit {size}
+     bool next = 12; // search: has {next} page ?
+    
+    repeated ObjectClass items = 1; // list
+}

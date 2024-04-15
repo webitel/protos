@@ -1,0 +1,220 @@
+syntax = "proto3";
+
+package api;
+
+option go_package = "webitel.go/api;api";
+
+import "oid.proto";
+import "roles.proto";
+import "google/api/annotations.proto";
+
+service AccessStore {
+
+    rpc ListObjectAccess(ListAccessRequestV1) returns (ListAccessResponseV1) {
+        option (google.api.http) = {
+                get: "/{object.name}/{object.id}/acl"
+        };
+    }
+    /* Been disabled in favor of the universal PATCH method
+    rpc GrantAccess(GrantAccessRequestV1) returns (GrantAccessResponseV1) {
+        option (google.api.http) = {
+                put: "/{object.name}/{object.id}/acl/{grantee}"
+                body: "grants"
+        };
+    }
+    rpc RevokeAccess(RevokeAccessRequestV1) returns (RevokeAccessResponseV1) {
+        option (google.api.http) = {
+                delete: "/{object.name}/{object.id}/acl/{grantee}"
+                body: "grants"
+        };
+    }
+    */
+    // TODO: replace with GrantAccess API, to become command like GRANT REVOKE ... with empty access rights string
+    rpc ToggleObjectAccess(UpdateAccessRequestV1) returns (UpdateAccessResponseV1) {
+        option (google.api.http) = {
+                patch: "/{object.name}/{object.id}/acl"
+                body: "list"
+        };
+    }
+
+    // default: TODO: indicate objclass=default as a default rights repo
+    rpc ListDefaultAccess(ListAccessRequestV1) returns (ListAccessResponseV1) {
+        option (google.api.http) = {
+                get: "/acl/{object.name}/{object.id}"
+        };
+    }
+    // Same as UpdateAccess except for DEFAULT access control system
+    rpc ToggleDefaultAccess(ToggleDefaultAccessRequest) returns (ToggleDefaultAccessResponse) {
+        option (google.api.http) = {
+            patch: "/acl/{object.name}/{object.id}?grantor={grantor}"
+            body: "*"
+        };
+    }
+}
+
+message AccessRule {
+
+    // ObjectId object = 1;
+    RoleId grantor = 2; // [WHO]: operational; current user NEED to be rechecked !!!
+    RoleId grantee = 3; // [WHOM]: required; NEED to be rechecked !!!
+    string granted = 4; // [WHAT]: full: [xrwdxrwd]; privileges: [----xrwd]; grantable: [xrwd----]
+    // // audit logs
+    // int64  created_at = 10;
+    // RoleId created_by = 11;
+    // int64  updated_at = 12;
+    // RoleId updated_by = 13;
+    // int64  deleted_at = 14;
+    // RoleId deleted_by = 15;
+
+    // // message Obj {
+    // //     string path = 1; // relative objclass name definition, e.g.: objclass, devices, queues, users, roles
+    // //     int64  id = 2;   // entity object id
+    // // }
+
+    // // regular record-based rule: [WHO] granted this rule to [WHOM]
+    // // default record-based rule: when [WHO] is creating record to [WHOM] add this access record
+    // message Rule {
+    //     RoleId grantor = 1; // [WHO]: operational; current user NEED to be rechecked !!!
+    //     RoleId grantee = 2; // [WHOM]: required; NEED to be rechecked !!!
+    //     string grants  = 3; // [WHAT]: full: [xrwdxrwd]; privileges: [----xrwd]; grantable: [xrwd----]
+    // }
+
+}
+
+// message Privilege {
+//     int64 id = 1;
+//     string code = 2;
+// }
+
+// GET /{class}/{oid}
+message ListAccessRequestV1 {
+    // --- object ident ---
+    // this might be something like objectId field
+    // message ObjectRef {
+    //     string class = 1; // FIXME: maybe .path ? e.g: /devices, /call_center/queue
+    //     int64  id = 2;
+    // }
+    // ObjectRef object = 1;
+    // // // TODO: register API: /{object.class:[\\w]+}/{object.id:[0-9]+}/acl
+    // string class = 1; // object .type definition
+    // int64 object = 2; // class.object.id
+    ObjectId object = 1;
+    // --- filters ---
+    repeated int64  grantor = 2; // [optional] [FROM] each rule owner is any of role(s) id; user -or- role
+    repeated int64  grantee = 3; // [optional] [TO] subject role(s) id; user -or- role
+    repeated string granted = 4; // [xrwdxrwd] [R]ecord-[b]ased-[A]ccess-[C]ontrol level check(!)
+    string q = 5; // [optional] [TO] subject.name ILIKE ?q=; user -or- role
+
+    // ----- Select Options -------------------------
+    repeated string fields = 20; // attributes list
+    repeated string sort = 21; // e.g.: "updated_at" - ASC; "!updated_at" - DESC;
+    // pagedResultsControl
+    int32 size = 22; // default: 16
+    int32 page = 23; // default: 1
+}
+
+message ListAccessResponseV1 {
+    // region: paged result control response value
+    int32 page = 2; // 
+    bool  next = 3; // indicate partial response: ( next || page > 1 ? partial : full )
+    // endregion
+    repeated AccessRule items = 1;
+}
+
+message GrantAccessRequestV1 {
+    // string class = 2;
+    // int64 object = 3; // class.object.id
+    ObjectId object = 1;
+    int64 grantee = 2; // grantee.role.id
+    // repeated string privileges = 5; // ["SEARCH","MODIFY","DELETE","CREATE"]
+    // bool grantable = 6; // WITH GRANT OPTION
+    string grants = 3;
+}
+
+// replace with: Access.Rule
+message GrantAccessResponseV1 {
+    // return: rule(s) affected; ListAccessResponse
+}
+
+message RevokeAccessRequestV1 {
+    // string domain = 1;
+    // string class = 2;
+    // int64 object = 3; // class.object.id
+    ObjectId object = 1; // [TO]:
+    int64 grantee = 2; // [FROM]: grantee.role.id
+    // repeated string privileges = 5; // ["SEARCH","MODIFY","DELETE","CREATE"]
+    // bool grantable = 6; // WITH GRANT OPTION
+    string grants = 3;
+}
+
+// replace with: Access.Rule
+message RevokeAccessResponseV1 {
+    // return: rule(s) affected; ListAccessResponse
+}
+
+// PATCH /{:obj.path=(?:devices|users|roles|objclass|etc...)}/{:obj.id=\d+}/acl
+//
+// {
+//     obj: {
+//         path: "devices", // object ident
+//         id:   "17",
+//     },
+//     changes: [
+//         {
+//             grantee_id: $(role.id), // subject ident
+//             access: "xrwd"          // toogle provided
+//         },
+//         {
+//             grantee_id: $(role.id),
+//             access: "xrwd" // toogle provided
+//         }
+//     ]
+// }
+message UpdateAccessRequestV1 {
+    
+    // message Changes {
+    //     // subject (role::object).id
+    //     int64 grantee_id = 1; // sub
+    //     // [ObAC]: "crud" all object class privileges
+    //     // [RbAC]: "r*u*d*" all object privileges with grant options
+    //     // [NOTE]: empty access string denote "delete" operation (REVOKE)
+    //     //         others - "add" or "replace" (GRANT)
+    //     string access = 2;
+    // }
+    // // // [scope:system]
+    // // int64  dc = 1;
+    // // string domain = 2;
+    // // // [_link:baseObject]
+    // // string object_class = 3;
+    // // int64  object_id = 4;
+    ObjectId object = 2;
+    // bool toggle = 1; // [optional]: toggle each 
+
+    // // [rbody:listAccess]
+    // // [MODE]: toggle|allOrNothing
+    // repeated Changes changes = 5;
+
+    repeated GrantAccessRequestV1 list = 5;
+}
+
+
+message UpdateAccessResponseV1 {
+    // Affected rules count
+    int64 granted = 1;
+    int64 revoked = 2;
+}
+
+
+message ToggleDefaultAccessRequest {
+
+    ObjectId object = 1; // [ON] objclass (either: by entity .id -or- class .name)
+    int64 grantor = 2;   // [FOR] creator user/role
+    // list of changes ...
+    repeated GrantAccessRequestV1 list = 3; // [TO] (GRANT/REVOKE)
+}
+
+message ToggleDefaultAccessResponse {
+
+    repeated AccessRule granted = 1;
+    repeated AccessRule revoked = 2;
+}

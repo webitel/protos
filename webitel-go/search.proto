@@ -1,0 +1,22 @@
+syntax="proto3";
+
+package api;
+
+option go_package = "webitel.go/api;api";
+
+message SearchRequest {
+
+    int64 id = 1;           // filter: eq 
+    repeated int64 ids = 2; // filter: in (...)
+
+    string name = 3;        // filter: like '[{prefix}%]{substring}[%{suffix}]'
+
+    repeated string fields = 10; // output selection
+    repeated string sort = 11;   // e.g.: "created_at" ASC; "!created_at" DESC;
+    int32 size = 12;
+    int32 page = 13;
+}
+
+message SearchResponse {
+    repeated bytes items = 1;
+}

@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package api;
+
+option go_package = "webitel.go/api;api";
+
+import "google/protobuf/struct.proto";
+import "google/api/annotations.proto";
+
+service UserSettings {
+
+    // GET /user/settings/{key=*}
+    rpc GetUserSettings(GetSettingsRequest) returns (UserSetting) {
+        option (google.api.http) = {
+                get: "/user/settings/{key=*}"
+        };
+    }
+
+    // Create -or- Update
+    //
+    // PUT /user/settings/{key=*}
+    // Content-Type: application/json; charset=utf-8
+    //
+    // ${value=.body}
+    rpc SetUserSettings(SetSettingsRequest) returns (UserSetting) {
+        option (google.api.http) = {
+                put: "/user/settings/{key=*}"
+                body: "value"
+        };
+    }
+}
+
+message GetSettingsRequest {
+    string key = 1;
+}
+
+message SetSettingsRequest {
+    string key = 1;
+    google.protobuf.Value value = 2;
+}
+
+//
+message UserSetting {
+    string key = 1;
+    google.protobuf.Value value = 2;
+}

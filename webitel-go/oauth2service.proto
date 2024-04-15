@@ -1,0 +1,99 @@
+syntax="proto3";
+
+package api;
+
+option go_package = "webitel.go/api;api";
+
+// option go_package = "webitel.go/auth/proto;oauth";
+
+import "oid.proto";
+import "google/protobuf/struct.proto";
+
+// OAuth 2.0 service federation
+service OAuth2Federation {
+
+    rpc SearchOAuthService(SearchOAuthServiceRequest) returns (SearchOAuthServiceResponse) {};
+    rpc CreateOAuthService(OAuthService) returns (OAuthService) {};
+    rpc LocateOAuthService(SearchOAuthServiceRequest) returns (OAuthService) {};
+    rpc UpdateOAuthService(UpdateOAuthServiceRequest) returns (OAuthService) {};
+    rpc DeleteOAuthService(DeleteOAuthServiceRequest) returns (DeleteOAuthServiceResponse) {};
+
+}
+
+message Claim {
+    string type = 1;
+    string value = 2;
+}
+
+// OAuth 2.0 Authentication [S]ervice [P]rovider Application Configuration
+message OAuthService {
+
+    int64 id = 1;
+    string name = 2; // display
+    ObjectId domain = 3;
+
+    string type = 4; // well-known vendor; provider
+    string logo = 5;
+    // Scopes to be requested 
+    repeated string scopes = 6;
+    // Identity claims policy rules
+    // NOTE: Order matters
+    repeated Claim claims = 7;
+    // google.protobuf.Struct claims = 7;
+
+      bool enabled = 8;
+    string client_id = 9;
+    string client_secret = 10;
+
+    string auth_url = 11; // OAuth 2.0 Authorization Endpoint
+    string token_url = 12; // OAuth 2.0 Token Endpoint
+    string userinfo_url = 13;  // OpenID Connect Userinfo Endpoint
+    string discovery_url = 14; // OpenID Connect Service Discovery
+
+    google.protobuf.Struct metadata = 15;
+
+       int64 created_at = 20; // unix
+    ObjectId created_by = 21; // user
+       int64 updated_at = 22; // unix
+    ObjectId updated_by = 23; // user
+}
+
+// SearchOAuthServiceRequest Options
+message SearchOAuthServiceRequest {
+    // ----- Select Options -------------------------
+    int32 page = 1; // default: 1
+    int32 size = 2; // default: 16
+    repeated string fields = 3; // attributes list
+    repeated string sort = 4; // e.g.: "updated_at" - ASC; "!updated_at" - DESC;
+    // ----- Search Basic Filters ---------------------------
+    repeated int64 id = 5; // selection: by unique identifier
+    string q = 6; // term-of-search: lookup[name]
+    string name = 7; // case-ignore substring match: ILIKE '*' - any; '?' - one
+    string access = 8; // [M]andatory[A]ccess[C]ontrol: with access mode (action) granted!
+      bool enabled = 9;
+    // ----- OAuthService-Specific Filters ----------------
+}
+
+message SearchOAuthServiceResponse {
+
+    int32 page = 1; // result: {page} number
+     bool next = 2; // result: has {next} page ?
+
+    repeated OAuthService items = 3;
+}
+
+message UpdateOAuthServiceRequest {
+    // Fields for partial update. PATCH
+    repeated string fields = 1;
+    // Configuration changes.
+    OAuthService changes = 2;
+}
+
+message DeleteOAuthServiceRequest {
+    repeated int64 id = 1;
+    bool permanent = 2;
+}
+
+message DeleteOAuthServiceResponse {
+
+}

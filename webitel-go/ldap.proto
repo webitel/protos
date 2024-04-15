@@ -1,0 +1,422 @@
+syntax="proto3";
+
+package api;
+
+option go_package = "webitel.go/api;api";
+
+import "oid.proto";
+import "roles.proto";
+import "users.proto";
+import "google/protobuf/struct.proto";
+import "google/api/annotations.proto";
+
+// LDAP repository
+service LDAP {
+
+    // Create LDAP profile
+    rpc CreateLDAPCatalog(LDAPCatalog) returns (LDAPCatalog) {
+        option (google.api.http) = {
+                post: "/ldap"
+                body: "*"
+        };
+    }
+    // Update LDAP profile details
+    rpc UpdateLDAPCatalog(UpdateLDAPRequest) returns (LDAPCatalog) {
+        option (google.api.http) = {
+                put: "/ldap/{profile.id}"
+                body: "*"
+                additional_bindings {
+                    patch: "/ldap/{profile.id}"
+                    body: "*"
+                }
+        };
+    }
+    // Delete LDAP profile(s) ...
+    rpc DeleteLDAPCatalog(DeleteLDAPRequest) returns (LDAPCatalog) {
+        option (google.api.http) = {
+                delete: "/ldap/{id}"
+                additional_bindings {
+                    delete: "/ldap"
+                    body: "*"
+                }
+        };
+    }
+    // Search for LDAP directories ...
+    rpc SearchLDAPCatalog(SearchLDAPRequest) returns (SearchLDAPResponse) {
+        option (google.api.http) = {
+                get: "/ldap"
+        };
+    }
+    // Read LDAP catalog profile by .id
+    rpc LocateLDAPCatalog(SearchLDAPRequest) returns (LDAPCatalog) {
+        option (google.api.http) = {
+                get: "/ldap/{id}"
+        };
+    }
+    // LDAPSearch performs LDAP Search operation ...
+    rpc LDAPSearch(LDAPSearchRequest) returns (LDAPSearchResponse) {
+        option (google.api.http) = {
+                post: "/ldap/:id/search"
+                body: "*"
+                additional_bindings {
+                    post: "/ldap/search"
+                    body: "*"
+                }
+        };
+    }
+
+    rpc SearchLDAPTemplate(LDAPTemplateRequest) returns (LDAPTemplateResponse) {
+        option (google.api.http) = {
+                get: "/ldap/{catalog_id}/templates"
+        };
+    }
+
+    rpc LocateLDAPTemplate(LDAPTemplateRequest) returns (LDAPTemplate) {
+        option (google.api.http) = {
+                get: "/ldap/{catalog_id}/templates/{id}"
+        };
+    }
+
+    rpc CreateLDAPTemplate(LDAPTemplate) returns (LDAPTemplate) {
+        option (google.api.http) = {
+                post: "/ldap/{catalog.id}/templates"
+                body: "*"
+        };
+    }
+
+    rpc UpdateLDAPTemplate(UpdateLDAPTemplateRequest) returns (LDAPTemplate) {
+        option (google.api.http) = {
+                patch: "/ldap/{template.catalog.id}/templates/{template.id}"
+                body: "*"
+                additional_bindings {
+                    put: "/ldap/{template.catalog.id}/templates/{template.id}"
+                    body: "*"
+                }
+        };
+    }
+
+    rpc DeleteLDAPTemplate(LDAPTemplateRequest) returns (LDAPTemplateResponse) {
+        option (google.api.http) = {
+                delete: "/ldap/{catalog.id}/templates/{id}"
+                body: "*"
+                additional_bindings {
+                    delete: "/ldap/{catalog.id}/templates"
+                    body: "*"
+                }
+        };
+    }
+
+    // Resync LDAP directory catalog changes ...
+    rpc ResyncLDAPCatalog(LDAProcessExecute) returns (LDAProcess) { // (ResyncLDAPResponse) {
+        option (google.api.http) = {
+                post: "/ldap/{catalog_id}/rsync"
+                body: "*"
+        };
+    }
+
+    rpc SearchLDAProcess(LDAProcessRequest) returns (LDAProcessResponse) { // (ResyncLDAPResponse) {
+        option (google.api.http) = {
+                get: "/ldap/{catalog_id}/rsync"
+        };
+    }
+
+    rpc LocateLDAProcess(LDAProcessRequest) returns (LDAProcess) { // (ResyncLDAPResponse) {
+        option (google.api.http) = {
+                get: "/ldap/{catalog_id}/rsync/{id}"
+        };
+    }
+}
+
+// LDAPCatalog profile
+message LDAPCatalog {
+
+    // identity
+    // int64 dc = 1;
+    int64 id = 1;
+    // Meaningfull title name
+    string name = 2;
+    // ----- Connection Options -----
+    string url = 5; // URL e.g.: [(ldap|ldapi|ldaps)://]host[:port]
+    // TLS configuration options
+    message TLSConfig {
+        // TODO: (!)
+        bytes cert = 1; // PEM: base64
+        bytes key = 2; // PEM: base64
+        bytes ca = 3; // PEM: base64
+    }
+    TLSConfig tls = 6;
+    // ----- BIND: Authorization -----
+    string bind = 7; // authorization method e.g.: SIMPLE, SAML, NTLM, etc.
+    string base_dn = 8; // base_dn, aka domain e.g.: 'dc=example,dc=org'
+    string username = 9; // bind_dn
+    string password = 10; // password
+
+    // ----- RSYNC Processing -----
+    // int32  priority = 4;
+    string cron = 21; // [CRON]OS SPEC ! github.com/robfig/cron/v3
+    LDAProcessOptions sync = 22;
+    // ----- DOMAIN: Entry model -----
+    string entry_uuid = 23; // entry unique id (except DN which may be updated)
+    string entry_modify = 24; // last modification timestamp attribute type
+    // // // ----- MAP: user(s) settings -----
+    // LDAPUsersMap users = 26; // DEPRECATED: Use Template(s) instead
+    // SYNC Object's search and mappings
+    repeated LDAPTemplate templates = 25;
+    // Last OR Current SYNC process details
+    LDAProcess process = 26;
+
+    // basic: last operation details
+    int64  created_at = 31; // unix
+    UserId created_by = 32; // user
+    int64  updated_at = 33; // unix
+    UserId updated_by = 34; // user
+}
+
+// https://datatracker.ietf.org/doc/html/rfc4511#section-4.1.11
+message LDAPControl {
+    string controlType  = 1; // LDAPOID,
+    bool   criticality  = 2; // BOOLEAN DEFAULT FALSE,
+    string controlValue = 3; // OCTET STRING OPTIONAL
+}
+
+// https://datatracker.ietf.org/doc/html/rfc4511#section-4.5.1
+message LDAPSearchRequest {
+    // ----- connection -----
+    // Optional. ID of the preconfigured LDAP catalog
+    int64 catalog_id = 1;
+    // Optional. URL to establish connection to LDAP catalog
+    string url = 5; // URL e.g.: [(ldap|ldapi|ldaps)://]host[:port]
+    // TLS configuration options
+    message TLSConfig {
+        // TODO: (!)
+        bytes PEM = 1; // base64
+    }
+    TLSConfig tls = 6;
+    // ----- BIND: Authorization -----
+    string bind = 7; // authorization method e.g.: SIMPLE, SAML, NTLM, etc.
+    string username = 8; // bind_dn
+    string password = 9; // password
+    // ----- SearchRequest -----
+    // baseObject [D]istinguished[N]ame
+    string baseObject = 10;
+    // baseObject              (0),
+    // singleLevel             (1),
+    // wholeSubtree            (2)
+    int32 scope = 11;
+    // neverDerefAliases       (0),
+    // derefInSearching        (1),
+    // derefFindingBaseObj     (2),
+    // derefAlways             (3)
+    int32 derefAliases = 12;
+    int64 sizeLimit = 13; // INTEGER (0 ..  maxInt),
+    int64 timeLimit = 14; // INTEGER (0 ..  maxInt),
+    bool typesOnly = 15; // BOOLEAN,
+    string filter = 16; // Filter,
+    repeated string attributes = 17; // AttributeSelection
+    // ----- LDAPMessage -----
+    // Controls NOT implemented yet !
+    repeated LDAPControl controls = 18;
+}
+
+// https://datatracker.ietf.org/doc/html/rfc4511#section-4.5.2
+message LDAPSearchResponse {
+    // ----- SearchResult (Entry|Reference) -----
+    repeated google.protobuf.Struct entries = 1;
+    // ----- LDAPResult -----
+    int32 resultCode = 2;
+    string matchedDN = 3; // LDAPDN,
+    string diagnosticMessage = 4; // LDAPString,
+    repeated string referral = 5; // [3] Referral OPTIONAL
+    // ----- LDAPMessage -----
+    repeated LDAPControl controls = 6;
+}
+
+// Search LDAP catalog(s) options
+message SearchLDAPRequest {
+    // ----- Select Options -------------------------
+    int32 page = 1; // default: 1
+    int32 size = 2; // default: 16
+    repeated string fields = 3; // attributes list
+    repeated string sort = 4; // e.g.: "updated_at" - ASC; "!updated_at" - DESC;
+    // ----- Search Basic Filters ---------------------------
+    repeated int64 id = 5; // selection: by unique identifier
+    string q = 6; // term-of-search: lookup[name]
+    string name = 7; // case-ignore substring match: ILIKE '*' - any; '?' - one
+    string access = 8; // [M]andatory[A]ccess[C]ontrol: with access mode (action) granted!
+    // ----- LDAPCatalog-Specific Filters ----------------
+}
+
+message SearchLDAPResponse {
+
+    int32 page = 1; // result: {page} number
+     bool next = 2; // result: has {next} page ?
+
+    repeated LDAPCatalog items = 3;
+}
+
+message UpdateLDAPRequest {
+    // Fields for partial update. PATCH
+    repeated string fields = 1;
+    // LDAP Catalog changes.
+    LDAPCatalog catalog = 2;
+}
+
+message DeleteLDAPRequest {
+    // catalog id
+    int64 id = 1;
+    bool related_objects = 2; // WITH objects bound to ?
+}
+
+message LDAProcessExecute {
+    // LDAP Catalog unique IDentifier to sync with
+    int64 catalog_id = 1; // catalog_id
+    // Options
+    LDAProcessOptions options = 2;
+}
+
+message LDAProcessOptions {
+    // Allows to create links
+    // with fetched LDAP entries
+    // for manually created objects
+    bool link_existing_objects = 1;
+    // Allows to reassign device's owner user
+    // due to preconfigured mapping LDAP template
+    bool reassign_device_users = 2;
+    // Operation timeout. Not implemented yet
+    int64 timeout = 10;
+    // Will NOT perform any operations on storage.
+    // To review potential processing only
+    bool test = 11;
+}
+
+// LDAPTemplate is an LDAP search entries to webitel objects transformation template
+message LDAPTemplate {
+    // ID unique
+    int64 id = 1;
+    // Name this template
+    string name = 2;
+    // Optional. LDAP Search base entry DN
+    string base_dn = 3;
+    // Required. LDAP Search filter string
+    string search = 4;
+    // LDAPCatalog belongs to
+    ObjectId catalog = 5;
+    // Optional. This Template is activated ?
+    bool enabled = 6;
+    // OPTIONAL. Role objclass fields mapping (Not implemented yet)
+    google.protobuf.Struct role = 7;
+    // OPTIONAL. Device objclass fields mapping
+    google.protobuf.Struct device = 8;
+    // OPTIONAL. User objclass fields mapping
+    google.protobuf.Struct user = 9;
+    // OPTIONAL. Agent objclass fields mapping
+    google.protobuf.Struct agent = 10;
+    // READONLY. Operational attributes
+    int64  created_at = 31; // unix
+    UserId created_by = 32; // user
+    int64  updated_at = 33; // unix
+    UserId updated_by = 34; // user
+
+}
+
+message LDAPTemplateRequest {
+    // ----- Select Options -------------------------
+    int32 page = 1; // default: 1
+    int32 size = 2; // default: 16
+    repeated string fields = 3; // attributes list
+    repeated string sort = 4; // e.g.: "updated_at" - ASC; "!updated_at" - DESC;
+    // ----- Search Basic Filters ---------------------------
+    // OPTIONAL. Search templates by .id
+    repeated int64 id = 5;
+    // REQUIRED. Parent LDAP catalog IDentifier
+    int64 catalog_id = 6;
+    // OPTIONAL. Filter(s) SET
+    string q = 7;
+    string name = 8;
+    string base_dn = 9;
+    string objclass = 10;
+
+    bool enabled = 11;
+    bool disabled = 12;
+
+}
+
+message LDAPTemplateResponse {
+
+    int32 page = 1; // result: {page} number
+     bool next = 2; // result: has {next} page ?
+
+    repeated LDAPTemplate items = 3;
+}
+
+message UpdateLDAPTemplateRequest {
+    // OPTIONAL. Fields for partial update. PATCH
+    repeated string fields = 1;
+    // Template changes.
+    LDAPTemplate template = 2;
+}
+
+// LDAP synchronization process details
+message LDAProcess {
+    // Readonly. Process unique identifier
+    int64 id = 1;
+    // Readonly. Executed with options
+    LDAProcessOptions options = 2;
+    // Readonly. Process start timestamp
+    int64 execute_at = 3;
+    // Optional. Start manually by the user or role
+    RoleId execute_by = 4;
+    // Optional. If not <zero> indicates that this process is completed.
+    int64 complete_at = 5;
+    // Optional. Status description or an error if any occured
+    string status = 6;
+    // Optional. List of entries been already processed
+    repeated LDAPObjentry progress = 7;
+}
+
+// LDAP entry object associatetions performed
+message LDAPObjentry {
+    // LDAP Entry Attributes fetched
+    google.protobuf.Struct entry = 1; // map<string, string> entry = 1;
+    // Internal object class been associated with this LDAP .entry
+    string class = 2;
+    // Internal object state; DUMP
+    google.protobuf.Struct object = 3;
+    // Operation been performed: create|update|delete
+    string proc = 4;
+    // An error(s) if any occured
+    // NON-FATAL Warnings
+    repeated string warn = 6;
+    // FATAL Error(s). NON empty indicates that this process failed
+    repeated string errs = 5;
+}
+
+message LDAProcessRequest {
+    // ----- Select Options -------------------------
+    int32 page = 1; // default: 1
+    int32 size = 2; // default: 16
+    repeated string fields = 3; // attributes list
+    repeated string sort = 4; // e.g.: "updated_at" - ASC; "!updated_at" - DESC;
+    // ----- Search Basic Filters ---------------------------
+    // OPTIONAL. Search process by unique .id
+    repeated int64 id = 5;
+    // REQUIRED. Parent LDAP catalog IDentifier
+    int64 catalog_id = 6;
+    // OPTIONAL. Filter(s) SET
+    string q = 7;
+    string template = 8;
+    repeated string objclass = 9;
+
+    bool failed = 10; // WITH .errs
+    bool enabled = 11; // created|updated
+    bool disabled = 12; // deleted
+
+}
+
+message LDAProcessResponse {
+
+    int32 page = 1; // result: {page} number
+     bool next = 2; // result: has {next} page ?
+
+    repeated LDAProcess items = 3;
+}

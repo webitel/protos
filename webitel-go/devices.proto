@@ -1,0 +1,346 @@
+syntax="proto3";
+
+package api;
+
+option go_package = "webitel.go/api;api";
+
+import "users.proto";
+// import "caller.proto";
+// import "google/protobuf/struct.proto";
+import "google/api/annotations.proto";
+
+service Devices {
+
+    rpc ReadDevice(ReadDeviceRequest) returns (ReadDeviceResponse) {
+        option (google.api.http) = {
+                get: "/devices/{id}"
+        };
+    }
+    rpc UpdateDevice(UpdateDeviceRequest) returns (UpdateDeviceResponse) {
+        option (google.api.http) = {
+                put: "/devices/{id}"
+                body: "device"
+                additional_bindings {
+                    patch: "/devices/{id}"
+                    body:   "device"
+                }
+        };
+    }
+    rpc DeleteDevice(DeleteDeviceRequest) returns (DeleteDeviceResponse) {
+        option (google.api.http) = {
+                delete: "/devices/{id}"
+                // body: "" // nothing
+                additional_bindings {
+                    delete: "/devices"
+                    body:   "ids"
+                }
+        };
+    }
+    rpc CreateDevice(CreateDeviceRequest) returns (CreateDeviceResponse) {
+        option (google.api.http) = {
+                post: "/devices"
+                body: "device"
+        };
+    }
+    rpc SearchDevice(SearchDeviceRequest) returns (SearchDeviceResponse) {
+        option (google.api.http) = {
+                get: "/devices"
+        };
+    }
+    // ----- Details (1:M) ----------------------------------------------
+    rpc SearchDeviceAudit(DeviceAuditRequest) returns (DeviceAuditResponse) {
+        option (google.api.http) = {
+                get: "/devices/{id}/audit"
+        };
+    }
+    rpc ListRegistrations(ListRegistrationsRequest) returns (ListRegistrationsResponse) {
+        option (google.api.http) = {
+                get: "/devices/{device.id}/registered"
+        };
+    }
+    
+    // rpc SigninDevice(SigninDeviceRequest) returns (SigninDeviceResponse) {}
+    // rpc SignoutDevice(SignoutDeviceRequest) returns (SignoutDeviceResponse) {}
+}
+
+// DeviceId lookup value
+message DeviceId {
+    int64  id = 1;   // Object ID
+    string name = 2; // Display Name
+}
+
+// // device states
+// enum DeviceType {
+//     hotdesk = 0;
+//     sipphone = 1;
+//     cellphone = 2;
+//     softphone = 3;
+//     smartphone = 4;
+// }
+
+// Device profile
+message Device {
+
+    int64  id = 1; // object id
+    // kind of
+    // DeviceType type = 19;
+    string name = 2; // display name
+    // credentials
+    string account = 3; // username
+    string password = 4; // password
+
+    UserId user = 5; // [optional] The user that 'owns' the device; 
+    int64  logged_in = 6;
+    // caller profile
+    // webitel.adt.caller caller = 4;
+
+    // Hotdesk: this workstation aliases
+    bool hotdesk = 7; // act as a hotdesk
+    repeated string hotdesks = 8; // associated aliases
+    map<string,string> provision = 9; // provision extra data
+
+    // provision
+    string brand = 10; // vendor brand name
+    string model = 11;
+    // static 
+    string mac = 12;
+    string ip = 13;
+
+    // sip // settings
+    // sip.custom_sip_headers.in // map<string,string>
+    // sip.custom_sip_headers.out // map<string,string>
+    // sip.expire_seconds // int32
+    
+    // device states
+    // enum State {
+    //     NOREG   = 0;
+    //     REGED   = 1;
+    //     RINGING = 2; // inbound in front of device
+    //     DIALING = 3; // outbound in front of device
+    //     DIALOG  = 4;
+    //     ONHOLD  = 5;
+    // }
+    // // presence state
+    // State state = 13;
+
+    // Provision Data
+    // well known fields are:
+    // {
+    //     "brand": "$(string)", // endpoint vendor, brand name e.g.: cisco, yealink, etc.
+    //     "model": "$(string)", // endpoint model name, brand-specific e.g.: 7821, T22, etc.
+    //     ...                   // the rest is an extra data, to be passed into provision templating
+    // }
+    // map <string, string> provision = 13; // simple <key, value> JSON object
+    // google.protobuf.Struct provision = 13;
+
+    bool reged = 15;
+    // TODO: something like PresenceStatus instead of Registration
+    // repeated Registration contacts = 16;
+
+    // // repeated Call calls = 14; // not implemented yet
+    // repeated Registration reged = 15;
+    // repeated DeviceAudit audit = 16;
+    // // TODO: make as an object details
+    // // {"device":{"id":},"dialogs":{""}}
+    // // state profiling
+    // // map<State, string> state_profile = 6;
+
+    int64  created_at = 20; // unix
+    UserId created_by = 21; // user
+    int64  updated_at = 22; // unix
+    UserId updated_by = 23; // user
+    int64  deleted_at = 24; // unix
+    UserId deleted_by = 25; // user
+
+}
+
+// REGISTER SIP status
+message Registration {
+
+    int64 id = 1;
+    UserId user = 2;
+    DeviceId device = 3;
+
+    string callid = 4;
+    string socket = 5; // registrar: local side (host) e.g.: 
+    string contact = 6; // binding_uri
+    string received = 7; // registrant: remote side (proxy)
+    string instance = 8; // ?sip.instance= register contact option
+    string user_agent = 9;
+    int64  expires_at = 10;
+    int64  register_at = 11;
+}
+
+// GET /devices/{id}
+message ReadDeviceRequest {
+    int64 id = 1;
+    repeated string fields = 2; // output selection
+}
+
+message ReadDeviceResponse {
+    Device device = 1;
+}
+
+// PUT /devices/{id}
+message UpdateDeviceRequest {
+    Device device = 1;
+    repeated string fields = 2; // PATCH: partial update
+}
+
+message UpdateDeviceResponse {
+    Device device = 1;
+}
+
+// DELETE /devices/{id}
+message DeleteDeviceRequest {
+    int64 id = 1;
+    bool permanent = 2;
+    repeated int64 ids = 3; // bulk
+}
+
+message DeleteDeviceResponse {
+    repeated Device deleted = 1;
+}
+
+// POST /devices
+message CreateDeviceRequest {
+    Device device = 1;
+    // string password = 2;
+}
+
+message CreateDeviceResponse {
+    Device device = 1;
+}
+
+// POST /devices
+message SearchDeviceRequest {
+    // ----- Select Options -------------------------
+    int32 size = 1; // default: 16
+    int32 page = 2; // default: 1
+    repeated string fields = 3; // attributes list
+    repeated string sort = 4; // e.g.: "updated_at" - ASC; "!updated_at" - DESC;
+    // ----- Search Basic Filters ---------------------------
+    repeated int64 ids = 5; // selection: by unique identifier
+    string q = 6; // term-of-search: lookup[name,account,hotdesk,brand,model,mac,ip]
+    string name = 7; // case-ignore substring match: ILIKE '*' - any; '?' - one
+    string access = 8; // [M]andatory[A]ccess[C]ontrol: with access mode (action) granted!
+    // ----- Device-Specific Filters ----------------
+    string account = 9; // substring like '%name%'
+    string hotdesk = 10; // filter: has hotdesk (=pattern); is hotdesk (=*)
+    // Device.State state = 11; // current state eq
+    UserId user = 12; // filter: by user_id
+    // string user = 12; // match: = .user_id($int) | ~ .user(extension|username|name)
+
+    string mac = 13; // filter: by MAC address
+    string ip = 14; // filter: by IP address
+    
+}
+
+message SearchDeviceResponse {
+
+    int32 page = 10; // select: offset {page}
+    int32 size = 11; // search: limit {size}
+     bool next = 12; // search: has {next} page ?
+
+    repeated Device items = 1; // devices
+}
+
+/*
+message SigninDeviceRequest {
+    int64 id = 1; // device_id to be assigned
+    int64 user_id = 2; // required: user_id owner
+}
+
+message SigninDeviceResponse {
+}
+
+message SignoutDeviceRequest {
+    int64 id = 1; // device_id
+    int64 user_id = 2; // optional
+}
+
+message SignoutDeviceResponse {
+}
+*/
+
+// Device login audit
+message DeviceAudit {
+
+    UserId   user = 1; // /devices/:id/audit related
+    DeviceId device = 2; // /users/:id/audit related
+    string   hotdesk = 3;
+    int64    logged_in = 4;
+    int64    logged_out = 5;
+}
+
+message DeviceAuditRequest {
+
+    UserId   user = 1;
+    DeviceId device = 2;
+    // Filter: timing range (optional)
+    int64 time_from = 3; // unix milliseconds
+    int64 time_till = 4; // unix milliseconds
+    // Search Options
+    repeated string fields = 5;
+    repeated string sort = 6;
+    int32 size = 7;
+    int32 page = 8;
+}
+
+message DeviceAuditResponse {
+
+    int32 page = 10; // select: offset {page}
+    int32 size = 11; // search: limit {size}
+     bool next = 12; // search: has {next} page ?
+
+    repeated DeviceAudit items = 1; // audit_logs
+}
+
+
+message ListRegistrationsRequest {
+    UserId user = 1;
+    DeviceId device = 2;
+}
+
+message ListRegistrationsResponse {
+
+    int32 page = 10; // select: offset {page}
+    int32 size = 11; // search: limit {size}
+     bool next = 12; // search: has {next} page ?
+
+    repeated Registration items = 1; // registered
+}
+
+// The hotdesk status of this device
+message Hotdesk {
+
+    bool disabled = 1;
+    // Set-of domain unique id(s)
+    repeated string alias = 2; // [optional] implicit .[id|mac|ip|account]
+    // The user(s) currently hotdesked into the device
+    repeated HotdeskUser users = 3;
+    // repeated ObjectId users = 3;
+
+}
+
+// Hotdesk-ed user session
+message HotdeskUser {
+
+    UserId user = 1; // currently hotdesked user.id
+    string hotdesk = 2; // [optional] hotdesk signed-in
+    int64 signed_in = 3; // [required] session opened at ...
+    int64 signed_out = 4; // [optional] session closed at ...
+}
+
+// Provision data
+message Provision {
+
+    string id = 1;     // Provisioner Template-ID
+    string brand = 2;  // IP-Phone brand name, e.g.: Yealink, Cisco, Linphone, etc.
+    string model  = 3; // IP-Phone brand-specific model, e.g.: T22, 7821, etc.
+
+    // combo_keys
+    // feature_keys
+
+    // extra data here ...
+}

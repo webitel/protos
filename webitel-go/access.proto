@@ -1,0 +1,97 @@
+syntax = "proto3";
+
+package api;
+
+option go_package = "webitel.go/api;api";
+
+import "roles.proto";
+
+service AC {
+    
+    rpc ListAccess(ListAccessRequest) returns (ListAccessResponse) {}
+	rpc GrantAccess(GrantAccessRequest) returns (GrantAccessResponse) {}
+    rpc RevokeAccess(RevokeAccessRequest) returns (RevokeAccessResponse) {}
+    // TODO: replace with GrantAccess API, to become command like GRANT REVOKE ... with empty access rights string
+    rpc UpdateAccess(UpdateAccessRequest) returns (UpdateAccessResponse) {}
+}
+
+message Access {
+
+    message Grant {
+        RoleId grantor = 1; // NEED to be rechecked !!!
+        RoleId grantee = 2; // NEED to be rechecked !!!
+        repeated string privileges = 3; // ["SEARCH","MODIFY","DELETE","CREATE"]
+        repeated string grantable = 4; // ["SEARCH","MODIFY","DELETE","CREATE"]
+    }
+}
+
+message Privilege {
+    int64 id = 1;
+    string code = 2;
+}
+
+// GET /{class}/{oid}
+message ListAccessRequest {
+    string domain = 1;
+    string class = 2;
+    int64 object = 3; // class.object.id
+    int64 subject = 4; // grantee.role.id
+    repeated string privileges = 5; // ["SEARCH","MODIFY","DELETE","CREATE"]
+    repeated string grantable = 6; // ["SEARCH","MODIFY","DELETE","CREATE"]
+}
+
+message ListAccessResponse {
+    repeated Access.Grant list = 1;
+}
+
+message GrantAccessRequest {
+    string domain = 1;
+    string class = 2;
+    int64 object = 3; // class.object.id
+    int64 subject = 4; // grantee.role.id
+    repeated string privileges = 5; // ["SEARCH","MODIFY","DELETE","CREATE"]
+    bool grantable = 6; // WITH GRANT OPTION
+}
+
+message GrantAccessResponse {
+}
+
+message RevokeAccessRequest {
+    string domain = 1;
+    string class = 2;
+    int64 object = 3; // class.object.id
+    int64 subject = 4; // grantee.role.id
+    repeated string grantable = 5; // ["SEARCH","MODIFY","DELETE","CREATE"]
+    repeated string privileges = 6; // ["SEARCH","MODIFY","DELETE","CREATE"]
+}
+
+message RevokeAccessResponse {
+}
+
+message UpdateAccessRequest {
+    
+    message Changes {
+        // subject (role::object).id
+        int64 grantee_id = 1;
+        // [ObAC]: "crud" all object class privileges
+        // [RbAC]: "r*u*d*" all object privileges with grant options
+        // [NOTE]: empty access string denote "delete" operation (REVOKE)
+        //         others - "add" or "replace" (GRANT)
+        string access = 2;
+    }
+    // [scope:system]
+    int64  dc = 1;
+    string domain = 2;
+    // [_link:baseObject]
+    string object_class = 3;
+    int64  object_id = 4;
+    // [rbody:listAccess]
+    // [MODE]: toggle|allOrNothing
+    repeated Changes changes = 5;
+}
+
+message UpdateAccessResponse {
+    // Affected rules count
+    int64 granted = 1;
+    int64 revoked = 2;
+}

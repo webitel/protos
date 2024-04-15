@@ -1,0 +1,209 @@
+syntax = "proto3";
+
+package api;
+
+option go_package = "webitel.go/api;api";
+
+import "oid.proto";
+import "presence.proto";
+import "customers.proto";
+import "permission.proto";
+import "google/api/annotations.proto";
+
+service Users {
+
+	rpc ReadUser(ReadUserRequest) returns (ReadUserResponse) {
+        option (google.api.http) = {
+                get: "/users/{id}"
+                additional_bindings {
+                    get: "/user"
+                }
+        };
+    }
+	rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
+        option (google.api.http) = {
+                put: "/users/{user.id}"
+                body: "*"
+        };
+    }
+    rpc DeleteUsers(DeleteUsersRequest) returns (DeleteUsersResponse) {
+        option (google.api.http) = {
+                delete: "/users/{user.id}"
+                additional_bindings {
+                    delete: "/users"
+                    body: "selection"
+                }
+        };
+    }
+    rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
+        option (google.api.http) = {
+                post: "/users"
+                body: "*"
+        };
+    }
+	rpc SearchUsers(SearchUsersRequest) returns (SearchUsersResponse) {
+        option (google.api.http) = {
+                get: "/users"
+                additional_bindings {
+                    post: "/users/search"
+                    body: "*"
+                }
+        };
+    }
+	// rpc UpdatePassword(UpdatePasswordRequest) returns (UpdatePasswordResponse) {}
+
+    rpc LogoutUser(LogoutUserRequest) returns (LogoutUserResponse) {
+        option (google.api.http) = {
+                post: "/users/{id}/logout"
+                body: "*"
+        };
+    }
+}
+
+// UserId lookup value.
+message UserId {
+    int64  id = 1;   // Object ID
+    string name = 2; // Display Name
+}
+
+// User profile.
+message User {
+
+    int64  id = 1;   // Object ID
+    string name = 2; // Caller-ID-Name: Display Name
+
+    string email = 3;
+
+    string username = 4; // alphanumeric username (login)
+    string password = 5;
+
+    string extension = 6; // Caller-ID-Number:
+    
+    // CallerId caller = 5; // extension
+    // PresenceStatus presence = 8;
+    UserPresence presence = 8;
+    // string presence = 7; // unique set of <user> presentity <status:basic> tuples open[ed]
+    // string status = 8; // short display status (short description)
+    
+    // bool   online = 9; // is currently online, ws::connected ? FIXME: maybe count of active connection
+    // bool   dnd = 10;    // temporary unavailable: does not ready to accept incoming calls
+
+    ObjectId device = 10; // [optional] default device assigned ? WebRTC register ?
+    // map<int64, string> devices = 13;
+    repeated ObjectId devices = 11; // [editable] list of unique `regular` devices, attached to this user
+    repeated ObjectId hotdesks = 12; // [readonly] list of unique `hotdesk` devices, assigned to this user
+
+    map<string,string> profile = 13; // list of variables, assigned to this user as an environment unit
+    repeated Permission permissions = 14; // set of operational permission grants
+    repeated LicenseUser license = 15; // list of unique licenses, granted to this user
+    repeated ObjectId roles = 16; // roles, member of which is this user
+    // map<int64, string> roles = 10;
+    // map<int64, string> admin = 11; // roles, admin of which is this user
+
+    // repeated Call calls = 13; // order by created_at
+    // repeated Registration reged = 13; // order by register_last
+    
+
+    int64  created_at = 20; // unix
+    UserId created_by = 21; // user
+    int64  updated_at = 22; // unix
+    UserId updated_by = 23; // user
+    int64  deleted_at = 24; // unix
+    UserId deleted_by = 25; // user
+
+}
+
+message CreateUserRequest {
+    User   user = 1;       // user entity to be created
+    string user_password = 2; // cleartext passphrase
+    string confirm_password = 3; // cleartext passphrase
+}
+
+message CreateUserResponse {
+    User user = 1;
+}
+
+message ReadUserRequest {
+    int64 id = 1;
+    repeated string fields = 2; // partial output
+}
+
+message ReadUserResponse {
+    User user = 1;
+}
+
+message UpdateUserRequest {
+    User user = 1; // body: modifications/changes
+    repeated string fields = 2; // PATCH: partial update
+}
+
+message UpdateUserResponse {
+    User updated = 1;
+}
+
+message DeleteUsersRequest {
+    int64 id = 1; // ONE /users/{id}
+    repeated int64 selection = 2; // MANY /users .ids=[id,...]
+    bool permanent = 3;
+}
+
+message DeleteUsersResponse {
+    repeated User deleted = 1;
+}
+
+message SearchUsersRequest {
+    // ----- Base Filters ---------------------------
+    repeated int64 id = 1;      // filter: .id = any({id}...)
+    repeated int64 not_id = 2;  // filter: .id <> all({not_ids}...)
+    // ----- User-specific Filters ------------------
+    string q = 3;                // filter: (.name|.username|.extension|.status) ILIKE '{q}'
+    string name = 4;             // filter: .name ILIKE '{name}'
+    string status = 5;           // filter: .status ILIKE '{status}'
+    string username = 6;         // filter: .username ILIKE '{username}'
+    string extension = 7;        // filter: .extension LIKE '{extension}'
+    // ----- View Modes -----------------------------
+    // NOTE: by default, search NOT 'deleted' objects ONLY
+    bool any = 8;                // filter: include 'deleted' ALSO ! (inactive)
+    bool deleted = 9;            // filter: .deleted_at NOTNULL (view: RECYCLE)
+    // simplified presence filter params
+    message Presence {
+        string status = 1;
+        string note = 2;
+    }
+    Presence presence = 10;
+    // // navigation filter
+    // repeated int64 roles = 7;
+    // ----- Search Options -------------------------
+    repeated string fields = 20; // select: output (fields,...)
+    repeated string sort = 21;   // select: order by (fields,...)
+    int32 page = 22;             // select: offset {page}
+    int32 size = 23;             // select: limit {size}
+}
+
+message SearchUsersResponse {
+
+    int32 page = 10; // select: offset {page}
+    int32 size = 11; // search: limit {size}
+     bool next = 12; // search: has {next} page ?
+
+    repeated User items = 1; // users
+}
+
+message UpdatePasswordRequest {
+    int64  id = 1;
+    string old_password = 2;     // OLD
+    string user_password = 3;    // NEW
+    string confirm_password = 4; // CONFIRM
+}
+
+message UpdatePasswordResponse {
+}
+
+
+message LogoutUserRequest {
+    int64 id = 1;
+}
+
+message LogoutUserResponse {
+
+}

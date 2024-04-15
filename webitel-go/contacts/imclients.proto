@@ -1,0 +1,214 @@
+syntax = "proto3";
+package webitel.contacts;
+option go_package = "webitel.go/api/contacts;contacts";
+
+import "contacts/fields.proto";
+
+import "google/api/visibility.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+// A contact's [I]nstant[M]essaging client.
+message IMClient {
+
+  // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+  //   // GET /contacts/{source.id}/imclients/{user.id}
+  //   example: ""
+  // };
+  
+  // [META]: --------------------------------------
+
+  // The unique ID of the association. Never changes.
+  string id = 1;
+  
+  // Version of the latest update. Numeric sequence.
+  int32 ver = 2;
+
+  // Unique ID of the latest version of the update.
+  // This ID changes after any update to the underlying value(s).
+  string etag = 3;
+
+  // // The Contact source associated with.
+  // webitel.contacts.Lookup contact = 4;
+
+  // The user who created this Field.
+  int64 created_at = 5;
+
+  // Timestamp(milli) of the Field creation.
+  webitel.contacts.Lookup created_by = 6;
+  
+  // Timestamp(milli) of the last Field update.
+  // Take part in Etag generation.
+  int64 updated_at = 7;
+  
+  // The user who performed last Update.
+  webitel.contacts.Lookup updated_by = 8;
+  
+  // [VALUE]: --------------------------------------
+
+  // External user which contacted to us.
+  // Id will be from external service.
+  // Name will be from external service.
+  Lookup user = 11
+  [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    example: "{\"id\":\"596417343\",\"type\":\"telegram\",\"name\":\"John Doe\"}"
+  }];
+
+  // App (Text-Gateway) used to connect the IM client.
+  // Id will be internal id of gateway.
+  // Name will be name of the gateway.
+  webitel.contacts.Lookup app = 12;
+
+  // Protocol used to connect the IM client.
+  string protocol = 13;
+
+  
+  // Can be set by self VIA IM-Account gateway only !
+  // If set -- all client sensitive data is READONLY, except .type !
+  // If set -- can be manualy deleted, by the user or VIA source ONLY !
+  
+  // [Via] App(-specific) peer(-id) to connect[from] the IM client.
+  string via = 14;
+
+}
+
+// Input of the contact IM client.
+message InputIMClient {
+  string protocol = 9;
+  // Id of Agent created this IM client.
+  string created_by = 10;
+  // External user id
+  string external_user = 11;
+  // App (Text-Gateway) used to connect the IM client.
+  string gateway_id = 12;
+
+
+  
+  // Can be set by self VIA IM-Account gateway only !
+  // If set -- all client sensitive data is READONLY, except .type !
+  // If set -- can be manualy deleted, by the user or VIA source ONLY !
+  
+  // [Via] App(-specific) peer(-id) to connect[from] the IM client.
+  string via = 13;
+}
+
+
+// [I]nstant[M]essaging Clients service catalog.
+service IMClients {
+  // Search IM client links
+  rpc ListIMClients(ListIMClientsRequest) returns (IMClientList)
+  {
+    option (google.api.http) = {
+      get: "/contacts/{contact_id}/imclients"
+    };
+  }
+  // Link IM client(s) with the Contact. (WARNING! Only for internal use, no authorization!)
+  rpc CreateIMClients(CreateIMClientsRequest) returns (EmptyResponse)  {}
+
+  // Link IM client(s) with the Contact. If conflict appears API reassigns client to the new contact. (WARNING! Only for internal use, no authorization!)
+  rpc UpsertIMClients(UpsertIMClientsRequest) returns (EmptyResponse)  {}
+
+
+//  rpc ResetIMClient(ResetIMClientRequest) returns (IMClient) {
+//    option (google.api.http) = {
+//      put: "/contacts/{contact_id}/imclients/{id}"
+//    };
+//  }
+
+
+  rpc DeleteIMClient(DeleteIMClientRequest) returns (EmptyResponse) {
+    option (google.api.http) = {
+      delete: "/contacts/{contact_id}/imclients/{id}"
+    };
+  }
+
+}
+
+
+message IMClientList {
+
+
+  // IMClient dataset page.
+  repeated IMClient data = 1;
+  // The page number of the partial result.
+  int32 page = 2;
+  // Indicates that this is a partial result.
+  // More data available upon query: ?size=${data.len}&page=${page++}
+  bool next = 3;
+}
+
+message EmptyResponse {}
+
+message ListIMClientsRequest {
+  
+  // ------- Result Options ------ //
+  
+  // Page number of result dataset records. offset = (page*size)
+  int32 page = 2;
+  
+  // Size count of records on result page. limit = (size++)
+  int32 size = 1;
+
+  // Search term: IMClient.
+  // `?` - matches any one character
+  // `*` - matches 0 or more characters
+  // Search fields: {user,app}
+  string q = 6;
+
+  // Sort the result according to fields.
+  repeated string sort = 3;
+  
+  // Fields to be retrieved into result.
+  repeated string fields = 4;
+
+  // ------- Search Options ------ //
+  
+  // Link contact ID.
+  string contact_id = 5;
+  
+  // Link(s) with unique ID only.
+  repeated string id = 7;
+
+}
+
+message DeleteIMClientRequest {
+  int64 id = 1;
+  string contact_id = 2;
+}
+
+//message ResetIMClientRequest {
+//  InputIMClient input = 1;
+//  string contact_id = 2;
+//  int64 id = 3;
+//}
+
+message CreateIMClientsRequest {
+
+  // ------- Create Options -------
+
+  // Link contact ID.
+  string contact_id = 1;
+
+  int64 domain_id = 2;
+
+  // Fixed set of IM client(s) to be linked with the contact.
+  // IM client(s) that conflicts(user.id) with already linked will be updated.
+  repeated InputIMClient input = 3;
+
+}
+
+message UpsertIMClientsRequest {
+
+  // ------- Create Options -------
+
+  // Link contact ID.
+  string contact_id = 1;
+
+  // DEPRECATED with use of authorization on this api
+  int64 domain_id = 2;
+
+  // Fixed set of IM client(s) to be linked with the contact.
+  // IM client(s) that conflicts(user.id) with already linked will be updated.
+  repeated InputIMClient input = 3;
+
+}

@@ -1,0 +1,231 @@
+syntax = "proto3";
+
+package api;
+
+option go_package = "webitel.go/api;api";
+
+import "oid.proto";
+import "users.proto";
+import "permission.proto";
+// import "caller.proto";
+import "google/protobuf/struct.proto";
+
+service Roles {
+    
+	rpc ReadRole(ReadRoleRequest) returns (ReadRoleResponse) {}
+	rpc UpdateRole(UpdateRoleRequest) returns (UpdateRoleResponse) {}
+    rpc DeleteRole(DeleteRoleRequest) returns (DeleteRoleResponse) {}
+    rpc CreateRole(CreateRoleRequest) returns (CreateRoleResponse) {}
+    rpc SearchRoles(SearchRolesRequest) returns (SearchRolesResponse) {}
+    rpc SearchRecordAvailableRoles(SearchRecordAvailableRolesRequest) returns (SearchRolesResponse) {}
+
+    rpc GrantRole(GrantRoleRequest) returns (GrantRoleResponse) {}
+    rpc RevokeRole(RevokeRoleRequest) returns (RevokeRoleResponse) {}
+    rpc RoleMembers(RoleMembersRequest) returns (RoleMembersResponse) {}
+
+    rpc RoleMetadata(RoleMetadataRequest) returns (RoleMetadataResponse) {}
+}
+
+// RoleId lookup value.
+message RoleId {
+
+    // Unique Object IDentifier
+    int64  id = 1;
+    // Display Name
+    string name = 2;
+    // Optional. Indicates that this role ID refers
+    // to the internal user as the system administrative unit
+    bool user = 3;
+}
+
+// Role represents group of users
+message Role {
+
+    int64  id = 1; // oid
+    string name = 2; // display common name
+    bool   user = 3; // READONLY. Report whether this Role refers to the internal User(=true) or Group(=false)
+    string description = 4; // short description
+    repeated Permission permissions = 5;
+
+    // Caller caller = 4; // TOBE removed !!!
+    // map<int64, string> users = 4;
+    repeated ObjectId members = 6; // users/roles
+    // Optional. Metadata bound to this role by the third party integrations
+    // Each attribute of this object represents separate various data
+    // to be able to store and merge separate keys (documents)
+    google.protobuf.Struct metadata = 7;
+
+    int64  created_at = 10; // unix
+    UserId created_by = 11; // user
+    int64  updated_at = 12; // unix
+    UserId updated_by = 13; // user
+    int64  deleted_at = 14; // unix
+    UserId deleted_by = 15; // user
+
+    message Member {
+
+        int64  id = 1; // user.id
+        string name = 2; // user.name
+        bool   admin = 3; // admin of the group ?
+    
+        int64  created_at = 10; // unix
+        string created_by = 11; // user.[id|name]
+        int64  updated_at = 12; // unix
+        string updated_by = 13; // user
+    
+    }
+}
+
+message CreateRoleRequest {
+    Role role = 1; // entity to be created
+    // ----- Query parameters -----
+    // Optional. Source role unique identifier
+    // to copy access (+default) control list from
+    int64 copy_id = 2;
+}
+
+message CreateRoleResponse {
+    Role created = 1; // entity to be created
+}
+
+message ReadRoleRequest {
+    // role.id
+    int64 id = 1;
+    // select projection
+    repeated string fields = 2; // select: output (fields,...)
+}
+
+message ReadRoleResponse {
+	Role role = 1;
+}
+
+message UpdateRoleRequest {
+    // modifications
+    Role role = 1;
+    // partial changes
+    repeated string fields = 2;
+}
+
+message UpdateRoleResponse {
+    Role updated = 1;
+}
+
+message DeleteRoleRequest {
+    int64 id = 1; // DELETE /roles/{id}
+    repeated int64 ids = 2; // POST /roles/delete {"ids"}
+    bool permanent = 3; // deleteOrMark 'deleted' ?
+}
+
+message DeleteRoleResponse {
+    Role deleted = 1;
+}
+
+message SearchRolesRequest {
+    // ----- Role-specific Filters ----------------- //
+    repeated int64 ids = 1; // filter: .id = any(:ids...)
+    string name = 2; // filter: group name like
+    UserId user = 3; // filter: has member id (bottom)
+    string q = 4; // filter: term of search (name, description)
+    // bool admin = 4;  // filter: where CURRENT user is 'ADMIN' of
+    // controls
+    repeated string fields = 10; // output
+    repeated string sort = 11; // sort: "field" asc; "!field" desc
+    int32 page = 12; // page number
+    int32 size = 13; // page size
+	
+}
+
+message SearchRecordAvailableRolesRequest {
+    // ----- Role-specific Filters ----------------- //
+    repeated int64 ids = 1; // filter: .id = any(:ids...)
+    string name = 2; // filter: group name like
+    UserId user = 3; // filter: has member id (bottom)
+    string q = 4; // filter: term of search (name, description)
+    // bool admin = 4;  // filter: where CURRENT user is 'ADMIN' of
+    // REQUIRED !
+    SystemObjects object = 5;
+    ObjectId record = 6;
+    // controls
+    repeated string fields = 10; // output
+    repeated string sort = 11; // sort: "field" asc; "!field" desc
+    int32 page = 12; // page number
+    int32 size = 13; // page size
+
+}
+
+message SearchRolesResponse {
+
+    // pagedResultsControl response value
+    int32 page = 10; // select: offset {page}
+    int32 size = 11; // search: limit {size}
+     bool next = 12; // search: has {next} page ?
+
+	repeated Role items = 1; // roles
+}
+
+
+
+
+message RoleMembersRequest {
+    string domain = 1; // domain relation
+    int64 role_id = 2;
+    // string role = 2; // filter: role (group) name
+    // int64 group = 3; // filter: group.id
+}
+
+message RoleMembersResponse {
+    repeated Role.Member results = 1;
+}
+
+// idempotent: set
+message GrantRoleRequest {
+    string domain = 1; // domain relation
+    int64 group = 2; // role
+    int64 user = 3; // member
+    bool admin = 4; // option: is admin of the group
+}
+
+message GrantRoleResponse {
+}
+
+message RevokeRoleRequest {
+    string domain = 1; // domain relation
+    int64 group = 2; // role
+    int64 user = 3; // member
+}
+
+message RevokeRoleResponse {
+}
+
+message RoleMetadataRequest {
+    // Optional. Unique ID of metadata role owner
+    int64 id = 1;
+    // Optional. Partial metadata document key name
+    string key = 2;
+    // Optional. Metadata document(s) merge options
+    google.protobuf.Value merge = 3;
+}
+
+message RoleMetadataResponse {
+    // Optional. Partial metadata document key name
+    string key = 1;
+    // Metadata value
+    google.protobuf.Value value = 2;
+}
+
+enum SystemObjects {
+    contacts = 0;
+    cc_list = 1;
+    cc_bucket =2;
+    calendars =3;
+    devices = 4;
+    cc_agent = 5;
+    cc_team =6;
+    cc_resource =7;
+    cc_resource_group = 8;
+    cc_queue =9;
+    roles = 10;
+    users = 11;
+    cognitive_profile = 12;
+
+}

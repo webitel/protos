@@ -1,0 +1,87 @@
+syntax="proto3";
+
+package api;
+
+option go_package = "webitel.go/api;api";
+
+import "users.proto";
+import "devices.proto";
+
+service CallManager {
+    rpc SearchCalls(SearchCallsRequest) returns (SearchCallsResponse) {
+        // GET /calls
+        // GET /users/:oid/calls
+        // GET /devices/:oid/calls
+        // GET /gateways/:oid/calls
+    }
+    // rpc Hangup(HangupCallRequest) returns (HangupCallResponse) {
+
+    // }
+}
+
+message SearchCallsRequest {
+    // Related To
+    UserId user = 1;
+    DeviceId device = 2;
+    // GatewayId gateway = 3;
+}
+
+message SearchCallsResponse {
+    repeated Call list = 1;
+}
+
+// CallerId display value.
+message CallerId {
+    string name = 1;
+    string number = 2;
+}
+
+// The Caller profile
+message Caller {
+
+    string   uuid = 1;             // [required] unique_id (channel.uuid)
+    string   proto = 2;            // [required] protocol; channel source: sip|sips|webrtc
+    // From:
+    CallerId origin = 3;           // [optional] [From]: source
+    CallerId caller = 4;           // [required] leg[A] display; at least is the same as origin
+    CallerId callee = 5;           // [optional] leg[B] display
+    string   ANI = 6;              // [optional] [A]utomatic[N]umber[I]dentification
+    // To:
+    string direction = 7;          // [required] inbound | outbound
+    string destination = 8;        // [required] [To]: in most cases this is the number
+    string transferred = 9;        // [optional] transfer source
+    // Timing of stages
+    uint64 created_at = 10;        // [required] !
+    uint64 progress_at = 11;       // [optional]
+    uint64 progress_media_at = 12; // [optional]
+    uint64 answered_at = 13;       // [optional]
+    uint64 bridged_at = 14;        // [optional]
+    uint64 hangup_at = 15;         // [optional] unlil hangup state reached
+    uint64 onhold_at = 16;         // [optional] last 'hold' at time
+    uint64 onhold_ms = 17;         // [optional] 'hold' time accumulated
+    // Other-Leg: oneof below or nothing
+    string commutation = 18;       // [optional] 'originator' | 'originatee' FIXME: 'bridge' ?
+    Caller originator = 19;        // defines::leg[A]; thisis:leg[B]
+    Caller originatee = 20;        // defines::leg[B]; thisis:leg[A]
+}
+
+message Channel {
+
+    string uuid = 1;      // [required] unique_id
+    string proto = 2;     // [required] source; protocol 
+    string state = 3;     // [required] call_state
+    string active = 4;    // [optional] answer_state
+    string hangup = 5;    // [optional] hangup_cause
+    Caller profile = 6;   // [required] profile in front of this channel
+    string direction = 7; // [required] inbound | outbound
+    // // references
+    // Call call = 8;
+    // UserId user = 9;
+    // DeviceId device = 10;
+    // GatewayId gateway = 11;
+}
+
+message Call {
+    string  uuid = 1;     // [optional] !uuid ? channel.uuid : uuid
+    Channel channel = 2;
+}
