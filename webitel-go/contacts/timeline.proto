@@ -6,7 +6,7 @@ option go_package = "webitel.go/api/contacts;contacts";
 
 import "google/api/annotations.proto";
 import "contacts/fields.proto";
-import "messages/history.proto";
+import "chat/messages/history.proto";
 
 service Timeline {
   rpc GetTimeline(GetTimelineRequest) returns (GetTimelineResponse) {
@@ -14,19 +14,19 @@ service Timeline {
       get: "/contacts/{contact_id}/timeline"
     };
   }
-//
+  //
   rpc GetDetailedMessageHistory(GetDetailedMessageHistoryRequest) returns (chat.ChatMessages) {
     option (google.api.http) = {
       get: "/contacts/{contact_id}/timeline/chats/{conversation_id}"
     };
   }
-//
-//  rpc GetDetailedCallHistory(GetDetailedCallHistoryRequest) returns (GetDetailedCallHistoryResponse) {
-//    option (google.api.http) = {
-//      get: "/contacts/{contact_id}/timeline/calls/{call_id}"
-//      body: "input"
-//    };
-//  }
+  //
+  //  rpc GetDetailedCallHistory(GetDetailedCallHistoryRequest) returns (GetDetailedCallHistoryResponse) {
+  //    option (google.api.http) = {
+  //      get: "/contacts/{contact_id}/timeline/calls/{call_id}"
+  //      body: "input"
+  //    };
+  //  }
 }
 
 
@@ -34,7 +34,7 @@ message GetTimelineRequest {
   string contact_id = 1;
   int64 date_from = 2;
   int64 date_to = 3;
-  repeated string type = 4;
+  repeated TimelineEventType type = 4;
 }
 
 message GetDetailedMessageHistoryRequest {
