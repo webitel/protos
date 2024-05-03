@@ -12,52 +12,98 @@ import "google/api/annotations.proto";
 
 service Users {
 
-	rpc ReadUser(ReadUserRequest) returns (ReadUserResponse) {
+    rpc ReadUser(ReadUserRequest) returns (ReadUserResponse) {
         option (google.api.http) = {
-                get: "/users/{id}"
-                additional_bindings {
-                    get: "/user"
-                }
+            get: "/users/{id}"
+            additional_bindings {
+                get: "/user"
+            }
         };
     }
-	rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
+    rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
         option (google.api.http) = {
-                put: "/users/{user.id}"
-                body: "*"
+            put: "/users/{user.id}"
+            body: "*"
         };
     }
     rpc DeleteUsers(DeleteUsersRequest) returns (DeleteUsersResponse) {
         option (google.api.http) = {
-                delete: "/users/{user.id}"
-                additional_bindings {
-                    delete: "/users"
-                    body: "selection"
-                }
+            delete: "/users/{user.id}"
+            additional_bindings {
+                delete: "/users"
+                body: "selection"
+            }
         };
     }
     rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
         option (google.api.http) = {
-                post: "/users"
-                body: "*"
+            post: "/users"
+            body: "*"
         };
     }
-	rpc SearchUsers(SearchUsersRequest) returns (SearchUsersResponse) {
+    rpc SearchUsers(SearchUsersRequest) returns (SearchUsersResponse) {
         option (google.api.http) = {
-                get: "/users"
-                additional_bindings {
-                    post: "/users/search"
-                    body: "*"
-                }
+            get: "/users"
+            additional_bindings {
+                post: "/users/search"
+                body: "*"
+            }
         };
     }
-	// rpc UpdatePassword(UpdatePasswordRequest) returns (UpdatePasswordResponse) {}
+    // rpc UpdatePassword(UpdatePasswordRequest) returns (UpdatePasswordResponse) {}
 
     rpc LogoutUser(LogoutUserRequest) returns (LogoutUserResponse) {
         option (google.api.http) = {
-                post: "/users/{id}/logout"
-                body: "*"
+            post: "/users/{id}/logout"
+            body: "*"
         };
     }
+}
+
+service TwoFactorAuthorization {
+    // GenerateUserSecret generates new or regenerates secret for the concrete user
+    rpc GenerateUserTotp(GenerateUserTotpRequest) returns (GenerateUserTotpResponse) {
+        option (google.api.http) = {
+            post: "/users/{user_id}/2fa"
+        };
+    }
+    // GetUserSecret locates the secret for user and returns it as a TOTP url
+    rpc GetUserTotp(GetUserTotpRequest) returns (GetUserTotpResponse) {
+        option (google.api.http) = {
+            get: "/users/{user_id}/2fa"
+        };
+    }
+    // GenerateTotpForNecessaryUsers generates necessary (not generated previously) totp keys for users in the domain
+    rpc GenerateTotpForNecessaryUsers(GenerateTotpForNecessaryUsersRequest) returns (GenerateTotpForNecessaryUsersResponse) {
+    }
+}
+
+message GenerateUserTotpRequest {
+    int64 user_id = 1;
+}
+
+message GenerateUserTotpResponse {
+    Totp totp = 1;
+}
+
+message GetUserTotpRequest {
+    int64 user_id = 1;
+}
+
+message GetUserTotpResponse {
+    Totp totp = 1;
+}
+
+message GenerateTotpForNecessaryUsersRequest {
+}
+
+message GenerateTotpForNecessaryUsersResponse {
+    int64 affected = 1;
+}
+
+message Totp {
+    UserId user = 1;
+    string url = 2;
 }
 
 // UserId lookup value.
@@ -78,13 +124,13 @@ message User {
     string password = 5;
 
     string extension = 6; // Caller-ID-Number:
-    
+
     // CallerId caller = 5; // extension
     // PresenceStatus presence = 8;
     UserPresence presence = 8;
     // string presence = 7; // unique set of <user> presentity <status:basic> tuples open[ed]
     // string status = 8; // short display status (short description)
-    
+
     // bool   online = 9; // is currently online, ws::connected ? FIXME: maybe count of active connection
     // bool   dnd = 10;    // temporary unavailable: does not ready to accept incoming calls
 
@@ -97,12 +143,14 @@ message User {
     repeated Permission permissions = 14; // set of operational permission grants
     repeated LicenseUser license = 15; // list of unique licenses, granted to this user
     repeated ObjectId roles = 16; // roles, member of which is this user
+
+    string totp_url = 17; // [readonly][optional] one time password if setting (2fa) is enabled
     // map<int64, string> roles = 10;
     // map<int64, string> admin = 11; // roles, admin of which is this user
 
     // repeated Call calls = 13; // order by created_at
     // repeated Registration reged = 13; // order by register_last
-    
+
 
     int64  created_at = 20; // unix
     UserId created_by = 21; // user
@@ -184,7 +232,7 @@ message SearchUsersResponse {
 
     int32 page = 10; // select: offset {page}
     int32 size = 11; // search: limit {size}
-     bool next = 12; // search: has {next} page ?
+    bool next = 12; // search: has {next} page ?
 
     repeated User items = 1; // users
 }
