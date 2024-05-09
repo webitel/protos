@@ -8,6 +8,7 @@ import "google/api/annotations.proto";
 
 service FileService {
     rpc UploadFile (stream UploadFileRequest) returns (UploadFileResponse) {}
+    rpc SafeUploadFile (stream SafeUploadFileRequest) returns (stream SafeUploadFileResponse) {}
     rpc DownloadFile (DownloadFileRequest) returns (stream StreamFile) {}
     rpc UploadFileUrl (UploadFileUrlRequest) returns (UploadFileUrlResponse) {}
     rpc GenerateFileLink (GenerateFileLinkRequest) returns (GenerateFileLinkResponse) {}
@@ -104,6 +105,41 @@ message UploadFileRequest {
         bytes chunk = 2;
     };
 
+}
+message SafeUploadFileRequest {
+
+    message Metadata {
+        int64 domain_id = 1;
+        string name = 2;
+        string mime_type = 3;
+        string uuid = 4;
+        bool stream_response = 5;
+        int64 profile_id = 6;
+    }
+
+    oneof data {
+        int64 file_id = 1;
+        Metadata metadata = 2;
+        bytes chunk = 3;
+    };
+
+}
+
+message SafeUploadFileResponse {
+
+    message Metadata {
+        int64 domain_id = 1;
+        string name = 2;
+        string mime_type = 3;
+        string uuid = 4;
+        bool stream_response = 5;
+        int64 profile_id = 6;
+    }
+
+    oneof data {
+        int64 file_id = 1;
+        Metadata metadata = 2;
+    };
 }
 
 message UploadFileResponse {
