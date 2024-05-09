@@ -6,7 +6,7 @@ option go_package = "webitel.go/api/contacts;contacts";
 
 import "google/api/annotations.proto";
 import "contacts/fields.proto";
-import "messages/history.proto";
+import "chat/messages/history.proto";
 
 service Timeline {
   rpc GetTimeline(GetTimelineRequest) returns (GetTimelineResponse) {
@@ -14,19 +14,6 @@ service Timeline {
       get: "/contacts/{contact_id}/timeline"
     };
   }
-  //
-  rpc GetDetailedMessageHistory(GetDetailedMessageHistoryRequest) returns (chat.ChatMessages) {
-    option (google.api.http) = {
-      get: "/contacts/{contact_id}/timeline/chats/{conversation_id}"
-    };
-  }
-  //
-  //  rpc GetDetailedCallHistory(GetDetailedCallHistoryRequest) returns (GetDetailedCallHistoryResponse) {
-  //    option (google.api.http) = {
-  //      get: "/contacts/{contact_id}/timeline/calls/{call_id}"
-  //      body: "input"
-  //    };
-  //  }
 }
 
 
@@ -35,31 +22,29 @@ message GetTimelineRequest {
   int64 date_from = 2;
   int64 date_to = 3;
   repeated TimelineEventType type = 4;
+  int64 page = 5;
+  int64 size = 6;
 }
 
-message GetDetailedMessageHistoryRequest {
-  string conversation_id = 1;
-  string contact_id = 2;
-}
-
-
-message GetDetailedCallHistoryRequest {
-  string call_id = 1;
-}
-
-
-message GetDetailedMessageHistoryResponse {
-
-}
-
-
-message GetDetailedCallHistoryResponse {
-
-}
 
 
 message GetTimelineResponse {
   repeated DayTimeline days = 2;
+  int64 page = 3;
+  bool next = 4;
+}
+
+
+message GetTimelineCounterRequest {
+  string contact_id = 1;
+}
+
+message GetTimelineCounterResponse {
+  int64 date_from = 1;
+  int64 date_to = 2;
+  int64 chats_count = 3;
+  int64 calls_count = 4;
+
 }
 
 message TimelineRecord {
