@@ -144,7 +144,7 @@ contacts_proto:
 
 swagger_mix:
 	/home/igor/programs/golib/bin/swagger-mixin ./swagger/engine.swagger.json ./swagger/storage.swagger.json \
- 	 ./swagger/messages.swagger.json ./swagger/logger.swagger.json ./swagger/contacts.swagger.json  > ./swagger/api.json | true
+ 	 ./swagger/messages.swagger.json ./swagger/logger.swagger.json ./swagger/contacts.swagger.json ./swagger/webitel-go.swagger.json  > ./swagger/api.json | true
 
 
 .PHONY: clean
