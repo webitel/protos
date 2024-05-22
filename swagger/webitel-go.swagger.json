@@ -1,0 +1,2080 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Webitel Contacts ReSTfull API",
+    "version": "v23.10",
+    "contact": {
+      "name": "Webitel LLC",
+      "url": "https://www.webitel.com",
+      "email": "support@webitel.com"
+    },
+    "license": {
+      "name": "MIT"
+    }
+  },
+  "tags": [
+    {
+      "name": "Users"
+    },
+    {
+      "name": "TwoFactorAuthentication"
+    },
+    {
+      "name": "Devices"
+    }
+  ],
+  "host": "nx.webitel.org",
+  "basePath": "/api",
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/devices": {
+      "get": {
+        "operationId": "Devices_SearchDevice",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.SearchDeviceResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "size",
+            "description": "----- Select Options -------------------------\n\ndefault: 16",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "page",
+            "description": "default: 1",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "fields",
+            "description": "attributes list",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "sort",
+            "description": "e.g.: \"updated_at\" - ASC; \"!updated_at\" - DESC;",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "ids",
+            "description": "----- Search Basic Filters ---------------------------\n\nselection: by unique identifier",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "q",
+            "description": "term-of-search: lookup[name,account,hotdesk,brand,model,mac,ip]",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "case-ignore substring match: ILIKE '*' - any; '?' - one",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "access",
+            "description": "[M]andatory[A]ccess[C]ontrol: with access mode (action) granted!",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "account",
+            "description": "----- Device-Specific Filters ----------------\n\nsubstring like '%name%'",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "hotdesk",
+            "description": "filter: has hotdesk (=pattern); is hotdesk (=*)",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "user.id",
+            "description": "Object ID",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "user.name",
+            "description": "Display Name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "mac",
+            "description": "filter: by MAC address",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "ip",
+            "description": "filter: by IP address",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Devices"
+        ]
+      },
+      "delete": {
+        "operationId": "Devices_DeleteDevice2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.DeleteDeviceResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ids",
+            "description": "bulk",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "int64"
+              }
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "permanent",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "Devices"
+        ]
+      },
+      "post": {
+        "operationId": "Devices_CreateDevice",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.CreateDeviceResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "device",
+            "description": "string password = 2;",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.Device"
+            }
+          }
+        ],
+        "tags": [
+          "Devices"
+        ]
+      }
+    },
+    "/devices/{device.id}": {
+      "put": {
+        "operationId": "Devices_UpdateDevice",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.UpdateDeviceResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "device.id",
+            "description": "object id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "device",
+            "description": "Device profile",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "display name",
+                  "title": "kind of\nDeviceType type = 19;"
+                },
+                "account": {
+                  "type": "string",
+                  "description": "username",
+                  "title": "credentials"
+                },
+                "password": {
+                  "type": "string",
+                  "title": "password"
+                },
+                "user": {
+                  "$ref": "#/definitions/api.UserId",
+                  "title": "[optional] The user that 'owns' the device;"
+                },
+                "logged_in": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "caller profile\n webitel.adt.caller caller = 4;"
+                },
+                "hotdesk": {
+                  "type": "boolean",
+                  "description": "act as a hotdesk",
+                  "title": "Hotdesk: this workstation aliases"
+                },
+                "hotdesks": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "title": "associated aliases"
+                },
+                "provision": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "provision extra data"
+                },
+                "brand": {
+                  "type": "string",
+                  "description": "vendor brand name",
+                  "title": "provision"
+                },
+                "model": {
+                  "type": "string"
+                },
+                "mac": {
+                  "type": "string",
+                  "title": "static"
+                },
+                "ip": {
+                  "type": "string"
+                },
+                "reged": {
+                  "type": "boolean",
+                  "title": "TODO: something like PresenceStatus instead of Registration\n repeated Registration contacts = 16;"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "unix"
+                },
+                "created_by": {
+                  "$ref": "#/definitions/api.UserId",
+                  "title": "user"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "unix"
+                },
+                "updated_by": {
+                  "$ref": "#/definitions/api.UserId",
+                  "title": "user"
+                },
+                "deleted_at": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "unix"
+                },
+                "deleted_by": {
+                  "$ref": "#/definitions/api.UserId",
+                  "title": "user"
+                }
+              },
+              "title": "Device profile"
+            }
+          },
+          {
+            "name": "fields",
+            "description": "PATCH: partial update",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Devices"
+        ]
+      },
+      "patch": {
+        "operationId": "Devices_UpdateDevice2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.UpdateDeviceResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "device.id",
+            "description": "object id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "device",
+            "description": "Device profile",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "display name",
+                  "title": "kind of\nDeviceType type = 19;"
+                },
+                "account": {
+                  "type": "string",
+                  "description": "username",
+                  "title": "credentials"
+                },
+                "password": {
+                  "type": "string",
+                  "title": "password"
+                },
+                "user": {
+                  "$ref": "#/definitions/api.UserId",
+                  "title": "[optional] The user that 'owns' the device;"
+                },
+                "logged_in": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "caller profile\n webitel.adt.caller caller = 4;"
+                },
+                "hotdesk": {
+                  "type": "boolean",
+                  "description": "act as a hotdesk",
+                  "title": "Hotdesk: this workstation aliases"
+                },
+                "hotdesks": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "title": "associated aliases"
+                },
+                "provision": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "provision extra data"
+                },
+                "brand": {
+                  "type": "string",
+                  "description": "vendor brand name",
+                  "title": "provision"
+                },
+                "model": {
+                  "type": "string"
+                },
+                "mac": {
+                  "type": "string",
+                  "title": "static"
+                },
+                "ip": {
+                  "type": "string"
+                },
+                "reged": {
+                  "type": "boolean",
+                  "title": "TODO: something like PresenceStatus instead of Registration\n repeated Registration contacts = 16;"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "unix"
+                },
+                "created_by": {
+                  "$ref": "#/definitions/api.UserId",
+                  "title": "user"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "unix"
+                },
+                "updated_by": {
+                  "$ref": "#/definitions/api.UserId",
+                  "title": "user"
+                },
+                "deleted_at": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "unix"
+                },
+                "deleted_by": {
+                  "$ref": "#/definitions/api.UserId",
+                  "title": "user"
+                }
+              },
+              "title": "Device profile"
+            }
+          },
+          {
+            "name": "fields",
+            "description": "PATCH: partial update",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Devices"
+        ]
+      }
+    },
+    "/devices/{device.id}/audit": {
+      "get": {
+        "summary": "----- Details (1:M) ----------------------------------------------",
+        "operationId": "Devices_SearchDeviceAudit",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.DeviceAuditResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "device.id",
+            "description": "Object ID",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "user.id",
+            "description": "Object ID",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "user.name",
+            "description": "Display Name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "device.name",
+            "description": "Display Name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "time_from",
+            "description": "Filter: timing range (optional)\n\nunix milliseconds",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "time_till",
+            "description": "unix milliseconds",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "fields",
+            "description": "Search Options",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "Devices"
+        ]
+      }
+    },
+    "/devices/{device.id}/registered": {
+      "get": {
+        "operationId": "Devices_ListRegistrations",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.ListRegistrationsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "device.id",
+            "description": "Object ID",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "user.id",
+            "description": "Object ID",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "user.name",
+            "description": "Display Name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "device.name",
+            "description": "Display Name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Devices"
+        ]
+      }
+    },
+    "/devices/{id}": {
+      "get": {
+        "operationId": "Devices_ReadDevice",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.ReadDeviceResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "fields",
+            "description": "output selection",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Devices"
+        ]
+      },
+      "delete": {
+        "operationId": "Devices_DeleteDevice",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.DeleteDeviceResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "permanent",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "ids",
+            "description": "bulk",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Devices"
+        ]
+      }
+    },
+    "/user": {
+      "get": {
+        "operationId": "Users_ReadUser2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.ReadUserResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "fields",
+            "description": "partial output",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users": {
+      "get": {
+        "operationId": "Users_SearchUsers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.SearchUsersResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "----- Base Filters ---------------------------\n\nfilter: .id = any({id}...)",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "not_id",
+            "description": "filter: .id \u003c\u003e all({not_ids}...)",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "q",
+            "description": "----- User-specific Filters ------------------\n\nfilter: (.name|.username|.extension|.status) ILIKE '{q}'",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "filter: .name ILIKE '{name}'",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "description": "filter: .status ILIKE '{status}'",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "username",
+            "description": "filter: .username ILIKE '{username}'",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "extension",
+            "description": "filter: .extension LIKE '{extension}'",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "any",
+            "description": "----- View Modes -----------------------------\nNOTE: by default, search NOT 'deleted' objects ONLY\n\nfilter: include 'deleted' ALSO ! (inactive)",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "deleted",
+            "description": "filter: .deleted_at NOTNULL (view: RECYCLE)",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "presence.status",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "presence.note",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "description": "// navigation filter\nrepeated int64 roles = 7;\n----- Search Options -------------------------\n\nselect: output (fields,...)",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "sort",
+            "description": "select: order by (fields,...)",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "page",
+            "description": "select: offset {page}",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "description": "select: limit {size}",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      },
+      "delete": {
+        "operationId": "Users_DeleteUsers2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.DeleteUsersResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "selection",
+            "description": "MANY /users .ids=[id,...]",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "int64"
+              }
+            }
+          },
+          {
+            "name": "id",
+            "description": "ONE /users/{id}",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "permanent",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      },
+      "post": {
+        "operationId": "Users_CreateUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.CreateUserResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.CreateUserRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/search": {
+      "post": {
+        "operationId": "Users_SearchUsers2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.SearchUsersResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.SearchUsersRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "operationId": "Users_ReadUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.ReadUserResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "fields",
+            "description": "partial output",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      },
+      "delete": {
+        "operationId": "Users_DeleteUsers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.DeleteUsersResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "ONE /users/{id}",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "selection",
+            "description": "MANY /users .ids=[id,...]",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "permanent",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/{id}/logout": {
+      "post": {
+        "operationId": "Users_LogoutUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.LogoutUserResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.Users.LogoutUserBody"
+            }
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/{user.id}": {
+      "put": {
+        "operationId": "Users_UpdateUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.UpdateUserResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user.id",
+            "description": "Object ID",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.Users.UpdateUserBody"
+            }
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/{user_id}/2fa": {
+      "get": {
+        "summary": "GetUserTfaKey locates the secret for user and returns it as a TOTP url",
+        "operationId": "TwoFactorAuthentication_GetUserTfaKey",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.GetUserTfaKeyResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "TwoFactorAuthentication"
+        ]
+      },
+      "post": {
+        "summary": "GenerateUserTfaKey generates new or regenerates secret for the concrete user",
+        "operationId": "TwoFactorAuthentication_GenerateUserTfaKey",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.GenerateUserTfaKeyResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "TwoFactorAuthentication"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "api.CreateDeviceResponse": {
+      "type": "object",
+      "properties": {
+        "device": {
+          "$ref": "#/definitions/api.Device"
+        }
+      }
+    },
+    "api.CreateUserRequest": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/api.User",
+          "title": "user entity to be created"
+        },
+        "user_password": {
+          "type": "string",
+          "title": "cleartext passphrase"
+        },
+        "confirm_password": {
+          "type": "string",
+          "title": "cleartext passphrase"
+        }
+      }
+    },
+    "api.CreateUserResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/api.User"
+        }
+      }
+    },
+    "api.DeleteDeviceResponse": {
+      "type": "object",
+      "properties": {
+        "deleted": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.Device"
+          }
+        }
+      }
+    },
+    "api.DeleteUsersResponse": {
+      "type": "object",
+      "properties": {
+        "deleted": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.User"
+          }
+        }
+      }
+    },
+    "api.Device": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "title": "object id"
+        },
+        "name": {
+          "type": "string",
+          "description": "display name",
+          "title": "kind of\nDeviceType type = 19;"
+        },
+        "account": {
+          "type": "string",
+          "description": "username",
+          "title": "credentials"
+        },
+        "password": {
+          "type": "string",
+          "title": "password"
+        },
+        "user": {
+          "$ref": "#/definitions/api.UserId",
+          "title": "[optional] The user that 'owns' the device;"
+        },
+        "logged_in": {
+          "type": "string",
+          "format": "int64",
+          "title": "caller profile\n webitel.adt.caller caller = 4;"
+        },
+        "hotdesk": {
+          "type": "boolean",
+          "description": "act as a hotdesk",
+          "title": "Hotdesk: this workstation aliases"
+        },
+        "hotdesks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "associated aliases"
+        },
+        "provision": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "provision extra data"
+        },
+        "brand": {
+          "type": "string",
+          "description": "vendor brand name",
+          "title": "provision"
+        },
+        "model": {
+          "type": "string"
+        },
+        "mac": {
+          "type": "string",
+          "title": "static"
+        },
+        "ip": {
+          "type": "string"
+        },
+        "reged": {
+          "type": "boolean",
+          "title": "TODO: something like PresenceStatus instead of Registration\n repeated Registration contacts = 16;"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "unix"
+        },
+        "created_by": {
+          "$ref": "#/definitions/api.UserId",
+          "title": "user"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "unix"
+        },
+        "updated_by": {
+          "$ref": "#/definitions/api.UserId",
+          "title": "user"
+        },
+        "deleted_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "unix"
+        },
+        "deleted_by": {
+          "$ref": "#/definitions/api.UserId",
+          "title": "user"
+        }
+      },
+      "title": "Device profile"
+    },
+    "api.DeviceAudit": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/api.UserId",
+          "title": "/devices/:id/audit related"
+        },
+        "device": {
+          "$ref": "#/definitions/api.DeviceId",
+          "title": "/users/:id/audit related"
+        },
+        "hotdesk": {
+          "type": "string"
+        },
+        "logged_in": {
+          "type": "string",
+          "format": "int64"
+        },
+        "logged_out": {
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "title": "Device login audit"
+    },
+    "api.DeviceAuditResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "title": "select: offset {page}"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32",
+          "title": "search: limit {size}"
+        },
+        "next": {
+          "type": "boolean",
+          "title": "search: has {next} page ?"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.DeviceAudit"
+          },
+          "title": "audit_logs"
+        }
+      }
+    },
+    "api.DeviceId": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "title": "Object ID"
+        },
+        "name": {
+          "type": "string",
+          "title": "Display Name"
+        }
+      },
+      "title": "DeviceId lookup value"
+    },
+    "api.GenerateTfaKeysForNecessaryUsersResponse": {
+      "type": "object",
+      "properties": {
+        "affected": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "api.GenerateUserTfaKeyResponse": {
+      "type": "object",
+      "properties": {
+        "totp": {
+          "$ref": "#/definitions/api.TfaUrl"
+        }
+      }
+    },
+    "api.GetUserTfaKeyResponse": {
+      "type": "object",
+      "properties": {
+        "totp": {
+          "$ref": "#/definitions/api.TfaUrl"
+        }
+      }
+    },
+    "api.LicenseUser": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "license.id"
+        },
+        "prod": {
+          "type": "string",
+          "title": "license.prod"
+        },
+        "user": {
+          "$ref": "#/definitions/api.ObjectId",
+          "title": "grant to::user"
+        },
+        "scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "setof objclass grants"
+        },
+        "issued_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "not before"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "not after"
+        }
+      },
+      "title": "USAGE details"
+    },
+    "api.ListRegistrationsResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "title": "select: offset {page}"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32",
+          "title": "search: limit {size}"
+        },
+        "next": {
+          "type": "boolean",
+          "title": "search: has {next} page ?"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.Registration"
+          },
+          "title": "registered"
+        }
+      }
+    },
+    "api.LogoutUserResponse": {
+      "type": "object"
+    },
+    "api.ObjectId": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "title": "identifier"
+        },
+        "name": {
+          "type": "string",
+          "title": "display name"
+        }
+      }
+    },
+    "api.Permission": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "[required] e.g.: 'read', 'playback_record_file', ..."
+        },
+        "name": {
+          "type": "string",
+          "title": "[optional] e.g.: 'Select Any'"
+        },
+        "usage": {
+          "type": "string",
+          "title": "[optional] e.g.: 'Grants permission to select any objects'"
+        }
+      }
+    },
+    "api.ReadDeviceResponse": {
+      "type": "object",
+      "properties": {
+        "device": {
+          "$ref": "#/definitions/api.Device"
+        }
+      }
+    },
+    "api.ReadUserResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/api.User"
+        }
+      }
+    },
+    "api.Registration": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "user": {
+          "$ref": "#/definitions/api.UserId"
+        },
+        "device": {
+          "$ref": "#/definitions/api.DeviceId"
+        },
+        "callid": {
+          "type": "string"
+        },
+        "socket": {
+          "type": "string",
+          "title": "registrar: local side (host) e.g.:"
+        },
+        "contact": {
+          "type": "string",
+          "title": "binding_uri"
+        },
+        "received": {
+          "type": "string",
+          "title": "registrant: remote side (proxy)"
+        },
+        "instance": {
+          "type": "string",
+          "title": "?sip.instance= register contact option"
+        },
+        "user_agent": {
+          "type": "string"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "register_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "title": "REGISTER SIP status"
+    },
+    "api.SearchDeviceResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "title": "select: offset {page}"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32",
+          "title": "search: limit {size}"
+        },
+        "next": {
+          "type": "boolean",
+          "title": "search: has {next} page ?"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.Device"
+          },
+          "title": "devices"
+        }
+      }
+    },
+    "api.SearchUsersRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          },
+          "description": "filter: .id = any({id}...)",
+          "title": "----- Base Filters ---------------------------"
+        },
+        "not_id": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          },
+          "title": "filter: .id \u003c\u003e all({not_ids}...)"
+        },
+        "q": {
+          "type": "string",
+          "description": "filter: (.name|.username|.extension|.status) ILIKE '{q}'",
+          "title": "----- User-specific Filters ------------------"
+        },
+        "name": {
+          "type": "string",
+          "title": "filter: .name ILIKE '{name}'"
+        },
+        "status": {
+          "type": "string",
+          "title": "filter: .status ILIKE '{status}'"
+        },
+        "username": {
+          "type": "string",
+          "title": "filter: .username ILIKE '{username}'"
+        },
+        "extension": {
+          "type": "string",
+          "title": "filter: .extension LIKE '{extension}'"
+        },
+        "any": {
+          "type": "boolean",
+          "description": "filter: include 'deleted' ALSO ! (inactive)",
+          "title": "----- View Modes -----------------------------\nNOTE: by default, search NOT 'deleted' objects ONLY"
+        },
+        "deleted": {
+          "type": "boolean",
+          "title": "filter: .deleted_at NOTNULL (view: RECYCLE)"
+        },
+        "presence": {
+          "$ref": "#/definitions/api.SearchUsersRequest.Presence"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "select: output (fields,...)",
+          "title": "// navigation filter\nrepeated int64 roles = 7;\n----- Search Options -------------------------"
+        },
+        "sort": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "select: order by (fields,...)"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "title": "select: offset {page}"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32",
+          "title": "select: limit {size}"
+        }
+      }
+    },
+    "api.SearchUsersRequest.Presence": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        }
+      },
+      "title": "simplified presence filter params"
+    },
+    "api.SearchUsersResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "title": "select: offset {page}"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32",
+          "title": "search: limit {size}"
+        },
+        "next": {
+          "type": "boolean",
+          "title": "search: has {next} page ?"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.User"
+          },
+          "title": "users"
+        }
+      }
+    },
+    "api.TfaUrl": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/api.UserId"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "api.UpdateDeviceResponse": {
+      "type": "object",
+      "properties": {
+        "device": {
+          "$ref": "#/definitions/api.Device"
+        }
+      }
+    },
+    "api.UpdateUserResponse": {
+      "type": "object",
+      "properties": {
+        "updated": {
+          "$ref": "#/definitions/api.User"
+        }
+      }
+    },
+    "api.User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "title": "Object ID"
+        },
+        "name": {
+          "type": "string",
+          "title": "Caller-ID-Name: Display Name"
+        },
+        "email": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string",
+          "title": "alphanumeric username (login)"
+        },
+        "password": {
+          "type": "string"
+        },
+        "extension": {
+          "type": "string",
+          "title": "Caller-ID-Number:"
+        },
+        "presence": {
+          "$ref": "#/definitions/api.UserPresence",
+          "description": "string presence = 7; // unique set of \u003cuser\u003e presentity \u003cstatus:basic\u003e tuples open[ed]\n string status = 8; // short display status (short description)",
+          "title": "CallerId caller = 5; // extension\nPresenceStatus presence = 8;"
+        },
+        "device": {
+          "$ref": "#/definitions/api.ObjectId",
+          "title": "[optional] default device assigned ? WebRTC register ?"
+        },
+        "devices": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.ObjectId"
+          },
+          "description": "[editable] list of unique `regular` devices, attached to this user",
+          "title": "map\u003cint64, string\u003e devices = 13;"
+        },
+        "hotdesks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.ObjectId"
+          },
+          "title": "[readonly] list of unique `hotdesk` devices, assigned to this user"
+        },
+        "profile": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "list of variables, assigned to this user as an environment unit"
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.Permission"
+          },
+          "title": "set of operational permission grants"
+        },
+        "license": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.LicenseUser"
+          },
+          "title": "list of unique licenses, granted to this user"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.ObjectId"
+          },
+          "title": "roles, member of which is this user"
+        },
+        "totp_url": {
+          "type": "string",
+          "title": "[readonly][optional] one time password if setting (2fa) is enabled"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "unix"
+        },
+        "created_by": {
+          "$ref": "#/definitions/api.UserId",
+          "title": "user"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "unix"
+        },
+        "updated_by": {
+          "$ref": "#/definitions/api.UserId",
+          "title": "user"
+        },
+        "deleted_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "unix"
+        },
+        "deleted_by": {
+          "$ref": "#/definitions/api.UserId",
+          "title": "user"
+        }
+      },
+      "description": "User profile."
+    },
+    "api.UserId": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "title": "Object ID"
+        },
+        "name": {
+          "type": "string",
+          "title": "Display Name"
+        }
+      },
+      "description": "UserId lookup value."
+    },
+    "api.UserPresence": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "title": "[required] user identity"
+        },
+        "status": {
+          "type": "string",
+          "title": "[optional] set of unique 'active' presentities {dnd,dlg,sip,wss}; assume {offline} if omitted"
+        },
+        "note": {
+          "type": "string",
+          "title": "[optional] human readable comment"
+        },
+        "expires": {
+          "type": "integer",
+          "format": "int32",
+          "title": "[optional] \u003cnote\u003e will be cleaned up after seconds"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "int64",
+          "title": "[required] last activity time"
+        }
+      }
+    },
+    "api.Users.LogoutUserBody": {
+      "type": "object"
+    },
+    "api.Users.UpdateUserBody": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Caller-ID-Name: Display Name"
+            },
+            "email": {
+              "type": "string"
+            },
+            "username": {
+              "type": "string",
+              "title": "alphanumeric username (login)"
+            },
+            "password": {
+              "type": "string"
+            },
+            "extension": {
+              "type": "string",
+              "title": "Caller-ID-Number:"
+            },
+            "presence": {
+              "$ref": "#/definitions/api.UserPresence",
+              "description": "string presence = 7; // unique set of \u003cuser\u003e presentity \u003cstatus:basic\u003e tuples open[ed]\n string status = 8; // short display status (short description)",
+              "title": "CallerId caller = 5; // extension\nPresenceStatus presence = 8;"
+            },
+            "device": {
+              "$ref": "#/definitions/api.ObjectId",
+              "title": "[optional] default device assigned ? WebRTC register ?"
+            },
+            "devices": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/api.ObjectId"
+              },
+              "description": "[editable] list of unique `regular` devices, attached to this user",
+              "title": "map\u003cint64, string\u003e devices = 13;"
+            },
+            "hotdesks": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/api.ObjectId"
+              },
+              "title": "[readonly] list of unique `hotdesk` devices, assigned to this user"
+            },
+            "profile": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "title": "list of variables, assigned to this user as an environment unit"
+            },
+            "permissions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/api.Permission"
+              },
+              "title": "set of operational permission grants"
+            },
+            "license": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/api.LicenseUser"
+              },
+              "title": "list of unique licenses, granted to this user"
+            },
+            "roles": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/api.ObjectId"
+              },
+              "title": "roles, member of which is this user"
+            },
+            "totp_url": {
+              "type": "string",
+              "title": "[readonly][optional] one time password if setting (2fa) is enabled"
+            },
+            "created_at": {
+              "type": "string",
+              "format": "int64",
+              "title": "unix"
+            },
+            "created_by": {
+              "$ref": "#/definitions/api.UserId",
+              "title": "user"
+            },
+            "updated_at": {
+              "type": "string",
+              "format": "int64",
+              "title": "unix"
+            },
+            "updated_by": {
+              "$ref": "#/definitions/api.UserId",
+              "title": "user"
+            },
+            "deleted_at": {
+              "type": "string",
+              "format": "int64",
+              "title": "unix"
+            },
+            "deleted_by": {
+              "$ref": "#/definitions/api.UserId",
+              "title": "user"
+            }
+          },
+          "title": "body: modifications/changes"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "PATCH: partial update"
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "AccessToken": {
+      "type": "apiKey",
+      "name": "X-Webitel-Access",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "AccessToken": []
+    }
+  ]
+}
