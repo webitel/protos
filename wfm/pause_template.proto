@@ -1,0 +1,273 @@
+syntax = "proto3";
+
+package wfm;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "proto/options/options.proto";
+import "lookup.proto";
+
+service PauseTemplateService {
+  option (options.objclass) = "pause_template";
+  rpc CreatePauseTemplate(CreatePauseTemplateRequest) returns (CreatePauseTemplateResponse) {
+    option (options.access) = ACTION_CREATE;
+    option (google.api.http) = {
+      post: "/wfm/lookups/pause_templates"
+      body: "*"
+    };
+  }
+
+  rpc ReadPauseTemplate(ReadPauseTemplateRequest) returns (ReadPauseTemplateResponse) {
+    option (options.access) = ACTION_READ;
+    option (google.api.http) = {get: "/wfm/lookups/pause_templates/{id}"};
+  }
+
+  rpc SearchPauseTemplate(SearchPauseTemplateRequest) returns (SearchPauseTemplateResponse) {
+    option (options.access) = ACTION_READ;
+    option (google.api.http) = {get: "/wfm/lookups/pause_templates"};
+  }
+
+  rpc UpdatePauseTemplate(UpdatePauseTemplateRequest) returns (UpdatePauseTemplateResponse) {
+    option (options.access) = ACTION_UPDATE;
+    option (google.api.http) = {
+      put: "/wfm/lookups/pause_templates/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeletePauseTemplate(DeletePauseTemplateRequest) returns (DeletePauseTemplateResponse) {
+    option (options.access) = ACTION_DELETE;
+    option (google.api.http) = {delete: "/wfm/lookups/pause_templates/{id}"};
+  }
+
+  // SearchPauseTemplateCause returns a list of pause template causes.
+  rpc SearchPauseTemplateCause(SearchPauseTemplateCauseRequest) returns (SearchPauseTemplateCauseResponse) {
+    option (options.access) = ACTION_READ;
+    option (google.api.http) = {get: "/wfm/lookups/pause_templates/{pause_template_id}/causes"};
+  }
+
+  // UpdatePauseTemplateCauseBulk updates a list of pause template causes.
+  // Update existing, create that not exists in database and delete that not exists in the list.
+  rpc UpdatePauseTemplateCauseBulk(UpdatePauseTemplateCauseBulkRequest) returns (UpdatePauseTemplateCauseBulkResponse) {
+    option (options.access) = ACTION_UPDATE;
+    option (google.api.http) = {
+      put: "/wfm/lookups/pause_templates/{pause_template_id}/causes"
+      body: "*"
+    };
+  }
+}
+
+message CreatePauseTemplateRequest {
+  PauseTemplate item = 1 [(buf.validate.field).required = true];
+}
+
+message CreatePauseTemplateResponse {
+  PauseTemplate item = 1;
+}
+
+message ReadPauseTemplateRequest {
+  int64 id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64.gt = 0
+  ];
+
+  repeated string fields = 5 [(buf.validate.field).repeated = {
+    unique: true,
+    items {
+      string {
+        min_len: 1,
+        in: [
+          'id',
+          'domain_id',
+          'name',
+          'description',
+          'created_at',
+          'created_by',
+          'updated_at',
+          'updated_by'
+        ]
+      }
+    }
+  }];
+}
+
+message ReadPauseTemplateResponse {
+  PauseTemplate item = 1;
+}
+
+message SearchPauseTemplateRequest {
+  optional string q = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 250
+  ];
+
+  optional int32 page = 2 [(buf.validate.field).int32.gt = 0];
+  optional int32 size = 3 [(buf.validate.field).int32.gt = 0];
+
+  optional string sort = 4 [(buf.validate.field).repeated = {
+    unique: true,
+    items {
+      string {
+        min_len: 1,
+        in: [
+          'id',
+          'domain_id',
+          'name',
+          'description',
+          'created_at',
+          'created_by',
+          'updated_at',
+          'updated_by'
+        ]
+      }
+    }
+  }];
+
+  repeated string fields = 5 [(buf.validate.field).repeated = {
+    unique: true,
+    items {
+      string {
+        min_len: 1,
+        in: [
+          'id',
+          'domain_id',
+          'name',
+          'description',
+          'created_at',
+          'created_by',
+          'updated_at',
+          'updated_by'
+        ]
+      }
+    }
+  }];
+}
+
+message SearchPauseTemplateResponse {
+  repeated PauseTemplate items = 1;
+  bool next = 2;
+}
+
+message UpdatePauseTemplateRequest {
+  int64 id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64.gt = 0
+  ];
+
+  PauseTemplate item = 2 [(buf.validate.field).required = true];
+}
+
+message UpdatePauseTemplateResponse {
+  PauseTemplate item = 1;
+}
+
+message DeletePauseTemplateRequest {
+  int64 id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64.gt = 0
+  ];
+}
+
+message DeletePauseTemplateResponse {
+  int64 id = 1;
+}
+
+message PauseTemplate {
+  int64 id = 1;
+  int64 domain_id = 2;
+  string name = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 250
+  ];
+
+  optional string description = 4 [(buf.validate.field).string.max_len = 250];
+
+  int64 created_at = 5;
+  LookupEntity created_by = 6;
+  int64 updated_at = 7;
+  LookupEntity updated_by = 8;
+}
+
+message SearchPauseTemplateCauseRequest {
+  int64 pause_template_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64.gt = 0
+  ];
+
+  optional string q = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 250
+  ];
+
+  optional int32 page = 3 [(buf.validate.field).int32.gt = 0];
+  optional int32 size = 4 [(buf.validate.field).int32.gt = 0];
+
+  optional string sort = 5 [(buf.validate.field).repeated = {
+    unique: true,
+    items {
+      string {
+        in: [
+          'id',
+          'domain_id',
+          'duration',
+          'cause',
+          'created_at',
+          'created_by',
+          'updated_at',
+          'updated_by'
+        ]
+      }
+    }
+  }];
+
+  repeated string fields = 6 [(buf.validate.field).repeated = {
+    unique: true,
+    items {
+      string {
+        in: [
+          'id',
+          'domain_id',
+          'duration',
+          'cause',
+          'created_at',
+          'created_by',
+          'updated_at',
+          'updated_by'
+        ]
+      }
+    }
+  }];
+}
+
+message SearchPauseTemplateCauseResponse {
+  repeated PauseTemplateCause items = 1;
+  bool next = 2;
+}
+
+message UpdatePauseTemplateCauseBulkRequest {
+  int64 pause_template_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64.gt = 0
+  ];
+
+  repeated PauseTemplateCause items = 2 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message UpdatePauseTemplateCauseBulkResponse {
+  repeated PauseTemplateCause items = 1;
+  bool next = 2;
+}
+
+message PauseTemplateCause {
+  int64 id = 1;
+  int64 domain_id = 2;
+
+  int64 duration = 3 [(buf.validate.field).int64.gt = 0];
+  optional LookupEntity cause = 4;
+
+  int64 created_at = 5;
+  LookupEntity created_by = 6;
+  int64 updated_at = 7;
+  LookupEntity updated_by = 8;
+}
