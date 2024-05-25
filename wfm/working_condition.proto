@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package wfm;
+
+import "buf/validate/validate.proto";
+import "proto/options/options.proto";
+import "lookup.proto";
+
+service WorkingConditionService {
+  option (options.objclass) = "working_condition";
+}
+
+message WorkingCondition {
+  option (buf.validate.message).cel = {
+    id: "working_conditions.working_hours",
+    message: "sum of workday_hours and pause_duration should not be more than 24h",
+    expression: "(this.workday_hours + (this.pause_duration / 60)) <= 24"
+  };
+
+  option (buf.validate.message).cel = {
+    id: "working_conditions.non_working_days",
+    message: "sum of vacation, sick_leaves and days_off should not be more that 365 days",
+    expression: "(this.vacation + this.sick_leaves + this.days_off) <= 365"
+  };
+
+  int64 id = 1;
+  int64 domain_id = 2;
+
+  int32 workday_hours = 3 [
+    (buf.validate.field).int32.gt = 0,
+    (buf.validate.field).int32.lte = 24
+  ];
+
+  int32 workdays_per_month = 4 [
+    (buf.validate.field).int32.gt = 0,
+    (buf.validate.field).int32.lte = 31
+  ];
+
+  int32 vacation = 5 [
+    (buf.validate.field).int32.gt = 0,
+    (buf.validate.field).int32.lte = 365
+  ];
+
+  int32 sick_leaves = 6 [
+    (buf.validate.field).int32.gt = 0,
+    (buf.validate.field).int32.lte = 365
+  ];
+
+  int32 days_off = 7 [
+    (buf.validate.field).int32.gt = 0,
+    (buf.validate.field).int32.lte = 365
+  ];
+
+  int32 pause_duration = 8 [
+    (buf.validate.field).int32.gt = 0,
+    (buf.validate.field).int32.lte = 1440
+  ];
+
+  LookupEntity pause_template = 9;
+  optional LookupEntity shift_template = 10;
+
+  int64 created_at = 11;
+  LookupEntity created_by = 12;
+  int64 updated_at = 13;
+  LookupEntity updated_by = 14;
+}
