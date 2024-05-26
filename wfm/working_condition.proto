@@ -3,11 +3,181 @@ syntax = "proto3";
 package wfm;
 
 import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
 import "proto/options/options.proto";
 import "lookup.proto";
 
 service WorkingConditionService {
   option (options.objclass) = "working_condition";
+  rpc CreateWorkingCondition(CreateWorkingConditionRequest) returns (CreateWorkingConditionResponse) {
+    option (options.access) = ACTION_CREATE;
+    option (google.api.http) = {
+      post: "/wfm/lookups/working_conditions"
+      body: "*"
+    };
+  }
+
+  rpc ReadWorkingCondition(ReadWorkingConditionRequest) returns (ReadWorkingConditionResponse) {
+    option (options.access) = ACTION_READ;
+    option (google.api.http) = {get: "/wfm/lookups/working_conditions/{id}"};
+  }
+
+  rpc SearchWorkingCondition(SearchWorkingConditionRequest) returns (SearchWorkingConditionResponse) {
+    option (options.access) = ACTION_READ;
+    option (google.api.http) = {get: "/wfm/lookups/working_conditions"};
+  }
+
+  rpc UpdateWorkingCondition(UpdateWorkingConditionRequest) returns (UpdateWorkingConditionResponse) {
+    option (options.access) = ACTION_UPDATE;
+    option (google.api.http) = {
+      put: "/wfm/lookups/working_conditions/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteWorkingCondition(DeleteWorkingConditionRequest) returns (DeleteWorkingConditionResponse) {
+    option (options.access) = ACTION_DELETE;
+    option (google.api.http) = {delete: "/wfm/lookups/working_conditions/{id}"};
+  }
+}
+
+message CreateWorkingConditionRequest {
+  WorkingCondition item = 1 [(buf.validate.field).required = true];
+}
+
+message CreateWorkingConditionResponse {
+  WorkingCondition item = 1;
+}
+
+message ReadWorkingConditionRequest {
+  int64 id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64.gt = 0
+  ];
+
+  repeated string fields = 5 [(buf.validate.field).repeated = {
+    unique: true,
+    items {
+      string {
+        min_len: 1,
+        in: [
+          'id',
+          'domain_id',
+          'name',
+          'description',
+          'workday_hours',
+          'workdays_per_month',
+          'vacation',
+          'sick_leaves',
+          'days_off',
+          'pause_duration',
+          'pause_template',
+          'shift_template',
+          'created_at',
+          'created_by',
+          'updated_at',
+          'updated_by'
+        ]
+      }
+    }
+  }];
+}
+
+message ReadWorkingConditionResponse {
+  WorkingCondition item = 1;
+}
+
+message SearchWorkingConditionRequest {
+  optional string q = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 250
+  ];
+
+  optional int32 page = 2 [(buf.validate.field).int32.gt = 0];
+  optional int32 size = 3 [(buf.validate.field).int32.gt = 0];
+
+  optional string sort = 4 [(buf.validate.field).repeated = {
+    unique: true,
+    items {
+      string {
+        min_len: 1,
+        in: [
+          'id',
+          'domain_id',
+          'name',
+          'description',
+          'workday_hours',
+          'workdays_per_month',
+          'vacation',
+          'sick_leaves',
+          'days_off',
+          'pause_duration',
+          'pause_template',
+          'shift_template',
+          'created_at',
+          'created_by',
+          'updated_at',
+          'updated_by'
+        ]
+      }
+    }
+  }];
+
+  repeated string fields = 5 [(buf.validate.field).repeated = {
+    unique: true,
+    items {
+      string {
+        min_len: 1,
+        in: [
+          'id',
+          'domain_id',
+          'name',
+          'description',
+          'workday_hours',
+          'workdays_per_month',
+          'vacation',
+          'sick_leaves',
+          'days_off',
+          'pause_duration',
+          'pause_template',
+          'shift_template',
+          'created_at',
+          'created_by',
+          'updated_at',
+          'updated_by'
+        ]
+      }
+    }
+  }];
+}
+
+message SearchWorkingConditionResponse {
+  repeated WorkingCondition items = 1;
+  bool next = 2;
+}
+
+message UpdateWorkingConditionRequest {
+  int64 id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64.gt = 0
+  ];
+
+  WorkingCondition item = 2 [(buf.validate.field).required = true];
+}
+
+message UpdateWorkingConditionResponse {
+  WorkingCondition item = 1;
+}
+
+message DeleteWorkingConditionRequest {
+  int64 id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64.gt = 0
+  ];
+}
+
+message DeleteWorkingConditionResponse {
+  int64 id = 1;
 }
 
 message WorkingCondition {
