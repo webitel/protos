@@ -195,42 +195,49 @@ message WorkingCondition {
 
   int64 id = 1;
   int64 domain_id = 2;
+  string name = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 250
+  ];
 
-  int32 workday_hours = 3 [
+  optional string description = 4 [(buf.validate.field).string.max_len = 250];
+
+  int32 workday_hours = 5 [
     (buf.validate.field).int32.gt = 0,
     (buf.validate.field).int32.lte = 24
   ];
 
-  int32 workdays_per_month = 4 [
+  int32 workdays_per_month = 6 [
     (buf.validate.field).int32.gt = 0,
     (buf.validate.field).int32.lte = 31
   ];
 
-  int32 vacation = 5 [
+  int32 vacation = 7 [
     (buf.validate.field).int32.gt = 0,
     (buf.validate.field).int32.lte = 365
   ];
 
-  int32 sick_leaves = 6 [
+  int32 sick_leaves = 8 [
     (buf.validate.field).int32.gt = 0,
     (buf.validate.field).int32.lte = 365
   ];
 
-  int32 days_off = 7 [
+  int32 days_off = 9 [
     (buf.validate.field).int32.gt = 0,
     (buf.validate.field).int32.lte = 365
   ];
 
-  int32 pause_duration = 8 [
+  int32 pause_duration = 10 [
     (buf.validate.field).int32.gt = 0,
     (buf.validate.field).int32.lte = 1440
   ];
 
-  LookupEntity pause_template = 9;
-  optional LookupEntity shift_template = 10;
+  LookupEntity pause_template = 11;
+  optional LookupEntity shift_template = 12;
 
-  int64 created_at = 11;
-  LookupEntity created_by = 12;
-  int64 updated_at = 13;
-  LookupEntity updated_by = 14;
+  int64 created_at = 13;
+  LookupEntity created_by = 14;
+  int64 updated_at = 15;
+  LookupEntity updated_by = 16;
 }
