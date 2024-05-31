@@ -60,48 +60,48 @@ service Users {
     }
 }
 
-service TwoFactorAuthorization {
-    // GenerateUserSecret generates new or regenerates secret for the concrete user
-    rpc GenerateUserTotp(GenerateUserTotpRequest) returns (GenerateUserTotpResponse) {
+service TwoFactorAuthentication {
+    // GenerateUserTfaKey generates new or regenerates secret for the concrete user
+    rpc GenerateUserTfaKey(GenerateUserTfaKeyRequest) returns (GenerateUserTfaKeyResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/2fa"
         };
     }
-    // GetUserSecret locates the secret for user and returns it as a TOTP url
-    rpc GetUserTotp(GetUserTotpRequest) returns (GetUserTotpResponse) {
+    // GetUserTfaKey locates the secret for user and returns it as a TOTP url
+    rpc GetUserTfaKey(GetUserTfaKeyRequest) returns (GetUserTfaKeyResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/2fa"
         };
     }
     // GenerateTotpForNecessaryUsers generates necessary (not generated previously) totp keys for users in the domain
-    rpc GenerateTotpForNecessaryUsers(GenerateTotpForNecessaryUsersRequest) returns (GenerateTotpForNecessaryUsersResponse) {
+    rpc GenerateTfaKeysForNecessaryUsers(GenerateTfaKeysForNecessaryUsersRequest) returns (GenerateTfaKeysForNecessaryUsersResponse) {
     }
 }
 
-message GenerateUserTotpRequest {
+message GenerateUserTfaKeyRequest {
     int64 user_id = 1;
 }
 
-message GenerateUserTotpResponse {
-    Totp totp = 1;
+message GenerateUserTfaKeyResponse {
+    TfaUrl totp = 1;
 }
 
-message GetUserTotpRequest {
+message GetUserTfaKeyRequest {
     int64 user_id = 1;
 }
 
-message GetUserTotpResponse {
-    Totp totp = 1;
+message GetUserTfaKeyResponse {
+    TfaUrl totp = 1;
 }
 
-message GenerateTotpForNecessaryUsersRequest {
+message GenerateTfaKeysForNecessaryUsersRequest {
 }
 
-message GenerateTotpForNecessaryUsersResponse {
+message GenerateTfaKeysForNecessaryUsersResponse {
     int64 affected = 1;
 }
 
-message Totp {
+message TfaUrl {
     UserId user = 1;
     string url = 2;
 }
