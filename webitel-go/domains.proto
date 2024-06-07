@@ -5,14 +5,47 @@ package api;
 option go_package = "webitel.go/api;api";
 
 // import "users.proto";
+import "google/api/annotations.proto";
 
 service Domains {
 
-	rpc ReadDomain(ReadDomainRequest) returns (ReadDomainResponse) {}
-	rpc UpdateDomain(UpdateDomainRequest) returns (UpdateDomainResponse) {}
-	rpc DeleteDomain(DeleteDomainRequest) returns (DeleteDomainResponse) {}
-	rpc CreateDomain(CreateDomainRequest) returns (CreateDomainResponse) {}
-	rpc SearchDomains(SearchDomainsRequest) returns (SearchDomainsResponse) {}
+	rpc ReadDomain(ReadDomainRequest) returns (ReadDomainResponse) {
+		option (google.api.http) = {
+			get: "/domain"
+			additional_bindings {
+				get: "/domains/{dc}"
+			};
+		};
+	}
+	rpc UpdateDomain(UpdateDomainRequest) returns (UpdateDomainResponse) {
+		option (google.api.http) = {
+			put: "/domains/{domain.dc}"
+			body: "*"
+			additional_bindings {
+				patch: "/domains/{domain.dc}"
+				body: "*"
+			};
+		};
+	}
+	rpc DeleteDomain(DeleteDomainRequest) returns (DeleteDomainResponse) {
+		option (google.api.http) = {
+			delete: "/domain"
+			additional_bindings {
+				delete: "/domains/{dc}"
+			};
+		};
+	}
+	rpc CreateDomain(CreateDomainRequest) returns (CreateDomainResponse) {
+		option (google.api.http) = {
+			post: "/domains"
+			body: "*"
+		};
+	}
+	rpc SearchDomains(SearchDomainsRequest) returns (SearchDomainsResponse) {
+		option (google.api.http) = {
+			get: "/domains"
+		};
+	}
 
 }
 

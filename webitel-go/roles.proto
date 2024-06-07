@@ -9,21 +9,56 @@ import "users.proto";
 import "permission.proto";
 // import "caller.proto";
 import "google/protobuf/struct.proto";
+import "google/api/annotations.proto";
 
 service Roles {
     
-	rpc ReadRole(ReadRoleRequest) returns (ReadRoleResponse) {}
-	rpc UpdateRole(UpdateRoleRequest) returns (UpdateRoleResponse) {}
-    rpc DeleteRole(DeleteRoleRequest) returns (DeleteRoleResponse) {}
-    rpc CreateRole(CreateRoleRequest) returns (CreateRoleResponse) {}
-    rpc SearchRoles(SearchRolesRequest) returns (SearchRolesResponse) {}
-    rpc SearchRecordAvailableRoles(SearchRecordAvailableRolesRequest) returns (SearchRolesResponse) {}
+	rpc ReadRole(ReadRoleRequest) returns (ReadRoleResponse) {
+      option (google.api.http) = {
+          get: "/roles/{id}"
+      };
+  }
+	rpc UpdateRole(UpdateRoleRequest) returns (UpdateRoleResponse) {
+      option (google.api.http) = {
+          put: "/roles/{role.id}"
+          body: "*"
+          additional_bindings {
+              patch: "/roles/{role.id}"
+              body: "*"
+          }
+      };
+  }
+    rpc DeleteRole(DeleteRoleRequest) returns (DeleteRoleResponse) {
+        option (google.api.http) = {
+            delete: "/roles/{id}"
+        };
+    }
+    rpc CreateRole(CreateRoleRequest) returns (CreateRoleResponse) {
+        option (google.api.http) = {
+            post: "/roles"
+            body: "*"
+        };
+    }
+    rpc SearchRoles(SearchRolesRequest) returns (SearchRolesResponse) {
+        option (google.api.http) = {
+            get: "/roles"
+        };
+    }
+    rpc SearchRecordAvailableRoles(SearchRecordAvailableRolesRequest) returns (SearchRolesResponse) {
+        option (google.api.http) = {
+            get: "/roles/objects/{object}/records/{record.id}"
+        };
+    }
 
     rpc GrantRole(GrantRoleRequest) returns (GrantRoleResponse) {}
     rpc RevokeRole(RevokeRoleRequest) returns (RevokeRoleResponse) {}
     rpc RoleMembers(RoleMembersRequest) returns (RoleMembersResponse) {}
 
-    rpc RoleMetadata(RoleMetadataRequest) returns (RoleMetadataResponse) {}
+    rpc RoleMetadata(RoleMetadataRequest) returns (RoleMetadataResponse) {
+        option (google.api.http) = {
+            get: "/roles/metadata"
+        };
+    }
 }
 
 // RoleId lookup value.

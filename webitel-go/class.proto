@@ -3,12 +3,30 @@ syntax = "proto3";
 package api;
 
 option go_package = "webitel.go/api;api";
+import "google/api/annotations.proto";
 
 service Classes {
 
-    rpc ReadClass(ReadClassRequest) returns (ReadClassResponse) {}
-    rpc UpdateClass(UpdateClassRequest) returns (UpdateClassResponse) {}
-    rpc SearchClasses(SearchClassesRequest) returns (SearchClassesResponse) {}
+    rpc ReadClass(ReadClassRequest) returns (ReadClassResponse) {
+        option (google.api.http) = {
+            get: "/objclass/{id}"
+        };
+    }
+    rpc UpdateClass(UpdateClassRequest) returns (UpdateClassResponse) {
+        option (google.api.http) = {
+            put: "/objclass/{class.id}"
+            body: "*"
+            additional_bindings {
+                patch: "/objclass/{class.id}"
+                body: "*"
+            }
+        };
+    }
+    rpc SearchClasses(SearchClassesRequest) returns (SearchClassesResponse) {
+        option (google.api.http) = {
+            get: "/objclass"
+        };
+    }
 }
 
 message ObjectClass {

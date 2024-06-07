@@ -28,7 +28,7 @@ service Users {
     }
     rpc DeleteUsers(DeleteUsersRequest) returns (DeleteUsersResponse) {
         option (google.api.http) = {
-            delete: "/users/{user.id}"
+            delete: "/users/{id}"
             additional_bindings {
                 delete: "/users"
                 body: "selection"
@@ -58,52 +58,6 @@ service Users {
             body: "*"
         };
     }
-}
-
-service TwoFactorAuthentication {
-    // GenerateUserTfaKey generates new or regenerates secret for the concrete user
-    rpc GenerateUserTfaKey(GenerateUserTfaKeyRequest) returns (GenerateUserTfaKeyResponse) {
-        option (google.api.http) = {
-            post: "/users/{user_id}/2fa"
-        };
-    }
-    // GetUserTfaKey locates the secret for user and returns it as a TOTP url
-    rpc GetUserTfaKey(GetUserTfaKeyRequest) returns (GetUserTfaKeyResponse) {
-        option (google.api.http) = {
-            get: "/users/{user_id}/2fa"
-        };
-    }
-    // GenerateTotpForNecessaryUsers generates necessary (not generated previously) totp keys for users in the domain
-    rpc GenerateTfaKeysForNecessaryUsers(GenerateTfaKeysForNecessaryUsersRequest) returns (GenerateTfaKeysForNecessaryUsersResponse) {
-    }
-}
-
-message GenerateUserTfaKeyRequest {
-    int64 user_id = 1;
-}
-
-message GenerateUserTfaKeyResponse {
-    TfaUrl totp = 1;
-}
-
-message GetUserTfaKeyRequest {
-    int64 user_id = 1;
-}
-
-message GetUserTfaKeyResponse {
-    TfaUrl totp = 1;
-}
-
-message GenerateTfaKeysForNecessaryUsersRequest {
-}
-
-message GenerateTfaKeysForNecessaryUsersResponse {
-    int64 affected = 1;
-}
-
-message TfaUrl {
-    UserId user = 1;
-    string url = 2;
 }
 
 // UserId lookup value.

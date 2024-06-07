@@ -5,15 +5,49 @@ package api;
 option go_package = "webitel.go/api;api";
 
 import "oid.proto";
+import "google/api/annotations.proto";
 
 service Customers {
 
-    rpc ServerInfo(ServerInfoRequest) returns (ServerInfoResponse) {}
+    rpc ServerInfo(ServerInfoRequest) returns (ServerInfoResponse) {
+        option(google.api.http) = {
+            get: "/srvinfo"
+        };
+    }
     // rpc GetCertificate(CertificateUsageRequest) returns (CertificateUsageResponse) {}
-    rpc GetCustomer(GetCustomerRequest) returns (GetCustomerResponse) {}
-    rpc UpdateCustomer(UpdateCustomerRequest) returns (UpdateCustomerResponse) {}
-    rpc LicenseUsage(LicenseUsageRequest) returns (LicenseUsageResponse) {}
-    rpc LicenseUsers(LicenseUsersRequest) returns (LicenseUsersResponse) {}
+    rpc GetCustomer(GetCustomerRequest) returns (GetCustomerResponse) {
+        option(google.api.http) = {
+            get: "/customer"
+            additional_bindings {
+                get: "/customer/{id}"
+            }
+        };
+    }
+    rpc UpdateCustomer(UpdateCustomerRequest) returns (UpdateCustomerResponse) {
+        option(google.api.http) = {
+            put: "/customer"
+//            TODO: something wrong with api registration on Webitel API Gateway. Registration /customer/{id}
+//            additional_bindings {
+//                put: "/customer/{id}"
+//            }
+        };
+    }
+    rpc LicenseUsage(LicenseUsageRequest) returns (LicenseUsageResponse) {
+        option (google.api.http) = {
+            get: "/customer/{customer_id}/license"
+            additional_bindings {
+                get: "/license"
+            }
+            additional_bindings {
+                get: "/products"
+            }
+        };
+    }
+    rpc LicenseUsers(LicenseUsersRequest) returns (LicenseUsersResponse) {
+        option (google.api.http) = {
+            get: "/products/{id}/users"
+        };
+    }
     // // rpc VerifyCertificate(VerifyCertificateRequest) returns (VerifyCertificateResponse) {}
     // rpc UpdateCertificate(UpdateCertificateRequest) returns (UpdateCertificateResponse) {}
     // // later: rpc RevokeCertificate(RevokeCertificateRequest) returns (RevokeCertificateResponse) {}

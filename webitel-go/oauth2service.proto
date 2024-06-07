@@ -8,15 +8,47 @@ option go_package = "webitel.go/api;api";
 
 import "oid.proto";
 import "google/protobuf/struct.proto";
+import "google/api/annotations.proto";
 
 // OAuth 2.0 service federation
 service OAuth2Federation {
 
-    rpc SearchOAuthService(SearchOAuthServiceRequest) returns (SearchOAuthServiceResponse) {};
-    rpc CreateOAuthService(OAuthService) returns (OAuthService) {};
-    rpc LocateOAuthService(SearchOAuthServiceRequest) returns (OAuthService) {};
-    rpc UpdateOAuthService(UpdateOAuthServiceRequest) returns (OAuthService) {};
-    rpc DeleteOAuthService(DeleteOAuthServiceRequest) returns (DeleteOAuthServiceResponse) {};
+    rpc SearchOAuthService(SearchOAuthServiceRequest) returns (SearchOAuthServiceResponse) {
+        option (google.api.http) = {
+            get: "/oauth/apps"
+        };
+    };
+    rpc CreateOAuthService(OAuthService) returns (OAuthService) {
+        option (google.api.http) = {
+            post: "/oauth/apps"
+            body: "*"
+        };
+    };
+    rpc LocateOAuthService(SearchOAuthServiceRequest) returns (OAuthService) {
+        option (google.api.http) = {
+            get: "/oauth/apps/{id}"
+        };
+    };
+    rpc UpdateOAuthService(UpdateOAuthServiceRequest) returns (OAuthService) {
+        option (google.api.http) = {
+            put: "/oauth/apps/{changes.id}"
+            body: "*"
+            additional_bindings {
+                patch: "/oauth/apps/{changes.id}"
+                body: "*"
+            }
+        };
+    };
+    rpc DeleteOAuthService(DeleteOAuthServiceRequest) returns (DeleteOAuthServiceResponse) {
+        option (google.api.http) = {
+            delete: "/oauth/apps"
+            body: "*"
+            additional_bindings {
+                delete: "/oauth/apps/{id}"
+                body: "*"
+            }
+        };
+    };
 
 }
 

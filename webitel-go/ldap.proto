@@ -23,10 +23,10 @@ service LDAP {
     // Update LDAP profile details
     rpc UpdateLDAPCatalog(UpdateLDAPRequest) returns (LDAPCatalog) {
         option (google.api.http) = {
-                put: "/ldap/{profile.id}"
+                put: "/ldap/{catalog.id}"
                 body: "*"
                 additional_bindings {
-                    patch: "/ldap/{profile.id}"
+                    patch: "/ldap/{catalog.id}"
                     body: "*"
                 }
         };
@@ -56,12 +56,19 @@ service LDAP {
     // LDAPSearch performs LDAP Search operation ...
     rpc LDAPSearch(LDAPSearchRequest) returns (LDAPSearchResponse) {
         option (google.api.http) = {
-                post: "/ldap/:id/search"
+                post: "/ldap/{catalog_id}/search"
                 body: "*"
+                additional_bindings {
+                    get: "/ldap/{catalog_id}/search"
+                }
                 additional_bindings {
                     post: "/ldap/search"
                     body: "*"
                 }
+                additional_bindings {
+                    get: "/ldap/search"
+                }
+
         };
     }
 
@@ -97,10 +104,10 @@ service LDAP {
 
     rpc DeleteLDAPTemplate(LDAPTemplateRequest) returns (LDAPTemplateResponse) {
         option (google.api.http) = {
-                delete: "/ldap/{catalog.id}/templates/{id}"
+                delete: "/ldap/{catalog_id}/templates/{id}"
                 body: "*"
                 additional_bindings {
-                    delete: "/ldap/{catalog.id}/templates"
+                    delete: "/ldap/{catalog_id}/templates"
                     body: "*"
                 }
         };
