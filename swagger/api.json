@@ -24,6 +24,162 @@
   "host": "dev.webitel.com",
   "basePath": "/api",
   "paths": {
+    "/acl/{object.name}/{object.id}": {
+      "get": {
+        "tags": [
+          "AccessStore"
+        ],
+        "summary": "default: TODO: indicate objclass=default as a default rights repo",
+        "operationId": "AccessStore_ListDefaultAccess",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "display name",
+            "name": "object.name",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "identifier",
+            "name": "object.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "description": "--- filters ---\n\n[optional] [FROM] each rule owner is any of role(s) id; user -or- role",
+            "name": "grantor",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "description": "[optional] [TO] subject role(s) id; user -or- role",
+            "name": "grantee",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "[xrwdxrwd] [R]ecord-[b]ased-[A]ccess-[C]ontrol level check(!)",
+            "name": "granted",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "[optional] [TO] subject.name ILIKE ?q=; user -or- role",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "----- Select Options -------------------------\n\nattributes list",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "e.g.: \"updated_at\" - ASC; \"!updated_at\" - DESC;",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "pagedResultsControl\n\ndefault: 16",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "default: 1",
+            "name": "page",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.ListAccessResponseV1"
+            }
+          }
+        }
+      }
+    },
+    "/acl/{object.name}/{object.id}/grantor/{grantor}": {
+      "patch": {
+        "tags": [
+          "AccessStore"
+        ],
+        "summary": "Same as UpdateAccess except for DEFAULT access control system",
+        "operationId": "AccessStore_ToggleDefaultAccess",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "display name",
+            "name": "object.name",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "identifier",
+            "name": "object.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "[FOR] creator user/role",
+            "name": "grantor",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.AccessStore.ToggleDefaultAccessBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.ToggleDefaultAccessResponse"
+            }
+          }
+        }
+      }
+    },
     "/calendars": {
       "get": {
         "tags": [
@@ -13972,6 +14128,290 @@
         }
       }
     },
+    "/customer": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "rpc GetCertificate(CertificateUsageRequest) returns (CertificateUsageResponse) {}",
+        "operationId": "Customers_GetCustomer",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Available Filters\n\nshow by customer id; serial number (uuid)",
+            "name": "id",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "show if valid only!",
+            "name": "valid",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "identifier",
+            "name": "domain.id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "display name",
+            "name": "domain.name",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Request Controls\n\nserial,",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "sort",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.GetCustomerResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Customers"
+        ],
+        "operationId": "Customers_UpdateCustomer",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "[optional] e.g.: Example Org.",
+            "name": "organization",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "byte",
+            "description": "[optional] logo source image",
+            "name": "logo_picture",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "byte",
+            "description": "[optional] raw bytes protobuf::base64.RawStdEncoding != certificate::base64.StdEncoding",
+            "name": "certificate",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "name": "revoke",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.UpdateCustomerResponse"
+            }
+          }
+        }
+      }
+    },
+    "/customer/{customer_id}/license": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "operationId": "Customers_LicenseUsage",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "customer_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "----- Search Options ----- //\n\ndefault: 16",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "default: 1",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "set of output fields",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "e.g.: \"updated_at\" - ASC; \"!updated_at\" - DESC;",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "identifier",
+            "name": "user.id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "display name",
+            "name": "user.name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "identifier",
+            "name": "domain.id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "display name",
+            "name": "domain.name",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "by serial number(s)",
+            "name": "id",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "by product name(s)",
+            "name": "product",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "view: all|valid|grantable\n\nshow: available to be granted",
+            "name": "valid",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter: term of search",
+            "name": "q",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.LicenseUsageResponse"
+            }
+          }
+        }
+      }
+    },
+    "/customer/{id}": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "rpc GetCertificate(CertificateUsageRequest) returns (CertificateUsageResponse) {}",
+        "operationId": "Customers_GetCustomer2",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Available Filters\n\nshow by customer id; serial number (uuid)",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "boolean",
+            "description": "show if valid only!",
+            "name": "valid",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "identifier",
+            "name": "domain.id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "display name",
+            "name": "domain.name",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Request Controls\n\nserial,",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "sort",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.GetCustomerResponse"
+            }
+          }
+        }
+      }
+    },
     "/devices": {
       "get": {
         "tags": [
@@ -14425,7 +14865,52 @@
         }
       }
     },
-    "/devices/{device.id}/audit": {
+    "/devices/{device.id}/registered": {
+      "get": {
+        "tags": [
+          "Devices"
+        ],
+        "operationId": "Devices_ListRegistrations",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Object ID",
+            "name": "device.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Object ID",
+            "name": "user.id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Display Name",
+            "name": "user.name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Display Name",
+            "name": "device.name",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.ListRegistrationsResponse"
+            }
+          }
+        }
+      }
+    },
+    "/devices/{device.id}/users/audit": {
       "get": {
         "tags": [
           "Devices"
@@ -14516,51 +15001,6 @@
         }
       }
     },
-    "/devices/{device.id}/registered": {
-      "get": {
-        "tags": [
-          "Devices"
-        ],
-        "operationId": "Devices_ListRegistrations",
-        "parameters": [
-          {
-            "type": "string",
-            "format": "int64",
-            "description": "Object ID",
-            "name": "device.id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "format": "int64",
-            "description": "Object ID",
-            "name": "user.id",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "description": "Display Name",
-            "name": "user.name",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "description": "Display Name",
-            "name": "device.name",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/api.ListRegistrationsResponse"
-            }
-          }
-        }
-      }
-    },
     "/devices/{id}": {
       "get": {
         "tags": [
@@ -14630,6 +15070,265 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/api.DeleteDeviceResponse"
+            }
+          }
+        }
+      }
+    },
+    "/domain": {
+      "get": {
+        "tags": [
+          "Domains"
+        ],
+        "operationId": "Domains_ReadDomain",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "domain",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "dc",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.ReadDomainResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Domains"
+        ],
+        "operationId": "Domains_DeleteDomain",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "domain",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "dc",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.DeleteDomainResponse"
+            }
+          }
+        }
+      }
+    },
+    "/domains": {
+      "get": {
+        "tags": [
+          "Domains"
+        ],
+        "operationId": "Domains_SearchDomains",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "like",
+            "name": "domain",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "attrs",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.SearchDomainsResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Domains"
+        ],
+        "operationId": "Domains_CreateDomain",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.CreateDomainRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.CreateDomainResponse"
+            }
+          }
+        }
+      }
+    },
+    "/domains/{dc}": {
+      "get": {
+        "tags": [
+          "Domains"
+        ],
+        "operationId": "Domains_ReadDomain2",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "dc",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "domain",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.ReadDomainResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Domains"
+        ],
+        "operationId": "Domains_DeleteDomain2",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "dc",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "domain",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.DeleteDomainResponse"
+            }
+          }
+        }
+      }
+    },
+    "/domains/{domain.dc}": {
+      "put": {
+        "tags": [
+          "Domains"
+        ],
+        "operationId": "Domains_UpdateDomain",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "component",
+            "name": "domain.dc",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.Domains.UpdateDomainBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.UpdateDomainResponse"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Domains"
+        ],
+        "operationId": "Domains_UpdateDomain2",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "component",
+            "name": "domain.dc",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.Domains.UpdateDomainBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.UpdateDomainResponse"
             }
           }
         }
@@ -15183,6 +15882,1376 @@
             "description": "Server error",
             "schema": {
               "$ref": "#/definitions/engineApiError"
+            }
+          }
+        }
+      }
+    },
+    "/ldap": {
+      "get": {
+        "tags": [
+          "LDAP"
+        ],
+        "summary": "Search for LDAP directories ...",
+        "operationId": "LDAP_SearchLDAPCatalog",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "----- Select Options -------------------------\n\ndefault: 1",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "default: 16",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "attributes list",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "e.g.: \"updated_at\" - ASC; \"!updated_at\" - DESC;",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "description": "----- Search Basic Filters ---------------------------\n\nselection: by unique identifier",
+            "name": "id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "term-of-search: lookup[name]",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "case-ignore substring match: ILIKE '*' - any; '?' - one",
+            "name": "name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "[M]andatory[A]ccess[C]ontrol: with access mode (action) granted!",
+            "name": "access",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.SearchLDAPResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "LDAP"
+        ],
+        "summary": "Create LDAP profile",
+        "operationId": "LDAP_CreateLDAPCatalog",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.LDAPCatalog"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.LDAPCatalog"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "LDAP"
+        ],
+        "summary": "Delete LDAP profile(s) ...",
+        "operationId": "LDAP_DeleteLDAPCatalog2",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.DeleteLDAPRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.LDAPCatalog"
+            }
+          }
+        }
+      }
+    },
+    "/ldap/search": {
+      "get": {
+        "tags": [
+          "LDAP"
+        ],
+        "summary": "LDAPSearch performs LDAP Search operation ...",
+        "operationId": "LDAP_LDAPSearch4",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "----- connection -----\nOptional. ID of the preconfigured LDAP catalog",
+            "name": "catalog_id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Optional. URL to establish connection to LDAP catalog\n\nURL e.g.: [(ldap|ldapi|ldaps)://]host[:port]",
+            "name": "url",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "byte",
+            "description": "TODO: (!)\n\nbase64",
+            "name": "tls.PEM",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "----- BIND: Authorization -----\n\nauthorization method e.g.: SIMPLE, SAML, NTLM, etc.",
+            "name": "bind",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "bind_dn",
+            "name": "username",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "password",
+            "name": "password",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "----- SearchRequest -----\nbaseObject [D]istinguished[N]ame",
+            "name": "baseObject",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "baseObject              (0),\nsingleLevel             (1),\nwholeSubtree            (2)",
+            "name": "scope",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "neverDerefAliases       (0),\nderefInSearching        (1),\nderefFindingBaseObj     (2),\nderefAlways             (3)",
+            "name": "derefAliases",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "INTEGER (0 ..  maxInt),",
+            "name": "sizeLimit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "INTEGER (0 ..  maxInt),",
+            "name": "timeLimit",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "BOOLEAN,",
+            "name": "typesOnly",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Filter,",
+            "name": "filter",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "AttributeSelection",
+            "name": "attributes",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.LDAPSearchResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "LDAP"
+        ],
+        "summary": "LDAPSearch performs LDAP Search operation ...",
+        "operationId": "LDAP_LDAPSearch3",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.LDAPSearchRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.LDAPSearchResponse"
+            }
+          }
+        }
+      }
+    },
+    "/ldap/{catalog.id}": {
+      "put": {
+        "tags": [
+          "LDAP"
+        ],
+        "summary": "Update LDAP profile details",
+        "operationId": "LDAP_UpdateLDAPCatalog",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "identity\nint64 dc = 1;",
+            "name": "catalog.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.LDAP.UpdateLDAPCatalogBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.LDAPCatalog"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "LDAP"
+        ],
+        "summary": "Update LDAP profile details",
+        "operationId": "LDAP_UpdateLDAPCatalog2",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "identity\nint64 dc = 1;",
+            "name": "catalog.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.LDAP.UpdateLDAPCatalogBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.LDAPCatalog"
+            }
+          }
+        }
+      }
+    },
+    "/ldap/{catalog.id}/templates": {
+      "post": {
+        "tags": [
+          "LDAP"
+        ],
+        "operationId": "LDAP_CreateLDAPTemplate",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "identifier",
+            "name": "catalog.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.LDAP.CreateLDAPTemplateBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.LDAPTemplate"
+            }
+          }
+        }
+      }
+    },
+    "/ldap/{catalog_id}/rsync": {
+      "get": {
+        "tags": [
+          "LDAP"
+        ],
+        "summary": "(ResyncLDAPResponse) {",
+        "operationId": "LDAP_SearchLDAProcess",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "REQUIRED. Parent LDAP catalog IDentifier",
+            "name": "catalog_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "----- Select Options -------------------------\n\ndefault: 1",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "default: 16",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "attributes list",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "e.g.: \"updated_at\" - ASC; \"!updated_at\" - DESC;",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "description": "----- Search Basic Filters ---------------------------\nOPTIONAL. Search process by unique .id",
+            "name": "id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "OPTIONAL. Filter(s) SET",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "template",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "objclass",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "WITH .errs",
+            "name": "failed",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "created|updated",
+            "name": "enabled",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "deleted",
+            "name": "disabled",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.LDAProcessResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "(ResyncLDAPResponse) {",
+        "tags": [
+          "LDAP"
+        ],
+        "summary": "Resync LDAP directory catalog changes ...",
+        "operationId": "LDAP_ResyncLDAPCatalog",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "LDAP Catalog unique IDentifier to sync with\n\ncatalog_id",
+            "name": "catalog_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.LDAP.ResyncLDAPCatalogBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.LDAProcess"
+            }
+          }
+        }
+      }
+    },
+    "/ldap/{catalog_id}/rsync/{id}": {
+      "get": {
+        "tags": [
+          "LDAP"
+        ],
+        "summary": "(ResyncLDAPResponse) {",
+        "operationId": "LDAP_LocateLDAProcess",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "REQUIRED. Parent LDAP catalog IDentifier",
+            "name": "catalog_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "csv",
+            "description": "----- Search Basic Filters ---------------------------\nOPTIONAL. Search process by unique .id",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "----- Select Options -------------------------\n\ndefault: 1",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "default: 16",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "attributes list",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "e.g.: \"updated_at\" - ASC; \"!updated_at\" - DESC;",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "OPTIONAL. Filter(s) SET",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "template",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "objclass",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "WITH .errs",
+            "name": "failed",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "created|updated",
+            "name": "enabled",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "deleted",
+            "name": "disabled",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.LDAProcess"
+            }
+          }
+        }
+      }
+    },
+    "/ldap/{catalog_id}/search": {
+      "get": {
+        "tags": [
+          "LDAP"
+        ],
+        "summary": "LDAPSearch performs LDAP Search operation ...",
+        "operationId": "LDAP_LDAPSearch2",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "----- connection -----\nOptional. ID of the preconfigured LDAP catalog",
+            "name": "catalog_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Optional. URL to establish connection to LDAP catalog\n\nURL e.g.: [(ldap|ldapi|ldaps)://]host[:port]",
+            "name": "url",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "byte",
+            "description": "TODO: (!)\n\nbase64",
+            "name": "tls.PEM",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "----- BIND: Authorization -----\n\nauthorization method e.g.: SIMPLE, SAML, NTLM, etc.",
+            "name": "bind",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "bind_dn",
+            "name": "username",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "password",
+            "name": "password",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "----- SearchRequest -----\nbaseObject [D]istinguished[N]ame",
+            "name": "baseObject",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "baseObject              (0),\nsingleLevel             (1),\nwholeSubtree            (2)",
+            "name": "scope",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "neverDerefAliases       (0),\nderefInSearching        (1),\nderefFindingBaseObj     (2),\nderefAlways             (3)",
+            "name": "derefAliases",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "INTEGER (0 ..  maxInt),",
+            "name": "sizeLimit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "INTEGER (0 ..  maxInt),",
+            "name": "timeLimit",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "BOOLEAN,",
+            "name": "typesOnly",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Filter,",
+            "name": "filter",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "AttributeSelection",
+            "name": "attributes",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.LDAPSearchResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "LDAP"
+        ],
+        "summary": "LDAPSearch performs LDAP Search operation ...",
+        "operationId": "LDAP_LDAPSearch",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "----- connection -----\nOptional. ID of the preconfigured LDAP catalog",
+            "name": "catalog_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.LDAP.LDAPSearchBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.LDAPSearchResponse"
+            }
+          }
+        }
+      }
+    },
+    "/ldap/{catalog_id}/templates": {
+      "get": {
+        "tags": [
+          "LDAP"
+        ],
+        "operationId": "LDAP_SearchLDAPTemplate",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "REQUIRED. Parent LDAP catalog IDentifier",
+            "name": "catalog_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "----- Select Options -------------------------\n\ndefault: 1",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "default: 16",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "attributes list",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "e.g.: \"updated_at\" - ASC; \"!updated_at\" - DESC;",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "description": "----- Search Basic Filters ---------------------------\nOPTIONAL. Search templates by .id",
+            "name": "id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "OPTIONAL. Filter(s) SET",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "base_dn",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "objclass",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "name": "enabled",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "name": "disabled",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.LDAPTemplateResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "LDAP"
+        ],
+        "operationId": "LDAP_DeleteLDAPTemplate2",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "REQUIRED. Parent LDAP catalog IDentifier",
+            "name": "catalog_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.LDAP.DeleteLDAPTemplateBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.LDAPTemplateResponse"
+            }
+          }
+        }
+      }
+    },
+    "/ldap/{catalog_id}/templates/{id}": {
+      "get": {
+        "tags": [
+          "LDAP"
+        ],
+        "operationId": "LDAP_LocateLDAPTemplate",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "REQUIRED. Parent LDAP catalog IDentifier",
+            "name": "catalog_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "csv",
+            "description": "----- Search Basic Filters ---------------------------\nOPTIONAL. Search templates by .id",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "----- Select Options -------------------------\n\ndefault: 1",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "default: 16",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "attributes list",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "e.g.: \"updated_at\" - ASC; \"!updated_at\" - DESC;",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "OPTIONAL. Filter(s) SET",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "base_dn",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "objclass",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "name": "enabled",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "name": "disabled",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.LDAPTemplate"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "LDAP"
+        ],
+        "operationId": "LDAP_DeleteLDAPTemplate",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "REQUIRED. Parent LDAP catalog IDentifier",
+            "name": "catalog_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "csv",
+            "description": "----- Search Basic Filters ---------------------------\nOPTIONAL. Search templates by .id",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.LDAP.DeleteLDAPTemplateBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.LDAPTemplateResponse"
+            }
+          }
+        }
+      }
+    },
+    "/ldap/{id}": {
+      "get": {
+        "tags": [
+          "LDAP"
+        ],
+        "summary": "Read LDAP catalog profile by .id",
+        "operationId": "LDAP_LocateLDAPCatalog",
+        "parameters": [
+          {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "csv",
+            "description": "----- Search Basic Filters ---------------------------\n\nselection: by unique identifier",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "----- Select Options -------------------------\n\ndefault: 1",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "default: 16",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "attributes list",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "e.g.: \"updated_at\" - ASC; \"!updated_at\" - DESC;",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "term-of-search: lookup[name]",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "case-ignore substring match: ILIKE '*' - any; '?' - one",
+            "name": "name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "[M]andatory[A]ccess[C]ontrol: with access mode (action) granted!",
+            "name": "access",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.LDAPCatalog"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "LDAP"
+        ],
+        "summary": "Delete LDAP profile(s) ...",
+        "operationId": "LDAP_DeleteLDAPCatalog",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "catalog id",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "boolean",
+            "description": "WITH objects bound to ?",
+            "name": "related_objects",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.LDAPCatalog"
+            }
+          }
+        }
+      }
+    },
+    "/ldap/{template.catalog.id}/templates/{template.id}": {
+      "put": {
+        "tags": [
+          "LDAP"
+        ],
+        "operationId": "LDAP_UpdateLDAPTemplate2",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "identifier",
+            "name": "template.catalog.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "ID unique",
+            "name": "template.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.LDAP.UpdateLDAPTemplateBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.LDAPTemplate"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "LDAP"
+        ],
+        "operationId": "LDAP_UpdateLDAPTemplate",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "identifier",
+            "name": "template.catalog.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "ID unique",
+            "name": "template.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.LDAP.UpdateLDAPTemplateBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.LDAPTemplate"
+            }
+          }
+        }
+      }
+    },
+    "/license": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "operationId": "Customers_LicenseUsage2",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "----- Search Options ----- //\n\ndefault: 16",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "default: 1",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "set of output fields",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "e.g.: \"updated_at\" - ASC; \"!updated_at\" - DESC;",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "identifier",
+            "name": "user.id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "display name",
+            "name": "user.name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "identifier",
+            "name": "domain.id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "display name",
+            "name": "domain.name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "customer_id",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "by serial number(s)",
+            "name": "id",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "by product name(s)",
+            "name": "product",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "view: all|valid|grantable\n\nshow: available to be granted",
+            "name": "valid",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter: term of search",
+            "name": "q",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.LicenseUsageResponse"
             }
           }
         }
@@ -15764,6 +17833,784 @@
         }
       }
     },
+    "/oauth/apps": {
+      "get": {
+        "tags": [
+          "OAuth2Federation"
+        ],
+        "operationId": "OAuth2Federation_SearchOAuthService",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "----- Select Options -------------------------\n\ndefault: 1",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "default: 16",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "attributes list",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "e.g.: \"updated_at\" - ASC; \"!updated_at\" - DESC;",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "description": "----- Search Basic Filters ---------------------------\n\nselection: by unique identifier",
+            "name": "id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "term-of-search: lookup[name]",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "case-ignore substring match: ILIKE '*' - any; '?' - one",
+            "name": "name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "[M]andatory[A]ccess[C]ontrol: with access mode (action) granted!",
+            "name": "access",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "----- OAuthService-Specific Filters ----------------",
+            "name": "enabled",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.SearchOAuthServiceResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "OAuth2Federation"
+        ],
+        "operationId": "OAuth2Federation_CreateOAuthService",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.OAuthService"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.OAuthService"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "OAuth2Federation"
+        ],
+        "operationId": "OAuth2Federation_DeleteOAuthService",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.DeleteOAuthServiceRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.DeleteOAuthServiceResponse"
+            }
+          }
+        }
+      }
+    },
+    "/oauth/apps/{changes.id}": {
+      "put": {
+        "tags": [
+          "OAuth2Federation"
+        ],
+        "operationId": "OAuth2Federation_UpdateOAuthService",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "changes.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.OAuth2Federation.UpdateOAuthServiceBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.OAuthService"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "OAuth2Federation"
+        ],
+        "operationId": "OAuth2Federation_UpdateOAuthService2",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "changes.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.OAuth2Federation.UpdateOAuthServiceBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.OAuthService"
+            }
+          }
+        }
+      }
+    },
+    "/oauth/apps/{id}": {
+      "get": {
+        "tags": [
+          "OAuth2Federation"
+        ],
+        "operationId": "OAuth2Federation_LocateOAuthService",
+        "parameters": [
+          {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "csv",
+            "description": "----- Search Basic Filters ---------------------------\n\nselection: by unique identifier",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "----- Select Options -------------------------\n\ndefault: 1",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "default: 16",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "attributes list",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "e.g.: \"updated_at\" - ASC; \"!updated_at\" - DESC;",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "term-of-search: lookup[name]",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "case-ignore substring match: ILIKE '*' - any; '?' - one",
+            "name": "name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "[M]andatory[A]ccess[C]ontrol: with access mode (action) granted!",
+            "name": "access",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "----- OAuthService-Specific Filters ----------------",
+            "name": "enabled",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.OAuthService"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "OAuth2Federation"
+        ],
+        "operationId": "OAuth2Federation_DeleteOAuthService2",
+        "parameters": [
+          {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "csv",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.OAuth2Federation.DeleteOAuthServiceBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.DeleteOAuthServiceResponse"
+            }
+          }
+        }
+      }
+    },
+    "/objclass": {
+      "get": {
+        "tags": [
+          "Classes"
+        ],
+        "operationId": "Classes_SearchClasses",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "TO BE REMOVED // bound to session.domain.id",
+            "name": "domain",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "[filter]: like '%class%'",
+            "name": "class",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "int64 id = 3;  // [filter]: obj.id = id\ncontrols\n\noutput",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "sort: \"field\" asc; \"!field\" desc",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "page number",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "page size",
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.SearchClassesResponse"
+            }
+          }
+        }
+      }
+    },
+    "/objclass/{class.id}": {
+      "put": {
+        "tags": [
+          "Classes"
+        ],
+        "operationId": "Classes_UpdateClass",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "(class::object).id",
+            "name": "class.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.Classes.UpdateClassBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.UpdateClassResponse"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Classes"
+        ],
+        "operationId": "Classes_UpdateClass2",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "(class::object).id",
+            "name": "class.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.Classes.UpdateClassBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.UpdateClassResponse"
+            }
+          }
+        }
+      }
+    },
+    "/objclass/{id}": {
+      "get": {
+        "tags": [
+          "Classes"
+        ],
+        "operationId": "Classes_ReadClass",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "[filter]: obj.id = id",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "domain",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "[filter]: like '%class%'",
+            "name": "class",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.ReadClassResponse"
+            }
+          }
+        }
+      }
+    },
+    "/permissions": {
+      "get": {
+        "tags": [
+          "Permissions"
+        ],
+        "summary": "GetPermissions list available from application",
+        "operationId": "Permissions_GetPermissions",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "TermOfSearch",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "= ANY(id)",
+            "name": "id",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "\u003c\u003e ANY(not)",
+            "name": "not",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "controls\n\noutput",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "sort: \"field\" asc; \"!field\" desc",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "page number",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "page size",
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.SearchPermissionResponse"
+            }
+          }
+        }
+      }
+    },
+    "/presence": {
+      "patch": {
+        "description": "(UserPresence) {",
+        "tags": [
+          "Presence"
+        ],
+        "summary": "set(presence) (notify, error)",
+        "operationId": "Presence_SetStatus2",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.SetStatusRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.PresenceStatus"
+            }
+          }
+        }
+      }
+    },
+    "/products": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "operationId": "Customers_LicenseUsage3",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "----- Search Options ----- //\n\ndefault: 16",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "default: 1",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "set of output fields",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "e.g.: \"updated_at\" - ASC; \"!updated_at\" - DESC;",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "identifier",
+            "name": "user.id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "display name",
+            "name": "user.name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "identifier",
+            "name": "domain.id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "display name",
+            "name": "domain.name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "customer_id",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "by serial number(s)",
+            "name": "id",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "by product name(s)",
+            "name": "product",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "view: all|valid|grantable\n\nshow: available to be granted",
+            "name": "valid",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter: term of search",
+            "name": "q",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.LicenseUsageResponse"
+            }
+          }
+        }
+      }
+    },
+    "/products/{id}/users": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "operationId": "Customers_LicenseUsers",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "----- Search Filters ----- //\n\nREQUIRED Product ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "----- Search Options ----- //\n\ndefault: 16",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "default: 1",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "set of output fields",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "e.g.: \"updated_at\" - ASC; \"!updated_at\" - DESC;",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter: term of search (username)",
+            "name": "q",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.LicenseUsersResponse"
+            }
+          }
+        }
+      }
+    },
     "/regions": {
       "get": {
         "tags": [
@@ -16008,6 +18855,451 @@
             "description": "Server error",
             "schema": {
               "$ref": "#/definitions/engineApiError"
+            }
+          }
+        }
+      }
+    },
+    "/roles": {
+      "get": {
+        "tags": [
+          "Roles"
+        ],
+        "operationId": "Roles_SearchRoles",
+        "parameters": [
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "description": "----- Role-specific Filters ----------------- //\n\nfilter: .id = any(:ids...)",
+            "name": "ids",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter: group name like",
+            "name": "name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Object ID",
+            "name": "user.id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Display Name",
+            "name": "user.name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter: term of search (name, description)",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "bool admin = 4;  // filter: where CURRENT user is 'ADMIN' of\ncontrols\n\noutput",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "sort: \"field\" asc; \"!field\" desc",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "page number",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "page size",
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.SearchRolesResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Roles"
+        ],
+        "operationId": "Roles_CreateRole",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.CreateRoleRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.CreateRoleResponse"
+            }
+          }
+        }
+      }
+    },
+    "/roles/metadata": {
+      "get": {
+        "tags": [
+          "Roles"
+        ],
+        "operationId": "Roles_RoleMetadata",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Optional. Unique ID of metadata role owner",
+            "name": "id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Optional. Partial metadata document key name",
+            "name": "key",
+            "in": "query"
+          },
+          {
+            "enum": [
+              "NULL_VALUE"
+            ],
+            "type": "string",
+            "default": "NULL_VALUE",
+            "description": "Represents a null value.\n\n - NULL_VALUE: Null value.",
+            "name": "merge.null_value",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "format": "double",
+            "description": "Represents a double value.",
+            "name": "merge.number_value",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Represents a string value.",
+            "name": "merge.string_value",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Represents a boolean value.",
+            "name": "merge.bool_value",
+            "in": "query"
+          },
+          {
+            "type": "object",
+            "description": "Represents a structured value.",
+            "name": "merge.struct_value",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.RoleMetadataResponse"
+            }
+          }
+        }
+      }
+    },
+    "/roles/objects/{object}/records/{record.id}": {
+      "get": {
+        "tags": [
+          "Roles"
+        ],
+        "operationId": "Roles_SearchRecordAvailableRoles",
+        "parameters": [
+          {
+            "enum": [
+              "contacts",
+              "cc_list",
+              "cc_bucket",
+              "calendars",
+              "devices",
+              "cc_agent",
+              "cc_team",
+              "cc_resource",
+              "cc_resource_group",
+              "cc_queue",
+              "roles",
+              "users",
+              "cognitive_profile"
+            ],
+            "type": "string",
+            "description": "bool admin = 4;  // filter: where CURRENT user is 'ADMIN' of\nREQUIRED !",
+            "name": "object",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "identifier",
+            "name": "record.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "description": "----- Role-specific Filters ----------------- //\n\nfilter: .id = any(:ids...)",
+            "name": "ids",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter: group name like",
+            "name": "name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Object ID",
+            "name": "user.id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Display Name",
+            "name": "user.name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter: term of search (name, description)",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "display name",
+            "name": "record.name",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "controls\n\noutput",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "sort: \"field\" asc; \"!field\" desc",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "page number",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "page size",
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.SearchRolesResponse"
+            }
+          }
+        }
+      }
+    },
+    "/roles/{id}": {
+      "get": {
+        "tags": [
+          "Roles"
+        ],
+        "operationId": "Roles_ReadRole",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "role.id",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "select projection\n\nselect: output (fields,...)",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.ReadRoleResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Roles"
+        ],
+        "operationId": "Roles_DeleteRole",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "DELETE /roles/{id}",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "description": "POST /roles/delete {\"ids\"}",
+            "name": "ids",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "deleteOrMark 'deleted' ?",
+            "name": "permanent",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.DeleteRoleResponse"
+            }
+          }
+        }
+      }
+    },
+    "/roles/{role.id}": {
+      "put": {
+        "tags": [
+          "Roles"
+        ],
+        "operationId": "Roles_UpdateRole",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "oid",
+            "name": "role.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.Roles.UpdateRoleBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.UpdateRoleResponse"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Roles"
+        ],
+        "operationId": "Roles_UpdateRole2",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "oid",
+            "name": "role.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.Roles.UpdateRoleBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.UpdateRoleResponse"
             }
           }
         }
@@ -17431,6 +20723,25 @@
             "collectionFormat": "multi",
             "name": "fields",
             "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "enum": [
+                "empty_system_settings_name",
+                "enable_omnichannel",
+                "member_chunk_size",
+                "amd_cancel_not_human",
+                "scheme_version_limit",
+                "enable_2fa",
+                "export_settings"
+              ],
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Filter by setting names.",
+            "name": "name",
+            "in": "query"
           }
         ],
         "responses": {
@@ -17663,6 +20974,82 @@
             "description": "Server error",
             "schema": {
               "$ref": "#/definitions/engineApiError"
+            }
+          }
+        }
+      }
+    },
+    "/signup": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Signup new domain with superior access token",
+        "operationId": "Auth_Signup",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "domain name",
+            "name": "domain",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "username",
+            "name": "username",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "user password",
+            "name": "password",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "scope request control",
+            "name": "scope",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "byte",
+            "description": "license/certificate",
+            "name": "certificate",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "OPTIONAL. Mobile device /login request ?",
+            "name": "mobile",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.LoginResponse"
+            }
+          }
+        }
+      }
+    },
+    "/srvinfo": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "operationId": "Customers_ServerInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.ServerInfoResponse"
             }
           }
         }
@@ -18979,6 +22366,63 @@
         }
       }
     },
+    "/user/settings/{key}": {
+      "get": {
+        "tags": [
+          "UserSettings"
+        ],
+        "summary": "GET /user/settings/{key=*}",
+        "operationId": "UserSettings_GetUserSettings",
+        "parameters": [
+          {
+            "pattern": "[^/]+",
+            "type": "string",
+            "name": "key",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.UserSetting"
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "PUT /user/settings/{key=*}\nContent-Type: application/json; charset=utf-8\n\n${value=.body}",
+        "tags": [
+          "UserSettings"
+        ],
+        "summary": "Create -or- Update",
+        "operationId": "UserSettings_SetUserSettings",
+        "parameters": [
+          {
+            "pattern": "[^/]+",
+            "type": "string",
+            "name": "key",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "value",
+            "in": "body",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.UserSetting"
+            }
+          }
+        }
+      }
+    },
     "/user/widget/activity/today": {
       "get": {
         "tags": [
@@ -19007,6 +22451,54 @@
             "description": "Server error",
             "schema": {
               "$ref": "#/definitions/engineApiError"
+            }
+          }
+        }
+      }
+    },
+    "/userinfo": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "The UserInfo Endpoint is an OAuth 2.0 Protected Resource that returns Claims about the authenticated End-User.",
+        "operationId": "Auth_UserInfo2",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "string id_token = 2;",
+            "name": "access_token",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.Userinfo"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "The UserInfo Endpoint is an OAuth 2.0 Protected Resource that returns Claims about the authenticated End-User.",
+        "operationId": "Auth_UserInfo",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "string id_token = 2;",
+            "name": "access_token",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.Userinfo"
             }
           }
         }
@@ -19337,6 +22829,337 @@
         }
       }
     },
+    "/users/{publish.id}/presence": {
+      "patch": {
+        "description": "(UserPresence) {",
+        "tags": [
+          "Presence"
+        ],
+        "summary": "set(presence) (notify, error)",
+        "operationId": "Presence_SetStatus",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "[required] user identity",
+            "name": "publish.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/api.Presence.SetStatusBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.PresenceStatus"
+            }
+          }
+        }
+      }
+    },
+    "/users/{token.user.id}/tokens": {
+      "post": {
+        "tags": [
+          "UserAccessTokens"
+        ],
+        "operationId": "UserAccessTokens_AddUserAccessToken",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "identifier",
+            "name": "token.user.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "processing\n------------\ntoken.user.id // [required] authorization\ntoken.usage   // [optional] short description",
+            "name": "token",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "title": "processing\n------------\ntoken.user.id // [required] authorization\ntoken.usage   // [optional] short description",
+              "properties": {
+                "created_at": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "unix::ms"
+                },
+                "created_by": {
+                  "$ref": "#/definitions/api.ObjectId"
+                },
+                "deleted_at": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "[optional] disabled at"
+                },
+                "deleted_by": {
+                  "title": "[optional] disabled by",
+                  "$ref": "#/definitions/api.ObjectId"
+                },
+                "id": {
+                  "type": "string",
+                  "title": "tokenKey::token_key"
+                },
+                "token": {
+                  "type": "string",
+                  "title": "tokenString::access_token"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "unix::ms"
+                },
+                "updated_by": {
+                  "$ref": "#/definitions/api.ObjectId"
+                },
+                "usage": {
+                  "type": "string",
+                  "title": "[optional] short usage description"
+                },
+                "user": {
+                  "type": "object",
+                  "title": "[optional] output depends on API endpoint",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "title": "display name"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "boolean",
+            "description": "ObjectId user = 1; // [required]\n string usage = 2;  // [optional] usage description\n bool enable = 3;",
+            "name": "enable",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.UserAccessToken"
+            }
+          }
+        }
+      }
+    },
+    "/users/{update.user.id}/tokens/{update.id}": {
+      "put": {
+        "tags": [
+          "UserAccessTokens"
+        ],
+        "operationId": "UserAccessTokens_UpdateUserAccessToken",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "identifier",
+            "name": "update.user.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "tokenKey::token_key",
+            "name": "update.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "[required] identification + modifications(about)",
+            "name": "update",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "title": "[required] identification + modifications(about)",
+              "properties": {
+                "created_at": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "unix::ms"
+                },
+                "created_by": {
+                  "$ref": "#/definitions/api.ObjectId"
+                },
+                "deleted_at": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "[optional] disabled at"
+                },
+                "deleted_by": {
+                  "title": "[optional] disabled by",
+                  "$ref": "#/definitions/api.ObjectId"
+                },
+                "token": {
+                  "type": "string",
+                  "title": "tokenString::access_token"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "unix::ms"
+                },
+                "updated_by": {
+                  "$ref": "#/definitions/api.ObjectId"
+                },
+                "usage": {
+                  "type": "string",
+                  "title": "[optional] short usage description"
+                },
+                "user": {
+                  "type": "object",
+                  "title": "[optional] output depends on API endpoint",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "title": "display name"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "[optional] PATCH implementation",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "name": "enable",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.UserAccessToken"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "UserAccessTokens"
+        ],
+        "operationId": "UserAccessTokens_UpdateUserAccessToken2",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "identifier",
+            "name": "update.user.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "tokenKey::token_key",
+            "name": "update.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "[required] identification + modifications(about)",
+            "name": "update",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "title": "[required] identification + modifications(about)",
+              "properties": {
+                "created_at": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "unix::ms"
+                },
+                "created_by": {
+                  "$ref": "#/definitions/api.ObjectId"
+                },
+                "deleted_at": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "[optional] disabled at"
+                },
+                "deleted_by": {
+                  "title": "[optional] disabled by",
+                  "$ref": "#/definitions/api.ObjectId"
+                },
+                "token": {
+                  "type": "string",
+                  "title": "tokenString::access_token"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "unix::ms"
+                },
+                "updated_by": {
+                  "$ref": "#/definitions/api.ObjectId"
+                },
+                "usage": {
+                  "type": "string",
+                  "title": "[optional] short usage description"
+                },
+                "user": {
+                  "type": "object",
+                  "title": "[optional] output depends on API endpoint",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "title": "display name"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "[optional] PATCH implementation",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "name": "enable",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.UserAccessToken"
+            }
+          }
+        }
+      }
+    },
     "/users/{user.id}": {
       "put": {
         "tags": [
@@ -19366,6 +23189,154 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/api.UpdateUserResponse"
+            }
+          }
+        }
+      }
+    },
+    "/users/{user.id}/tokens": {
+      "get": {
+        "tags": [
+          "UserAccessTokens"
+        ],
+        "operationId": "UserAccessTokens_ListUserAccessToken",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "identifier",
+            "name": "user.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "display name",
+            "name": "user.name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "int32 page = 2;\nint64 size = 3;\n\n.usage ILIKE :q",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "----- Search Options -------------------------\n\nselect: output (fields,...)",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "select: order by (fields,...)",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "select: offset {page}",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "select: limit {size}",
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.UserAccessTokenList"
+            }
+          }
+        }
+      }
+    },
+    "/users/{user.id}/tokens/{id}": {
+      "get": {
+        "tags": [
+          "UserAccessTokens"
+        ],
+        "operationId": "UserAccessTokens_GetUserAccessToken",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "identifier",
+            "name": "user.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "tokenKey::uuid",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "display name",
+            "name": "user.name",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.UserAccessToken"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "UserAccessTokens"
+        ],
+        "operationId": "UserAccessTokens_DeleteUserAccessToken",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "identifier",
+            "name": "user.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "tokenKey::uuid",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "display name",
+            "name": "user.name",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.UserAccessToken"
             }
           }
         }
@@ -19416,6 +23387,155 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/api.GenerateUserTfaKeyResponse"
+            }
+          }
+        }
+      }
+    },
+    "/{object.name}/{object.id}/acl": {
+      "get": {
+        "tags": [
+          "AccessStore"
+        ],
+        "operationId": "AccessStore_ListObjectAccess",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "display name",
+            "name": "object.name",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "identifier",
+            "name": "object.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "description": "--- filters ---\n\n[optional] [FROM] each rule owner is any of role(s) id; user -or- role",
+            "name": "grantor",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "description": "[optional] [TO] subject role(s) id; user -or- role",
+            "name": "grantee",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "[xrwdxrwd] [R]ecord-[b]ased-[A]ccess-[C]ontrol level check(!)",
+            "name": "granted",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "[optional] [TO] subject.name ILIKE ?q=; user -or- role",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "----- Select Options -------------------------\n\nattributes list",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "e.g.: \"updated_at\" - ASC; \"!updated_at\" - DESC;",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "pagedResultsControl\n\ndefault: 16",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "default: 1",
+            "name": "page",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.ListAccessResponseV1"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "AccessStore"
+        ],
+        "summary": "TODO: replace with GrantAccess API, to become command like GRANT REVOKE ... with empty access rights string",
+        "operationId": "AccessStore_ToggleObjectAccess",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "display name",
+            "name": "object.name",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "identifier",
+            "name": "object.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "list",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/api.GrantAccessRequestV1"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/api.UpdateAccessResponseV1"
             }
           }
         }
@@ -19692,11 +23812,162 @@
         }
       }
     },
+    "api.AccessRule": {
+      "type": "object",
+      "properties": {
+        "granted": {
+          "type": "string",
+          "title": "[WHAT]: full: [xrwdxrwd]; privileges: [----xrwd]; grantable: [xrwd----]"
+        },
+        "grantee": {
+          "title": "[WHOM]: required; NEED to be rechecked !!!",
+          "$ref": "#/definitions/api.RoleId"
+        },
+        "grantor": {
+          "description": "[WHO]: operational; current user NEED to be rechecked !!!",
+          "title": "ObjectId object = 1;",
+          "$ref": "#/definitions/api.RoleId"
+        }
+      }
+    },
+    "api.AccessStore.ToggleDefaultAccessBody": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "description": "list of changes ...\n\n[TO] (GRANT/REVOKE)",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.GrantAccessRequestV1"
+          }
+        },
+        "object": {
+          "type": "object",
+          "title": "[ON] objclass (either: by entity .id -or- class .name)"
+        }
+      }
+    },
+    "api.AccessToken": {
+      "type": "object",
+      "title": "OAuth 2.0 Access Token Response compatible",
+      "properties": {
+        "access_token": {
+          "description": "REQUIRED. The access token issued by the authorization server.",
+          "type": "string"
+        },
+        "expires_in": {
+          "description": "RECOMMENDED. The lifetime in seconds of the access token.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "refresh_token": {
+          "description": "OPTIONAL. The refresh token, which can be used to obtain\nnew access tokens using the same authorization grant.",
+          "type": "string"
+        },
+        "state": {
+          "description": "OPTIONAL, if identical to the scope requested by the client;\notherwise, REQUIRED. The scope of the access token.\nrepeated string scope = 5 [ json_name = \"scope\" ];\nREQUIRED if the \"state\" parameter was present in the client\nauthorization request. The exact value received from the client.",
+          "type": "string"
+        },
+        "token_type": {
+          "description": "REQUIRED. The type of the token issued. Value is case insensitive.",
+          "type": "string"
+        }
+      }
+    },
+    "api.Claim": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "api.Classes.UpdateClassBody": {
+      "type": "object",
+      "properties": {
+        "class": {
+          "type": "object",
+          "properties": {
+            "abac": {
+              "type": "boolean",
+              "title": "[a]ttribute-[b]ased [a]ccess [c]ontrol"
+            },
+            "class": {
+              "type": "string",
+              "title": "(class::object).name"
+            },
+            "obac": {
+              "type": "boolean",
+              "title": "[o]peration-[b]ased [a]ccess [c]ontrol (from::collection.dal)"
+            },
+            "rbac": {
+              "type": "boolean",
+              "title": "[r]ecord-[b]ased [a]ccess [c]ontrol (from::resource.acl)"
+            }
+          }
+        },
+        "domain": {
+          "type": "string",
+          "title": "TO BE REMOVED // bound to session.domain.id"
+        },
+        "fields": {
+          "type": "array",
+          "title": "PATCH: partial update",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "api.CreateDeviceResponse": {
       "type": "object",
       "properties": {
         "device": {
           "$ref": "#/definitions/api.Device"
+        }
+      }
+    },
+    "api.CreateDomainRequest": {
+      "type": "object",
+      "title": "POST /domains",
+      "properties": {
+        "organization": {
+          "$ref": "#/definitions/api.Organization"
+        },
+        "password": {
+          "type": "string"
+        },
+        "superuser": {
+          "type": "string"
+        }
+      }
+    },
+    "api.CreateDomainResponse": {
+      "type": "object"
+    },
+    "api.CreateRoleRequest": {
+      "type": "object",
+      "properties": {
+        "copy_id": {
+          "type": "string",
+          "format": "int64",
+          "title": "----- Query parameters -----\nOptional. Source role unique identifier\nto copy access (+default) control list from"
+        },
+        "role": {
+          "title": "entity to be created",
+          "$ref": "#/definitions/api.Role"
+        }
+      }
+    },
+    "api.CreateRoleResponse": {
+      "type": "object",
+      "properties": {
+        "created": {
+          "title": "entity to be created",
+          "$ref": "#/definitions/api.Role"
         }
       }
     },
@@ -19725,6 +23996,93 @@
         }
       }
     },
+    "api.Customer": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "description": "local created ms",
+          "type": "string",
+          "format": "int64",
+          "title": "string version = 2; // version\nlocal store details"
+        },
+        "dnsrv": {
+          "type": "array",
+          "title": "[optional] domains",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.ObjectId"
+          }
+        },
+        "id": {
+          "type": "string",
+          "title": "serial number assigned (global::Customer-ID)"
+        },
+        "issued_at": {
+          "description": "[required] issuer(CA) created at",
+          "type": "string",
+          "format": "int64",
+          "title": "validity boundaries"
+        },
+        "license": {
+          "description": "grants issued",
+          "type": "array",
+          "title": "int32 competitive = 13; // zero-based competitive sessions limit ?",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.LicenseV1"
+          }
+        },
+        "limit": {
+          "description": "defines map[class]limit usage",
+          "type": "object",
+          "title": "extensions granted",
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "next_update": {
+          "type": "string",
+          "format": "int64",
+          "title": "[optional]: signature expires; update required after"
+        },
+        "not_after": {
+          "type": "string",
+          "format": "int64",
+          "title": "[required] valid till"
+        },
+        "not_before": {
+          "type": "string",
+          "format": "int64",
+          "title": "[optional] valid from"
+        },
+        "organization": {
+          "type": "string",
+          "title": "registration name"
+        },
+        "revoked_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "local revoked ms"
+        },
+        "this_update": {
+          "description": "[optional]: issuer(CA) signed at",
+          "type": "string",
+          "format": "int64",
+          "title": "signature validity"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "last uploaded ms"
+        },
+        "verify": {
+          "description": "[optional] validation results",
+          "title": "Verification status",
+          "$ref": "#/definitions/api.Verification"
+        }
+      }
+    },
     "api.DeleteDeviceResponse": {
       "type": "object",
       "properties": {
@@ -19734,6 +24092,49 @@
             "type": "object",
             "$ref": "#/definitions/api.Device"
           }
+        }
+      }
+    },
+    "api.DeleteDomainResponse": {
+      "type": "object"
+    },
+    "api.DeleteLDAPRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "title": "catalog id"
+        },
+        "related_objects": {
+          "type": "boolean",
+          "title": "WITH objects bound to ?"
+        }
+      }
+    },
+    "api.DeleteOAuthServiceRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
+        "permanent": {
+          "type": "boolean"
+        }
+      }
+    },
+    "api.DeleteOAuthServiceResponse": {
+      "type": "object"
+    },
+    "api.DeleteRoleResponse": {
+      "type": "object",
+      "properties": {
+        "deleted": {
+          "$ref": "#/definitions/api.Role"
         }
       }
     },
@@ -19915,6 +24316,66 @@
         }
       }
     },
+    "api.Domains.UpdateDomainBody": {
+      "type": "object",
+      "title": "PUT /domain/{domain.dc}",
+      "properties": {
+        "domain": {
+          "type": "object",
+          "properties": {
+            "country": {
+              "type": "string"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "int64",
+              "title": "unix"
+            },
+            "createdBy": {
+              "type": "string",
+              "title": "user"
+            },
+            "domain": {
+              "type": "string",
+              "title": "FQDN"
+            },
+            "email": {
+              "type": "string"
+            },
+            "locality": {
+              "type": "string"
+            },
+            "organization": {
+              "type": "string"
+            },
+            "postalAddress": {
+              "type": "string"
+            },
+            "postalCode": {
+              "type": "string"
+            },
+            "stateOrProvince": {
+              "type": "string"
+            },
+            "streetAddress": {
+              "type": "string"
+            },
+            "telephoneNumber": {
+              "type": "string"
+            },
+            "updatedAt": {
+              "type": "string",
+              "format": "int64",
+              "title": "unix"
+            },
+            "updatedBy": {
+              "type": "string",
+              "title": "user"
+            }
+          }
+        }
+      }
+    },
     "api.GenerateTfaKeysForNecessaryUsersResponse": {
       "type": "object",
       "properties": {
@@ -19932,11 +24393,919 @@
         }
       }
     },
+    "api.GetCustomerResponse": {
+      "type": "object",
+      "properties": {
+        "customer": {
+          "$ref": "#/definitions/api.Customer"
+        }
+      }
+    },
     "api.GetUserTfaKeyResponse": {
       "type": "object",
       "properties": {
         "totp": {
           "$ref": "#/definitions/api.TfaUrl"
+        }
+      }
+    },
+    "api.GrantAccessRequestV1": {
+      "type": "object",
+      "properties": {
+        "grantee": {
+          "type": "string",
+          "format": "int64",
+          "title": "grantee.role.id"
+        },
+        "grants": {
+          "type": "string",
+          "title": "repeated string privileges = 5; // [\"SEARCH\",\"MODIFY\",\"DELETE\",\"CREATE\"]\nbool grantable = 6; // WITH GRANT OPTION"
+        },
+        "object": {
+          "title": "string class = 2;\nint64 object = 3; // class.object.id",
+          "$ref": "#/definitions/api.ObjectId"
+        }
+      }
+    },
+    "api.GrantRoleResponse": {
+      "type": "object"
+    },
+    "api.LDAP.CreateLDAPTemplateBody": {
+      "type": "object",
+      "title": "LDAPTemplate is an LDAP search entries to webitel objects transformation template",
+      "properties": {
+        "agent": {
+          "type": "object",
+          "title": "OPTIONAL. Agent objclass fields mapping"
+        },
+        "base_dn": {
+          "type": "string",
+          "title": "Optional. LDAP Search base entry DN"
+        },
+        "catalog": {
+          "type": "object",
+          "title": "LDAPCatalog belongs to",
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "display name"
+            }
+          }
+        },
+        "created_at": {
+          "description": "unix",
+          "type": "string",
+          "format": "int64",
+          "title": "READONLY. Operational attributes"
+        },
+        "created_by": {
+          "title": "user",
+          "$ref": "#/definitions/api.UserId"
+        },
+        "device": {
+          "type": "object",
+          "title": "OPTIONAL. Device objclass fields mapping"
+        },
+        "enabled": {
+          "type": "boolean",
+          "title": "Optional. This Template is activated ?"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "title": "ID unique"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name this template"
+        },
+        "role": {
+          "type": "object",
+          "title": "OPTIONAL. Role objclass fields mapping (Not implemented yet)"
+        },
+        "search": {
+          "type": "string",
+          "title": "Required. LDAP Search filter string"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "unix"
+        },
+        "updated_by": {
+          "title": "user",
+          "$ref": "#/definitions/api.UserId"
+        },
+        "user": {
+          "type": "object",
+          "title": "OPTIONAL. User objclass fields mapping"
+        }
+      }
+    },
+    "api.LDAP.DeleteLDAPTemplateBody": {
+      "type": "object",
+      "properties": {
+        "base_dn": {
+          "type": "string"
+        },
+        "disabled": {
+          "type": "boolean"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "fields": {
+          "type": "array",
+          "title": "attributes list",
+          "items": {
+            "type": "string"
+          }
+        },
+        "id": {
+          "type": "array",
+          "title": "----- Search Basic Filters ---------------------------\nOPTIONAL. Search templates by .id",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
+        "name": {
+          "type": "string"
+        },
+        "objclass": {
+          "type": "string"
+        },
+        "page": {
+          "description": "default: 1",
+          "type": "integer",
+          "format": "int32",
+          "title": "----- Select Options -------------------------"
+        },
+        "q": {
+          "type": "string",
+          "title": "OPTIONAL. Filter(s) SET"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32",
+          "title": "default: 16"
+        },
+        "sort": {
+          "type": "array",
+          "title": "e.g.: \"updated_at\" - ASC; \"!updated_at\" - DESC;",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "api.LDAP.LDAPSearchBody": {
+      "type": "object",
+      "title": "https://datatracker.ietf.org/doc/html/rfc4511#section-4.5.1",
+      "properties": {
+        "attributes": {
+          "type": "array",
+          "title": "AttributeSelection",
+          "items": {
+            "type": "string"
+          }
+        },
+        "baseObject": {
+          "type": "string",
+          "title": "----- SearchRequest -----\nbaseObject [D]istinguished[N]ame"
+        },
+        "bind": {
+          "description": "authorization method e.g.: SIMPLE, SAML, NTLM, etc.",
+          "type": "string",
+          "title": "----- BIND: Authorization -----"
+        },
+        "controls": {
+          "type": "array",
+          "title": "----- LDAPMessage -----\nControls NOT implemented yet !",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.LDAPControl"
+          }
+        },
+        "derefAliases": {
+          "type": "integer",
+          "format": "int32",
+          "title": "neverDerefAliases       (0),\nderefInSearching        (1),\nderefFindingBaseObj     (2),\nderefAlways             (3)"
+        },
+        "filter": {
+          "type": "string",
+          "title": "Filter,"
+        },
+        "password": {
+          "type": "string",
+          "title": "password"
+        },
+        "scope": {
+          "type": "integer",
+          "format": "int32",
+          "title": "baseObject              (0),\nsingleLevel             (1),\nwholeSubtree            (2)"
+        },
+        "sizeLimit": {
+          "type": "string",
+          "format": "int64",
+          "title": "INTEGER (0 ..  maxInt),"
+        },
+        "timeLimit": {
+          "type": "string",
+          "format": "int64",
+          "title": "INTEGER (0 ..  maxInt),"
+        },
+        "tls": {
+          "$ref": "#/definitions/api.LDAPSearchRequest.TLSConfig"
+        },
+        "typesOnly": {
+          "type": "boolean",
+          "title": "BOOLEAN,"
+        },
+        "url": {
+          "description": "URL e.g.: [(ldap|ldapi|ldaps)://]host[:port]",
+          "type": "string",
+          "title": "Optional. URL to establish connection to LDAP catalog"
+        },
+        "username": {
+          "type": "string",
+          "title": "bind_dn"
+        }
+      }
+    },
+    "api.LDAP.ResyncLDAPCatalogBody": {
+      "type": "object",
+      "properties": {
+        "options": {
+          "title": "Options",
+          "$ref": "#/definitions/api.LDAProcessOptions"
+        }
+      }
+    },
+    "api.LDAP.UpdateLDAPCatalogBody": {
+      "type": "object",
+      "properties": {
+        "catalog": {
+          "description": "LDAP Catalog changes.",
+          "type": "object",
+          "title": "LDAP Catalog changes.",
+          "properties": {
+            "base_dn": {
+              "type": "string",
+              "title": "base_dn, aka domain e.g.: 'dc=example,dc=org'"
+            },
+            "bind": {
+              "description": "authorization method e.g.: SIMPLE, SAML, NTLM, etc.",
+              "type": "string",
+              "title": "----- BIND: Authorization -----"
+            },
+            "created_at": {
+              "description": "unix",
+              "type": "string",
+              "format": "int64",
+              "title": "basic: last operation details"
+            },
+            "created_by": {
+              "title": "user",
+              "$ref": "#/definitions/api.UserId"
+            },
+            "cron": {
+              "description": "[CRON]OS SPEC ! github.com/robfig/cron/v3",
+              "type": "string",
+              "title": "----- RSYNC Processing -----\nint32  priority = 4;"
+            },
+            "entry_modify": {
+              "type": "string",
+              "title": "last modification timestamp attribute type"
+            },
+            "entry_uuid": {
+              "description": "entry unique id (except DN which may be updated)",
+              "type": "string",
+              "title": "----- DOMAIN: Entry model -----"
+            },
+            "name": {
+              "type": "string",
+              "title": "Meaningfull title name"
+            },
+            "password": {
+              "type": "string",
+              "title": "password"
+            },
+            "process": {
+              "title": "Last OR Current SYNC process details",
+              "$ref": "#/definitions/api.LDAProcess"
+            },
+            "sync": {
+              "$ref": "#/definitions/api.LDAProcessOptions"
+            },
+            "templates": {
+              "type": "array",
+              "title": "// // ----- MAP: user(s) settings -----\nLDAPUsersMap users = 26; // DEPRECATED: Use Template(s) instead\nSYNC Object's search and mappings",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/api.LDAPTemplate"
+              }
+            },
+            "tls": {
+              "$ref": "#/definitions/api.LDAPCatalog.TLSConfig"
+            },
+            "updated_at": {
+              "type": "string",
+              "format": "int64",
+              "title": "unix"
+            },
+            "updated_by": {
+              "title": "user",
+              "$ref": "#/definitions/api.UserId"
+            },
+            "url": {
+              "description": "URL e.g.: [(ldap|ldapi|ldaps)://]host[:port]",
+              "type": "string",
+              "title": "----- Connection Options -----"
+            },
+            "username": {
+              "type": "string",
+              "title": "bind_dn"
+            }
+          }
+        },
+        "fields": {
+          "type": "array",
+          "title": "Fields for partial update. PATCH",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "api.LDAP.UpdateLDAPTemplateBody": {
+      "type": "object",
+      "properties": {
+        "fields": {
+          "type": "array",
+          "title": "OPTIONAL. Fields for partial update. PATCH",
+          "items": {
+            "type": "string"
+          }
+        },
+        "template": {
+          "description": "Template changes.",
+          "type": "object",
+          "title": "Template changes.",
+          "properties": {
+            "agent": {
+              "type": "object",
+              "title": "OPTIONAL. Agent objclass fields mapping"
+            },
+            "base_dn": {
+              "type": "string",
+              "title": "Optional. LDAP Search base entry DN"
+            },
+            "catalog": {
+              "type": "object",
+              "title": "LDAPCatalog belongs to",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "title": "display name"
+                }
+              }
+            },
+            "created_at": {
+              "description": "unix",
+              "type": "string",
+              "format": "int64",
+              "title": "READONLY. Operational attributes"
+            },
+            "created_by": {
+              "title": "user",
+              "$ref": "#/definitions/api.UserId"
+            },
+            "device": {
+              "type": "object",
+              "title": "OPTIONAL. Device objclass fields mapping"
+            },
+            "enabled": {
+              "type": "boolean",
+              "title": "Optional. This Template is activated ?"
+            },
+            "name": {
+              "type": "string",
+              "title": "Name this template"
+            },
+            "role": {
+              "type": "object",
+              "title": "OPTIONAL. Role objclass fields mapping (Not implemented yet)"
+            },
+            "search": {
+              "type": "string",
+              "title": "Required. LDAP Search filter string"
+            },
+            "updated_at": {
+              "type": "string",
+              "format": "int64",
+              "title": "unix"
+            },
+            "updated_by": {
+              "title": "user",
+              "$ref": "#/definitions/api.UserId"
+            },
+            "user": {
+              "type": "object",
+              "title": "OPTIONAL. User objclass fields mapping"
+            }
+          }
+        }
+      }
+    },
+    "api.LDAPCatalog": {
+      "type": "object",
+      "title": "LDAPCatalog profile",
+      "properties": {
+        "base_dn": {
+          "type": "string",
+          "title": "base_dn, aka domain e.g.: 'dc=example,dc=org'"
+        },
+        "bind": {
+          "description": "authorization method e.g.: SIMPLE, SAML, NTLM, etc.",
+          "type": "string",
+          "title": "----- BIND: Authorization -----"
+        },
+        "created_at": {
+          "description": "unix",
+          "type": "string",
+          "format": "int64",
+          "title": "basic: last operation details"
+        },
+        "created_by": {
+          "title": "user",
+          "$ref": "#/definitions/api.UserId"
+        },
+        "cron": {
+          "description": "[CRON]OS SPEC ! github.com/robfig/cron/v3",
+          "type": "string",
+          "title": "----- RSYNC Processing -----\nint32  priority = 4;"
+        },
+        "entry_modify": {
+          "type": "string",
+          "title": "last modification timestamp attribute type"
+        },
+        "entry_uuid": {
+          "description": "entry unique id (except DN which may be updated)",
+          "type": "string",
+          "title": "----- DOMAIN: Entry model -----"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "title": "identity\nint64 dc = 1;"
+        },
+        "name": {
+          "type": "string",
+          "title": "Meaningfull title name"
+        },
+        "password": {
+          "type": "string",
+          "title": "password"
+        },
+        "process": {
+          "title": "Last OR Current SYNC process details",
+          "$ref": "#/definitions/api.LDAProcess"
+        },
+        "sync": {
+          "$ref": "#/definitions/api.LDAProcessOptions"
+        },
+        "templates": {
+          "type": "array",
+          "title": "// // ----- MAP: user(s) settings -----\nLDAPUsersMap users = 26; // DEPRECATED: Use Template(s) instead\nSYNC Object's search and mappings",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.LDAPTemplate"
+          }
+        },
+        "tls": {
+          "$ref": "#/definitions/api.LDAPCatalog.TLSConfig"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "unix"
+        },
+        "updated_by": {
+          "title": "user",
+          "$ref": "#/definitions/api.UserId"
+        },
+        "url": {
+          "description": "URL e.g.: [(ldap|ldapi|ldaps)://]host[:port]",
+          "type": "string",
+          "title": "----- Connection Options -----"
+        },
+        "username": {
+          "type": "string",
+          "title": "bind_dn"
+        }
+      }
+    },
+    "api.LDAPCatalog.TLSConfig": {
+      "type": "object",
+      "title": "TLS configuration options",
+      "properties": {
+        "ca": {
+          "type": "string",
+          "format": "byte",
+          "title": "PEM: base64"
+        },
+        "cert": {
+          "description": "PEM: base64",
+          "type": "string",
+          "format": "byte",
+          "title": "TODO: (!)"
+        },
+        "key": {
+          "type": "string",
+          "format": "byte",
+          "title": "PEM: base64"
+        }
+      }
+    },
+    "api.LDAPControl": {
+      "type": "object",
+      "title": "https://datatracker.ietf.org/doc/html/rfc4511#section-4.1.11",
+      "properties": {
+        "controlType": {
+          "type": "string",
+          "title": "LDAPOID,"
+        },
+        "controlValue": {
+          "type": "string",
+          "title": "OCTET STRING OPTIONAL"
+        },
+        "criticality": {
+          "type": "boolean",
+          "title": "BOOLEAN DEFAULT FALSE,"
+        }
+      }
+    },
+    "api.LDAPObjentry": {
+      "type": "object",
+      "title": "LDAP entry object associatetions performed",
+      "properties": {
+        "class": {
+          "type": "string",
+          "title": "Internal object class been associated with this LDAP .entry"
+        },
+        "entry": {
+          "description": "map\u003cstring, string\u003e entry = 1;",
+          "type": "object",
+          "title": "LDAP Entry Attributes fetched"
+        },
+        "errs": {
+          "type": "array",
+          "title": "FATAL Error(s). NON empty indicates that this process failed",
+          "items": {
+            "type": "string"
+          }
+        },
+        "object": {
+          "type": "object",
+          "title": "Internal object state; DUMP"
+        },
+        "proc": {
+          "type": "string",
+          "title": "Operation been performed: create|update|delete"
+        },
+        "warn": {
+          "type": "array",
+          "title": "An error(s) if any occured\nNON-FATAL Warnings",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "api.LDAPSearchRequest": {
+      "type": "object",
+      "title": "https://datatracker.ietf.org/doc/html/rfc4511#section-4.5.1",
+      "properties": {
+        "attributes": {
+          "type": "array",
+          "title": "AttributeSelection",
+          "items": {
+            "type": "string"
+          }
+        },
+        "baseObject": {
+          "type": "string",
+          "title": "----- SearchRequest -----\nbaseObject [D]istinguished[N]ame"
+        },
+        "bind": {
+          "description": "authorization method e.g.: SIMPLE, SAML, NTLM, etc.",
+          "type": "string",
+          "title": "----- BIND: Authorization -----"
+        },
+        "catalog_id": {
+          "type": "string",
+          "format": "int64",
+          "title": "----- connection -----\nOptional. ID of the preconfigured LDAP catalog"
+        },
+        "controls": {
+          "type": "array",
+          "title": "----- LDAPMessage -----\nControls NOT implemented yet !",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.LDAPControl"
+          }
+        },
+        "derefAliases": {
+          "type": "integer",
+          "format": "int32",
+          "title": "neverDerefAliases       (0),\nderefInSearching        (1),\nderefFindingBaseObj     (2),\nderefAlways             (3)"
+        },
+        "filter": {
+          "type": "string",
+          "title": "Filter,"
+        },
+        "password": {
+          "type": "string",
+          "title": "password"
+        },
+        "scope": {
+          "type": "integer",
+          "format": "int32",
+          "title": "baseObject              (0),\nsingleLevel             (1),\nwholeSubtree            (2)"
+        },
+        "sizeLimit": {
+          "type": "string",
+          "format": "int64",
+          "title": "INTEGER (0 ..  maxInt),"
+        },
+        "timeLimit": {
+          "type": "string",
+          "format": "int64",
+          "title": "INTEGER (0 ..  maxInt),"
+        },
+        "tls": {
+          "$ref": "#/definitions/api.LDAPSearchRequest.TLSConfig"
+        },
+        "typesOnly": {
+          "type": "boolean",
+          "title": "BOOLEAN,"
+        },
+        "url": {
+          "description": "URL e.g.: [(ldap|ldapi|ldaps)://]host[:port]",
+          "type": "string",
+          "title": "Optional. URL to establish connection to LDAP catalog"
+        },
+        "username": {
+          "type": "string",
+          "title": "bind_dn"
+        }
+      }
+    },
+    "api.LDAPSearchRequest.TLSConfig": {
+      "type": "object",
+      "title": "TLS configuration options",
+      "properties": {
+        "PEM": {
+          "description": "base64",
+          "type": "string",
+          "format": "byte",
+          "title": "TODO: (!)"
+        }
+      }
+    },
+    "api.LDAPSearchResponse": {
+      "type": "object",
+      "title": "https://datatracker.ietf.org/doc/html/rfc4511#section-4.5.2",
+      "properties": {
+        "controls": {
+          "type": "array",
+          "title": "----- LDAPMessage -----",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.LDAPControl"
+          }
+        },
+        "diagnosticMessage": {
+          "type": "string",
+          "title": "LDAPString,"
+        },
+        "entries": {
+          "type": "array",
+          "title": "----- SearchResult (Entry|Reference) -----",
+          "items": {
+            "type": "object"
+          }
+        },
+        "matchedDN": {
+          "type": "string",
+          "title": "LDAPDN,"
+        },
+        "referral": {
+          "type": "array",
+          "title": "[3] Referral OPTIONAL",
+          "items": {
+            "type": "string"
+          }
+        },
+        "resultCode": {
+          "type": "integer",
+          "format": "int32",
+          "title": "----- LDAPResult -----"
+        }
+      }
+    },
+    "api.LDAPTemplate": {
+      "type": "object",
+      "title": "LDAPTemplate is an LDAP search entries to webitel objects transformation template",
+      "properties": {
+        "agent": {
+          "type": "object",
+          "title": "OPTIONAL. Agent objclass fields mapping"
+        },
+        "base_dn": {
+          "type": "string",
+          "title": "Optional. LDAP Search base entry DN"
+        },
+        "catalog": {
+          "title": "LDAPCatalog belongs to",
+          "$ref": "#/definitions/api.ObjectId"
+        },
+        "created_at": {
+          "description": "unix",
+          "type": "string",
+          "format": "int64",
+          "title": "READONLY. Operational attributes"
+        },
+        "created_by": {
+          "title": "user",
+          "$ref": "#/definitions/api.UserId"
+        },
+        "device": {
+          "type": "object",
+          "title": "OPTIONAL. Device objclass fields mapping"
+        },
+        "enabled": {
+          "type": "boolean",
+          "title": "Optional. This Template is activated ?"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "title": "ID unique"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name this template"
+        },
+        "role": {
+          "type": "object",
+          "title": "OPTIONAL. Role objclass fields mapping (Not implemented yet)"
+        },
+        "search": {
+          "type": "string",
+          "title": "Required. LDAP Search filter string"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "unix"
+        },
+        "updated_by": {
+          "title": "user",
+          "$ref": "#/definitions/api.UserId"
+        },
+        "user": {
+          "type": "object",
+          "title": "OPTIONAL. User objclass fields mapping"
+        }
+      }
+    },
+    "api.LDAPTemplateResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.LDAPTemplate"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "title": "result: has {next} page ?"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "title": "result: {page} number"
+        }
+      }
+    },
+    "api.LDAProcess": {
+      "type": "object",
+      "title": "LDAP synchronization process details",
+      "properties": {
+        "complete_at": {
+          "description": "Optional. If not \u003czero\u003e indicates that this process is completed.",
+          "type": "string",
+          "format": "int64"
+        },
+        "execute_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "Readonly. Process start timestamp"
+        },
+        "execute_by": {
+          "title": "Optional. Start manually by the user or role",
+          "$ref": "#/definitions/api.RoleId"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "title": "Readonly. Process unique identifier"
+        },
+        "options": {
+          "title": "Readonly. Executed with options",
+          "$ref": "#/definitions/api.LDAProcessOptions"
+        },
+        "progress": {
+          "type": "array",
+          "title": "Optional. List of entries been already processed",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.LDAPObjentry"
+          }
+        },
+        "status": {
+          "type": "string",
+          "title": "Optional. Status description or an error if any occured"
+        }
+      }
+    },
+    "api.LDAProcessOptions": {
+      "type": "object",
+      "properties": {
+        "link_existing_objects": {
+          "type": "boolean",
+          "title": "Allows to create links\nwith fetched LDAP entries\nfor manually created objects"
+        },
+        "reassign_device_users": {
+          "type": "boolean",
+          "title": "Allows to reassign device's owner user\ndue to preconfigured mapping LDAP template"
+        },
+        "test": {
+          "type": "boolean",
+          "title": "Will NOT perform any operations on storage.\nTo review potential processing only"
+        },
+        "timeout": {
+          "type": "string",
+          "format": "int64",
+          "title": "Operation timeout. Not implemented yet"
+        }
+      }
+    },
+    "api.LDAProcessResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.LDAProcess"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "title": "result: has {next} page ?"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "title": "result: {page} number"
+        }
+      }
+    },
+    "api.LicenseUsageResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "title": "size = (.next ? len(items) : undef (\u003e len(size)))\n----- Result entries ----- //",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.LicenseV1"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "title": "next page exists ? more results ?"
+        },
+        "page": {
+          "description": "this page number !",
+          "type": "integer",
+          "format": "int32",
+          "title": "----- Result paging ----- //"
         }
       }
     },
@@ -19975,6 +25344,106 @@
         }
       }
     },
+    "api.LicenseUsersResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "title": "size = (.next ? len(items) : undef (\u003e len(size)))\n----- Result entries ----- //",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.ProductUser"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "title": "next page exists ? more results ?"
+        },
+        "page": {
+          "description": "this page number !",
+          "type": "integer",
+          "format": "int32",
+          "title": "----- Result paging ----- //"
+        }
+      }
+    },
+    "api.LicenseV1": {
+      "type": "object",
+      "properties": {
+        "competitive": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string",
+          "title": "serial number assigned (global::License-ID)"
+        },
+        "limit": {
+          "type": "integer",
+          "format": "int32",
+          "title": "required: limit count (maximum allowed usage quantity)"
+        },
+        "not_after": {
+          "type": "string",
+          "format": "int64",
+          "title": "optional"
+        },
+        "not_before": {
+          "type": "string",
+          "format": "int64",
+          "title": "optional"
+        },
+        "product": {
+          "type": "string",
+          "title": "product name, e.g.: DEVICE, MANAGER, OPERATOR"
+        },
+        "remain": {
+          "description": "available",
+          "type": "integer",
+          "format": "int32",
+          "title": "operational attributes ...\nremain = limit - len(users)"
+        },
+        "scope": {
+          "description": "list of known classes, \u0026this product grants mandatory access to, e.g.: 'users', 'roles', 'cc_agent', 'calendars', ...",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "status": {
+          "$ref": "#/definitions/api.Verification"
+        },
+        "users": {
+          "type": "array",
+          "title": "users.id (grantees)",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.LicenseUser"
+          }
+        }
+      }
+    },
+    "api.ListAccessResponseV1": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "title": "endregion",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.AccessRule"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "title": "indicate partial response: ( next || page \u003e 1 ? partial : full )"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "title": "region: paged result control response value"
+        }
+      }
+    },
     "api.ListRegistrationsResponse": {
       "type": "object",
       "properties": {
@@ -20002,8 +25471,269 @@
         }
       }
     },
+    "api.LoginResponse": {
+      "type": "object",
+      "properties": {
+        "authorization": {
+          "$ref": "#/definitions/api.AccessToken"
+        }
+      }
+    },
     "api.LogoutUserResponse": {
       "type": "object"
+    },
+    "api.OAuth2Federation.DeleteOAuthServiceBody": {
+      "type": "object",
+      "properties": {
+        "permanent": {
+          "type": "boolean"
+        }
+      }
+    },
+    "api.OAuth2Federation.UpdateOAuthServiceBody": {
+      "type": "object",
+      "properties": {
+        "changes": {
+          "description": "Configuration changes.",
+          "type": "object",
+          "title": "Configuration changes.",
+          "properties": {
+            "auth_url": {
+              "type": "string",
+              "title": "OAuth 2.0 Authorization Endpoint"
+            },
+            "claims": {
+              "description": "google.protobuf.Struct claims = 7;",
+              "type": "array",
+              "title": "Identity claims policy rules\nNOTE: Order matters",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/api.Claim"
+              }
+            },
+            "client_id": {
+              "type": "string"
+            },
+            "client_secret": {
+              "type": "string"
+            },
+            "created_at": {
+              "type": "string",
+              "format": "int64",
+              "title": "unix"
+            },
+            "created_by": {
+              "title": "user",
+              "$ref": "#/definitions/api.ObjectId"
+            },
+            "discovery_url": {
+              "type": "string",
+              "title": "OpenID Connect Service Discovery"
+            },
+            "domain": {
+              "$ref": "#/definitions/api.ObjectId"
+            },
+            "enabled": {
+              "type": "boolean"
+            },
+            "logo": {
+              "type": "string"
+            },
+            "metadata": {
+              "type": "object"
+            },
+            "name": {
+              "type": "string",
+              "title": "display"
+            },
+            "scopes": {
+              "type": "array",
+              "title": "Scopes to be requested",
+              "items": {
+                "type": "string"
+              }
+            },
+            "token_url": {
+              "type": "string",
+              "title": "OAuth 2.0 Token Endpoint"
+            },
+            "type": {
+              "type": "string",
+              "title": "well-known vendor; provider"
+            },
+            "updated_at": {
+              "type": "string",
+              "format": "int64",
+              "title": "unix"
+            },
+            "updated_by": {
+              "title": "user",
+              "$ref": "#/definitions/api.ObjectId"
+            },
+            "userinfo_url": {
+              "type": "string",
+              "title": "OpenID Connect Userinfo Endpoint"
+            }
+          }
+        },
+        "fields": {
+          "type": "array",
+          "title": "Fields for partial update. PATCH",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "api.OAuthService": {
+      "type": "object",
+      "title": "OAuth 2.0 Authentication [S]ervice [P]rovider Application Configuration",
+      "properties": {
+        "auth_url": {
+          "type": "string",
+          "title": "OAuth 2.0 Authorization Endpoint"
+        },
+        "claims": {
+          "description": "google.protobuf.Struct claims = 7;",
+          "type": "array",
+          "title": "Identity claims policy rules\nNOTE: Order matters",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.Claim"
+          }
+        },
+        "client_id": {
+          "type": "string"
+        },
+        "client_secret": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "unix"
+        },
+        "created_by": {
+          "title": "user",
+          "$ref": "#/definitions/api.ObjectId"
+        },
+        "discovery_url": {
+          "type": "string",
+          "title": "OpenID Connect Service Discovery"
+        },
+        "domain": {
+          "$ref": "#/definitions/api.ObjectId"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "logo": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object"
+        },
+        "name": {
+          "type": "string",
+          "title": "display"
+        },
+        "scopes": {
+          "type": "array",
+          "title": "Scopes to be requested",
+          "items": {
+            "type": "string"
+          }
+        },
+        "token_url": {
+          "type": "string",
+          "title": "OAuth 2.0 Token Endpoint"
+        },
+        "type": {
+          "type": "string",
+          "title": "well-known vendor; provider"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "unix"
+        },
+        "updated_by": {
+          "title": "user",
+          "$ref": "#/definitions/api.ObjectId"
+        },
+        "userinfo_url": {
+          "type": "string",
+          "title": "OpenID Connect Userinfo Endpoint"
+        }
+      }
+    },
+    "api.Objclass": {
+      "type": "object",
+      "title": "AccessScope represents authorized access level\nto object class declaration within domain namespace",
+      "properties": {
+        "abac": {
+          "description": "[A]ttribute-[b]ased;  not implemented; next releases ...",
+          "type": "boolean",
+          "title": "Is [?]-[b]ased [A]ccess [C]ontrol *model enabled ?"
+        },
+        "access": {
+          "description": "flags: [ CREATE | SELECT | UPDATE | DELETE ]",
+          "type": "string",
+          "title": "Extension: discretionary access control"
+        },
+        "class": {
+          "type": "string",
+          "title": "class: alphanumeric code name"
+        },
+        "id": {
+          "description": "class: object id",
+          "type": "string",
+          "format": "int64",
+          "title": "Inherit::ObjectClass"
+        },
+        "name": {
+          "type": "string",
+          "title": "class: display common name"
+        },
+        "obac": {
+          "type": "boolean",
+          "title": "[O]peration-[b]ased;  Mandatory: control access to object.class (alias: collection, section, etc.)"
+        },
+        "rbac": {
+          "type": "boolean",
+          "title": "[R]ecord-[b]ased; Discretionary: control access to object.entry (alias: resource, record, etc.)"
+        }
+      }
+    },
+    "api.ObjectClass": {
+      "type": "object",
+      "properties": {
+        "abac": {
+          "type": "boolean",
+          "title": "[a]ttribute-[b]ased [a]ccess [c]ontrol"
+        },
+        "class": {
+          "type": "string",
+          "title": "(class::object).name"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "title": "(class::object).id"
+        },
+        "obac": {
+          "type": "boolean",
+          "title": "[o]peration-[b]ased [a]ccess [c]ontrol (from::collection.dal)"
+        },
+        "rbac": {
+          "type": "boolean",
+          "title": "[r]ecord-[b]ased [a]ccess [c]ontrol (from::resource.acl)"
+        }
+      }
     },
     "api.ObjectId": {
       "type": "object",
@@ -20016,6 +25746,65 @@
         "name": {
           "type": "string",
           "title": "display name"
+        }
+      }
+    },
+    "api.Organization": {
+      "type": "object",
+      "properties": {
+        "country": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "int64",
+          "title": "unix"
+        },
+        "createdBy": {
+          "type": "string",
+          "title": "user"
+        },
+        "dc": {
+          "type": "string",
+          "format": "int64",
+          "title": "component"
+        },
+        "domain": {
+          "type": "string",
+          "title": "FQDN"
+        },
+        "email": {
+          "type": "string"
+        },
+        "locality": {
+          "type": "string"
+        },
+        "organization": {
+          "type": "string"
+        },
+        "postalAddress": {
+          "type": "string"
+        },
+        "postalCode": {
+          "type": "string"
+        },
+        "stateOrProvince": {
+          "type": "string"
+        },
+        "streetAddress": {
+          "type": "string"
+        },
+        "telephoneNumber": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "int64",
+          "title": "unix"
+        },
+        "updatedBy": {
+          "type": "string",
+          "title": "user"
         }
       }
     },
@@ -20036,11 +25825,171 @@
         }
       }
     },
+    "api.Presence.SetStatusBody": {
+      "type": "object",
+      "properties": {
+        "fields": {
+          "type": "array",
+          "title": "PATCH: partial attributes",
+          "items": {
+            "type": "string"
+          }
+        },
+        "publish": {
+          "description": "BODY: partial modifications",
+          "type": "object",
+          "title": "int64 id = 1; // user.id",
+          "properties": {
+            "expires": {
+              "type": "integer",
+              "format": "int32",
+              "title": "[optional] \u003cnote\u003e will be cleaned up after seconds"
+            },
+            "note": {
+              "type": "string",
+              "title": "[optional] human readable comment"
+            },
+            "status": {
+              "type": "string",
+              "title": "[optional] set of unique 'active' presentities {dnd,dlg,sip,wss}; assume {offline} if omitted"
+            },
+            "timestamp": {
+              "type": "string",
+              "format": "int64",
+              "title": "[required] last activity time"
+            }
+          }
+        }
+      }
+    },
+    "api.PresenceStatus": {
+      "type": "object",
+      "title": "PresenceStatus PUBLISH",
+      "properties": {
+        "app": {
+          "type": "string",
+          "title": "[optional] service node identity"
+        },
+        "closed": {
+          "type": "boolean",
+          "title": "[optional] signify \u003cstatus\u003e tuple gone from user's presence; equls to (open == 0)"
+        },
+        "contact": {
+          "type": "string",
+          "title": "[optional] communication \u003curl\u003e"
+        },
+        "domain_id": {
+          "type": "string",
+          "format": "int64",
+          "title": "[hidden] for cluster purpose"
+        },
+        "expires": {
+          "type": "string",
+          "format": "int64",
+          "title": "NOTE: \u003cdnd\u003e actualy has no expires until user manualy switch it off"
+        },
+        "id": {
+          "description": "[required] tuple unique id; \u003ctrack\u003e",
+          "type": "string",
+          "title": "basic:latest"
+        },
+        "note": {
+          "type": "string",
+          "title": "[optional] human readable comment"
+        },
+        "open": {
+          "type": "integer",
+          "format": "int32",
+          "title": "[optional] positive value signify 'active'"
+        },
+        "presence": {
+          "description": "// FIXME: well-known types ?\r\n repeated Dialog  call = 9;\r\n repeated Sipreg  sip = 9;\r\n repeated Websock wss = 9;",
+          "type": "array",
+          "title": "detailed: -registered -tracking tuples",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.PresenceStatus"
+          }
+        },
+        "priority": {
+          "type": "integer",
+          "format": "int32",
+          "title": "[optional] importance level of this within presentity's"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "int64",
+          "title": "[optional] this tuple (document) modifications version"
+        },
+        "status": {
+          "type": "string",
+          "title": "[optional] unique set of \u003cenum:dnd|call|sip|wss\u003e; assume \u003coffline\u003e if blank; \u003cscope\u003e on request"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "int64",
+          "title": "[required] opened time"
+        }
+      }
+    },
+    "api.ProductUser": {
+      "type": "object",
+      "title": "ProductUser GRANT details",
+      "properties": {
+        "domain": {
+          "title": "grant to::domain",
+          "$ref": "#/definitions/api.ObjectId"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "not after"
+        },
+        "issued_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "not before"
+        },
+        "sessions": {
+          "type": "integer",
+          "format": "int32",
+          "title": "User's active sessions count !"
+        },
+        "user": {
+          "title": "grant to::user",
+          "$ref": "#/definitions/api.ObjectId"
+        }
+      }
+    },
+    "api.ReadClassResponse": {
+      "type": "object",
+      "properties": {
+        "class": {
+          "$ref": "#/definitions/api.ObjectClass"
+        }
+      }
+    },
     "api.ReadDeviceResponse": {
       "type": "object",
       "properties": {
         "device": {
           "$ref": "#/definitions/api.Device"
+        }
+      }
+    },
+    "api.ReadDomainResponse": {
+      "type": "object",
+      "properties": {
+        "domain": {
+          "$ref": "#/definitions/api.Organization"
+        }
+      }
+    },
+    "api.ReadRoleResponse": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "$ref": "#/definitions/api.Role"
         }
       }
     },
@@ -20098,6 +26047,262 @@
         }
       }
     },
+    "api.RevokeRoleResponse": {
+      "type": "object"
+    },
+    "api.Role": {
+      "type": "object",
+      "title": "Role represents group of users",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "unix"
+        },
+        "created_by": {
+          "title": "user",
+          "$ref": "#/definitions/api.UserId"
+        },
+        "deleted_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "unix"
+        },
+        "deleted_by": {
+          "title": "user",
+          "$ref": "#/definitions/api.UserId"
+        },
+        "description": {
+          "type": "string",
+          "title": "short description"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "title": "oid"
+        },
+        "members": {
+          "description": "users/roles",
+          "type": "array",
+          "title": "Caller caller = 4; // TOBE removed !!!\nmap\u003cint64, string\u003e users = 4;",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.ObjectId"
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "title": "Optional. Metadata bound to this role by the third party integrations\nEach attribute of this object represents separate various data\nto be able to store and merge separate keys (documents)"
+        },
+        "name": {
+          "type": "string",
+          "title": "display common name"
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.Permission"
+          }
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "unix"
+        },
+        "updated_by": {
+          "title": "user",
+          "$ref": "#/definitions/api.UserId"
+        },
+        "user": {
+          "type": "boolean",
+          "title": "READONLY. Report whether this Role refers to the internal User(=true) or Group(=false)"
+        }
+      }
+    },
+    "api.Role.Member": {
+      "type": "object",
+      "properties": {
+        "admin": {
+          "type": "boolean",
+          "title": "admin of the group ?"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "unix"
+        },
+        "created_by": {
+          "type": "string",
+          "title": "user.[id|name]"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "title": "user.id"
+        },
+        "name": {
+          "type": "string",
+          "title": "user.name"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "unix"
+        },
+        "updated_by": {
+          "type": "string",
+          "title": "user"
+        }
+      }
+    },
+    "api.RoleId": {
+      "description": "RoleId lookup value.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "title": "Unique Object IDentifier"
+        },
+        "name": {
+          "type": "string",
+          "title": "Display Name"
+        },
+        "user": {
+          "type": "boolean",
+          "title": "Optional. Indicates that this role ID refers\nto the internal user as the system administrative unit"
+        }
+      }
+    },
+    "api.RoleMembersResponse": {
+      "type": "object",
+      "properties": {
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.Role.Member"
+          }
+        }
+      }
+    },
+    "api.RoleMetadataResponse": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "title": "Optional. Partial metadata document key name"
+        },
+        "value": {
+          "title": "Metadata value"
+        }
+      }
+    },
+    "api.Roles.UpdateRoleBody": {
+      "type": "object",
+      "properties": {
+        "fields": {
+          "type": "array",
+          "title": "partial changes",
+          "items": {
+            "type": "string"
+          }
+        },
+        "role": {
+          "type": "object",
+          "title": "modifications",
+          "properties": {
+            "created_at": {
+              "type": "string",
+              "format": "int64",
+              "title": "unix"
+            },
+            "created_by": {
+              "title": "user",
+              "$ref": "#/definitions/api.UserId"
+            },
+            "deleted_at": {
+              "type": "string",
+              "format": "int64",
+              "title": "unix"
+            },
+            "deleted_by": {
+              "title": "user",
+              "$ref": "#/definitions/api.UserId"
+            },
+            "description": {
+              "type": "string",
+              "title": "short description"
+            },
+            "members": {
+              "description": "users/roles",
+              "type": "array",
+              "title": "Caller caller = 4; // TOBE removed !!!\nmap\u003cint64, string\u003e users = 4;",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/api.ObjectId"
+              }
+            },
+            "metadata": {
+              "type": "object",
+              "title": "Optional. Metadata bound to this role by the third party integrations\nEach attribute of this object represents separate various data\nto be able to store and merge separate keys (documents)"
+            },
+            "name": {
+              "type": "string",
+              "title": "display common name"
+            },
+            "permissions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/api.Permission"
+              }
+            },
+            "updated_at": {
+              "type": "string",
+              "format": "int64",
+              "title": "unix"
+            },
+            "updated_by": {
+              "title": "user",
+              "$ref": "#/definitions/api.UserId"
+            },
+            "user": {
+              "type": "boolean",
+              "title": "READONLY. Report whether this Role refers to the internal User(=true) or Group(=false)"
+            }
+          }
+        }
+      }
+    },
+    "api.SearchClassesResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "title": "list",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.ObjectClass"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "title": "search: has {next} page ?"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "title": "select: offset {page}"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32",
+          "title": "search: limit {size}"
+        }
+      }
+    },
     "api.SearchDeviceResponse": {
       "type": "object",
       "properties": {
@@ -20117,6 +26322,115 @@
           "type": "integer",
           "format": "int32",
           "title": "select: offset {page}"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32",
+          "title": "search: limit {size}"
+        }
+      }
+    },
+    "api.SearchDomainsResponse": {
+      "type": "object",
+      "properties": {
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.Organization"
+          }
+        }
+      }
+    },
+    "api.SearchLDAPResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.LDAPCatalog"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "title": "result: has {next} page ?"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "title": "result: {page} number"
+        }
+      }
+    },
+    "api.SearchOAuthServiceResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.OAuthService"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "title": "result: has {next} page ?"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "title": "result: {page} number"
+        }
+      }
+    },
+    "api.SearchPermissionResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "title": "result entries",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.Permission"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "title": "search: has {next} page ?"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "title": "select: offset {page}"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32",
+          "title": "search: limit {size}"
+        }
+      }
+    },
+    "api.SearchRolesResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "title": "roles",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.Role"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "title": "search: has {next} page ?"
+        },
+        "page": {
+          "description": "select: offset {page}",
+          "type": "integer",
+          "format": "int32",
+          "title": "pagedResultsControl response value"
         },
         "size": {
           "type": "integer",
@@ -20244,6 +26558,52 @@
         }
       }
     },
+    "api.ServerInfoResponse": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "format": "byte",
+          "title": "int64 time = 1; // current timestamp (ms)"
+        }
+      }
+    },
+    "api.SetStatusRequest": {
+      "type": "object",
+      "properties": {
+        "fields": {
+          "type": "array",
+          "title": "PATCH: partial attributes",
+          "items": {
+            "type": "string"
+          }
+        },
+        "publish": {
+          "description": "BODY: partial modifications",
+          "title": "int64 id = 1; // user.id",
+          "$ref": "#/definitions/api.UserPresence"
+        }
+      }
+    },
+    "api.SystemObjects": {
+      "type": "string",
+      "default": "contacts",
+      "enum": [
+        "contacts",
+        "cc_list",
+        "cc_bucket",
+        "calendars",
+        "devices",
+        "cc_agent",
+        "cc_team",
+        "cc_resource",
+        "cc_resource_group",
+        "cc_queue",
+        "roles",
+        "users",
+        "cognitive_profile"
+      ]
+    },
     "api.TfaUrl": {
       "type": "object",
       "properties": {
@@ -20255,11 +26615,78 @@
         }
       }
     },
+    "api.ToggleDefaultAccessResponse": {
+      "type": "object",
+      "properties": {
+        "granted": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.AccessRule"
+          }
+        },
+        "revoked": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.AccessRule"
+          }
+        }
+      }
+    },
+    "api.UpdateAccessResponseV1": {
+      "type": "object",
+      "properties": {
+        "granted": {
+          "type": "string",
+          "format": "int64",
+          "title": "Affected rules count"
+        },
+        "revoked": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "api.UpdateClassResponse": {
+      "type": "object",
+      "properties": {
+        "class": {
+          "title": "updated",
+          "$ref": "#/definitions/api.ObjectClass"
+        }
+      }
+    },
+    "api.UpdateCustomerResponse": {
+      "type": "object",
+      "properties": {
+        "customer": {
+          "title": "detailed",
+          "$ref": "#/definitions/api.Customer"
+        }
+      }
+    },
     "api.UpdateDeviceResponse": {
       "type": "object",
       "properties": {
         "device": {
           "$ref": "#/definitions/api.Device"
+        }
+      }
+    },
+    "api.UpdateDomainResponse": {
+      "type": "object",
+      "properties": {
+        "domain": {
+          "$ref": "#/definitions/api.Organization"
+        }
+      }
+    },
+    "api.UpdateRoleResponse": {
+      "type": "object",
+      "properties": {
+        "updated": {
+          "$ref": "#/definitions/api.Role"
         }
       }
     },
@@ -20388,6 +26815,77 @@
         }
       }
     },
+    "api.UserAccessToken": {
+      "description": "UserId lookup value.",
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "unix::ms"
+        },
+        "created_by": {
+          "$ref": "#/definitions/api.ObjectId"
+        },
+        "deleted_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "[optional] disabled at"
+        },
+        "deleted_by": {
+          "title": "[optional] disabled by",
+          "$ref": "#/definitions/api.ObjectId"
+        },
+        "id": {
+          "type": "string",
+          "title": "tokenKey::token_key"
+        },
+        "token": {
+          "type": "string",
+          "title": "tokenString::access_token"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "unix::ms"
+        },
+        "updated_by": {
+          "$ref": "#/definitions/api.ObjectId"
+        },
+        "usage": {
+          "type": "string",
+          "title": "[optional] short usage description"
+        },
+        "user": {
+          "title": "[optional] output depends on API endpoint",
+          "$ref": "#/definitions/api.ObjectId"
+        }
+      }
+    },
+    "api.UserAccessTokenList": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.UserAccessToken"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "title": "is there more results ? next page is available ?"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "size": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "api.UserId": {
       "description": "UserId lookup value.",
       "type": "object",
@@ -20428,6 +26926,90 @@
           "type": "string",
           "format": "int64",
           "title": "[required] last activity time"
+        }
+      }
+    },
+    "api.UserSetting": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {}
+      }
+    },
+    "api.Userinfo": {
+      "type": "object",
+      "title": "https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims",
+      "properties": {
+        "dc": {
+          "type": "string",
+          "format": "int64",
+          "title": "current domain component id"
+        },
+        "domain": {
+          "type": "string",
+          "title": "session domain.name"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "unix"
+        },
+        "extension": {
+          "type": "string"
+        },
+        "license": {
+          "type": "array",
+          "title": "map[key]details",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.LicenseUser"
+          }
+        },
+        "name": {
+          "type": "string",
+          "title": "current user.id"
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.Permission"
+          }
+        },
+        "preferred_username": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "title": "map[role]oid",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.ObjectId"
+          }
+        },
+        "scope": {
+          "type": "array",
+          "title": "map[class]dac",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/api.Objclass"
+          }
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "user last updated"
+        },
+        "user_id": {
+          "type": "string",
+          "format": "int64",
+          "title": "current user.id"
+        },
+        "username": {
+          "type": "string",
+          "title": "session end-user login"
         }
       }
     },
@@ -20554,6 +27136,25 @@
               "type": "string",
               "title": "alphanumeric username (login)"
             }
+          }
+        }
+      }
+    },
+    "api.Verification": {
+      "type": "object",
+      "properties": {
+        "errors": {
+          "type": "array",
+          "title": "invalid",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notify": {
+          "type": "array",
+          "title": "non-fatal warnings, e.g.:",
+          "items": {
+            "type": "string"
           }
         }
       }
@@ -28101,7 +34702,8 @@
         "member_chunk_size",
         "amd_cancel_not_human",
         "scheme_version_limit",
-        "enable_2fa"
+        "enable_2fa",
+        "export_settings"
       ]
     },
     "engineTag": {
