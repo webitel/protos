@@ -28,6 +28,11 @@ service TeamTriggerService {
       get: "/call_center/teams/{team_id}/triggers"
     };
   }
+  rpc SearchAgentTrigger (SearchAgentTriggerRequest) returns (ListTeamTrigger) {
+    option (google.api.http) = {
+      get: "/call_center/teams/triggers/agent"
+    };
+  }
   rpc ReadTeamTrigger (ReadTeamTriggerRequest) returns (TeamTrigger) {
     option (google.api.http) = {
       get: "/call_center/teams/{team_id}/triggers/{id}"
@@ -87,6 +92,20 @@ message UpdateTeamTriggerRequest {
 }
 
 message SearchTeamTriggerRequest {
+  int64 team_id = 1;
+  int32 page = 2;
+  int32 size = 3;
+  string q = 4;
+
+  string sort = 5;
+  repeated string fields = 6;
+
+  google.protobuf.BoolValue enabled = 7;
+  repeated uint32 id = 8;
+  repeated uint32 schema_id = 9;
+}
+
+message SearchAgentTriggerRequest {
   int64 team_id = 1;
   int32 page = 2;
   int32 size = 3;
