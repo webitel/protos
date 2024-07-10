@@ -1,0 +1,237 @@
+syntax = "proto3";
+
+package wfm;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "proto/options/options.proto";
+import "lookup.proto";
+
+service WorkingConditionService {
+  option (options.objclass) = "working_conditions";
+  rpc CreateWorkingCondition(CreateWorkingConditionRequest) returns (CreateWorkingConditionResponse) {
+    option (options.access) = ACTION_CREATE;
+    option (google.api.http) = {
+      post: "/wfm/lookups/working_conditions"
+      body: "*"
+    };
+  }
+
+  rpc ReadWorkingCondition(ReadWorkingConditionRequest) returns (ReadWorkingConditionResponse) {
+    option (options.access) = ACTION_READ;
+    option (google.api.http) = {get: "/wfm/lookups/working_conditions/{id}"};
+  }
+
+  rpc SearchWorkingCondition(SearchWorkingConditionRequest) returns (SearchWorkingConditionResponse) {
+    option (options.access) = ACTION_READ;
+    option (google.api.http) = {get: "/wfm/lookups/working_conditions"};
+  }
+
+  rpc UpdateWorkingCondition(UpdateWorkingConditionRequest) returns (UpdateWorkingConditionResponse) {
+    option (options.access) = ACTION_UPDATE;
+    option (google.api.http) = {
+      put: "/wfm/lookups/working_conditions/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteWorkingCondition(DeleteWorkingConditionRequest) returns (DeleteWorkingConditionResponse) {
+    option (options.access) = ACTION_DELETE;
+    option (google.api.http) = {delete: "/wfm/lookups/working_conditions/{id}"};
+  }
+}
+
+message CreateWorkingConditionRequest {
+  WorkingCondition item = 1 [(buf.validate.field).required = true];
+}
+
+message CreateWorkingConditionResponse {
+  WorkingCondition item = 1;
+}
+
+message ReadWorkingConditionRequest {
+  int64 id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64.gt = 0
+  ];
+
+  repeated string fields = 5 [(buf.validate.field).repeated = {
+    unique: true,
+    items {
+      string {
+        min_len: 1,
+        in: [
+          'id',
+          'domain_id',
+          'name',
+          'description',
+          'workday_hours',
+          'workdays_per_month',
+          'vacation',
+          'sick_leaves',
+          'days_off',
+          'pause_duration',
+          'pause_template',
+          'shift_template',
+          'created_at',
+          'created_by',
+          'updated_at',
+          'updated_by'
+        ]
+      }
+    }
+  }];
+}
+
+message ReadWorkingConditionResponse {
+  WorkingCondition item = 1;
+}
+
+message SearchWorkingConditionRequest {
+  optional string q = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 250
+  ];
+
+  optional int32 page = 2 [(buf.validate.field).int32.gt = 0];
+  optional int32 size = 3 [(buf.validate.field).int32.gt = 0];
+
+  optional string sort = 4 [(buf.validate.field).string = {
+    in: [
+      'id',
+      'domain_id',
+      'name',
+      'description',
+      'workday_hours',
+      'workdays_per_month',
+      'vacation',
+      'sick_leaves',
+      'days_off',
+      'pause_duration',
+      'pause_template',
+      'shift_template',
+      'created_at',
+      'created_by',
+      'updated_at',
+      'updated_by'
+    ]}
+  ];
+
+  repeated string fields = 5 [(buf.validate.field).repeated = {
+    unique: true,
+    items {
+      string {
+        min_len: 1,
+        in: [
+          'id',
+          'domain_id',
+          'name',
+          'description',
+          'workday_hours',
+          'workdays_per_month',
+          'vacation',
+          'sick_leaves',
+          'days_off',
+          'pause_duration',
+          'pause_template',
+          'shift_template',
+          'created_at',
+          'created_by',
+          'updated_at',
+          'updated_by'
+        ]
+      }
+    }
+  }];
+}
+
+message SearchWorkingConditionResponse {
+  repeated WorkingCondition items = 1;
+  bool next = 2;
+}
+
+message UpdateWorkingConditionRequest {
+  int64 id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64.gt = 0
+  ];
+
+  WorkingCondition item = 2 [(buf.validate.field).required = true];
+}
+
+message UpdateWorkingConditionResponse {
+  WorkingCondition item = 1;
+}
+
+message DeleteWorkingConditionRequest {
+  int64 id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64.gt = 0
+  ];
+}
+
+message DeleteWorkingConditionResponse {
+  int64 id = 1;
+}
+
+message WorkingCondition {
+  option (buf.validate.message).cel = {
+    id: "working_conditions.working_hours",
+    message: "workday_hours should be greater than pause_duration",
+    expression: "this.workday_hours >= (this.pause_duration / 60)"
+  };
+
+  option (buf.validate.message).cel = {
+    id: "working_conditions.non_working_days",
+    message: "sum of vacation, sick_leaves and days_off should not be more that 365 days",
+    expression: "(this.vacation + this.sick_leaves + this.days_off) <= 365"
+  };
+
+  int64 id = 1;
+  int64 domain_id = 2;
+  string name = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 250
+  ];
+
+  optional string description = 4 [(buf.validate.field).string.max_len = 250];
+
+  optional int32 workday_hours = 5 [
+    (buf.validate.field).int32.gt = 0,
+    (buf.validate.field).int32.lte = 24
+  ];
+
+  optional int32 workdays_per_month = 6 [
+    (buf.validate.field).int32.gt = 0,
+    (buf.validate.field).int32.lte = 31
+  ];
+
+  optional int32 vacation = 7 [
+    (buf.validate.field).int32.gt = 0,
+    (buf.validate.field).int32.lte = 365
+  ];
+
+  optional int32 sick_leaves = 8 [
+    (buf.validate.field).int32.gt = 0,
+    (buf.validate.field).int32.lte = 365
+  ];
+
+  optional int32 days_off = 9 [
+    (buf.validate.field).int32.gt = 0,
+    (buf.validate.field).int32.lte = 365
+  ];
+
+  optional int32 pause_duration = 10 [
+    (buf.validate.field).int32.gt = 0,
+    (buf.validate.field).int32.lte = 1440
+  ];
+
+  LookupEntity pause_template = 11;
+  optional LookupEntity shift_template = 12;
+
+  int64 created_at = 13;
+  LookupEntity created_by = 14;
+  int64 updated_at = 15;
+  LookupEntity updated_by = 16;
+}
