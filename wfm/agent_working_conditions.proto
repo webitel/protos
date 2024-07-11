@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package wfm;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "proto/options/options.proto";
+import "lookup.proto";
+
+service AgentWorkingConditionsService {
+  option (options.objclass) = "agent_working_conditions";
+  rpc ReadAgentWorkingConditions(ReadAgentWorkingConditionsRequest) returns (ReadAgentWorkingConditionsResponse) {
+    option (options.access) = ACTION_READ;
+    option (google.api.http) = {get: "/wfm/agents/{agent_id}/conditions"};
+  }
+
+  rpc UpdateAgentWorkingConditions(UpdateAgentWorkingConditionsRequest) returns (UpdateAgentWorkingConditionsResponse) {
+    option (options.access) = ACTION_UPDATE;
+    option (google.api.http) = {
+      put: "/wfm/agents/{agent_id}/conditions"
+      body: "*"
+    };
+  }
+}
+
+message ReadAgentWorkingConditionsRequest {
+  int64 agent_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64.gt = 0
+  ];
+}
+
+message ReadAgentWorkingConditionsResponse {
+  AgentWorkingConditions item = 1;
+}
+
+message UpdateAgentWorkingConditionsRequest {
+  int64 agent_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64.gt = 0
+  ];
+
+  AgentWorkingConditions item = 2 [(buf.validate.field).required = true];
+}
+
+message UpdateAgentWorkingConditionsResponse {
+  AgentWorkingConditions item = 1;
+}
+
+message AgentWorkingConditions {
+  LookupEntity working_condition = 1 [(buf.validate.field).required = true];
+  optional LookupEntity pause_template = 2;
+}

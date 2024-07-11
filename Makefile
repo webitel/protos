@@ -143,8 +143,8 @@ contacts_proto:
 .PHONY: swagger_mix
 
 swagger_mix:
-	/home/igor/programs/golib/bin/swagger-mixin ./swagger/engine.swagger.json ./swagger/storage.swagger.json \
- 	 ./swagger/messages.swagger.json ./swagger/logger.swagger.json ./swagger/contacts.swagger.json ./swagger/webitel-go.swagger.json  > ./swagger/api.json | true
+	go run github.com/msample/swagger-mixin@latest ./swagger/engine.swagger.json ./swagger/storage.swagger.json \
+ 	 ./swagger/messages.swagger.json ./swagger/logger.swagger.json ./swagger/contacts.swagger.json ./swagger/webitel-go.swagger.json ./swagger/wfm.swagger.json  > ./swagger/api.json | true
 
 
 .PHONY: clean
