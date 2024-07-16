@@ -2201,7 +2201,8 @@
               "type": "string",
               "enum": [
                 "chat",
-                "call"
+                "call",
+                "email"
               ]
             },
             "collectionFormat": "multi"
@@ -3350,6 +3351,110 @@
       "default": "READ",
       "title": "- READ: Can `fetch` record. [GET]\n - WRITE: Can `update` record. [PUT|PATCH]\n - DELETE: Can `delete` record. [DELETE]"
     },
+    "webitel.contacts.Attachment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "url": {
+          "type": "string"
+        },
+        "mime": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "size": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "webitel.contacts.CallEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "closed_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "duration": {
+          "type": "string",
+          "format": "int64"
+        },
+        "is_inbound": {
+          "type": "boolean"
+        },
+        "is_missed": {
+          "type": "boolean"
+        },
+        "participants": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.contacts.Lookup"
+          }
+        },
+        "gateway": {
+          "$ref": "#/definitions/webitel.contacts.Lookup"
+        },
+        "flow_scheme": {
+          "$ref": "#/definitions/webitel.contacts.Lookup"
+        },
+        "queue": {
+          "$ref": "#/definitions/webitel.contacts.Lookup"
+        },
+        "is_detailed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "webitel.contacts.ChatEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "closed_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "duration": {
+          "type": "string",
+          "format": "int64"
+        },
+        "is_inbound": {
+          "type": "boolean"
+        },
+        "is_missed": {
+          "type": "boolean"
+        },
+        "participants": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.contacts.Lookup"
+          }
+        },
+        "gateway": {
+          "$ref": "#/definitions/webitel.contacts.Lookup"
+        },
+        "flow_scheme": {
+          "$ref": "#/definitions/webitel.contacts.Lookup"
+        },
+        "queue": {
+          "$ref": "#/definitions/webitel.contacts.Lookup"
+        },
+        "is_detailed": {
+          "type": "boolean"
+        }
+      }
+    },
     "webitel.contacts.Comment": {
       "type": "object",
       "example": {
@@ -3669,8 +3774,12 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/webitel.contacts.TimelineRecord"
+            "$ref": "#/definitions/webitel.contacts.Event"
           }
+        },
+        "day_timestamp": {
+          "type": "string",
+          "format": "int64"
         },
         "chats_count": {
           "type": "string",
@@ -3680,7 +3789,7 @@
           "type": "string",
           "format": "int64"
         },
-        "day_timestamp": {
+        "emails_count": {
           "type": "string",
           "format": "int64"
         }
@@ -3739,6 +3848,76 @@
       },
       "description": "The Contact's email address."
     },
+    "webitel.contacts.EmailEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "from": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "array of senders (email addresses)"
+        },
+        "to": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "array of receivers (email addresses)"
+        },
+        "sender": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "array of receivers (email addresses)"
+        },
+        "cc": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "array of ccs (email addresses)"
+        },
+        "is_inbound": {
+          "type": "boolean",
+          "title": "inbound/outbound email"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string",
+          "title": "plain text of email"
+        },
+        "html": {
+          "type": "string",
+          "title": "html body of email"
+        },
+        "owner": {
+          "$ref": "#/definitions/webitel.contacts.Lookup",
+          "title": "Agent who sent/accepted"
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.contacts.Attachment"
+          }
+        },
+        "profile": {
+          "$ref": "#/definitions/webitel.contacts.Lookup",
+          "title": "email profile"
+        },
+        "is_detailed": {
+          "type": "boolean",
+          "title": "reserved for the open"
+        }
+      }
+    },
     "webitel.contacts.EmailList": {
       "type": "object",
       "properties": {
@@ -3765,12 +3944,34 @@
     "webitel.contacts.EmptyResponse": {
       "type": "object"
     },
+    "webitel.contacts.Event": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/webitel.contacts.TimelineEventType"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "chat": {
+          "$ref": "#/definitions/webitel.contacts.ChatEvent"
+        },
+        "call": {
+          "$ref": "#/definitions/webitel.contacts.CallEvent"
+        },
+        "email": {
+          "$ref": "#/definitions/webitel.contacts.EmailEvent"
+        }
+      }
+    },
     "webitel.contacts.GetTimelineCounterResponse": {
       "type": "object",
       "properties": {
         "date_from": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "title": "filter dates"
         },
         "date_to": {
           "type": "string",
@@ -3778,9 +3979,14 @@
         },
         "chats_count": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "title": "defined event types"
         },
         "calls_count": {
+          "type": "string",
+          "format": "int64"
+        },
+        "emails_count": {
           "type": "string",
           "format": "int64"
         }
@@ -4762,57 +4968,10 @@
       "type": "string",
       "enum": [
         "chat",
-        "call"
+        "call",
+        "email"
       ],
       "default": "chat"
-    },
-    "webitel.contacts.TimelineRecord": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "created_at": {
-          "type": "string",
-          "format": "int64"
-        },
-        "closed_at": {
-          "type": "string",
-          "format": "int64"
-        },
-        "duration": {
-          "type": "string",
-          "format": "int64"
-        },
-        "type": {
-          "$ref": "#/definitions/webitel.contacts.TimelineEventType"
-        },
-        "is_inbound": {
-          "type": "boolean"
-        },
-        "is_missed": {
-          "type": "boolean"
-        },
-        "participants": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.contacts.Lookup"
-          }
-        },
-        "gateway": {
-          "$ref": "#/definitions/webitel.contacts.Lookup"
-        },
-        "flow_scheme": {
-          "$ref": "#/definitions/webitel.contacts.Lookup"
-        },
-        "queue": {
-          "$ref": "#/definitions/webitel.contacts.Lookup"
-        },
-        "is_detailed": {
-          "type": "boolean"
-        }
-      }
     },
     "webitel.contacts.Timezone": {
       "type": "object",
