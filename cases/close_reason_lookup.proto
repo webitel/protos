@@ -1,0 +1,165 @@
+syntax = "proto3";
+package cases;
+
+import "cases_import.proto";
+
+import "google/api/visibility.proto";
+import "google/protobuf/wrappers.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+
+// CloseReasonLookup message represents a close reason lookup entity with metadata
+message CloseReasonLookup {
+  string id = 1;
+  string name = 2;
+  string description = 4;
+  int64 created_at = 5;
+  int64 updated_at = 6;
+  Lookup created_by = 7;
+  Lookup updated_by = 8;
+}
+
+// CloseReasonLookupList message contains a list of CloseReasonLookup items with pagination
+message CloseReasonLookupList {
+  int32 page = 1;
+  bool next = 2;
+  repeated Lookup items = 3;
+}
+
+// CreateCloseReasonLookupRequest message for creating a new close reason lookup
+message CreateCloseReasonLookupRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["name"]
+    }
+  };
+
+  string name = 1;
+  string description = 3;
+}
+
+// UpdateCloseReasonLookupRequest message for updating an existing close reason lookup
+message UpdateCloseReasonLookupRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"]
+    }
+  };
+
+  string id = 1;
+  string name = 2;
+  string description = 4;
+}
+
+// DeleteCloseReasonLookupRequest message for deleting an existing close reason lookup
+message DeleteCloseReasonLookupRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"]
+    }
+  };
+
+  string id = 1;
+}
+
+// ListCloseReasonLookupsRequest message for listing or searching close reason lookups
+message ListCloseReasonLookupsRequest {
+  // Page number of result dataset records. offset = (page*size)
+  int32 page = 1;
+
+  // Size count of records on result page. limit = (size++)
+  int32 size = 2;
+
+  // Fields to be retrieved as a result.
+  repeated string fields = 3;
+
+  // Sort the result according to fields.
+  repeated string sort = 4;
+
+  // Filter by unique IDs.
+  repeated string id = 5;
+
+  // Search term: lookup name;
+  // `?` - matches any one character
+  // `*` - matches 0 or more characters
+  string q = 6;
+
+  // Filter by lookup name.
+  string name = 7;
+}
+
+// LocateCloseReasonLookupRequest message for locating a specific close reason lookup by ID
+message LocateCloseReasonLookupRequest {
+  string id = 1;
+  repeated string fields = 2;
+}
+
+// LocateCloseReasonLookupResponse message contains a single close reason lookup entity
+message LocateCloseReasonLookupResponse {
+  CloseReasonLookup group = 1;
+}
+
+// CloseReasonLookups service definition with RPC methods for managing close reason lookups
+service CloseReasonLookups {
+  // RPC method to list or search close reason lookups
+  rpc ListAppealLookups(ListCloseReasonLookupsRequest) returns (CloseReasonLookupList) {
+    option (google.api.http) = {
+      get: "/cases/appealLookups"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Retrieve a list of groups or search groups"
+    };
+  }
+
+  // RPC method to create a new close reason lookup
+  rpc CreateAppealLookup(CreateCloseReasonLookupRequest) returns (CloseReasonLookup) {
+    option (google.api.http) = {
+      post: "/cases/appealLookups"
+      body: "*"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Create a new group"
+    };
+  }
+
+  // RPC method to update an existing close reason lookup
+  rpc UpdateAppealLookup(UpdateCloseReasonLookupRequest) returns (CloseReasonLookup) {
+    option (google.api.http) = {
+      put: "/cases/appealLookups/{id}"
+      body: "*"
+      additional_bindings {
+        patch: "/cases/appealLookups/{id}"
+        body: "*"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Update an existing group"
+    };
+  }
+
+  // RPC method to delete an existing close reason lookup
+  rpc DeleteAppealLookup(DeleteCloseReasonLookupRequest) returns (CloseReasonLookup) {
+    option (google.api.http) = {
+      delete: "/cases/appealLookups/{id}"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Delete a group"
+    };
+  }
+
+  // RPC method to locate a specific close reason lookup by ID
+  rpc LocateAppealLookup(LocateCloseReasonLookupRequest) returns (LocateCloseReasonLookupResponse) {
+    option (google.api.http) = {
+      get: "/cases/appealLookups/{id}"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Locate a group by ID"
+    };
+  }
+}
