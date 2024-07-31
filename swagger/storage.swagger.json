@@ -859,6 +859,30 @@
         "tags": [
           "FileTranscriptService"
         ]
+      },
+      "put": {
+        "operationId": "PutFileTranscript",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storagePutFileTranscriptResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/storagePutFileTranscriptRequest"
+            }
+          }
+        ],
+        "tags": [
+          "FileTranscriptService"
+        ]
       }
     },
     "/storage/transcript_file/{id}/phrases": {
@@ -902,6 +926,27 @@
     }
   },
   "definitions": {
+    "SafeUploadFileResponsePart": {
+      "type": "object",
+      "properties": {
+        "upload_id": {
+          "type": "string"
+        },
+        "size": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "SafeUploadFileResponseProgress": {
+      "type": "object",
+      "properties": {
+        "uploaded": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "StartFileTranscriptResponseTranscriptJob": {
       "type": "object",
       "properties": {
@@ -955,7 +1000,7 @@
         "NULL_VALUE"
       ],
       "default": "NULL_VALUE",
-      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\n The JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
     },
     "runtimeStreamError": {
       "type": "object",
@@ -1543,6 +1588,120 @@
       ],
       "default": "DefaultProvider"
     },
+    "storagePutFileTranscriptRequest": {
+      "type": "object",
+      "properties": {
+        "file_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "locale": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "phrases": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/storageTranscriptPhrase"
+          }
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    },
+    "storagePutFileTranscriptResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "storageSafeUploadFileRequestMetadata": {
+      "type": "object",
+      "properties": {
+        "domain_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        },
+        "mime_type": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "stream_response": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "profile_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "progress": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "channel": {
+          "$ref": "#/definitions/storageUploadFileChannel"
+        }
+      }
+    },
+    "storageSafeUploadFileResponse": {
+      "type": "object",
+      "properties": {
+        "part": {
+          "$ref": "#/definitions/SafeUploadFileResponsePart"
+        },
+        "metadata": {
+          "$ref": "#/definitions/storageSafeUploadFileResponseMetadata"
+        },
+        "progress": {
+          "$ref": "#/definitions/SafeUploadFileResponseProgress"
+        }
+      }
+    },
+    "storageSafeUploadFileResponseMetadata": {
+      "type": "object",
+      "properties": {
+        "file_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "file_url": {
+          "type": "string"
+        },
+        "size": {
+          "type": "string",
+          "format": "int64"
+        },
+        "code": {
+          "$ref": "#/definitions/storageUploadStatusCode"
+        },
+        "server": {
+          "type": "string"
+        },
+        "sha256sum": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "mime_type": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
     "storageServiceType": {
       "type": "string",
       "enum": [
@@ -1618,6 +1777,9 @@
         "size": {
           "type": "string",
           "format": "int64"
+        },
+        "sha256sum": {
+          "type": "string"
         }
       }
     },
@@ -1741,6 +1903,16 @@
         "name"
       ]
     },
+    "storageUploadFileChannel": {
+      "type": "string",
+      "enum": [
+        "UnknownChannel",
+        "ChatChannel",
+        "MailChannel",
+        "CallChannel"
+      ],
+      "default": "UnknownChannel"
+    },
     "storageUploadFileRequestMetadata": {
       "type": "object",
       "properties": {
@@ -1764,6 +1936,9 @@
         "profile_id": {
           "type": "string",
           "format": "int64"
+        },
+        "channel": {
+          "$ref": "#/definitions/storageUploadFileChannel"
         }
       }
     },
@@ -1785,6 +1960,9 @@
           "$ref": "#/definitions/storageUploadStatusCode"
         },
         "server": {
+          "type": "string"
+        },
+        "sha256sum": {
           "type": "string"
         }
       }
@@ -1808,6 +1986,9 @@
         },
         "code": {
           "$ref": "#/definitions/storageUploadStatusCode"
+        },
+        "sha256sum": {
+          "type": "string"
         }
       }
     },
@@ -1822,6 +2003,18 @@
     }
   },
   "x-stream-definitions": {
+    "storageSafeUploadFileResponse": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/storageSafeUploadFileResponse"
+        },
+        "error": {
+          "$ref": "#/definitions/runtimeStreamError"
+        }
+      },
+      "title": "Stream result of storageSafeUploadFileResponse"
+    },
     "storageStreamFile": {
       "type": "object",
       "properties": {

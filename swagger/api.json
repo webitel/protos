@@ -11225,6 +11225,81 @@
         }
       }
     },
+    "/contacts/{contact_id}/chat/{chat_id}/messages": {
+      "get": {
+        "tags": [
+          "ContactsChatCatalog"
+        ],
+        "operationId": "ContactsChatCatalog_GetContactChatHistory",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Contact identificator",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Unique chat dialog",
+            "name": "chat_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Messages ONLY starting from the specified message ID",
+            "name": "offset.id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Messages ONLY been sent before the specified epochtime(milli).",
+            "name": "offset.date",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of messages to return.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Search term: message.text",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to return into result.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
+            "name": "group[string]",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.chat.GetContactChatHistoryResponse"
+            }
+          }
+        }
+      }
+    },
     "/contacts/{contact_id}/emails": {
       "get": {
         "tags": [
@@ -21915,6 +21990,30 @@
       }
     },
     "/storage/transcript_file": {
+      "put": {
+        "tags": [
+          "FileTranscriptService"
+        ],
+        "operationId": "PutFileTranscript",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/storagePutFileTranscriptRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storagePutFileTranscriptResponse"
+            }
+          }
+        }
+      },
       "post": {
         "tags": [
           "FileTranscriptService"
@@ -23871,6 +23970,27 @@
         "score": {
           "type": "number",
           "format": "float"
+        }
+      }
+    },
+    "SafeUploadFileResponsePart": {
+      "type": "object",
+      "properties": {
+        "size": {
+          "type": "string",
+          "format": "int64"
+        },
+        "upload_id": {
+          "type": "string"
+        }
+      }
+    },
+    "SafeUploadFileResponseProgress": {
+      "type": "object",
+      "properties": {
+        "uploaded": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -37181,6 +37301,120 @@
         "ElevenLabs"
       ]
     },
+    "storagePutFileTranscriptRequest": {
+      "type": "object",
+      "properties": {
+        "file_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "locale": {
+          "type": "string"
+        },
+        "phrases": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/storageTranscriptPhrase"
+          }
+        },
+        "text": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "storagePutFileTranscriptResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "storageSafeUploadFileRequestMetadata": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "$ref": "#/definitions/storageUploadFileChannel"
+        },
+        "domain_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "mime_type": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "profile_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "progress": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "stream_response": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "storageSafeUploadFileResponse": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/storageSafeUploadFileResponseMetadata"
+        },
+        "part": {
+          "$ref": "#/definitions/SafeUploadFileResponsePart"
+        },
+        "progress": {
+          "$ref": "#/definitions/SafeUploadFileResponseProgress"
+        }
+      }
+    },
+    "storageSafeUploadFileResponseMetadata": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "$ref": "#/definitions/storageUploadStatusCode"
+        },
+        "file_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "file_url": {
+          "type": "string"
+        },
+        "mime_type": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "server": {
+          "type": "string"
+        },
+        "sha256sum": {
+          "type": "string"
+        },
+        "size": {
+          "type": "string",
+          "format": "int64"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
     "storageServiceType": {
       "type": "string",
       "default": "DefaultService",
@@ -37248,6 +37482,9 @@
           "type": "string"
         },
         "name": {
+          "type": "string"
+        },
+        "sha256sum": {
           "type": "string"
         },
         "size": {
@@ -37379,9 +37616,22 @@
         }
       }
     },
+    "storageUploadFileChannel": {
+      "type": "string",
+      "default": "UnknownChannel",
+      "enum": [
+        "UnknownChannel",
+        "ChatChannel",
+        "MailChannel",
+        "CallChannel"
+      ]
+    },
     "storageUploadFileRequestMetadata": {
       "type": "object",
       "properties": {
+        "channel": {
+          "$ref": "#/definitions/storageUploadFileChannel"
+        },
         "domain_id": {
           "type": "string",
           "format": "int64"
@@ -37421,6 +37671,9 @@
         "server": {
           "type": "string"
         },
+        "sha256sum": {
+          "type": "string"
+        },
         "size": {
           "type": "string",
           "format": "int64"
@@ -37440,6 +37693,9 @@
         "mime": {
           "type": "string"
         },
+        "sha256sum": {
+          "type": "string"
+        },
         "size": {
           "type": "string",
           "format": "int64"
@@ -37457,6 +37713,52 @@
         "Ok",
         "Failed"
       ]
+    },
+    "webitel.chat.Button": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "description": "Postback/Callback data.",
+          "type": "string"
+        },
+        "share": {
+          "description": "Request to share contact info.",
+          "$ref": "#/definitions/webitel.chat.Button.Request"
+        },
+        "text": {
+          "description": "Caption to display.",
+          "type": "string"
+        },
+        "url": {
+          "description": "URL to navigate to ..",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.chat.Button.Request": {
+      "description": "- phone: Phone Number\n - email: Email Address\n - contact: General Form\n - location: Current Location",
+      "type": "string",
+      "title": "Type of request to share contact info",
+      "default": "phone",
+      "enum": [
+        "phone",
+        "email",
+        "contact",
+        "location"
+      ]
+    },
+    "webitel.chat.ButtonRow": {
+      "type": "object",
+      "properties": {
+        "row": {
+          "type": "array",
+          "title": "Button(s) in a row",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.Button"
+          }
+        }
+      }
     },
     "webitel.chat.Chat": {
       "description": "The Chat info.\nAlias: participant, subscriber, member, peer, leg.",
@@ -37597,6 +37899,62 @@
         }
       }
     },
+    "webitel.chat.ChatMessage": {
+      "description": "Chat Message.",
+      "type": "object",
+      "properties": {
+        "chat": {
+          "description": "Conversation the message belongs to ..",
+          "$ref": "#/definitions/webitel.chat.ContactChat"
+        },
+        "context": {
+          "description": "Context. Variables. Environment.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "date": {
+          "description": "Timestamp when this message was sent (published).",
+          "type": "string",
+          "format": "int64"
+        },
+        "edit": {
+          "description": "Timestamp when this message was last edited.",
+          "type": "string",
+          "format": "int64"
+        },
+        "file": {
+          "description": "Message Media. Attachment.",
+          "$ref": "#/definitions/webitel.chat.MessageFile"
+        },
+        "from": {
+          "description": "Sender of the message.",
+          "$ref": "#/definitions/webitel.chat.ChatPeer"
+        },
+        "id": {
+          "description": "Unique message identifier inside this chat.",
+          "type": "string",
+          "format": "int64"
+        },
+        "keyboard": {
+          "description": "Keyboard. Buttons. Quick Replies.",
+          "$ref": "#/definitions/webitel.chat.MessageReplyMarkup"
+        },
+        "postback": {
+          "description": "Postback. Reply Button Click[ed].",
+          "$ref": "#/definitions/webitel.chat.MessagePostback"
+        },
+        "sender": {
+          "description": "Chat Sender of the message, sent on behalf of a chat (member).",
+          "$ref": "#/definitions/webitel.chat.ContactChat"
+        },
+        "text": {
+          "description": "Message Text.",
+          "type": "string"
+        }
+      }
+    },
     "webitel.chat.ChatMessages": {
       "type": "object",
       "title": "ChatMessages dataset",
@@ -37649,6 +38007,86 @@
           "type": "string",
           "format": "int64",
           "title": "Messages ONLY starting from the specified message ID"
+        }
+      }
+    },
+    "webitel.chat.ChatPeer": {
+      "description": "Peer contact.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Contact unique **ID**entifier.\nContact **type**-specific string.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Contact display **name**.",
+          "type": "string"
+        },
+        "type": {
+          "description": "Contact **type** provider.",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.chat.ContactChat": {
+      "description": "The Chat info.\nAlias: participant, subscriber, member, peer, leg.",
+      "type": "object",
+      "properties": {
+        "context": {
+          "description": "Context. Variables.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "dc": {
+          "description": "[D]omain[C]omponent primary ID.",
+          "type": "string",
+          "format": "int64"
+        },
+        "id": {
+          "description": "Unique identifier for this chat.\n[FROM] Member / Channel ID.\n\n// [TO] Group. Conversation ID.\n string chat_id = 2;",
+          "type": "string"
+        },
+        "invite": {
+          "description": "OPTIONAL. Invite[d] BY member info.",
+          "$ref": "#/definitions/webitel.chat.ContactChat.Invite"
+        },
+        "join": {
+          "description": "OPTIONAL. A non-zero value indicates that\nthe participant has joined the chat.",
+          "type": "string",
+          "format": "int64"
+        },
+        "left": {
+          "type": "string",
+          "format": "int64",
+          "title": "OPTIONAL. A non-zero value indicates that\nthe participant has left the chat. OFFLINE(!)"
+        },
+        "peer": {
+          "description": "[FROM]: User identity. Seed.",
+          "$ref": "#/definitions/webitel.chat.ChatPeer"
+        },
+        "title": {
+          "description": "[TO]: Chat title.",
+          "type": "string"
+        },
+        "via": {
+          "description": "[FROM] VIA text gateway profile.",
+          "$ref": "#/definitions/webitel.chat.ChatPeer"
+        }
+      }
+    },
+    "webitel.chat.ContactChat.Invite": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "int64",
+          "title": "Timestamp when the invitation to join the chat was sent"
+        },
+        "from": {
+          "type": "string",
+          "title": "Chat member ID who invited to join the chat"
         }
       }
     },
@@ -37765,6 +38203,64 @@
         }
       }
     },
+    "webitel.chat.GetContactChatHistoryRequest.Offset": {
+      "type": "object",
+      "title": "Offset options",
+      "properties": {
+        "date": {
+          "description": "Messages ONLY been sent before the specified epochtime(milli).",
+          "type": "string",
+          "format": "int64"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "title": "Messages ONLY starting from the specified message ID"
+        }
+      }
+    },
+    "webitel.chat.GetContactChatHistoryResponse": {
+      "type": "object",
+      "title": "ChatMessages dataset",
+      "properties": {
+        "chats": {
+          "type": "array",
+          "title": "List of chats mentioned in messages. [FROM]",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.ContactChat"
+          }
+        },
+        "messages": {
+          "description": "Dataset page of messages.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.ChatMessage"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "title": "Next page is available ?"
+        },
+        "page": {
+          "description": "Dataset page number.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "peers": {
+          "type": "array",
+          "title": "List of peers mentioned in messages. [FROM]",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.ChatPeer"
+          }
+        }
+      }
+    },
+    "webitel.chat.LinkContactToClientNAResponse": {
+      "type": "object"
+    },
     "webitel.chat.Lookup": {
       "type": "object",
       "properties": {
@@ -37815,6 +38311,14 @@
           "type": "string",
           "format": "int64"
         },
+        "keyboard": {
+          "description": "Keyboard. Buttons. Quick Replies.",
+          "$ref": "#/definitions/webitel.chat.ReplyMarkup"
+        },
+        "postback": {
+          "description": "Postback. Reply Button Click[ed].",
+          "$ref": "#/definitions/webitel.chat.Postback"
+        },
         "sender": {
           "description": "Chat Sender of the message, sent on behalf of a chat (member).",
           "$ref": "#/definitions/webitel.chat.Chat"
@@ -37822,6 +38326,111 @@
         "text": {
           "description": "Message Text.",
           "type": "string"
+        }
+      }
+    },
+    "webitel.chat.MessageButton": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "description": "Postback/Callback data.",
+          "type": "string"
+        },
+        "share": {
+          "description": "Request to share contact info.",
+          "$ref": "#/definitions/webitel.chat.MessageButton.Request"
+        },
+        "text": {
+          "description": "Caption to display.",
+          "type": "string"
+        },
+        "url": {
+          "description": "URL to navigate to ..",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.chat.MessageButton.Request": {
+      "description": "- phone: Phone Number\n - email: Email Address\n - contact: General Form\n - location: Current Location",
+      "type": "string",
+      "title": "Type of request to share contact info",
+      "default": "phone",
+      "enum": [
+        "phone",
+        "email",
+        "contact",
+        "location"
+      ]
+    },
+    "webitel.chat.MessageButtonRow": {
+      "type": "object",
+      "properties": {
+        "row": {
+          "type": "array",
+          "title": "Button(s) in a row",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.MessageButton"
+          }
+        }
+      }
+    },
+    "webitel.chat.MessageFile": {
+      "description": "Media File.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "File location"
+        },
+        "name": {
+          "type": "string",
+          "title": "Filename"
+        },
+        "size": {
+          "type": "string",
+          "format": "int64",
+          "title": "Size in bytes"
+        },
+        "type": {
+          "type": "string",
+          "title": "MIME media type"
+        }
+      }
+    },
+    "webitel.chat.MessagePostback": {
+      "description": "Postback. Reply Button Click[ed].",
+      "type": "object",
+      "properties": {
+        "code": {
+          "description": "Data associated with the Button.",
+          "type": "string"
+        },
+        "mid": {
+          "description": "Message ID of the button.",
+          "type": "string",
+          "format": "int64"
+        },
+        "text": {
+          "description": "Button's display caption.",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.chat.MessageReplyMarkup": {
+      "type": "object",
+      "properties": {
+        "buttons": {
+          "type": "array",
+          "title": "Markup of button(s)",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.MessageButtonRow"
+          }
+        },
+        "no_input": {
+          "description": "An option used to block input to force\nthe user to respond with one of the buttons.",
+          "type": "boolean"
         }
       }
     },
@@ -37840,6 +38449,42 @@
         "type": {
           "description": "Contact **type** provider.",
           "type": "string"
+        }
+      }
+    },
+    "webitel.chat.Postback": {
+      "description": "Postback. Reply Button Click[ed].",
+      "type": "object",
+      "properties": {
+        "code": {
+          "description": "Data associated with the Button.",
+          "type": "string"
+        },
+        "mid": {
+          "description": "Message ID of the button.",
+          "type": "string",
+          "format": "int64"
+        },
+        "text": {
+          "description": "Button's display caption.",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.chat.ReplyMarkup": {
+      "type": "object",
+      "properties": {
+        "buttons": {
+          "type": "array",
+          "title": "Markup of button(s)",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.ButtonRow"
+          }
+        },
+        "no_input": {
+          "description": "An option used to block input to force\nthe user to respond with one of the buttons.",
+          "type": "boolean"
         }
       }
     },
