@@ -7,28 +7,36 @@ import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
 // LookupStatus message represents a status entity with metadata
-message LookupStatus {
+message StatusCondition { // StatusCondition
   int64 id = 1;
-  int64 lookup_id = 2;
-  string name = 3;
-  string description = 4;
-  bool is_initial = 5;
-  bool is_final = 6;
-  int64 created_at = 7;
-  int64 updated_at = 8;
-  general.Lookup created_by = 9;
-  general.Lookup updated_by = 10;
+  string name = 2;
+  string description = 3;
+  bool initial = 4;
+  bool final = 5;
+  int64 created_at = 20;
+  int64 updated_at = 21;
+  general.Lookup created_by = 22;
+  general.Lookup updated_by = 23;
+}
+
+message InputStatusCondition {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  bool initial = 4; //TODO ADD BOOL VALUE
+  bool final = 5;
 }
 
 // LookupStatusList message contains a list of LookupStatus items with pagination
-message LookupStatusList {
+message StatusConditionList {
   int32 page = 1;
   bool next = 2;
-  repeated LookupStatus items = 3;
+  repeated StatusCondition items = 3;
 }
 
+
 // CreateLookupStatusRequest message for creating a new status
-message CreateLookupStatusRequest {
+message CreateStatusConditionRequest {
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
       required: ["name", "lookup_id"]
@@ -43,23 +51,30 @@ message CreateLookupStatusRequest {
 }
 
 // UpdateLookupStatusRequest message for updating an existing status
-message UpdateLookupStatusRequest {
+message UpdateStatusConditionRequest {
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
       required: ["id"]
     }
   };
 
-  int64 id = 1;
-  int64 lookup_id = 2;
-  string name = 3;
-  string description = 4;
-  bool is_initial = 5;
-  bool is_final = 6;
+  InputStatusCondition input = 1;
+
+}
+
+// UpdateLookupStatusRequest message for updating an existing status
+message UpdateStatusConditionsRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"]
+    }
+  };
+
+ repeated InputStatusCondition input = 1;
 }
 
 // DeleteLookupStatusRequest message for deleting an existing status
-message DeleteLookupStatusRequest {
+message DeleteStatusConditionRequest {
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
       required: ["id"]
@@ -70,7 +85,7 @@ message DeleteLookupStatusRequest {
 }
 
 // ListLookupStatusesRequest message for listing or searching statuses
-message ListLookupStatusesRequest {
+message ListStatusConditionRequest {
   // Page number of result dataset records. offset = (page*size)
   int32 page = 1;
 
@@ -99,22 +114,22 @@ message ListLookupStatusesRequest {
 }
 
 // LocateLookupStatusRequest message for locating a specific status by ID
-message LocateLookupStatusRequest {
+message LocateStatusConditionRequest {
   int64 id = 1;
   repeated string fields = 2;
 }
 
 // LocateLookupStatusResponse message contains a single status entity
-message LocateLookupStatusResponse {
-  LookupStatus status = 1;
+message LocateStatusConditionResponse {
+  StatusCondition status = 1;
 }
 
 // LookupStatuses service definition with RPC methods for managing statuses
-service LookupStatuses {
+service StatusConditions {
   // RPC method to list or search statuses
-  rpc ListLookupStatuses(ListLookupStatusesRequest) returns (LookupStatusList) {
+  rpc ListLookupStatuses(ListStatusConditionRequest) returns (StatusConditionList) {
     option (google.api.http) = {
-      get: "/cases/lookupStatuses"
+      get: "/cases/statusConditions"
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -123,9 +138,9 @@ service LookupStatuses {
   }
 
   // RPC method to create a new status
-  rpc CreateLookupStatus(CreateLookupStatusRequest) returns (LookupStatus) {
+  rpc CreateLookupStatus(CreateStatusConditionRequest) returns (StatusCondition) {
     option (google.api.http) = {
-      post: "/cases/lookupStatuses"
+      post: "/cases/statusConditions"
       body: "*"
     };
 
@@ -135,12 +150,28 @@ service LookupStatuses {
   }
 
   // RPC method to update an existing status
-  rpc UpdateLookupStatus(UpdateLookupStatusRequest) returns (LookupStatus) {
+  rpc UpdateLookupStatus(UpdateStatusConditionRequest) returns (StatusCondition) {
     option (google.api.http) = {
-      put: "/cases/lookupStatuses/{id}"
+      put: "/cases/statusConditions/{id}"
       body: "*"
       additional_bindings {
-        patch: "/cases/lookupStatuses/{id}"
+        patch: "/cases/statusConditions/{id}"
+        body: "*"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Update an existing lookup status"
+    };
+  }
+
+  // RPC method to update an existing status
+  rpc UpdateLookupStatuses(UpdateStatusConditionRequest) returns (StatusCondition) {
+    option (google.api.http) = {
+      put: "/cases/statusConditions"
+      body: "*"
+      additional_bindings {
+        patch: "/cases/statusConditions/{id}"
         body: "*"
       }
     };
@@ -151,9 +182,9 @@ service LookupStatuses {
   }
 
   // RPC method to delete an existing status
-  rpc DeleteLookupStatus(DeleteLookupStatusRequest) returns (LookupStatus) {
+  rpc DeleteLookupStatus(DeleteStatusConditionRequest) returns (StatusCondition) {
     option (google.api.http) = {
-      delete: "/cases/lookupStatuses/{id}"
+      delete: "/cases/statusConditions/{id}"
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -162,9 +193,9 @@ service LookupStatuses {
   }
 
   // RPC method to locate a specific status by ID
-  rpc LocateLookupStatus(LocateLookupStatusRequest) returns (LocateLookupStatusResponse) {
+  rpc LocateLookupStatus(LocateStatusConditionRequest) returns (LocateStatusConditionResponse) {
     option (google.api.http) = {
-      get: "/cases/lookupStatuses/{id}"
+      get: "/cases/statusConditions/{id}"
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
