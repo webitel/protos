@@ -61,17 +61,6 @@ message UpdateStatusConditionRequest {
   InputStatusCondition input = 1;
 }
 
-// UpdateStatusConditionsRequest message for updating multiple existing statuses
-message UpdateStatusConditionsRequest {
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      required: ["id"]
-    }
-  };
-
-  repeated InputStatusCondition input = 1;
-}
-
 // DeleteStatusConditionRequest message for deleting an existing status
 message DeleteStatusConditionRequest {
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
@@ -147,21 +136,6 @@ service StatusConditions {
     };
   }
 
-  // RPC method to update multiple existing statuses
-  rpc UpdateStatusConditions(UpdateStatusConditionsRequest) returns (StatusCondition) {
-    option (google.api.http) = {
-      put: "/cases/statusConditions"
-      body: "*"
-      additional_bindings {
-        patch: "/cases/statusConditions"
-        body: "*"
-      }
-    };
-
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Update multiple existing statuses"
-    };
-  }
 
   // RPC method to delete an existing status
   rpc DeleteStatusCondition(DeleteStatusConditionRequest) returns (StatusCondition) {
