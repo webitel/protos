@@ -29,6 +29,9 @@ service ContactsChatCatalog {
   rpc GetContactChatHistory(GetContactChatHistoryRequest) returns (GetContactChatHistoryResponse) {
     option (google.api.http) = {
       get: "/contacts/{contact_id}/chat/{chat_id}/messages"
+      additional_bindings: {
+        get: "/contacts/{contact_id}/chat/messages"
+      };
     };
   }
 }
@@ -75,6 +78,8 @@ message GetContactChatHistoryRequest {
   Offset offset = 1;
   // Number of messages to return.
   int32 limit = 2;
+
+  int32 page = 4;
   // Search term: message.text
   string q = 5;
   // Fields to return into result.
