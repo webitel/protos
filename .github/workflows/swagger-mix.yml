@@ -1,0 +1,30 @@
+on:
+  push:
+    paths:
+      - swagger/**
+
+jobs:
+  swagger-mix:
+    runs-on: ubuntu-latest
+    name: Merge a swagger files 
+    steps:
+        - name: Set up Go
+          uses: actions/setup-go@v4
+          with:
+            go-version: 1.22
+        - name: Checkout the code
+          uses: actions/checkout@v4
+        - name: Run generator
+          run:
+            go run github.com/msample/swagger-mixin@latest swagger/engine.swagger.json swagger/storage.swagger.json swagger/messages.swagger.json swagger/logger.swagger.json swagger/contacts.swagger.json swagger/webitel-go.swagger.json swagger/wfm.swagger.json  > swagger/api.json
+        - name: Git add changes
+          if: always()
+          run:
+            git add swagger/api.json
+        - name: Push changes
+          if: always()
+          run: |
+              git config --global user.name 'webitel-bot'
+              git config --global user.email 'webitel-bot@users.noreply.github.com'
+              git commit -am "Automated swagger-mix generation"
+              git push
