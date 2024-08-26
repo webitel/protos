@@ -7,6 +7,8 @@ import "google/api/annotations.proto";
 import "proto/options/options.proto";
 import "lookup.proto";
 
+option go_package = "github.com/webitel/protos/wfm;api";
+
 service PauseTemplateService {
   option (options.objclass) = "pause_templates";
   rpc CreatePauseTemplate(CreatePauseTemplateRequest) returns (CreatePauseTemplateResponse) {
@@ -30,7 +32,7 @@ service PauseTemplateService {
   rpc UpdatePauseTemplate(UpdatePauseTemplateRequest) returns (UpdatePauseTemplateResponse) {
     option (options.access) = ACTION_UPDATE;
     option (google.api.http) = {
-      put: "/wfm/lookups/pause_templates/{id}"
+      put: "/wfm/lookups/pause_templates/{item.id}"
       body: "*"
     };
   }
@@ -143,12 +145,7 @@ message SearchPauseTemplateResponse {
 }
 
 message UpdatePauseTemplateRequest {
-  int64 id = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).int64.gt = 0
-  ];
-
-  PauseTemplate item = 2 [(buf.validate.field).required = true];
+  PauseTemplate item = 1 [(buf.validate.field).required = true];
 }
 
 message UpdatePauseTemplateResponse {
