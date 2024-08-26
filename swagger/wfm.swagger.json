@@ -6,6 +6,9 @@
   },
   "tags": [
     {
+      "name": "AgentAbsenceService"
+    },
+    {
       "name": "AgentWorkingConditionsService"
     },
     {
@@ -25,6 +28,226 @@
     "application/json"
   ],
   "paths": {
+    "/wfm/agents/absences": {
+      "get": {
+        "operationId": "AgentAbsenceService_SearchAgentsAbsences",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/wfmSearchAgentsAbsencesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "supervisor_id",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "team_id",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "skill_id",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "absent_at_from",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "absent_at_to",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "AgentAbsenceService"
+        ]
+      },
+      "post": {
+        "operationId": "AgentAbsenceService_CreateAgentsAbsencesBulk",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/wfmCreateAgentsAbsencesBulkResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/wfmCreateAgentsAbsencesBulkRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AgentAbsenceService"
+        ]
+      }
+    },
+    "/wfm/agents/{agent_id}/absences": {
+      "get": {
+        "operationId": "AgentAbsenceService_ReadAgentAbsences",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/wfmReadAgentAbsencesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "absent_at_from",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "absent_at_to",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "AgentAbsenceService"
+        ]
+      }
+    },
+    "/wfm/agents/{agent_id}/absences/{id}": {
+      "delete": {
+        "operationId": "AgentAbsenceService_DeleteAgentAbsence",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/wfmDeleteAgentAbsenceResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "AgentAbsenceService"
+        ]
+      }
+    },
     "/wfm/agents/{agent_id}/conditions": {
       "get": {
         "operationId": "AgentWorkingConditionsService_ReadAgentWorkingConditions",
@@ -95,6 +318,154 @@
         ],
         "tags": [
           "AgentWorkingConditionsService"
+        ]
+      }
+    },
+    "/wfm/agents/{item.agent.id}/absences": {
+      "post": {
+        "operationId": "AgentAbsenceService_CreateAgentAbsence",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/wfmCreateAgentAbsenceResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "item.agent.id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "item": {
+                  "type": "object",
+                  "properties": {
+                    "agent": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "absence": {
+                      "$ref": "#/definitions/wfmAbsence"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "AgentAbsenceService"
+        ]
+      }
+    },
+    "/wfm/agents/{item.agent.id}/absences/{item.absence.id}": {
+      "put": {
+        "operationId": "AgentAbsenceService_UpdateAgentAbsence",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/wfmUpdateAgentAbsenceResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "item.agent.id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "item.absence.id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "item": {
+                  "type": "object",
+                  "properties": {
+                    "agent": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "absence": {
+                      "type": "object",
+                      "properties": {
+                        "domain_id": {
+                          "type": "string",
+                          "format": "int64"
+                        },
+                        "type_id": {
+                          "$ref": "#/definitions/wfmAgentAbsenceType"
+                        },
+                        "absent_at": {
+                          "type": "string",
+                          "format": "int64"
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "format": "int64"
+                        },
+                        "created_by": {
+                          "$ref": "#/definitions/wfmLookupEntity"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "int64"
+                        },
+                        "updated_by": {
+                          "$ref": "#/definitions/wfmLookupEntity"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "AgentAbsenceService"
         ]
       }
     },
@@ -256,7 +627,9 @@
         "tags": [
           "PauseTemplateService"
         ]
-      },
+      }
+    },
+    "/wfm/lookups/pause_templates/{item.id}": {
       "put": {
         "operationId": "PauseTemplateService_UpdatePauseTemplate",
         "responses": {
@@ -275,7 +648,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "item.id",
             "in": "path",
             "required": true,
             "type": "string",
@@ -289,7 +662,33 @@
               "type": "object",
               "properties": {
                 "item": {
-                  "$ref": "#/definitions/wfmPauseTemplate"
+                  "type": "object",
+                  "properties": {
+                    "domain_id": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "created_by": {
+                      "$ref": "#/definitions/wfmLookupEntity"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "updated_by": {
+                      "$ref": "#/definitions/wfmLookupEntity"
+                    }
+                  }
                 }
               }
             }
@@ -573,7 +972,9 @@
         "tags": [
           "ShiftTemplateService"
         ]
-      },
+      }
+    },
+    "/wfm/lookups/shift_templates/{item.id}": {
       "put": {
         "operationId": "ShiftTemplateService_UpdateShiftTemplate",
         "responses": {
@@ -592,7 +993,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "item.id",
             "in": "path",
             "required": true,
             "type": "string",
@@ -606,7 +1007,33 @@
               "type": "object",
               "properties": {
                 "item": {
-                  "$ref": "#/definitions/wfmShiftTemplate"
+                  "type": "object",
+                  "properties": {
+                    "domain_id": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "created_by": {
+                      "$ref": "#/definitions/wfmLookupEntity"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "updated_by": {
+                      "$ref": "#/definitions/wfmLookupEntity"
+                    }
+                  }
                 }
               }
             }
@@ -890,7 +1317,9 @@
         "tags": [
           "WorkingConditionService"
         ]
-      },
+      }
+    },
+    "/wfm/lookups/working_conditions/{item.id}": {
       "put": {
         "operationId": "WorkingConditionService_UpdateWorkingCondition",
         "responses": {
@@ -909,7 +1338,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "item.id",
             "in": "path",
             "required": true,
             "type": "string",
@@ -923,7 +1352,63 @@
               "type": "object",
               "properties": {
                 "item": {
-                  "$ref": "#/definitions/wfmWorkingCondition"
+                  "type": "object",
+                  "properties": {
+                    "domain_id": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "workday_hours": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "workdays_per_month": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "vacation": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "sick_leaves": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "days_off": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "pause_duration": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "pause_template": {
+                      "$ref": "#/definitions/wfmLookupEntity"
+                    },
+                    "shift_template": {
+                      "$ref": "#/definitions/wfmLookupEntity"
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "created_by": {
+                      "$ref": "#/definitions/wfmLookupEntity"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "updated_by": {
+                      "$ref": "#/definitions/wfmLookupEntity"
+                    }
+                  }
                 }
               }
             }
@@ -936,6 +1421,22 @@
     }
   },
   "definitions": {
+    "CreateAgentsAbsencesBulkRequestabsentType": {
+      "type": "object",
+      "properties": {
+        "type_id": {
+          "$ref": "#/definitions/wfmAgentAbsenceType"
+        },
+        "absent_at_from": {
+          "type": "string",
+          "format": "int64"
+        },
+        "absent_at_to": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -964,6 +1465,76 @@
         }
       }
     },
+    "wfmAbsence": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "domain_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "type_id": {
+          "$ref": "#/definitions/wfmAgentAbsenceType"
+        },
+        "absent_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "created_by": {
+          "$ref": "#/definitions/wfmLookupEntity"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_by": {
+          "$ref": "#/definitions/wfmLookupEntity"
+        }
+      }
+    },
+    "wfmAgentAbsence": {
+      "type": "object",
+      "properties": {
+        "agent": {
+          "$ref": "#/definitions/wfmLookupEntity"
+        },
+        "absence": {
+          "$ref": "#/definitions/wfmAbsence"
+        }
+      }
+    },
+    "wfmAgentAbsenceType": {
+      "type": "string",
+      "enum": [
+        "AGENT_ABSENCE_TYPE_UNSPECIFIED",
+        "AGENT_ABSENCE_TYPE_DAYOFF",
+        "AGENT_ABSENCE_TYPE_VACATION",
+        "AGENT_ABSENCE_TYPE_SICKDAY"
+      ],
+      "default": "AGENT_ABSENCE_TYPE_UNSPECIFIED"
+    },
+    "wfmAgentAbsences": {
+      "type": "object",
+      "properties": {
+        "agent": {
+          "$ref": "#/definitions/wfmLookupEntity"
+        },
+        "absences": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmAbsence"
+          }
+        }
+      }
+    },
     "wfmAgentWorkingConditions": {
       "type": "object",
       "properties": {
@@ -972,6 +1543,45 @@
         },
         "pause_template": {
           "$ref": "#/definitions/wfmLookupEntity"
+        }
+      }
+    },
+    "wfmCreateAgentAbsenceResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/wfmAgentAbsence"
+        }
+      }
+    },
+    "wfmCreateAgentsAbsencesBulkRequest": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/CreateAgentsAbsencesBulkRequestabsentType"
+          }
+        },
+        "agent_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        }
+      }
+    },
+    "wfmCreateAgentsAbsencesBulkResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
         }
       }
     },
@@ -1020,6 +1630,15 @@
       "properties": {
         "item": {
           "$ref": "#/definitions/wfmWorkingCondition"
+        }
+      }
+    },
+    "wfmDeleteAgentAbsenceResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -1129,6 +1748,14 @@
         }
       }
     },
+    "wfmReadAgentAbsencesResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/wfmAgentAbsences"
+        }
+      }
+    },
     "wfmReadAgentWorkingConditionsResponse": {
       "type": "object",
       "properties": {
@@ -1158,6 +1785,21 @@
       "properties": {
         "item": {
           "$ref": "#/definitions/wfmWorkingCondition"
+        }
+      }
+    },
+    "wfmSearchAgentsAbsencesResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmAgentAbsences"
+          }
+        },
+        "next": {
+          "type": "boolean"
         }
       }
     },
@@ -1301,6 +1943,14 @@
         },
         "updated_by": {
           "$ref": "#/definitions/wfmLookupEntity"
+        }
+      }
+    },
+    "wfmUpdateAgentAbsenceResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/wfmAgentAbsence"
         }
       }
     },
