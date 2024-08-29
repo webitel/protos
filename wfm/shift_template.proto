@@ -7,6 +7,8 @@ import "google/api/annotations.proto";
 import "proto/options/options.proto";
 import "lookup.proto";
 
+option go_package = "github.com/webitel/protos/wfm;api";
+
 service ShiftTemplateService {
   option (options.objclass) = "shift_templates";
   rpc CreateShiftTemplate(CreateShiftTemplateRequest) returns (CreateShiftTemplateResponse) {
@@ -30,7 +32,7 @@ service ShiftTemplateService {
   rpc UpdateShiftTemplate(UpdateShiftTemplateRequest) returns (UpdateShiftTemplateResponse) {
     option (options.access) = ACTION_UPDATE;
     option (google.api.http) = {
-      put: "/wfm/lookups/shift_templates/{id}"
+      put: "/wfm/lookups/shift_templates/{item.id}"
       body: "*"
     };
   }
@@ -143,12 +145,7 @@ message SearchShiftTemplateResponse {
 }
 
 message UpdateShiftTemplateRequest {
-  int64 id = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).int64.gt = 0
-  ];
-
-  ShiftTemplate item = 2 [(buf.validate.field).required = true];
+  ShiftTemplate item = 1 [(buf.validate.field).required = true];
 }
 
 message UpdateShiftTemplateResponse {

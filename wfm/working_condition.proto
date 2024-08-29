@@ -7,6 +7,8 @@ import "google/api/annotations.proto";
 import "proto/options/options.proto";
 import "lookup.proto";
 
+option go_package = "github.com/webitel/protos/wfm;api";
+
 service WorkingConditionService {
   option (options.objclass) = "working_conditions";
   rpc CreateWorkingCondition(CreateWorkingConditionRequest) returns (CreateWorkingConditionResponse) {
@@ -30,7 +32,7 @@ service WorkingConditionService {
   rpc UpdateWorkingCondition(UpdateWorkingConditionRequest) returns (UpdateWorkingConditionResponse) {
     option (options.access) = ACTION_UPDATE;
     option (google.api.http) = {
-      put: "/wfm/lookups/working_conditions/{id}"
+      put: "/wfm/lookups/working_conditions/{item.id}"
       body: "*"
     };
   }
@@ -151,12 +153,7 @@ message SearchWorkingConditionResponse {
 }
 
 message UpdateWorkingConditionRequest {
-  int64 id = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).int64.gt = 0
-  ];
-
-  WorkingCondition item = 2 [(buf.validate.field).required = true];
+  WorkingCondition item = 1 [(buf.validate.field).required = true];
 }
 
 message UpdateWorkingConditionResponse {
