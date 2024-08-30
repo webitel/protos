@@ -4,15 +4,15 @@ package wfm;
 
 import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
-import "proto/options/options.proto";
+import "proto/webitel/option.proto";
 import "lookup.proto";
 
 option go_package = "github.com/webitel/protos/wfm;api";
 
 service AgentAbsenceService {
-  option (options.objclass) = "agent_absence";
+  option (option.objclass) = "agent_absence";
   rpc CreateAgentAbsence(CreateAgentAbsenceRequest) returns (CreateAgentAbsenceResponse) {
-    option (options.access) = ACTION_CREATE;
+    option (option.access) = ACTION_CREATE;
     option (google.api.http) = {
       post: "/wfm/agents/{item.agent.id}/absences"
       body: "*"
@@ -20,7 +20,7 @@ service AgentAbsenceService {
   }
 
   rpc UpdateAgentAbsence(UpdateAgentAbsenceRequest) returns (UpdateAgentAbsenceResponse) {
-    option (options.access) = ACTION_UPDATE;
+    option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
       put: "/wfm/agents/{item.agent.id}/absences/{item.absence.id}"
       body: "*"
@@ -28,17 +28,17 @@ service AgentAbsenceService {
   }
 
   rpc DeleteAgentAbsence(DeleteAgentAbsenceRequest) returns (DeleteAgentAbsenceResponse) {
-    option (options.access) = ACTION_DELETE;
+    option (option.access) = ACTION_DELETE;
     option (google.api.http) = {delete: "/wfm/agents/{agent_id}/absences/{id}"};
   }
 
   rpc ReadAgentAbsences(ReadAgentAbsencesRequest) returns (ReadAgentAbsencesResponse) {
-    option (options.access) = ACTION_READ;
+    option (option.access) = ACTION_READ;
     option (google.api.http) = {get: "/wfm/agents/{agent_id}/absences"};
   }
 
   rpc CreateAgentsAbsencesBulk(CreateAgentsAbsencesBulkRequest) returns (CreateAgentsAbsencesBulkResponse) {
-    option (options.access) = ACTION_CREATE;
+    option (option.access) = ACTION_CREATE;
     option (google.api.http) = {
       post: "/wfm/agents/absences"
       body: "*"
@@ -46,7 +46,7 @@ service AgentAbsenceService {
   }
 
   rpc SearchAgentsAbsences(SearchAgentsAbsencesRequest) returns (SearchAgentsAbsencesResponse) {
-    option (options.access) = ACTION_READ;
+    option (option.access) = ACTION_READ;
     option (google.api.http) = {get: "/wfm/agents/absences"};
   }
 }
@@ -114,7 +114,7 @@ message CreateAgentsAbsencesBulkRequest {
 }
 
 message CreateAgentsAbsencesBulkResponse {
-  repeated int64 items = 1;
+  repeated AgentAbsences items = 1;
 }
 
 message SearchAgentsAbsencesRequest {
