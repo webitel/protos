@@ -180,6 +180,62 @@
         }
       }
     },
+    "/agent/chats": {
+      "get": {
+        "tags": [
+          "AgentChatsService"
+        ],
+        "operationId": "AgentChatsService_GetAgentChats",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "default",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "filter",
+            "name": "only_closed",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.chat.GetAgentChatsResponse"
+            }
+          }
+        }
+      }
+    },
     "/calendars": {
       "get": {
         "tags": [
@@ -39186,6 +39242,44 @@
         "Failed"
       ]
     },
+    "webitel.chat.AgentChat": {
+      "type": "object",
+      "properties": {
+        "close_reason": {
+          "type": "string",
+          "title": "Close reason (from agent perspective)"
+        },
+        "closed_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "gateway": {
+          "title": "Chat gateway",
+          "$ref": "#/definitions/webitel.chat.Peer"
+        },
+        "id": {
+          "type": "string",
+          "title": "Chat id"
+        },
+        "last_message": {
+          "title": "Chat first message",
+          "$ref": "#/definitions/webitel.chat.Message"
+        },
+        "queue": {
+          "title": "Queue name (unreal)",
+          "$ref": "#/definitions/webitel.chat.Peer"
+        },
+        "started_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "Chat time length"
+        },
+        "title": {
+          "type": "string",
+          "title": "Chat title"
+        }
+      }
+    },
     "webitel.chat.Button": {
       "type": "object",
       "properties": {
@@ -39597,6 +39691,10 @@
           "format": "int64",
           "title": "Timestamp when dialog was closed.\nZero value means - connected (online)\nOtherwise - disconnected (offline)"
         },
+        "closed_cause": {
+          "type": "string",
+          "title": "Close reason if closed from the request sender perspective"
+        },
         "context": {
           "description": "Context. Variables. Environment.",
           "type": "object",
@@ -39672,6 +39770,25 @@
         "type": {
           "type": "string",
           "title": "MIME media type"
+        }
+      }
+    },
+    "webitel.chat.GetAgentChatsResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.AgentChat"
+          }
+        },
+        "next": {
+          "type": "boolean"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
