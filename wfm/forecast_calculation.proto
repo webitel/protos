@@ -1,0 +1,191 @@
+syntax = "proto3";
+
+package wfm;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "proto/webitel/option.proto";
+import "lookup.proto";
+
+option go_package = "github.com/webitel/protos/wfm;api";
+
+service ForecastCalculationService {
+  option (option.objclass) = "forecast_calculations";
+  rpc CreateForecastCalculation(CreateForecastCalculationRequest) returns (CreateForecastCalculationResponse) {
+    option (option.access) = ACTION_CREATE;
+    option (google.api.http) = {
+      post: "/wfm/lookups/forecast_calculation"
+      body: "*"
+    };
+  }
+  
+  rpc ReadForecastCalculation(ReadForecastCalculationRequest) returns (ReadForecastCalculationResponse) {
+    option (option.access) = ACTION_READ;
+    option (google.api.http) = {get: "/wfm/lookups/forecast_calculation/{id}"};
+  }
+
+  rpc SearchForecastCalculation(SearchForecastCalculationRequest) returns (SearchForecastCalculationResponse) {
+    option (option.access) = ACTION_READ;
+    option (google.api.http) = {get: "/wfm/lookups/forecast_calculation"};
+  }
+
+  rpc UpdateForecastCalculation(UpdateForecastCalculationRequest) returns (UpdateForecastCalculationResponse) {
+    option (option.access) = ACTION_UPDATE;
+    option (google.api.http) = {
+      put: "/wfm/lookups/forecast_calculation/{item.id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteForecastCalculation(DeleteForecastCalculationRequest) returns (DeleteForecastCalculationResponse) {
+    option (option.access) = ACTION_DELETE;
+    option (google.api.http) = {delete: "/wfm/lookups/forecast_calculation/{id}"};
+  }
+
+  rpc ExecuteForecastCalculation(ExecuteForecastCalculationRequest) returns (ExecuteForecastCalculationResponse) {
+    option (option.access) = ACTION_READ;
+    option (google.api.http) = {get: "/wfm/lookups/forecast_calculation/{id}"};
+  }
+}
+
+message CreateForecastCalculationRequest {
+  ForecastCalculation item = 1 [(buf.validate.field).required = true];
+}
+
+message CreateForecastCalculationResponse {
+  ForecastCalculation item = 1;
+}
+
+message ReadForecastCalculationRequest {
+  int64 id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64.gt = 0
+  ];
+
+  repeated string fields = 5 [(buf.validate.field).repeated = {
+    unique: true,
+    items {
+      string {
+        min_len: 1,
+        in: [
+          'id',
+          'domain_id',
+          'name',
+          'description',
+          'query',
+          'created_at',
+          'created_by',
+          'updated_at',
+          'updated_by'
+        ]
+      }
+    }
+  }];
+}
+
+message ReadForecastCalculationResponse {
+  ForecastCalculation item = 1;
+}
+
+message SearchForecastCalculationRequest {
+  optional string q = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 250
+  ];
+
+  optional int32 page = 2 [(buf.validate.field).int32.gt = 0];
+  optional int32 size = 3 [(buf.validate.field).int32.gt = 0];
+
+  optional string sort = 4 [(buf.validate.field).string = {
+    in: [
+      'id',
+      'domain_id',
+      'name',
+      'description',
+      'query',
+      'created_at',
+      'created_by',
+      'updated_at',
+      'updated_by'
+    ]
+  }];
+
+  repeated string fields = 5 [(buf.validate.field).repeated = {
+    unique: true,
+    items {
+      string {
+        min_len: 1,
+        in: [
+          'id',
+          'domain_id',
+          'name',
+          'description',
+          'query',
+          'created_at',
+          'created_by',
+          'updated_at',
+          'updated_by'
+        ]
+      }
+    }
+  }];
+}
+
+message SearchForecastCalculationResponse {
+  repeated ForecastCalculation items = 1;
+  bool next = 2;
+}
+
+message UpdateForecastCalculationRequest {
+  ForecastCalculation item = 1 [(buf.validate.field).required = true];
+}
+
+message UpdateForecastCalculationResponse {
+  ForecastCalculation item = 1;
+}
+
+message DeleteForecastCalculationRequest {
+  int64 id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64.gt = 0
+  ];
+}
+
+message DeleteForecastCalculationResponse {
+  int64 id = 1;
+}
+
+message ExecuteForecastCalculationRequest {
+  int64 id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64.gt = 0
+  ];
+}
+
+message ExecuteForecastCalculationResponse {
+  message Field {
+    string name = 1;
+    string type = 2;
+    repeated string values = 3;
+  }
+
+  repeated Field fields = 1;
+}
+
+message ForecastCalculation {
+  int64 id = 1;
+  int64 domain_id = 2;
+  string name = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 250
+  ];
+
+  optional string description = 4 [(buf.validate.field).string.max_len = 250];
+  string query = 5 [(buf.validate.field).required = true];
+
+  int64 created_at = 6;
+  LookupEntity created_by = 7;
+  int64 updated_at = 8;
+  LookupEntity updated_by = 9;
+}
