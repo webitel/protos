@@ -22,6 +22,13 @@ service LoggerService {
       get: "/logger/{object}/record/{record_id}/logs"
     };
   }
+   rpc DeleteConfigLogs(DeleteConfigLogsRequest) returns (DeleteConfigLogsResponse) {
+    option (google.api.http) = {
+      delete: "/logger/config/{config_id}/logs"
+      body: "*"
+    };
+  }
+
 }
 
 enum Action {
@@ -98,6 +105,17 @@ message SearchLogByRecordIdRequest {
   string user_ip = 11;
   int64 date_from = 12;
   int64 date_to = 13;
+}
+
+message DeleteConfigLogsRequest {
+  // Required
+  int32 config_id = 1;
+  // Not required
+  int32 older_than = 2;
+}
+
+message DeleteConfigLogsResponse {
+  int64 processed = 1;
 }
 
 message Logs {
