@@ -4,10 +4,6 @@
     "title": "config_service.proto",
     "version": "version not set"
   },
-  "schemes": [
-    "http",
-    "https"
-  ],
   "consumes": [
     "application/json"
   ],
@@ -17,12 +13,18 @@
   "paths": {
     "/logger/available_objects": {
       "get": {
-        "operationId": "ReadSystemObjects",
+        "operationId": "ConfigService_ReadSystemObjects",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerSystemObjects"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -31,8 +33,7 @@
             "name": "include_existing",
             "in": "query",
             "required": false,
-            "type": "boolean",
-            "format": "boolean"
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -42,12 +43,18 @@
     },
     "/logger/config": {
       "get": {
-        "operationId": "SearchConfig",
+        "operationId": "ConfigService_SearchConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerConfigs"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -118,12 +125,18 @@
         ]
       },
       "delete": {
-        "operationId": "DeleteConfigBulk",
+        "operationId": "ConfigService_DeleteConfigBulk",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerEmpty"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -142,12 +155,18 @@
         ]
       },
       "post": {
-        "operationId": "CreateConfig",
+        "operationId": "ConfigService_CreateConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerConfig"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -168,12 +187,18 @@
     },
     "/logger/config/{config_id}": {
       "get": {
-        "operationId": "ReadConfig",
+        "operationId": "ConfigService_ReadConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerConfig"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -191,12 +216,18 @@
         ]
       },
       "delete": {
-        "operationId": "DeleteConfig",
+        "operationId": "ConfigService_DeleteConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerEmpty"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -214,12 +245,18 @@
         ]
       },
       "put": {
-        "operationId": "UpdateConfig",
+        "operationId": "ConfigService_UpdateConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerConfig"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -245,12 +282,18 @@
         ]
       },
       "patch": {
-        "operationId": "PatchConfig",
+        "operationId": "ConfigService_PatchConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerConfig"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -278,12 +321,18 @@
     },
     "/logger/config/{config_id}/logs": {
       "get": {
-        "operationId": "SearchLogByConfigId",
+        "operationId": "LoggerService_SearchLogByConfigId",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerLogs"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -383,15 +432,60 @@
         "tags": [
           "LoggerService"
         ]
+      },
+      "delete": {
+        "operationId": "LoggerService_DeleteConfigLogs",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/loggerDeleteConfigLogsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "config_id",
+            "description": "Required",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/loggerDeleteConfigLogsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "LoggerService"
+        ]
       }
-    }, "/logger/user/{user_id}/logs": {
+    },
+    "/logger/user/{user_id}/logs": {
       "get": {
-        "operationId": "SearchLogByUserId",
+        "operationId": "LoggerService_SearchLogByUserId",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerLogs"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -498,12 +592,18 @@
     },
     "/logger/{object}/record/{record_id}/logs": {
       "get": {
-        "operationId": "SearchLogByRecordId",
+        "operationId": "LoggerService_SearchLogByRecordId",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerLogs"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -668,8 +768,7 @@
           "$ref": "#/definitions/loggerLookup"
         },
         "enabled": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "days_to_store": {
           "type": "integer",
@@ -684,6 +783,13 @@
         },
         "description": {
           "type": "string"
+        },
+        "logs_size": {
+          "type": "string"
+        },
+        "logs_count": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -691,8 +797,7 @@
       "type": "object",
       "properties": {
         "is_enabled": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
@@ -704,8 +809,7 @@
           "format": "int32"
         },
         "next": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "items": {
           "type": "array",
@@ -722,8 +826,7 @@
           "$ref": "#/definitions/loggerLookup"
         },
         "enabled": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "days_to_store": {
           "type": "integer",
@@ -750,6 +853,30 @@
             "type": "integer",
             "format": "int32"
           }
+        }
+      }
+    },
+    "loggerDeleteConfigLogsRequest": {
+      "type": "object",
+      "properties": {
+        "config_id": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Required"
+        },
+        "older_than": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Not required"
+        }
+      }
+    },
+    "loggerDeleteConfigLogsResponse": {
+      "type": "object",
+      "properties": {
+        "processed": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -799,8 +926,7 @@
           "format": "int32"
         },
         "next": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "items": {
           "type": "array",
@@ -830,8 +956,7 @@
           "format": "int32"
         },
         "enabled": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "days_to_store": {
           "type": "integer",
@@ -874,8 +999,7 @@
           "format": "int32"
         },
         "enabled": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "days_to_store": {
           "type": "integer",
@@ -890,6 +1014,39 @@
         },
         "description": {
           "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "runtimeError": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
         }
       }
     }
