@@ -27,7 +27,14 @@ service MemberService {
     // Search of Member
     rpc SearchMembers(SearchMembersRequest) returns (ListMember) {
         option (google.api.http) = {
-            get: "/call_center/members" //fixme ?
+            get: "/call_center/members"
+        };
+    }
+
+    rpc PatchMemberOne(PatchMemberOneRequest) returns (MemberInQueue) {
+        option (google.api.http) = {
+            patch: "/call_center/members/{id}"
+            body: "*"
         };
     }
 
@@ -424,6 +431,28 @@ message DeleteMemberRequest {
     int64 id = 1;
     int64 queue_id = 2;
     int64 domain_id = 3;
+}
+
+message PatchMemberOneRequest {
+    int64 id = 1;
+    int32 priority = 2;
+    int64 expire_at = 3;
+    map<string, string> variables = 4;
+    string name = 5;
+    Lookup timezone = 6;
+    repeated MemberCommunicationCreateRequest communications = 7;
+    Lookup bucket = 8;
+    int64 min_offering_at = 9;
+    string stop_cause = 10;
+
+    repeated string fields = 11;
+    int64 domain_id = 12;
+
+    Lookup agent = 13;
+    Lookup skill = 14;
+
+    int32 attempts = 15;
+    Lookup queue = 16;
 }
 
 message UpdateMemberRequest {
