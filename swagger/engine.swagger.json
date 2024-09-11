@@ -3683,6 +3683,45 @@
         ]
       }
     },
+    "/call_center/members/{id}": {
+      "patch": {
+        "operationId": "PatchMemberOne",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineMemberInQueue"
+            }
+          },
+          "default": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/engineApiError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/enginePatchMemberOneRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MemberService"
+        ]
+      }
+    },
     "/call_center/pause_causes": {
       "get": {
         "operationId": "SearchAgentPauseCause",
@@ -19752,6 +19791,71 @@
         "hide_missed": {
           "type": "boolean",
           "format": "boolean"
+        }
+      }
+    },
+    "enginePatchMemberOneRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "priority": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "expire_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "variables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "name": {
+          "type": "string"
+        },
+        "timezone": {
+          "$ref": "#/definitions/engineLookup"
+        },
+        "communications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/engineMemberCommunicationCreateRequest"
+          }
+        },
+        "bucket": {
+          "$ref": "#/definitions/engineLookup"
+        },
+        "min_offering_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "stop_cause": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "domain_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "agent": {
+          "$ref": "#/definitions/engineLookup"
+        },
+        "skill": {
+          "$ref": "#/definitions/engineLookup"
+        },
+        "attempts": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
