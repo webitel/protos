@@ -708,7 +708,7 @@
                     "description": {
                       "type": "string"
                     },
-                    "query": {
+                    "procedure": {
                       "type": "string"
                     },
                     "created_at": {
@@ -898,6 +898,7 @@
     },
     "/wfm/lookups/pause_templates/{item.id}": {
       "put": {
+        "summary": "UpdatePauseTemplateCauseBulk updates a pause template with a list of causes.\nUpdate existing cause, create that not exists in database and delete that not exists in the list.",
         "operationId": "PauseTemplateService_UpdatePauseTemplate",
         "responses": {
           "200": {
@@ -941,6 +942,13 @@
                     "description": {
                       "type": "string"
                     },
+                    "causes": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "$ref": "#/definitions/wfmPauseTemplateCause"
+                      }
+                    },
                     "created_at": {
                       "type": "string",
                       "format": "int64"
@@ -955,121 +963,6 @@
                     "updated_by": {
                       "$ref": "#/definitions/wfmLookupEntity"
                     }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "tags": [
-          "PauseTemplateService"
-        ]
-      }
-    },
-    "/wfm/lookups/pause_templates/{pause_template_id}/causes": {
-      "get": {
-        "summary": "SearchPauseTemplateCause returns a list of pause template causes.",
-        "operationId": "PauseTemplateService_SearchPauseTemplateCause",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/wfmSearchPauseTemplateCauseResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "pause_template_id",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "format": "int64"
-          },
-          {
-            "name": "q",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "sort",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          }
-        ],
-        "tags": [
-          "PauseTemplateService"
-        ]
-      },
-      "put": {
-        "summary": "UpdatePauseTemplateCauseBulk updates a list of pause template causes.\nUpdate existing, create that not exists in database and delete that not exists in the list.",
-        "operationId": "PauseTemplateService_UpdatePauseTemplateCauseBulk",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/wfmUpdatePauseTemplateCauseBulkResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "pause_template_id",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "format": "int64"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "items": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "$ref": "#/definitions/wfmPauseTemplateCause"
                   }
                 }
               }
@@ -1243,6 +1136,7 @@
     },
     "/wfm/lookups/shift_templates/{item.id}": {
       "put": {
+        "summary": "UpdateShiftTemplate updates a shift template with a list times.\nUpdate existing time, create that not exists in database and delete that not exists in the list.",
         "operationId": "ShiftTemplateService_UpdateShiftTemplate",
         "responses": {
           "200": {
@@ -1286,6 +1180,13 @@
                     "description": {
                       "type": "string"
                     },
+                    "times": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "$ref": "#/definitions/wfmShiftTemplateTime"
+                      }
+                    },
                     "created_at": {
                       "type": "string",
                       "format": "int64"
@@ -1300,121 +1201,6 @@
                     "updated_by": {
                       "$ref": "#/definitions/wfmLookupEntity"
                     }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "tags": [
-          "ShiftTemplateService"
-        ]
-      }
-    },
-    "/wfm/lookups/shift_templates/{shift_template_id}/times": {
-      "get": {
-        "summary": "SearchShiftTemplateTime returns a list of pause template times.",
-        "operationId": "ShiftTemplateService_SearchShiftTemplateTime",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/wfmSearchShiftTemplateTimeResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "shift_template_id",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "format": "int64"
-          },
-          {
-            "name": "q",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "sort",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          }
-        ],
-        "tags": [
-          "ShiftTemplateService"
-        ]
-      },
-      "put": {
-        "summary": "UpdateShiftTemplateTimeBulk updates a list of shift template times.\nUpdate existing, create that not exists in database and delete that not exists in the list.",
-        "operationId": "ShiftTemplateService_UpdateShiftTemplateTimeBulk",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/wfmUpdateShiftTemplateTimeBulkResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "shift_template_id",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "format": "int64"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "items": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "$ref": "#/definitions/wfmShiftTemplateTime"
                   }
                 }
               }
@@ -1704,20 +1490,16 @@
         }
       }
     },
-    "ExecuteForecastCalculationResponseField": {
+    "ExecuteForecastCalculationResponseForecast": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string"
+        "timestamp": {
+          "type": "string",
+          "format": "int64"
         },
-        "type": {
-          "type": "string"
-        },
-        "values": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+        "agents": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -1981,11 +1763,11 @@
     "wfmExecuteForecastCalculationResponse": {
       "type": "object",
       "properties": {
-        "fields": {
+        "items": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/ExecuteForecastCalculationResponseField"
+            "$ref": "#/definitions/ExecuteForecastCalculationResponseForecast"
           }
         }
       }
@@ -2007,7 +1789,7 @@
         "description": {
           "type": "string"
         },
-        "query": {
+        "procedure": {
           "type": "string"
         },
         "created_at": {
@@ -2055,6 +1837,13 @@
         "description": {
           "type": "string"
         },
+        "causes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmPauseTemplateCause"
+          }
+        },
         "created_at": {
           "type": "string",
           "format": "int64"
@@ -2074,33 +1863,11 @@
     "wfmPauseTemplateCause": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string",
-          "format": "int64"
-        },
-        "domain_id": {
-          "type": "string",
-          "format": "int64"
-        },
         "duration": {
           "type": "string",
           "format": "int64"
         },
         "cause": {
-          "$ref": "#/definitions/wfmLookupEntity"
-        },
-        "created_at": {
-          "type": "string",
-          "format": "int64"
-        },
-        "created_by": {
-          "$ref": "#/definitions/wfmLookupEntity"
-        },
-        "updated_at": {
-          "type": "string",
-          "format": "int64"
-        },
-        "updated_by": {
           "$ref": "#/definitions/wfmLookupEntity"
         }
       }
@@ -2183,21 +1950,6 @@
         }
       }
     },
-    "wfmSearchPauseTemplateCauseResponse": {
-      "type": "object",
-      "properties": {
-        "items": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/wfmPauseTemplateCause"
-          }
-        },
-        "next": {
-          "type": "boolean"
-        }
-      }
-    },
     "wfmSearchPauseTemplateResponse": {
       "type": "object",
       "properties": {
@@ -2221,21 +1973,6 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/wfmShiftTemplate"
-          }
-        },
-        "next": {
-          "type": "boolean"
-        }
-      }
-    },
-    "wfmSearchShiftTemplateTimeResponse": {
-      "type": "object",
-      "properties": {
-        "items": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/wfmShiftTemplateTime"
           }
         },
         "next": {
@@ -2275,6 +2012,13 @@
         "description": {
           "type": "string"
         },
+        "times": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmShiftTemplateTime"
+          }
+        },
         "created_at": {
           "type": "string",
           "format": "int64"
@@ -2294,14 +2038,6 @@
     "wfmShiftTemplateTime": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string",
-          "format": "int64"
-        },
-        "domain_id": {
-          "type": "string",
-          "format": "int64"
-        },
         "start": {
           "type": "integer",
           "format": "int32"
@@ -2309,20 +2045,6 @@
         "end": {
           "type": "integer",
           "format": "int32"
-        },
-        "created_at": {
-          "type": "string",
-          "format": "int64"
-        },
-        "created_by": {
-          "$ref": "#/definitions/wfmLookupEntity"
-        },
-        "updated_at": {
-          "type": "string",
-          "format": "int64"
-        },
-        "updated_by": {
-          "$ref": "#/definitions/wfmLookupEntity"
         }
       }
     },
@@ -2350,21 +2072,6 @@
         }
       }
     },
-    "wfmUpdatePauseTemplateCauseBulkResponse": {
-      "type": "object",
-      "properties": {
-        "items": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/wfmPauseTemplateCause"
-          }
-        },
-        "next": {
-          "type": "boolean"
-        }
-      }
-    },
     "wfmUpdatePauseTemplateResponse": {
       "type": "object",
       "properties": {
@@ -2378,21 +2085,6 @@
       "properties": {
         "item": {
           "$ref": "#/definitions/wfmShiftTemplate"
-        }
-      }
-    },
-    "wfmUpdateShiftTemplateTimeBulkResponse": {
-      "type": "object",
-      "properties": {
-        "items": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/wfmShiftTemplateTime"
-          }
-        },
-        "next": {
-          "type": "boolean"
         }
       }
     },
