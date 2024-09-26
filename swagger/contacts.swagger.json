@@ -39,6 +39,12 @@
     },
     {
       "name": "Timeline"
+    },
+    {
+      "name": "Groups"
+    },
+    {
+      "name": "ContactGroups"
     }
   ],
   "host": "nx.webitel.org",
@@ -192,6 +198,239 @@
         ],
         "tags": [
           "Contacts"
+        ]
+      }
+    },
+    "/contacts/groups": {
+      "get": {
+        "summary": "Retrieve a list of groups or search groups",
+        "operationId": "Groups_ListGroups",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.GroupList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "description": "Page number of result dataset records. offset = (page*size)",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "description": "Size count of records on result page. limit = (size++)",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved as a result.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "sort",
+            "description": "Sort the result according to fields.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "id",
+            "description": "Filter by unique IDs.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "q",
+            "description": "Search term: group name;\n`?` - matches any one character\n`*` - matches 0 or more characters",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Filter by group name.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Groups"
+        ]
+      },
+      "post": {
+        "summary": "Create a new group",
+        "operationId": "Groups_CreateGroup",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.Group"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "Request message for creating a new group.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.CreateGroupRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Groups"
+        ]
+      }
+    },
+    "/contacts/groups/{id}": {
+      "get": {
+        "summary": "Locate a group by ID",
+        "operationId": "Groups_LocateGroup",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.LocateGroupResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "The unique ID of the group to locate.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved into result.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Groups"
+        ]
+      },
+      "delete": {
+        "summary": "Delete a group",
+        "operationId": "Groups_DeleteGroup",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.Group"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "The unique ID of the group to delete.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Groups"
+        ]
+      },
+      "put": {
+        "summary": "Update an existing group",
+        "operationId": "Groups_UpdateGroup",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.Group"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "The unique ID of the group to update.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.Groups.UpdateGroupBody"
+            }
+          }
+        ],
+        "tags": [
+          "Groups"
+        ]
+      },
+      "patch": {
+        "summary": "Update an existing group",
+        "operationId": "Groups_UpdateGroup2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.Group"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "The unique ID of the group to update.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.Groups.UpdateGroupBody"
+            }
+          }
+        ],
+        "tags": [
+          "Groups"
         ]
       }
     },
@@ -776,6 +1015,436 @@
         ],
         "tags": [
           "Emails"
+        ]
+      }
+    },
+    "/contacts/{contact_id}/groups": {
+      "get": {
+        "summary": "List of the Contact's group(s).",
+        "operationId": "ContactGroups_ListContactGroups",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.ContactGroupList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "description": "Contact ID associated with.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "description": "Page number of result dataset records. offset = (page*size)",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "description": "Size count of records on result page. limit = (size++)",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "query",
+            "description": "Search term: group name;\n`?` - matches any one character\n`*` - matches 0 or more characters",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort",
+            "description": "Sort the result according to fields.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved as a result.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "id",
+            "description": "Record(s) with unique ID only.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ContactGroups"
+        ]
+      },
+      "delete": {
+        "summary": "Remove the Contact's group(s).",
+        "operationId": "ContactGroups_DeleteContactGroups",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.ContactGroupList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "description": "Contact ID associated with.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved as a result.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "etag",
+            "description": "Set of unique ID(s) to remove.",
+            "in": "query",
+            "required": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "uniqueItems": true
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ContactGroups"
+        ]
+      },
+      "post": {
+        "summary": "Associate more group(s) with the Contact.",
+        "operationId": "ContactGroups_MergeContactGroups",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.ContactGroupList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "description": "Link contact ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "input",
+            "description": "Array of the unique User(s) to associate with the Contact.\nAny duplicate of an already linked user{id} will result in an error.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/webitel.contacts.InputContactGroup"
+              }
+            }
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved as a result.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ContactGroups"
+        ]
+      },
+      "put": {
+        "summary": "Resets all groups of the contact according to the input dataset.",
+        "operationId": "ContactGroups_ResetContactGroups",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.ContactGroupList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "description": "Link contact ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "input",
+            "description": "Final set of group(s) to be linked with the contact.\nGroup(s) that are already linked with the contact\nbut not given in here will be removed.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/webitel.contacts.InputContactGroup",
+                "uniqueItems": true
+              },
+              "minItems": 1
+            }
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved into result of changes.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ContactGroups"
+        ]
+      }
+    },
+    "/contacts/{contact_id}/groups/{etag}": {
+      "get": {
+        "summary": "Locate the Contact's group association.",
+        "operationId": "ContactGroups_LocateContactGroup",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.ContactGroup"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "description": "Contact source ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "etag",
+            "description": "Unique group link IDentifier.\nAccept: `etag` (obsolete+) or `id`.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "\\w+"
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved into result.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ContactGroups"
+        ]
+      },
+      "delete": {
+        "summary": "Remove the Contact's group association.",
+        "operationId": "ContactGroups_DeleteContactGroup",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.ContactGroup"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "description": "Contact ID associated with.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "etag",
+            "description": "Unique ID to remove.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved as a result.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ContactGroups"
+        ]
+      },
+      "put": {
+        "summary": "Update the Contact's group details.",
+        "operationId": "ContactGroups_UpdateContactGroup",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.ContactGroupList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "description": "Link contact ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "etag",
+            "description": "Unique ID of the latest version of an existing resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "input",
+            "description": "NEW Update of the group link.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "group": {
+                  "$ref": "#/definitions/webitel.contacts.Lookup",
+                  "description": "Group of contacts associated."
+                }
+              },
+              "title": "NEW Update of the group link."
+            }
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved into result of changes.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ContactGroups"
+        ]
+      },
+      "patch": {
+        "summary": "Update the Contact's group details.",
+        "operationId": "ContactGroups_UpdateContactGroup2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.ContactGroupList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "description": "Link contact ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "etag",
+            "description": "Unique ID of the latest version of an existing resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "input",
+            "description": "NEW Update of the group link.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "group": {
+                  "$ref": "#/definitions/webitel.contacts.Lookup",
+                  "description": "Group of contacts associated."
+                }
+              },
+              "title": "NEW Update of the group link."
+            }
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved into result of changes.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ContactGroups"
         ]
       }
     },
@@ -3309,6 +3978,14 @@
                     "$ref": "#/definitions/webitel.contacts.InputVariable"
                   },
                   "description": "Arbitrary client data that is populated by clients."
+                },
+                "groups": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/webitel.contacts.InputContactGroup"
+                  },
+                  "description": "The Contact's associated group(s)."
                 }
               },
               "title": "NEW Contact source changes"
@@ -3425,6 +4102,10 @@
             "type": "object",
             "$ref": "#/definitions/webitel.contacts.TranscriptLookup"
           }
+        },
+        "total_duration": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -3774,6 +4455,10 @@
           "$ref": "#/definitions/webitel.contacts.TimezoneList",
           "description": "The Contact's timezone preference(s)."
         },
+        "groups": {
+          "$ref": "#/definitions/webitel.contacts.ContactGroupList",
+          "description": "The Contact's associated group(s)."
+        },
         "imclients": {
           "$ref": "#/definitions/webitel.contacts.IMClientList",
           "description": "The contact's [I]nstant[M]essaging clients."
@@ -3784,6 +4469,70 @@
         }
       },
       "description": "The Contact principal source.\nOUTPUT purpose only."
+    },
+    "webitel.contacts.ContactGroup": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique ID of the association. Never changes."
+        },
+        "ver": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Version of the latest update. Numeric sequence."
+        },
+        "etag": {
+          "type": "string",
+          "description": "Unique ID of the latest version of the update.\nThis ID changes after any update to the underlying value(s)."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "The user who created this Field."
+        },
+        "created_by": {
+          "$ref": "#/definitions/webitel.contacts.Lookup",
+          "description": "Timestamp(milli) of the Field creation."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Timestamp(milli) of the last Field update.\nTake part in Etag generation."
+        },
+        "updated_by": {
+          "$ref": "#/definitions/webitel.contacts.Lookup",
+          "description": "The user who performed last Update."
+        },
+        "group": {
+          "$ref": "#/definitions/webitel.contacts.Lookup",
+          "description": "Group of contacts associated."
+        }
+      },
+      "description": "The Contact's Group association."
+    },
+    "webitel.contacts.ContactGroupList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.contacts.ContactGroup"
+          },
+          "description": "Group dataset page."
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The page number of the partial result."
+        },
+        "next": {
+          "type": "boolean",
+          "title": "Indicates that this is a partial result.\nMore data available upon query: ?size=${data.len}\u0026page=${page++}"
+        }
+      },
+      "description": "Contact groups dataset.\nNOTE: Edge represents connection between two nodes.\nSo this ContactGroupList.data are always subordinate to some contact.id."
     },
     "webitel.contacts.ContactList": {
       "type": "object",
@@ -3807,6 +4556,23 @@
         }
       },
       "description": "Contact dataset."
+    },
+    "webitel.contacts.CreateGroupRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the group."
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of the group."
+        }
+      },
+      "description": "Request message for creating a new group.",
+      "required": [
+        "name"
+      ]
     },
     "webitel.contacts.DayTimeline": {
       "type": "object",
@@ -4052,6 +4818,79 @@
         }
       }
     },
+    "webitel.contacts.Group": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique ID of the group. Never changes."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the group."
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of the group."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Timestamp(milli) of the group's creation."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Timestamp(milli) of the last group update."
+        },
+        "created_by": {
+          "$ref": "#/definitions/webitel.contacts.Lookup",
+          "description": "The user who created this group."
+        },
+        "updated_by": {
+          "$ref": "#/definitions/webitel.contacts.Lookup",
+          "description": "The user who performed the last update."
+        }
+      },
+      "title": "Group of Contacts"
+    },
+    "webitel.contacts.GroupList": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number of the partial result."
+        },
+        "next": {
+          "type": "boolean",
+          "description": "Have more records."
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.contacts.Group"
+          },
+          "description": "List of groups."
+        }
+      },
+      "description": "A list of Groups."
+    },
+    "webitel.contacts.Groups.UpdateGroupBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The new name of the group."
+        },
+        "description": {
+          "type": "string",
+          "description": "The new description of the group."
+        }
+      },
+      "description": "Request message for updating an existing group."
+    },
     "webitel.contacts.IMClient": {
       "type": "object",
       "properties": {
@@ -4254,9 +5093,34 @@
             "$ref": "#/definitions/webitel.contacts.InputVariable"
           },
           "description": "Arbitrary client data that is populated by clients."
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.contacts.InputContactGroup"
+          },
+          "description": "The Contact's associated group(s)."
         }
       },
       "description": "The Contact principal input."
+    },
+    "webitel.contacts.InputContactGroup": {
+      "type": "object",
+      "properties": {
+        "etag": {
+          "type": "string",
+          "description": "Unique ID of the latest version of an existing resource."
+        },
+        "group": {
+          "$ref": "#/definitions/webitel.contacts.Lookup",
+          "description": "Group of contacts associated."
+        }
+      },
+      "description": "An input of the Contact's groups.",
+      "required": [
+        "etag"
+      ]
     },
     "webitel.contacts.InputEmailAddress": {
       "type": "object",
@@ -4743,6 +5607,16 @@
         }
       },
       "description": "LabelsData\nNOTE: Edge represents connection between two nodes.\nSo this ContactLabels.data are always subordinate to some contact.id."
+    },
+    "webitel.contacts.LocateGroupResponse": {
+      "type": "object",
+      "properties": {
+        "group": {
+          "$ref": "#/definitions/webitel.contacts.Group",
+          "description": "The located group."
+        }
+      },
+      "description": "Response message for locating a group."
     },
     "webitel.contacts.Lookup": {
       "type": "object",
