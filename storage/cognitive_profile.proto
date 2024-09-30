@@ -49,6 +49,13 @@ service CognitiveProfileService {
       delete: "/storage/cognitive_profiles/{id}"
     };
   }
+
+  // Search Voices
+  rpc SearchCognitiveProfileVoices(SearchCognitiveProfileVoicesRequest) returns (ListCognitiveProfileVoices) {
+    option (google.api.http) = {
+      get: "/storage/cognitive_profiles/{id}/voice"
+    };
+  }
 }
 
 enum ServiceType {
@@ -78,6 +85,11 @@ message CognitiveProfile {
   string description = 10;
   ServiceType service = 11;
   bool default = 12;
+}
+
+message CognitiveProfileVoice {
+  string id = 13;
+  string name = 14;
 }
 
 message CreateCognitiveProfileRequest {
@@ -147,4 +159,13 @@ message PatchCognitiveProfileRequest {
 
 message DeleteCognitiveProfileRequest {
   int64 id = 1;
+}
+
+message SearchCognitiveProfileVoicesRequest {
+  string q = 3;
+  int64 id = 6;
+}
+
+message ListCognitiveProfileVoices {
+  repeated CognitiveProfileVoice items = 1;
 }
