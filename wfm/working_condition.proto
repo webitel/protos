@@ -90,16 +90,14 @@ message ReadWorkingConditionResponse {
 }
 
 message SearchWorkingConditionRequest {
-  optional string q = 1 [
+  optional int32 page = 1 [(buf.validate.field).int32.gt = 0];
+  optional int32 size = 2 [(buf.validate.field).int32.gt = 0];
+  optional string q = 3 [
     (buf.validate.field).string.min_len = 1,
     (buf.validate.field).string.max_len = 250
   ];
 
-  optional int32 page = 2 [(buf.validate.field).int32.gt = 0];
-  optional int32 size = 3 [(buf.validate.field).int32.gt = 0];
-
   optional string sort = 4;
-
   repeated string fields = 5 [(buf.validate.field).repeated = {
     unique: true,
     items {
