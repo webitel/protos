@@ -9,33 +9,35 @@ import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
 
-// CloseReason message represents a close reason entity with metadata
-message CloseReason {
-  // Unique identifier of the close reason
+// Priority message represents a priority entity with metadata
+message Priority {
+  // Unique identifier of the priority
   int64 id = 1;
-  // Name of the close reason
+  // Name of the priority
   string name = 2;
-  // Description of the close reason
+  // Description of the priority
   string description = 4;
-  // CreatedAt timestamp of the close reason
+  // CreatedAt timestamp of the priority
   int64 created_at = 20;
-  // UpdatedAt timestamp of the close reason
+  // UpdatedAt timestamp of the priority
   int64 updated_at = 21;
-  // CreatedBy user of the close reason
+  // CreatedBy user of the priority
   general.Lookup created_by = 22;
-  // UpdatedBy user of the close reason
+  // UpdatedBy user of the priority
   general.Lookup updated_by = 23;
+  // Color of the priority
+  string color = 24;
 }
 
-// CloseReasonList message contains a list of CloseReason items with pagination
-message CloseReasonList {
+// PriorityList message contains a list of Priority items with pagination
+message PriorityList {
   int32 page = 1;
   bool next = 2;
-  repeated CloseReason items = 3;
+  repeated Priority items = 3;
 }
 
-// CreateCloseReasonRequest message for creating a new close reason
-message CreateCloseReasonRequest {
+// CreatePriorityRequest message for creating a new priority
+message CreatePriorityRequest {
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
       required: ["name"]
@@ -44,15 +46,23 @@ message CreateCloseReasonRequest {
 
   string name = 1;
   string description = 3;
+  string color = 4;
 }
 
-message InputCloseReason{
-  string name = 2;
-  string description = 4;
+
+// InputPriority message for creating a new priority
+message InputPriority{
+  // Name of the priority
+  string name = 1;
+  // Description of the priority
+  string description = 2;
+  // Color of the priority
+  string color = 3;
 }
 
-// UpdateCloseReasonRequest message for updating an existing close reason
-message UpdateCloseReasonRequest {
+// UpdatePriorityRequest message for updating an existing priority
+message UpdatePriorityRequest {
+// UpdatePriorityRequest message for updating an existing priority
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
       required: ["id"]
@@ -60,7 +70,7 @@ message UpdateCloseReasonRequest {
   };
 
   int64 id = 1;
-  InputCloseReason input = 2;
+  InputPriority input = 2;
 
      // ---- JSON PATCH fields mask ----
   // List of JPath fields specified in body(input).
@@ -74,8 +84,8 @@ message UpdateCloseReasonRequest {
   }];
 }
 
-// DeleteCloseReasonRequest message for deleting an existing close reason
-message DeleteCloseReasonRequest {
+// DeletePriorityRequest message for deleting an existing priority
+message DeletePriorityRequest {
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
       required: ["id"]
@@ -85,8 +95,8 @@ message DeleteCloseReasonRequest {
   int64 id = 1;
 }
 
-// ListCloseReasonsRequest message for listing or searching close reasons
-message ListCloseReasonRequest {
+// ListPriorityRequest message for listing or searching priority
+message ListPriorityRequest {
   // Page number of result dataset records. offset = (page*size)
   int32 page = 1;
   // Size count of records on result page. limit = (size++)
@@ -104,77 +114,79 @@ message ListCloseReasonRequest {
   string q = 6;
 }
 
-// LocateCloseReasonRequest message for locating a specific close reason by ID
-message LocateCloseReasonRequest {
+// LocatePriorityRequest message for locating a specific priority by ID
+message LocatePriorityRequest {
+  // ID of the priority to be located
   int64 id = 1;
+  // Fields to be retrieved as a result.
   repeated string fields = 2;
 }
 
-// LocateCloseReasonResponse message contains a single close reason entity
-message LocateCloseReasonResponse {
-  CloseReason close_reason = 1;
+// LocatePriorityResponse message contains a single priority entity
+message LocatePriorityResponse {
+  Priority priority = 1;
 }
 
-// CloseReasons service definition with RPC methods for managing close reasons
-service CloseReasons {
-  // RPC method to list or search close reasons
-  rpc ListCloseReasons(ListCloseReasonRequest) returns (CloseReasonList) {
+// Priorities service definition with RPC methods for managing priorities
+service Priorities {
+  // RPC method to list or search priorities
+  rpc ListPriorities(ListPriorityRequest) returns (PriorityList) {
     option (google.api.http) = {
-      get: "/cases/closeReasons"
+      get: "/cases/priorities"
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Retrieve a list of close reasons or search close reasons"
+      summary: "Retrieve a list of priorities or search priorities"
     };
   }
 
-  // RPC method to create a new close reason
-  rpc CreateCloseReason(CreateCloseReasonRequest) returns (CloseReason) {
+  // RPC method to create a new priority
+  rpc CreatePriority(CreatePriorityRequest) returns (Priority) {
     option (google.api.http) = {
-      post: "/cases/closeReasons"
+      post: "/cases/priorities"
       body: "*"
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Create a new close reason"
+      summary: "Create a new priority"
     };
   }
 
-  // RPC method to update an existing close reason
-  rpc UpdateCloseReason(UpdateCloseReasonRequest) returns (CloseReason) {
+  // RPC method to update an existing priority
+  rpc UpdatePriority(UpdatePriorityRequest) returns (Priority) {
     option (google.api.http) = {
-      put: "/cases/closeReasons/{id}"
+      put: "/cases/priorities/{id}"
       body: "input"
       additional_bindings {
-        patch: "/cases/closeReasons/{id}"
+        patch: "/cases/priorities/{id}"
         body: "input"
       }
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Update an existing close reason"
+      summary: "Update an existing priority"
     };
   }
 
-  // RPC method to delete an existing close reason
-  rpc DeleteCloseReason(DeleteCloseReasonRequest) returns (CloseReason) {
+  // RPC method to delete an existing priority
+  rpc DeletePriority(DeletePriorityRequest) returns (Priority) {
     option (google.api.http) = {
-      delete: "/cases/closeReasons/{id}"
+      delete: "/cases/priorities/{id}"
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Delete a close reason"
+      summary: "Delete a priority"
     };
   }
 
-  // RPC method to locate a specific close reason by ID
-  rpc LocateCloseReason(LocateCloseReasonRequest) returns (LocateCloseReasonResponse) {
+  // RPC method to locate a specific priority by ID
+  rpc LocatePriority(LocatePriorityRequest) returns (LocatePriorityResponse) {
     option (google.api.http) = {
-      get: "/cases/closeReasons/{id}"
+      get: "/cases/priorities/{id}"
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Locate a close reason by ID"
+      summary: "Locate a priority by ID"
     };
   }
 }
