@@ -22612,6 +22612,42 @@
         }
       }
     },
+    "/storage/cognitive_profiles/{id}/voice": {
+      "get": {
+        "tags": [
+          "CognitiveProfileService"
+        ],
+        "summary": "Search Voices",
+        "operationId": "SearchCognitiveProfileVoices",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "key",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storageListCognitiveProfileVoices"
+            }
+          }
+        }
+      }
+    },
     "/storage/file": {
       "delete": {
         "tags": [
@@ -22633,6 +22669,205 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/storageDeleteFilesResponse"
+            }
+          }
+        }
+      }
+    },
+    "/storage/file_policies": {
+      "get": {
+        "tags": [
+          "FilePoliciesService"
+        ],
+        "summary": "List of FilePolicy",
+        "operationId": "SearchFilePolicies",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "name": "id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storageListFilePolicies"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "FilePoliciesService"
+        ],
+        "summary": "Create FilePolicy",
+        "operationId": "CreateFilePolicy",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/storageCreateFilePolicyRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storageFilePolicy"
+            }
+          }
+        }
+      }
+    },
+    "/storage/file_policies/{id}": {
+      "get": {
+        "tags": [
+          "FilePoliciesService"
+        ],
+        "summary": "FilePolicy item",
+        "operationId": "ReadFilePolicy",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storageFilePolicy"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "FilePoliciesService"
+        ],
+        "summary": "Update FilePolicy",
+        "operationId": "UpdateFilePolicy",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/storageUpdateFilePolicyRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storageFilePolicy"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "FilePoliciesService"
+        ],
+        "summary": "Remove FilePolicy",
+        "operationId": "DeleteFilePolicy",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storageFilePolicy"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "FilePoliciesService"
+        ],
+        "summary": "Patch FilePolicy",
+        "operationId": "PatchFilePolicy",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/storagePatchFilePolicyRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storageFilePolicy"
             }
           }
         }
@@ -39403,6 +39638,17 @@
         }
       }
     },
+    "storageCognitiveProfileVoice": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
     "storageCreateBackendProfileRequest": {
       "type": "object",
       "properties": {
@@ -39476,6 +39722,41 @@
         },
         "service": {
           "$ref": "#/definitions/storageServiceType"
+        }
+      }
+    },
+    "storageCreateFilePolicyRequest": {
+      "type": "object",
+      "properties": {
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "mime_types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "name": {
+          "type": "string"
+        },
+        "speed_download": {
+          "type": "string",
+          "format": "int64"
+        },
+        "speed_upload": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -39554,6 +39835,59 @@
     },
     "storageDeleteFilesResponse": {
       "type": "object"
+    },
+    "storageFilePolicy": {
+      "type": "object",
+      "properties": {
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "created_by": {
+          "$ref": "#/definitions/engineLookup"
+        },
+        "description": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "mime_types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "name": {
+          "type": "string"
+        },
+        "speed_download": {
+          "type": "string",
+          "format": "int64"
+        },
+        "speed_upload": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_by": {
+          "$ref": "#/definitions/engineLookup"
+        }
+      }
     },
     "storageFileTranscriptSafeResponse": {
       "type": "object",
@@ -39646,6 +39980,32 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/storageCognitiveProfile"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "storageListCognitiveProfileVoices": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/storageCognitiveProfileVoice"
+          }
+        }
+      }
+    },
+    "storageListFilePolicies": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/storageFilePolicy"
           }
         },
         "next": {
@@ -39817,6 +40177,51 @@
         }
       }
     },
+    "storagePatchFilePolicyRequest": {
+      "type": "object",
+      "properties": {
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "mime_types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "name": {
+          "type": "string"
+        },
+        "speed_download": {
+          "type": "string",
+          "format": "int64"
+        },
+        "speed_upload": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "storagePatchImportTemplateRequest": {
       "description": "Patch import template for CSV",
       "type": "object",
@@ -39899,6 +40304,10 @@
           "type": "string",
           "format": "int64"
         },
+        "generate_thumbnail": {
+          "type": "boolean",
+          "format": "boolean"
+        },
         "mime_type": {
           "type": "string"
         },
@@ -39964,6 +40373,9 @@
         "size": {
           "type": "string",
           "format": "int64"
+        },
+        "thumbnail": {
+          "$ref": "#/definitions/storageThumbnail"
         },
         "uuid": {
           "type": "string"
@@ -40048,6 +40460,21 @@
         },
         "uuid": {
           "type": "string"
+        }
+      }
+    },
+    "storageThumbnail": {
+      "type": "object",
+      "properties": {
+        "mime_type": {
+          "type": "string"
+        },
+        "scale": {
+          "type": "string"
+        },
+        "size": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -40144,6 +40571,45 @@
         }
       }
     },
+    "storageUpdateFilePolicyRequest": {
+      "type": "object",
+      "properties": {
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "mime_types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "name": {
+          "type": "string"
+        },
+        "speed_download": {
+          "type": "string",
+          "format": "int64"
+        },
+        "speed_upload": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "storageUpdateImportTemplateRequest": {
       "description": "Update import template for CSV",
       "type": "object",
@@ -40178,7 +40644,8 @@
         "UnknownChannel",
         "ChatChannel",
         "MailChannel",
-        "CallChannel"
+        "CallChannel",
+        "LogChannel"
       ]
     },
     "storageUploadFileRequestMetadata": {
@@ -40190,6 +40657,10 @@
         "domain_id": {
           "type": "string",
           "format": "int64"
+        },
+        "generate_thumbnail": {
+          "type": "boolean",
+          "format": "boolean"
         },
         "mime_type": {
           "type": "string"
@@ -40232,6 +40703,9 @@
         "size": {
           "type": "string",
           "format": "int64"
+        },
+        "thumbnail": {
+          "$ref": "#/definitions/storageThumbnail"
         }
       }
     },
@@ -40254,6 +40728,9 @@
         "size": {
           "type": "string",
           "format": "int64"
+        },
+        "thumbnail": {
+          "$ref": "#/definitions/storageThumbnail"
         },
         "url": {
           "type": "string"
