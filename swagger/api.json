@@ -22171,6 +22171,590 @@
         }
       }
     },
+    "/spaces": {
+      "get": {
+        "description": "| Field       | Type \n| ----------- | ---- \n| **----------- READ-ONLY -----------** | \n| `id`        | int64 \n| `ver`       | int32 \n| `etag`      | string \n| **---------- OPERATIONAL ----------** | \n| `created_at` | int64(epoch:milli) \n| `created_by` | lookup(user) \n| `updated_at` | int64(epoch:milli) \n| `updated_by` | lookup(user) \n| **---------- ATTRIBUTES -----------** | \n| `name`      | name! \n| `home_page`   | string (home_page) \n| `state`       | bool \n| `has_children`| bool \n",
+        "tags": [
+          "Spaces"
+        ],
+        "operationId": "Spaces_ListSpaces",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Limit of result page records count.   _default(16); limit=(size\u003c=0?-1:size+1);_\n\n```javascript\nconst\n    default = 16\n  , maximum = 32\n;\n\n```",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Search term:\n`?` - matches any character\n`*` - matches 0 or more characters\nUsed to query records within a set of `qin` fields, eg: name, etc...",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "pattern": "^[+|-|!]?\\w+$",
+              "type": "string",
+              "default": "id"
+            },
+            "collectionFormat": "multi",
+            "description": "Sort result dataset of records by fields.\n```\nsort ::= *( ORDER name )\n\nORDER  = ASC / DESC\nDESC   = \"-\" / \"!\"\nASC    = [ \"+\" ]   ; Default\n```\n\nFields available\n\n- `id`(seq)\n- `domain`{name}\n- `state`",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "default": "*"
+            },
+            "collectionFormat": "multi",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Records with unique IDentifier(s).\nAccept: `id` -or- `etag`.",
+            "name": "id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.knowledgebase.SpaceList"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "Create NEW Space",
+        "operationId": "Spaces_CreateSpace",
+        "parameters": [
+          {
+            "description": "NEW Spaces source changes",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/webitel.knowledgebase.InputSpace"
+              }
+            }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Source Fields to return into result.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.knowledgebase.Space"
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{etag}": {
+      "get": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "Locate spaces source",
+        "operationId": "Spaces_LocateSpaces",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "The Space source IDentifier.\nAccept: `etag` (obsolete+) or `id`.",
+            "name": "etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Source Fields to return into result.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.knowledgebase.Space"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "Remove Space source",
+        "operationId": "Spaces_DeleteSpace",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Unique ID of the latest version of a resource.",
+            "name": "etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved into result of changes.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.knowledgebase.Space"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "NEW Update of the Space source",
+        "operationId": "Spaces_UpdateSpace",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Unique ID of the latest version of an existing resorce.",
+            "name": "etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "NEW Space source changes",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "title": "NEW Space source changes",
+              "properties": {
+                "home_page": {
+                  "description": "BIO. Short description about the space.\nOPTIONAL. Multi-lined text.",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Represents the name of the knowledge base space.",
+                  "type": "string"
+                },
+                "state": {
+                  "description": "The state of the space.",
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Source Fields to return into result.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.knowledgebase.Space"
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{space_id}/articles": {
+      "get": {
+        "tags": [
+          "Articles"
+        ],
+        "summary": "List of the Space's Article(s).",
+        "operationId": "Articles_ListArticles",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Space ID associated with.",
+            "name": "space_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page number of result dataset records. offset = (page*size)",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Size count of records on result page. limit = (size++)",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Search term: location name;\n`?` - matches any one character\n`*` - matches 0 or more characters",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Sort the result according to fields.",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved as a result.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Record(s) with unique ID only.",
+            "name": "id",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Active Article only.",
+            "name": "state",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.knowledgebase.ArticleList"
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{space_id}/articles/{article_id}/childrens": {
+      "get": {
+        "tags": [
+          "Articles"
+        ],
+        "operationId": "Articles_ListArticlesChildren",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "space ID associated with.",
+            "name": "space_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Record(s) with unique ID only.",
+            "name": "article_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.knowledgebase.ArticleList"
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{space_id}/articles/{etag}": {
+      "get": {
+        "tags": [
+          "Articles"
+        ],
+        "summary": "Locate the space's Article association.",
+        "operationId": "Articles_LocateArticle",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Space ID associated with.",
+            "name": "space_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "\\w+",
+            "description": "Unique Article link IDentifier.\nAccept: `etag` (obsolete+) or `id`.",
+            "name": "etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved into result.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.knowledgebase.Article"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Articles"
+        ],
+        "operationId": "Articles_CreateArticle",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Link space ID.",
+            "name": "space_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Unique ID of the latest version of an existing resource.",
+            "name": "etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "NEW Update of the Article link.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "title": "NEW Update of the Article link.",
+              "properties": {
+                "space_id": {
+                  "description": "[VALUE]: --------------------------------------\nSpace ID associated with.",
+                  "type": "string",
+                  "format": "int64"
+                },
+                "state": {
+                  "description": "Indicates the state of the article.",
+                  "type": "boolean"
+                },
+                "tags": {
+                  "description": "Tags associated with the article.",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "text": {
+                  "description": "The text content of the article.",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved into result of changes.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.knowledgebase.Article"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Articles"
+        ],
+        "summary": "Update the space's Article details.",
+        "operationId": "Articles_UpdateArticle",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Link space ID.",
+            "name": "space_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Unique ID of the latest version of an existing resource.",
+            "name": "etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "NEW Update of the Article link.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "title": "NEW Update of the Article link.",
+              "properties": {
+                "space_id": {
+                  "description": "[VALUE]: --------------------------------------\nSpace ID associated with.",
+                  "type": "string",
+                  "format": "int64"
+                },
+                "state": {
+                  "description": "Indicates the state of the article.",
+                  "type": "boolean"
+                },
+                "tags": {
+                  "description": "Tags associated with the article.",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "text": {
+                  "description": "The text content of the article.",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved into result of changes.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.knowledgebase.Article"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Articles"
+        ],
+        "summary": "Remove the space's Article association.",
+        "operationId": "Articles_DeleteArticle",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Space ID associated with.",
+            "name": "space_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Unique ID to remove.",
+            "name": "etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved as a result.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.knowledgebase.Article"
+            }
+          }
+        }
+      }
+    },
     "/srvinfo": {
       "get": {
         "tags": [
@@ -22612,6 +23196,42 @@
         }
       }
     },
+    "/storage/cognitive_profiles/{id}/voice": {
+      "get": {
+        "tags": [
+          "CognitiveProfileService"
+        ],
+        "summary": "Search Voices",
+        "operationId": "SearchCognitiveProfileVoices",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "key",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storageListCognitiveProfileVoices"
+            }
+          }
+        }
+      }
+    },
     "/storage/file": {
       "delete": {
         "tags": [
@@ -22633,6 +23253,205 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/storageDeleteFilesResponse"
+            }
+          }
+        }
+      }
+    },
+    "/storage/file_policies": {
+      "get": {
+        "tags": [
+          "FilePoliciesService"
+        ],
+        "summary": "List of FilePolicy",
+        "operationId": "SearchFilePolicies",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "name": "id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storageListFilePolicies"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "FilePoliciesService"
+        ],
+        "summary": "Create FilePolicy",
+        "operationId": "CreateFilePolicy",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/storageCreateFilePolicyRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storageFilePolicy"
+            }
+          }
+        }
+      }
+    },
+    "/storage/file_policies/{id}": {
+      "get": {
+        "tags": [
+          "FilePoliciesService"
+        ],
+        "summary": "FilePolicy item",
+        "operationId": "ReadFilePolicy",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storageFilePolicy"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "FilePoliciesService"
+        ],
+        "summary": "Update FilePolicy",
+        "operationId": "UpdateFilePolicy",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/storageUpdateFilePolicyRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storageFilePolicy"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "FilePoliciesService"
+        ],
+        "summary": "Remove FilePolicy",
+        "operationId": "DeleteFilePolicy",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storageFilePolicy"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "FilePoliciesService"
+        ],
+        "summary": "Patch FilePolicy",
+        "operationId": "PatchFilePolicy",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/storagePatchFilePolicyRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storageFilePolicy"
             }
           }
         }
@@ -25062,55 +25881,6 @@
         }
       }
     },
-    "/wfm/lookups/forecast_calculation/{id_1}": {
-      "get": {
-        "tags": [
-          "ForecastCalculationService"
-        ],
-        "operationId": "ForecastCalculationService_ExecuteForecastCalculation",
-        "parameters": [
-          {
-            "type": "string",
-            "format": "int64",
-            "name": "id_1",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "format": "int64",
-            "name": "team_id",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "format": "int64",
-            "name": "forecast_data.from",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "format": "int64",
-            "name": "forecast_data.to",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/wfmExecuteForecastCalculationResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        }
-      }
-    },
     "/wfm/lookups/forecast_calculation/{id}": {
       "get": {
         "tags": [
@@ -25180,6 +25950,55 @@
         }
       }
     },
+    "/wfm/lookups/forecast_calculation/{id}/execute": {
+      "get": {
+        "tags": [
+          "ForecastCalculationService"
+        ],
+        "operationId": "ForecastCalculationService_ExecuteForecastCalculation",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "team_id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "forecast_data.from",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "forecast_data.to",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/wfmExecuteForecastCalculationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        }
+      }
+    },
     "/wfm/lookups/forecast_calculation/{item.id}": {
       "put": {
         "tags": [
@@ -25204,6 +26023,12 @@
                 "item": {
                   "type": "object",
                   "properties": {
+                    "args": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
                     "created_at": {
                       "type": "string",
                       "format": "int64"
@@ -30695,6 +31520,9 @@
           "type": "string",
           "format": "int64"
         },
+        "forecast_calculation": {
+          "$ref": "#/definitions/engineLookup"
+        },
         "id": {
           "type": "string",
           "format": "int64"
@@ -31969,6 +32797,9 @@
         "domain_id": {
           "type": "string",
           "format": "int64"
+        },
+        "forecast_calculation": {
+          "$ref": "#/definitions/engineLookup"
         },
         "invite_chat_timeout": {
           "type": "integer",
@@ -37801,6 +38632,9 @@
           "type": "string",
           "format": "int64"
         },
+        "forecast_calculation": {
+          "$ref": "#/definitions/engineLookup"
+        },
         "id": {
           "type": "string",
           "format": "int64"
@@ -39397,6 +40231,17 @@
         }
       }
     },
+    "storageCognitiveProfileVoice": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
     "storageCreateBackendProfileRequest": {
       "type": "object",
       "properties": {
@@ -39470,6 +40315,45 @@
         },
         "service": {
           "$ref": "#/definitions/storageServiceType"
+        }
+      }
+    },
+    "storageCreateFilePolicyRequest": {
+      "type": "object",
+      "properties": {
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "mime_types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "name": {
+          "type": "string"
+        },
+        "retention_days": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "speed_download": {
+          "type": "string",
+          "format": "int64"
+        },
+        "speed_upload": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -39548,6 +40432,63 @@
     },
     "storageDeleteFilesResponse": {
       "type": "object"
+    },
+    "storageFilePolicy": {
+      "type": "object",
+      "properties": {
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "created_by": {
+          "$ref": "#/definitions/engineLookup"
+        },
+        "description": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "mime_types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "name": {
+          "type": "string"
+        },
+        "retention_days": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "speed_download": {
+          "type": "string",
+          "format": "int64"
+        },
+        "speed_upload": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_by": {
+          "$ref": "#/definitions/engineLookup"
+        }
+      }
     },
     "storageFileTranscriptSafeResponse": {
       "type": "object",
@@ -39640,6 +40581,32 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/storageCognitiveProfile"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "storageListCognitiveProfileVoices": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/storageCognitiveProfileVoice"
+          }
+        }
+      }
+    },
+    "storageListFilePolicies": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/storageFilePolicy"
           }
         },
         "next": {
@@ -39811,6 +40778,55 @@
         }
       }
     },
+    "storagePatchFilePolicyRequest": {
+      "type": "object",
+      "properties": {
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "mime_types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "name": {
+          "type": "string"
+        },
+        "retention_days": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "speed_download": {
+          "type": "string",
+          "format": "int64"
+        },
+        "speed_upload": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "storagePatchImportTemplateRequest": {
       "description": "Patch import template for CSV",
       "type": "object",
@@ -39893,6 +40909,10 @@
           "type": "string",
           "format": "int64"
         },
+        "generate_thumbnail": {
+          "type": "boolean",
+          "format": "boolean"
+        },
         "mime_type": {
           "type": "string"
         },
@@ -39958,6 +40978,9 @@
         "size": {
           "type": "string",
           "format": "int64"
+        },
+        "thumbnail": {
+          "$ref": "#/definitions/storageThumbnail"
         },
         "uuid": {
           "type": "string"
@@ -40042,6 +41065,21 @@
         },
         "uuid": {
           "type": "string"
+        }
+      }
+    },
+    "storageThumbnail": {
+      "type": "object",
+      "properties": {
+        "mime_type": {
+          "type": "string"
+        },
+        "scale": {
+          "type": "string"
+        },
+        "size": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -40138,6 +41176,49 @@
         }
       }
     },
+    "storageUpdateFilePolicyRequest": {
+      "type": "object",
+      "properties": {
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "mime_types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "name": {
+          "type": "string"
+        },
+        "retention_days": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "speed_download": {
+          "type": "string",
+          "format": "int64"
+        },
+        "speed_upload": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "storageUpdateImportTemplateRequest": {
       "description": "Update import template for CSV",
       "type": "object",
@@ -40172,7 +41253,8 @@
         "UnknownChannel",
         "ChatChannel",
         "MailChannel",
-        "CallChannel"
+        "CallChannel",
+        "LogChannel"
       ]
     },
     "storageUploadFileRequestMetadata": {
@@ -40184,6 +41266,10 @@
         "domain_id": {
           "type": "string",
           "format": "int64"
+        },
+        "generate_thumbnail": {
+          "type": "boolean",
+          "format": "boolean"
         },
         "mime_type": {
           "type": "string"
@@ -40226,6 +41312,9 @@
         "size": {
           "type": "string",
           "format": "int64"
+        },
+        "thumbnail": {
+          "$ref": "#/definitions/storageThumbnail"
         }
       }
     },
@@ -40248,6 +41337,9 @@
         "size": {
           "type": "string",
           "format": "int64"
+        },
+        "thumbnail": {
+          "$ref": "#/definitions/storageThumbnail"
         },
         "url": {
           "type": "string"
@@ -43227,6 +44319,235 @@
         "page": 1
       }
     },
+    "webitel.knowledgebase.Article": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "description": "The user who created this Field.",
+          "type": "string",
+          "format": "int64"
+        },
+        "created_by": {
+          "description": "Timestamp(milli) of the Field creation.",
+          "$ref": "#/definitions/webitel.knowledgebase.Lookup"
+        },
+        "etag": {
+          "description": "Unique ID of the latest version of the update.\nThis ID changes after any update to the underlying value(s).",
+          "type": "string"
+        },
+        "id": {
+          "description": "The unique ID of the association. Never changes.",
+          "type": "string"
+        },
+        "space_id": {
+          "description": "Space ID associated with.",
+          "type": "string",
+          "format": "int64"
+        },
+        "state": {
+          "description": "Indicates the state of the article.",
+          "type": "boolean"
+        },
+        "tags": {
+          "description": "Tags associated with the article.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "text": {
+          "description": "The text content of the article.",
+          "type": "string"
+        },
+        "updated_at": {
+          "description": "Timestamp(milli) of the last Field update.\nTake part in Etag generation.",
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_by": {
+          "description": "The user who performed last Update.",
+          "$ref": "#/definitions/webitel.knowledgebase.Lookup"
+        }
+      }
+    },
+    "webitel.knowledgebase.ArticleList": {
+      "description": "Article dataset.\nNOTE: Edge represents connection between two nodes.\nSo this spaceArticles.data are always subordinate to some space.id.",
+      "type": "object",
+      "properties": {
+        "data": {
+          "description": "Article dataset page.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.knowledgebase.Article"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "title": "Indicates that this is a partial result.\nMore data available upon query: ?size=${data.len}\u0026page=${page++}"
+        },
+        "page": {
+          "description": "The page number of the partial result.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "webitel.knowledgebase.InputArticle": {
+      "description": "An input of the Space's Articles.",
+      "type": "object",
+      "required": [
+        "etag"
+      ],
+      "properties": {
+        "etag": {
+          "description": "Unique ID of the latest version of an existing resource.",
+          "type": "string"
+        },
+        "space_id": {
+          "description": "[VALUE]: --------------------------------------\nSpace ID associated with.",
+          "type": "string",
+          "format": "int64"
+        },
+        "state": {
+          "description": "Indicates the state of the article.",
+          "type": "boolean"
+        },
+        "tags": {
+          "description": "Tags associated with the article.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "text": {
+          "description": "The text content of the article.",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.knowledgebase.InputSpace": {
+      "description": "The Space principal input.",
+      "type": "object",
+      "properties": {
+        "etag": {
+          "description": "Unique ID of the latest version of an existing resorce.",
+          "type": "string"
+        },
+        "home_page": {
+          "description": "BIO. Short description about the space.\nOPTIONAL. Multi-lined text.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Represents the name of the knowledge base space.",
+          "type": "string"
+        },
+        "state": {
+          "description": "The state of the space.",
+          "type": "boolean"
+        }
+      }
+    },
+    "webitel.knowledgebase.Lookup": {
+      "description": "Lookup reference information.\nSimplified search filter to uniquely identify related object.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Reference Object unique ID.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Reference Object display name.",
+          "type": "string"
+        },
+        "type": {
+          "description": "Reference Object well-known type.",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.knowledgebase.Space": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "description": "The timestamp when the space was created (in Unix time).",
+          "type": "string",
+          "format": "int64"
+        },
+        "created_by": {
+          "description": "The user who created the space.",
+          "$ref": "#/definitions/webitel.knowledgebase.Lookup"
+        },
+        "domain": {
+          "description": "READONLY. The space's metadata.",
+          "$ref": "#/definitions/webitel.knowledgebase.Lookup"
+        },
+        "etag": {
+          "description": "Unique ID of the latest version of the update.\nThis ID changes after any update to the underlying value(s).",
+          "type": "string"
+        },
+        "has_children": {
+          "description": "Indicates if the space has children.",
+          "type": "boolean"
+        },
+        "home_page": {
+          "description": "BIO. Short description about the space.",
+          "type": "string"
+        },
+        "id": {
+          "description": "The unique ID of the association. Never changes.",
+          "type": "string"
+        },
+        "mode": {
+          "description": "[R]ecord[b]ased[A]ccess[C]ontrol mode granted.",
+          "type": "string"
+        },
+        "name": {
+          "description": "The name of the space.",
+          "type": "string"
+        },
+        "state": {
+          "description": "The state of the space.",
+          "type": "boolean"
+        },
+        "updated_at": {
+          "description": "The timestamp when the space was last updated (in Unix time).",
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_by": {
+          "description": "The user who last updated the space.",
+          "$ref": "#/definitions/webitel.knowledgebase.Lookup"
+        },
+        "ver": {
+          "description": "READONLY. Operational attributes\nVersion of the latest update. Numeric sequence.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "webitel.knowledgebase.SpaceList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "description": "Space(s) dataset page.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.knowledgebase.Space"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "title": "Indicates that this is a partial result.\nMore data available upon query: ?size=${data.len}\u0026page=${page++}"
+        },
+        "page": {
+          "description": "The page number of the partial result.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
     "wfmAbsence": {
       "type": "object",
       "properties": {
@@ -43484,6 +44805,12 @@
     "wfmForecastCalculation": {
       "type": "object",
       "properties": {
+        "args": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "created_at": {
           "type": "string",
           "format": "int64"

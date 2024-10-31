@@ -11,7 +11,7 @@ import "filter.proto";
 option go_package = "github.com/webitel/protos/wfm;wfm";
 
 service ForecastCalculationService {
-  option (option.objclass) = "forecast_calculations";
+  option (option.objclass) = "wfm_lookups";
   rpc CreateForecastCalculation(CreateForecastCalculationRequest) returns (CreateForecastCalculationResponse) {
     option (option.access) = ACTION_CREATE;
     option (google.api.http) = {
@@ -45,7 +45,7 @@ service ForecastCalculationService {
 
   rpc ExecuteForecastCalculation(ExecuteForecastCalculationRequest) returns (ExecuteForecastCalculationResponse) {
     option (option.access) = ACTION_READ;
-    option (google.api.http) = {get: "/wfm/lookups/forecast_calculation/{id}"};
+    option (google.api.http) = {get: "/wfm/lookups/forecast_calculation/{id}/execute"};
   }
 }
 
@@ -164,25 +164,36 @@ message ExecuteForecastCalculationResponse {
 }
 
 message ForecastCalculation {
-  option (buf.validate.message).cel = {
-    id: "procedure"
-    message: "procedure should be stored in wfm scheme and name should contains only a-z, A-Z, 0-9, _ (example: wfm.proc_name(1, foo, $bar))"
-    expression: 'this.procedure.matches("^wfm\\\\.\\\\w+\\\\(.*\\\\)$")'
-  };
-
   int64 id = 1;
   int64 domain_id = 2;
   string name = 3 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.min_len = 1,
-    (buf.validate.field).string.max_len = 250
+    (buf.validate.field).string = {
+      min_len: 1,
+      max_len: 250
+    }
   ];
 
   optional string description = 4;
-  string procedure = 5 [(buf.validate.field).required = true];
+  string procedure = 5 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel = {
+      id: "procedure"
+      message: "procedure should be stored in wfm scheme and name should contains only a-z, A-Z, 0-9, _ (example: wfm.proc_name)"
+      expression: 'this.matches("^wfm\\\\.\\\\w+$")'
+    }
+  ];
 
-  int64 created_at = 6;
-  LookupEntity created_by = 7;
-  int64 updated_at = 8;
-  LookupEntity updated_by = 9;
+  repeated string args = 6 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).repeated = {
+      unique: true,
+      min_items: 3
+    }
+  ];
+
+  int64 created_at = 7;
+  LookupEntity created_by = 8;
+  int64 updated_at = 9;
+  LookupEntity updated_by = 10;
 }

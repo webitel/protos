@@ -32,6 +32,13 @@ enum UploadFileChannel {
     ChatChannel = 1;
     MailChannel = 2;
     CallChannel = 3;
+    LogChannel = 4;
+}
+
+message Thumbnail {
+    string mime_type = 1;
+    int64 size = 2;
+    string scale = 3;
 }
 
 message GenerateFileLinkRequest {
@@ -52,6 +59,7 @@ message DownloadFileRequest {
     bool metadata = 3;
     int64 offset = 4;
     int64 buffer_size = 5;
+    bool fetch_thumbnail = 6;
 }
 
 message StreamFile {
@@ -63,6 +71,7 @@ message StreamFile {
         string uuid = 4;
         int64 size = 5;
         string sha256sum = 6;
+        Thumbnail thumbnail = 7;
     }
 
     oneof data {
@@ -87,6 +96,7 @@ message UploadFileUrlRequest {
     string url = 4;
     string mime = 5;
     UploadFileChannel channel = 6;
+    bool generate_thumbnail = 7;
 }
 
 message UploadFileUrlResponse {
@@ -96,6 +106,7 @@ message UploadFileUrlResponse {
     int64 size = 5;
     UploadStatusCode code = 6;
     string sha256sum = 7;
+    Thumbnail thumbnail = 8;
 }
 
 message UploadFileRequest {
@@ -108,6 +119,7 @@ message UploadFileRequest {
         bool stream_response = 5;
         int64 profile_id = 6;
         UploadFileChannel channel = 7;
+        bool generate_thumbnail = 8;
     }
 
     oneof data {
@@ -136,6 +148,7 @@ message SafeUploadFileRequest {
         int64 profile_id = 6;
         bool progress = 7;
         UploadFileChannel channel = 8;
+        bool generate_thumbnail = 9;
     }
 
     oneof data {
@@ -159,6 +172,7 @@ message SafeUploadFileResponse {
         string name = 7;
         string mime_type = 8;
         string uuid = 9;
+        Thumbnail thumbnail = 10;
     }
 
     message Part {
@@ -184,4 +198,5 @@ message UploadFileResponse {
     UploadStatusCode code = 4;
     string server = 5;
     string sha256sum = 6;
+    Thumbnail thumbnail = 7;
 }
