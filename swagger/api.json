@@ -183,9 +183,9 @@
     "/agent/chats": {
       "get": {
         "tags": [
-          "AgentChatsService"
+          "AgentChatService"
         ],
-        "operationId": "AgentChatsService_GetAgentChats",
+        "operationId": "AgentChatService_GetAgentChats",
         "parameters": [
           {
             "type": "integer",
@@ -239,9 +239,9 @@
     "/agent/chats/{chat_id}": {
       "patch": {
         "tags": [
-          "AgentChatsService"
+          "AgentChatService"
         ],
-        "operationId": "AgentChatsService_MarkChatProcessed",
+        "operationId": "AgentChatService_MarkChatProcessed",
         "parameters": [
           {
             "type": "string",
@@ -41358,6 +41358,10 @@
     "webitel.chat.AgentChat": {
       "type": "object",
       "properties": {
+        "client": {
+          "title": "External user (either type user or contact)",
+          "$ref": "#/definitions/webitel.chat.Peer"
+        },
         "close_reason": {
           "type": "string",
           "title": "Close reason (from agent perspective)"
@@ -41379,7 +41383,7 @@
           "$ref": "#/definitions/webitel.chat.Message"
         },
         "queue": {
-          "title": "Queue name (unreal)",
+          "title": "Queue name",
           "$ref": "#/definitions/webitel.chat.Peer"
         },
         "started_at": {
@@ -41393,7 +41397,7 @@
         },
         "unprocessed_close": {
           "type": "boolean",
-          "title": "Special attribute for the closed-active chats (on fact closed but should be on active tab on the front-end)\ncan be true only when close reason = any(\"agent_timeout\", \"client_timeout\", \"silence_timeout\", \"client_leave\")"
+          "title": "Special attribute for the closed-active chats (on fact closed but should be on active tab on the front-end)\ncan be true only when close reason = any(\"client_leave\", \"client_timeout\", \"agent_timeout\", \"silence_timeout\")"
         }
       }
     },
