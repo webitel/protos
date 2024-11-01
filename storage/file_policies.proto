@@ -52,6 +52,13 @@ service FilePoliciesService {
       delete: "/storage/file_policies/{id}"
     };
   }
+
+  rpc MovePositionFilePolicy(MovePositionFilePolicyRequest) returns (MovePositionFilePolicyResponse) {
+    option (google.api.http) = {
+      patch: "/storage/file_policies/{from_id}/to/{to_id}"
+      body: "*"
+    };
+  }
 }
 
 message FilePolicy {
@@ -68,7 +75,7 @@ message FilePolicy {
   string description = 11;
   repeated string channels = 12;
   int32 retention_days = 13;
-  int32 priority = 14;
+  int32 position = 14;
   int64 max_upload_size = 15;
 }
 
@@ -81,8 +88,7 @@ message CreateFilePolicyRequest {
   string description = 6;
   repeated string channels = 7;
   int32 retention_days = 8;
-  int32 priority = 9;
-  int64 max_upload_size = 10;
+  int64 max_upload_size = 9;
 }
 
 message ListFilePolicies {
@@ -115,8 +121,7 @@ message UpdateFilePolicyRequest {
   string description = 7;
   repeated string channels = 8;
   int32 retention_days = 9;
-  int32 priority = 10;
-  int64 max_upload_size = 11;
+  int64 max_upload_size = 10;
 }
 
 message PatchFilePolicyRequest {
@@ -130,10 +135,18 @@ message PatchFilePolicyRequest {
   string description = 8;
   repeated string channels = 9;
   int32 retention_days = 10;
-  int32 priority = 11;
-  int64 max_upload_size = 12;
+  int64 max_upload_size = 11;
 }
 
 message DeleteFilePolicyRequest {
   int32 id = 1;
+}
+
+message MovePositionFilePolicyRequest {
+  int32 from_id = 1;
+  int32 to_id = 2;
+}
+
+message MovePositionFilePolicyResponse {
+  bool success = 1;
 }
