@@ -5928,6 +5928,49 @@
         "tags": [
           "Articles"
         ]
+      },
+      "post": {
+        "operationId": "Articles_CreateArticle",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.knowledgebase.ArticleList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "space_id",
+            "description": "Link space ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "input",
+            "description": "NEW Update of the Article link.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.knowledgebase.InputArticle"
+            }
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved into result of changes.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Articles"
+        ]
       }
     },
     "/spaces/{space_id}/articles/{article_id}/childrens": {
@@ -5955,6 +5998,51 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "sort",
+            "description": "Sort the result according to fields.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved as a result.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "page",
+            "description": "Page number of result dataset records. offset = (page*size)",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "description": "Size count of records on result page. limit = (size++)",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "state",
+            "description": "Active Article only.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -6055,7 +6143,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/webitel.knowledgebase.Article"
+              "$ref": "#/definitions/webitel.knowledgebase.ArticleList"
             }
           }
         },
@@ -6101,79 +6189,14 @@
                     "type": "string"
                   },
                   "description": "Tags associated with the article."
-                }
-              },
-              "title": "NEW Update of the Article link."
-            }
-          },
-          {
-            "name": "fields",
-            "description": "Fields to be retrieved into result of changes.",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          }
-        ],
-        "tags": [
-          "Articles"
-        ]
-      },
-      "put": {
-        "operationId": "Articles_CreateArticle",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.knowledgebase.Article"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "space_id",
-            "description": "Link space ID.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "etag",
-            "description": "Unique ID of the latest version of an existing resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "input",
-            "description": "NEW Update of the Article link.",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "space_id": {
+                },
+                "title": {
                   "type": "string",
-                  "format": "int64",
-                  "description": "[VALUE]: --------------------------------------\nSpace ID associated with."
+                  "description": "The title of the article."
                 },
-                "state": {
-                  "type": "boolean",
-                  "description": "Indicates the state of the article."
-                },
-                "text": {
+                "parent_article": {
                   "type": "string",
-                  "description": "The text content of the article."
-                },
-                "tags": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  },
-                  "description": "Tags associated with the article."
+                  "description": "The parent article ID."
                 }
               },
               "title": "NEW Update of the Article link."
@@ -9611,6 +9634,18 @@
             "type": "string"
           },
           "description": "Tags associated with the article."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the article."
+        },
+        "parent_article": {
+          "type": "string",
+          "description": "The parent article ID."
+        },
+        "has_children": {
+          "type": "boolean",
+          "description": "Indicates that the article has children."
         }
       }
     },
@@ -9663,6 +9698,14 @@
             "type": "string"
           },
           "description": "Tags associated with the article."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the article."
+        },
+        "parent_article": {
+          "type": "string",
+          "description": "The parent article ID."
         }
       },
       "description": "An input of the Space's Articles.",
