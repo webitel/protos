@@ -1,0 +1,192 @@
+syntax = "proto3";
+
+package wfm;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "proto/webitel/option.proto";
+import "lookup.proto";
+
+option go_package = "github.com/webitel/protos/wfm;wfm";
+
+service WorkingScheduleService {
+  option (option.objclass) = "working_schedules";
+  rpc CreateWorkingSchedule(CreateWorkingScheduleRequest) returns (CreateWorkingScheduleResponse) {
+    option (option.access) = ACTION_CREATE;
+    option (google.api.http) = {
+      post: "/wfm/lookups/working_schedules"
+      body: "*"
+    };
+  }
+
+  rpc ReadWorkingSchedule(ReadWorkingScheduleRequest) returns (ReadWorkingScheduleResponse) {
+    option (option.access) = ACTION_READ;
+    option (google.api.http) = {get: "/wfm/lookups/working_schedules/{id}"};
+  }
+
+  rpc SearchWorkingSchedule(SearchWorkingScheduleRequest) returns (SearchWorkingScheduleResponse) {
+    option (option.access) = ACTION_READ;
+    option (google.api.http) = {get: "/wfm/lookups/working_schedules"};
+  }
+  
+  rpc UpdateWorkingSchedule(UpdateWorkingScheduleRequest) returns (UpdateWorkingScheduleResponse) {
+    option (option.access) = ACTION_UPDATE;
+    option (google.api.http) = {
+      put: "/wfm/lookups/working_schedules/{item.id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteWorkingSchedule(DeleteWorkingScheduleRequest) returns (DeleteWorkingScheduleResponse) {
+    option (option.access) = ACTION_DELETE;
+    option (google.api.http) = {delete: "/wfm/lookups/working_schedules/{id}"};
+  }
+}
+
+message CreateWorkingScheduleRequest {
+  WorkingSchedule item = 1 [(buf.validate.field).required = true];
+}
+
+message CreateWorkingScheduleResponse {
+  WorkingSchedule item = 1;
+}
+
+message ReadWorkingScheduleRequest {
+  int64 id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64.gt = 0
+  ];
+
+  repeated string fields = 2 [(buf.validate.field).repeated = {
+    unique: true,
+    items {
+      string {
+        min_len: 1,
+        in: [
+          'id',
+          'domain_id',
+          'name',
+          'state',
+          'team',
+          'start_date_at',
+          'end_date_at',
+          'start_time_at',
+          'end_time_at',
+          'extra_skills',
+          'block_outside_activity',
+          'agents',
+          'created_at',
+          'created_by',
+          'updated_at',
+          'updated_by'
+        ]
+      }
+    }
+  }];
+}
+
+message ReadWorkingScheduleResponse {
+  WorkingSchedule item = 1;
+}
+
+message SearchWorkingScheduleRequest {
+  optional string q = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 250
+  ];
+
+  optional int32 page = 2 [(buf.validate.field).int32.gt = 0];
+  optional int32 size = 3 [(buf.validate.field).int32.gt = 0];
+
+  optional string sort = 4;
+
+  repeated string fields = 5 [(buf.validate.field).repeated = {
+    unique: true,
+    items {
+      string {
+        min_len: 1,
+        in: [
+          'id',
+          'domain_id',
+          'name',
+          'state',
+          'team',
+          'start_date_at',
+          'end_date_at',
+          'start_time_at',
+          'end_time_at',
+          'extra_skills',
+          'block_outside_activity',
+          'agents',
+          'created_at',
+          'created_by',
+          'updated_at',
+          'updated_by'
+        ]
+      }
+    }
+  }];
+}
+
+message SearchWorkingScheduleResponse {
+  repeated WorkingSchedule items = 1;
+  bool next = 2;
+}
+
+message UpdateWorkingScheduleRequest {
+  WorkingSchedule item = 1 [(buf.validate.field).required = true];
+}
+
+message UpdateWorkingScheduleResponse {
+  WorkingSchedule item = 1;
+}
+
+message DeleteWorkingScheduleRequest {
+  int64 id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64.gt = 0
+  ];
+}
+
+message DeleteWorkingScheduleResponse {
+  int64 id = 1;
+}
+
+enum WorkingScheduleState {
+  WORKING_SCHEDULE_STATE_UNSPECIFIED = 0;
+  WORKING_SCHEDULE_STATE_DRAFT = 1;
+  WORKING_SCHEDULE_STATE_PENDING = 2;
+  WORKING_SCHEDULE_STATE_ACTIVE = 3;
+  WORKING_SCHEDULE_STATE_ARCHIVED = 4;
+}
+
+message WorkingSchedule {
+  int64 id = 1;
+  int64 domain_id = 2;
+  string name = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 250
+  ];
+
+  WorkingScheduleState state = 4;
+
+  LookupEntity team = 5;
+  LookupEntity calendar = 6;
+
+  int64 start_date_at = 7;
+  int64 end_date_at = 8;
+
+  int64 start_time_at = 9;
+  int64 end_time_at = 10;
+
+  repeated LookupEntity extra_skills = 11;
+  bool block_outside_activity = 12;
+
+  repeated LookupEntity agents = 13;
+
+  int64 created_at = 14;
+  LookupEntity created_by = 15;
+  int64 updated_at = 16;
+  LookupEntity updated_by = 17;
+}
