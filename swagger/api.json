@@ -22491,6 +22491,48 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "Articles"
+        ],
+        "operationId": "Articles_CreateArticle",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Link space ID.",
+            "name": "space_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "NEW Update of the Article link.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.knowledgebase.InputArticle"
+            }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved into result of changes.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.knowledgebase.ArticleList"
+            }
+          }
+        }
       }
     },
     "/spaces/{space_id}/articles/{article_id}/childrens": {
@@ -22513,6 +22555,46 @@
             "name": "article_id",
             "in": "path",
             "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Sort the result according to fields.",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved as a result.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page number of result dataset records. offset = (page*size)",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Size count of records on result page. limit = (size++)",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Active Article only.",
+            "name": "state",
+            "in": "query"
           }
         ],
         "responses": {
@@ -22568,78 +22650,6 @@
           }
         }
       },
-      "put": {
-        "tags": [
-          "Articles"
-        ],
-        "operationId": "Articles_CreateArticle",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "Link space ID.",
-            "name": "space_id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "Unique ID of the latest version of an existing resource.",
-            "name": "etag",
-            "in": "path",
-            "required": true
-          },
-          {
-            "description": "NEW Update of the Article link.",
-            "name": "input",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "title": "NEW Update of the Article link.",
-              "properties": {
-                "space_id": {
-                  "description": "[VALUE]: --------------------------------------\nSpace ID associated with.",
-                  "type": "string",
-                  "format": "int64"
-                },
-                "state": {
-                  "description": "Indicates the state of the article.",
-                  "type": "boolean"
-                },
-                "tags": {
-                  "description": "Tags associated with the article.",
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "text": {
-                  "description": "The text content of the article.",
-                  "type": "string"
-                }
-              }
-            }
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
-            "description": "Fields to be retrieved into result of changes.",
-            "name": "fields",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.knowledgebase.Article"
-            }
-          }
-        }
-      },
       "post": {
         "tags": [
           "Articles"
@@ -22670,6 +22680,10 @@
               "type": "object",
               "title": "NEW Update of the Article link.",
               "properties": {
+                "parent_article": {
+                  "description": "The parent article ID.",
+                  "type": "string"
+                },
                 "space_id": {
                   "description": "[VALUE]: --------------------------------------\nSpace ID associated with.",
                   "type": "string",
@@ -22688,6 +22702,10 @@
                 },
                 "text": {
                   "description": "The text content of the article.",
+                  "type": "string"
+                },
+                "title": {
+                  "description": "The title of the article.",
                   "type": "string"
                 }
               }
@@ -22708,7 +22726,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/webitel.knowledgebase.Article"
+              "$ref": "#/definitions/webitel.knowledgebase.ArticleList"
             }
           }
         }
@@ -23343,6 +23361,46 @@
         }
       }
     },
+    "/storage/file_policies/{from_id}/to/{to_id}": {
+      "patch": {
+        "tags": [
+          "FilePoliciesService"
+        ],
+        "operationId": "MovePositionFilePolicy",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "from_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "to_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/storageMovePositionFilePolicyRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storageMovePositionFilePolicyResponse"
+            }
+          }
+        }
+      }
+    },
     "/storage/file_policies/{id}": {
       "get": {
         "tags": [
@@ -23452,6 +23510,39 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/storageFilePolicy"
+            }
+          }
+        }
+      }
+    },
+    "/storage/file_policies/{id}/apply": {
+      "patch": {
+        "tags": [
+          "FilePoliciesService"
+        ],
+        "operationId": "FilePolicyApply",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/storageFilePolicyApplyRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storageFilePolicyApplyResponse"
             }
           }
         }
@@ -40334,6 +40425,10 @@
           "type": "boolean",
           "format": "boolean"
         },
+        "max_upload_size": {
+          "type": "string",
+          "format": "int64"
+        },
         "mime_types": {
           "type": "array",
           "items": {
@@ -40460,6 +40555,10 @@
           "type": "integer",
           "format": "int32"
         },
+        "max_upload_size": {
+          "type": "string",
+          "format": "int64"
+        },
         "mime_types": {
           "type": "array",
           "items": {
@@ -40468,6 +40567,10 @@
         },
         "name": {
           "type": "string"
+        },
+        "position": {
+          "type": "integer",
+          "format": "int32"
         },
         "retention_days": {
           "type": "integer",
@@ -40487,6 +40590,24 @@
         },
         "updated_by": {
           "$ref": "#/definitions/engineLookup"
+        }
+      }
+    },
+    "storageFilePolicyApplyRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "storageFilePolicyApplyResponse": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -40693,6 +40814,28 @@
         }
       }
     },
+    "storageMovePositionFilePolicyRequest": {
+      "type": "object",
+      "properties": {
+        "from_id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "to_id": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "storageMovePositionFilePolicyResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
     "storagePatchBackendProfileRequest": {
       "type": "object",
       "properties": {
@@ -40803,6 +40946,10 @@
         "id": {
           "type": "integer",
           "format": "int32"
+        },
+        "max_upload_size": {
+          "type": "string",
+          "format": "int64"
         },
         "mime_types": {
           "type": "array",
@@ -41063,6 +41210,9 @@
           "type": "string",
           "format": "int64"
         },
+        "thumbnail": {
+          "$ref": "#/definitions/storageThumbnail"
+        },
         "uuid": {
           "type": "string"
         }
@@ -41196,6 +41346,10 @@
           "type": "integer",
           "format": "int32"
         },
+        "max_upload_size": {
+          "type": "string",
+          "format": "int64"
+        },
         "mime_types": {
           "type": "array",
           "items": {
@@ -41254,7 +41408,8 @@
         "ChatChannel",
         "MailChannel",
         "CallChannel",
-        "LogChannel"
+        "LogChannel",
+        "MediaChannel"
       ]
     },
     "storageUploadFileRequestMetadata": {
@@ -41358,10 +41513,6 @@
     "webitel.chat.AgentChat": {
       "type": "object",
       "properties": {
-        "client": {
-          "title": "External user (either type user or contact)",
-          "$ref": "#/definitions/webitel.chat.Peer"
-        },
         "close_reason": {
           "type": "string",
           "title": "Close reason (from agent perspective)"
@@ -41369,6 +41520,10 @@
         "closed_at": {
           "type": "string",
           "format": "int64"
+        },
+        "contact": {
+          "title": "Connected contact",
+          "$ref": "#/definitions/webitel.chat.Peer"
         },
         "gateway": {
           "title": "Chat gateway",
@@ -44339,8 +44494,16 @@
           "description": "Unique ID of the latest version of the update.\nThis ID changes after any update to the underlying value(s).",
           "type": "string"
         },
+        "has_children": {
+          "description": "Indicates that the article has children.",
+          "type": "boolean"
+        },
         "id": {
           "description": "The unique ID of the association. Never changes.",
+          "type": "string"
+        },
+        "parent_article": {
+          "description": "The parent article ID.",
           "type": "string"
         },
         "space_id": {
@@ -44361,6 +44524,10 @@
         },
         "text": {
           "description": "The text content of the article.",
+          "type": "string"
+        },
+        "title": {
+          "description": "The title of the article.",
           "type": "string"
         },
         "updated_at": {
@@ -44408,6 +44575,10 @@
           "description": "Unique ID of the latest version of an existing resource.",
           "type": "string"
         },
+        "parent_article": {
+          "description": "The parent article ID.",
+          "type": "string"
+        },
         "space_id": {
           "description": "[VALUE]: --------------------------------------\nSpace ID associated with.",
           "type": "string",
@@ -44426,6 +44597,10 @@
         },
         "text": {
           "description": "The text content of the article.",
+          "type": "string"
+        },
+        "title": {
+          "description": "The title of the article.",
           "type": "string"
         }
       }
