@@ -104,20 +104,24 @@ service CaseComments {
     };
   }
 
-  // Merges multiple comments into a case.
-  rpc MergeComments(MergeCommentsRequest) returns (CaseCommentList) {
+  // Publish comment into a case.
+  rpc PublishComment(PublishCommentRequest) returns (CaseCommentList) {
     option (google.api.http) = {
       post: "/cases/{case_etag}/comments"
       body: "input"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Merge multiple comments into a specific case"
+      summary: "Publish comment into a specific case"
     };
   }
 }
 
 // Input structure for creating or updating a case comment.
 message InputCaseComment {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    // POST /cases/{case_etag}/comments
+    example: "{\"text\":\"My new comment\"}"
+  };
   // Identifier for the comment.
   string etag = 1;
 
@@ -186,8 +190,8 @@ message ListCommentsRequest {
   string case_etag = 9;
 }
 
-// Request to merge multiple comments into a single case.
-message MergeCommentsRequest {
+// Request to publish comment into a case.
+message PublishCommentRequest {
   // JSON fields specified in the front-end request.
   repeated string x_json_mask = 1
     [(google.api.field_visibility) = {
@@ -204,6 +208,6 @@ message MergeCommentsRequest {
   // Etag or ID of the case to which comments belong.
   string case_etag = 3;
 
-  // List of comments to merge.
-  repeated InputCaseComment input = 4;
+  // Comment to publish.
+  InputCaseComment input = 4;
 }
