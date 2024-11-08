@@ -7,6 +7,7 @@ import "general.proto";
 import "google/api/visibility.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
+import "proto/webitel/option.proto";
 
 
 message CaseLink {
@@ -37,14 +38,17 @@ message CaseLinkList {
 
 
 service CaseLinks {
+  option (option.objclass) = "cases";
   /*  Itself  */
 
   rpc LocateLink(LocateLinkRequest) returns (CaseLink) {
+    option (option.access) = ACTION_READ;
     option (google.api.http) = {
       get: "/cases/links/{etag}"
     };
   }
   rpc UpdateLink(UpdateLinkRequest) returns (CaseLink) {
+    option (option.access) = ACTION_READ;
     option (google.api.http) = {
       put: "/cases/links/{input.etag}"
       body: "input"
@@ -55,6 +59,7 @@ service CaseLinks {
     };
   }
   rpc DeleteLink(DeleteLinkRequest) returns (CaseLink) {
+    option (option.access) = ACTION_READ;
     option (google.api.http) = {
       delete: "/cases/links/{etag}"
     };

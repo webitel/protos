@@ -7,6 +7,7 @@ import "general.proto";
 import "google/api/visibility.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "google/api/annotations.proto";
+import "proto/webitel/option.proto";
 
 // Service message represents a service entity within a catalog
 message Service {
@@ -155,6 +156,8 @@ message LocateServiceResponse {
 
 // Service definition for managing services within catalogs
 service Services {
+  option (option.objclass) = "dictionaries";
+
   // RPC method to list or search services within a catalog
   rpc ListServices(ListServiceRequest) returns (ServiceList) {
     option (google.api.http) = {
@@ -164,6 +167,8 @@ service Services {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Retrieve a list of services or search services within a catalog"
     };
+
+    option (option.access) = ACTION_READ;
   }
 
   // RPC method to create a new service within a catalog
@@ -176,6 +181,8 @@ service Services {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Create a new service within a catalog"
     };
+
+    option (option.access) = ACTION_CREATE;
   }
 
   // RPC method to update an existing service
@@ -192,6 +199,8 @@ service Services {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Update an existing service"
     };
+
+    option (option.access) = ACTION_UPDATE;
   }
 
   // RPC method to delete a service
@@ -203,6 +212,8 @@ service Services {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Delete a service"
     };
+
+    option (option.access) = ACTION_DELETE;
   }
 
   // RPC method to locate a specific service by ID
@@ -214,5 +225,7 @@ service Services {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Locate a service by ID"
     };
+
+    option (option.access) = ACTION_READ;
   }
 }

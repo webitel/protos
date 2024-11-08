@@ -14,16 +14,20 @@ import "google/api/visibility.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "protoc-gen-openapiv2/options/openapiv2.proto";
+import "proto/webitel/option.proto";
 
 
 service Cases {
+  option (option.objclass) = "cases";
   rpc SearchCases(SearchCasesRequest) returns (CaseList) {
+    option (option.access) = ACTION_READ;
     option (google.api.http) = {
       get: "/cases"
     };
 
   }
   rpc LocateCase(LocateCaseRequest) returns (Case) {
+    option (option.access) = ACTION_READ;
     option (google.api.http) = {
       get: "/cases/{etag}"
     };
@@ -33,6 +37,7 @@ service Cases {
   // fill them from service (we can't change the SLA and SLA conditions)
   // etag doesn't play any role on this API
   rpc CreateCase(CreateCaseRequest) returns (Case) {
+    option (option.access) = ACTION_CREATE;
     option (google.api.http) = {
       post: "/cases"
       body: "input"
@@ -43,6 +48,7 @@ service Cases {
   // service and dependent fields set from the service automatically (we can't change the SLA, SLA conditions )
   // etag is required to update the true version of the case
   rpc UpdateCase(UpdateCaseRequest) returns (Case) {
+    option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
       put: "/cases/{input.etag}"
       body: "input"
@@ -55,6 +61,7 @@ service Cases {
   // on delete, we should require etag, to understand if user has right version of the case
   // also will be deleted all objects connected to the case, such as comments, related cases, links and files
   rpc DeleteCase(DeleteCaseRequest) returns (Case) {
+    option (option.access) = ACTION_DELETE;
     option (google.api.http) = {
       delete: "/cases/{etag}"
     };
@@ -243,14 +250,23 @@ enum RelationType {
 
 
 service RelatedCases {
+    option (option.objclass) = "cases";
   /*  Itself  */
 
   rpc LocateRelatedCase(LocateRelatedCaseRequest) returns (RelatedCase) {
+    option (option.access) = ACTION_READ;
     option (google.api.http) = {
       get: "/cases/related/{etag}"
     };
   }
+  rpc CreateRelatedCase(CreateRelatedCaseRequest) returns (RelatedCase) {
+    option (option.access) = ACTION_READ;
+    option (google.api.http) = {
+      post: "/cases/related/{etag}"
+    };
+  }
   rpc UpdateRelatedCase(UpdateRelatedCaseRequest) returns (RelatedCase) {
+    option (option.access) = ACTION_READ;
     option (google.api.http) = {
       put: "/cases/related/{input.etag}"
       body: "input"
@@ -261,6 +277,7 @@ service RelatedCases {
     };
   }
   rpc DeleteRelatedCase(DeleteRelatedCaseRequest) returns (RelatedCase) {
+    option (option.access) = ACTION_READ;
     option (google.api.http) = {
       delete: "/cases/related/{etag}"
     };
@@ -272,20 +289,9 @@ service RelatedCases {
   // The related cases can be obtained bidirectionally as child or parent, but we should consider them from the perspective of the requested case, by inverting their connection type
   // Requested case always a parent and related cases a children
   rpc ListRelatedCases(ListRelatedCasesRequest) returns (RelatedCaseList) {
+    option (option.access) = ACTION_DELETE;
     option (google.api.http) = {
       get: "/cases/{case_etag}/related"
-    };
-  }
-  rpc MergeRelatedCases(MergeRelatedCasesRequest) returns (RelatedCaseList) {
-    option (google.api.http) = {
-      post: "/cases/{case_etag}/related"
-      body: "input"
-    };
-  }
-  rpc ResetRelatedCases(ResetRelatedCasesRequest) returns (RelatedCaseList) {
-    option (google.api.http) = {
-      put: "/cases/{case_etag}/related"
-      body: "input"
     };
   }
 }
@@ -326,7 +332,7 @@ message ListRelatedCasesRequest {
 }
 
 
-message MergeRelatedCasesRequest {
+message CreateRelatedCaseRequest {
  repeated string x_json_mask = 1 // list of json fields specified in front-end request (patch)
   [(google.api.field_visibility) = {
     restriction: "PREVIEW" // "INTERNAL"
@@ -337,19 +343,5 @@ message MergeRelatedCasesRequest {
   }];
   repeated string fields = 2; // result fields needed on the front-end for each comment
   string case_etag = 3; // new/existing comments belong to (id accepted)
-  repeated InputRelatedCase input = 4;
-}
-
-message ResetRelatedCasesRequest {
-  repeated string x_json_mask = 1 // list of json fields specified in front-end request (patch)
-  [(google.api.field_visibility) = {
-    restriction: "PREVIEW" // "INTERNAL"
-  },
-  (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    read_only: true
-    pattern: "^$"
-  }];
-  repeated string fields = 2; // result fields needed on the front-end for each comment
-  string case_etag = 3; // new/existing comments belong to (id accepted)
-  repeated InputRelatedCase input = 4;
+  InputRelatedCase input = 4;
 }

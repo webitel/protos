@@ -5,6 +5,7 @@ option go_package = "github.com/webitel/cases/api/cases;cases";
 
 import "general.proto";
 import "google/api/annotations.proto";
+import "proto/webitel/option.proto";
 
 message CaseFile {
   general.Lookup author = 6; // contact of the creator
@@ -29,8 +30,10 @@ message File {
 
 
 service CaseFiles {
+  option (option.objclass) = "cases";
   /*   With Case   */
   rpc ListFiles(ListFilesRequest) returns (CaseFileList) {
+    option (option.access) = ACTION_READ;
     option (google.api.http) = {
       get: "/cases/{case_etag}/files"
     };

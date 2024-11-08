@@ -8,8 +8,7 @@ import "google/api/visibility.proto";
 import "google/protobuf/wrappers.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
-
-
+import "proto/webitel/option.proto";  // Added import for option.proto
 
 // StatusCondition message represents a status entity with metadata
 message StatusCondition {
@@ -25,7 +24,7 @@ message StatusCondition {
   bool final = 5;
   // Status ID of the status condition
   int64 status_id = 6;
-   // CreatedAt timestamp of the status condition
+  // CreatedAt timestamp of the status condition
   int64 created_at = 20;
   // UpdatedAt timestamp of the status condition
   int64 updated_at = 21;
@@ -91,8 +90,6 @@ message UpdateStatusConditionRequest {
   }];
 }
 
-
-
 // DeleteStatusConditionRequest message for deleting an existing status
 message DeleteStatusConditionRequest {
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
@@ -142,6 +139,8 @@ message LocateStatusConditionResponse {
 
 // StatusConditions service definition with RPC methods for managing statuses
 service StatusConditions {
+  option (option.objclass) = "dictionaries";  // Added class option for the service
+
   // RPC method to list or search statuses
   rpc ListStatusConditions(ListStatusConditionRequest) returns (StatusConditionList) {
     option (google.api.http) = {
@@ -151,9 +150,10 @@ service StatusConditions {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Retrieve a list of statuses or search status conditions"
     };
+    option (option.access) = ACTION_READ;  // Added access option for read action
   }
 
-  // RPC method to create a new status
+  // RPC method to create a new status condition
   rpc CreateStatusCondition(CreateStatusConditionRequest) returns (StatusCondition) {
     option (google.api.http) = {
       post: "/statuses/{status_id}/status"
@@ -163,9 +163,10 @@ service StatusConditions {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Create a new status condition"
     };
+    option (option.access) = ACTION_CREATE;  // Added access option for create action
   }
 
-  // RPC method to update an existing status
+  // RPC method to update an existing status condition
   rpc UpdateStatusCondition(UpdateStatusConditionRequest) returns (StatusCondition) {
     option (google.api.http) = {
       put: "/statuses/{status_id}/status/{id}"
@@ -179,10 +180,10 @@ service StatusConditions {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Update an existing status condition"
     };
+    option (option.access) = ACTION_UPDATE;  // Added access option for update action
   }
 
-
-  // RPC method to delete an existing status
+  // RPC method to delete an existing status condition
   rpc DeleteStatusCondition(DeleteStatusConditionRequest) returns (StatusCondition) {
     option (google.api.http) = {
       delete: "/statuses/{status_id}/status/{id}"
@@ -191,9 +192,10 @@ service StatusConditions {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Delete a status condition"
     };
+    option (option.access) = ACTION_DELETE;  // Added access option for delete action
   }
 
-  // RPC method to locate a specific status by ID
+  // RPC method to locate a specific status condition by ID
   rpc LocateStatusCondition(LocateStatusConditionRequest) returns (LocateStatusConditionResponse) {
     option (google.api.http) = {
       get: "/statuses/{status_id}/status/{id}"
@@ -202,5 +204,6 @@ service StatusConditions {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Locate a status condition by ID"
     };
+    option (option.access) = ACTION_READ;  // Added access option for read action
   }
 }

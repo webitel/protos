@@ -7,6 +7,7 @@ import "general.proto";
 import "google/api/annotations.proto";
 import "google/api/visibility.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
+import "proto/webitel/option.proto";  // Added import for option.proto
 
 // Status message represents a status entity with metadata
 message Status {
@@ -49,6 +50,7 @@ message InputStatus{
   string name = 1;
   string description = 2;
 }
+
 // UpdateStatusRequest message for updating an existing status
 message UpdateStatusRequest {
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
@@ -60,7 +62,7 @@ message UpdateStatusRequest {
   int64 id = 1;
   InputStatus input = 2;
 
-    // ---- JSON PATCH fields mask ----
+  // ---- JSON PATCH fields mask ----
   // List of JPath fields specified in body(input).
   repeated string x_json_mask = 3
   [(google.api.field_visibility) = {
@@ -71,8 +73,6 @@ message UpdateStatusRequest {
     pattern: "^$"
   }];
 }
-
-
 
 // DeleteStatusRequest message for deleting an existing status
 message DeleteStatusRequest {
@@ -117,6 +117,8 @@ message LocateStatusResponse {
 
 // Statuses service definition with RPC methods for managing statuses
 service Statuses {
+  option (option.objclass) = "dictionaries";  // Added class option for the service
+
   // RPC method to list or search statuses
   rpc ListStatuses(ListStatusRequest) returns (StatusList) {
     option (google.api.http) = {
@@ -126,6 +128,7 @@ service Statuses {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Retrieve a list of statuses or search statuses"
     };
+    option (option.access) = ACTION_READ;  // Added access option for read action
   }
 
   // RPC method to create a new status
@@ -138,6 +141,7 @@ service Statuses {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Create a new status"
     };
+    option (option.access) = ACTION_CREATE;  // Added access option for create action
   }
 
   // RPC method to update an existing status
@@ -154,10 +158,8 @@ service Statuses {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Update an existing status"
     };
+    option (option.access) = ACTION_UPDATE;  // Added access option for update action
   }
-
-  // RPC method to partially update an existing status
-
 
   // RPC method to delete an existing status
   rpc DeleteStatus(DeleteStatusRequest) returns (Status) {
@@ -168,6 +170,7 @@ service Statuses {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Delete a status"
     };
+    option (option.access) = ACTION_DELETE;  // Added access option for delete action
   }
 
   // RPC method to locate a specific status by ID
@@ -179,5 +182,6 @@ service Statuses {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Locate a status by ID"
     };
+    option (option.access) = ACTION_READ;  // Added access option for read action
   }
 }

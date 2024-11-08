@@ -8,6 +8,7 @@ import "service.proto";
 import "google/api/visibility.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "google/api/annotations.proto";
+import "proto/webitel/option.proto";
 
 
 enum FetchType {
@@ -192,8 +193,10 @@ message LocateCatalogResponse {
 
 // Service definition for managing catalog entities
 service Catalogs {
+  option (option.objclass) = "dictionaries";
   // RPC method to list or search catalogs
   rpc ListCatalogs(ListCatalogRequest) returns (CatalogList) {
+    option (option.access) = ACTION_READ;
     option (google.api.http) = {
       get: "/cases/catalogs"
     };
@@ -205,6 +208,7 @@ service Catalogs {
 
   // RPC method to create a new catalog
   rpc CreateCatalog(CreateCatalogRequest) returns (Catalog) {
+    option (option.access) = ACTION_CREATE;
     option (google.api.http) = {
       post: "/cases/catalogs",
       body: "*"
@@ -217,6 +221,7 @@ service Catalogs {
 
   // RPC method to update an existing catalog
   rpc UpdateCatalog(UpdateCatalogRequest) returns (Catalog) {
+    option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
       put: "/cases/catalogs/{id}",
       body: "input"
@@ -233,6 +238,7 @@ service Catalogs {
 
   // RPC method to delete a catalog
   rpc DeleteCatalog(DeleteCatalogRequest) returns (CatalogList) {
+    option (option.access) = ACTION_DELETE;
     option (google.api.http) = {
       delete: "/cases/catalogs/{id}"
     };
@@ -244,6 +250,7 @@ service Catalogs {
 
   // RPC method to locate a specific catalog by ID
   rpc LocateCatalog(LocateCatalogRequest) returns (LocateCatalogResponse) {
+    option (option.access) = ACTION_READ;
     option (google.api.http) = {
       get: "/cases/catalogs/{id}"
     };

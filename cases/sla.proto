@@ -8,6 +8,7 @@ import "google/api/visibility.proto";
 import "google/protobuf/timestamp.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
+import "proto/webitel/option.proto";  // Added import
 
 // ReactionTime message represents the reaction time in hours and minutes
 message ReactionTime {
@@ -161,6 +162,8 @@ message LocateSLAResponse {
 
 // SLAs service definition with RPC methods for managing SLAs
 service SLAs {
+  option (option.objclass) = "dictionaries";  // Added option for the service
+
   // RPC method to list or search SLAs
   rpc ListSLAs(ListSLARequest) returns (SLAList) {
     option (google.api.http) = {
@@ -170,6 +173,7 @@ service SLAs {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Retrieve a list of SLAs or search SLA conditions"
     };
+    option (option.access) = ACTION_READ;  // Added option for method access
   }
 
   // RPC method to create a new SLA
@@ -182,6 +186,7 @@ service SLAs {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Create a new SLA"
     };
+    option (option.access) = ACTION_CREATE;  // Added option for method access
   }
 
   // RPC method to update an existing SLA
@@ -198,6 +203,7 @@ service SLAs {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Update an existing SLA"
     };
+    option (option.access) = ACTION_UPDATE;  // Added option for method access
   }
 
   // RPC method to delete an existing SLA
@@ -209,6 +215,7 @@ service SLAs {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Delete an SLA"
     };
+    option (option.access) = ACTION_DELETE;  // Added option for method access
   }
 
   // RPC method to locate a specific SLA by ID
@@ -220,5 +227,6 @@ service SLAs {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Locate an SLA by ID"
     };
+    option (option.access) = ACTION_READ;  // Added option for method access
   }
 }
