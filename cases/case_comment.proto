@@ -1,45 +1,70 @@
 syntax = "proto3";
 
-
 package webitel.cases;
 option go_package = "github.com/webitel/cases/api/cases;cases";
-
 
 import "general.proto";
 import "google/api/visibility.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-
+// Represents a comment associated with a case.
 message CaseComment {
-  int64 id = 1;
+
+  // Main identifier for read, update, and delete operations.
+  string id = 1;
+
+  // Version number of the comment, used for concurrency control.
   int32 ver = 2;
-  string etag = 3; // main field required for read, update and delete
-  general.Lookup created_by = 4;
-  int64 created_at = 5; // unixmilli
-  general.Lookup updated_by = 6;
-  int64 updated_at = 7; // unixmilli
-  general.Lookup author = 8; // contact-author
-  string text = 9; // message itself
-  bool edited = 10; // indicates if comment was edited by user, calculated on-flight (created_at < updated_at)
-  // int64 case_id = 11; // relation on case (optional)
+
+  // User who created the comment.
+  general.Lookup created_by = 3;
+
+  // Timestamp (in milliseconds) of when the comment was created.
+  int64 created_at = 4;
+
+  // User who last updated the comment.
+  general.Lookup updated_by = 5;
+
+  // Timestamp (in milliseconds) of the last update.
+  int64 updated_at = 6;
+
+  // The content of the comment.
+  string text = 7;
+
+  // Indicates if the comment was edited; true if created_at < updated_at.
+  bool edited = 8;
+
+  // Optional relation to the associated case.
+  int64 case_id = 9;
 }
 
-
+// Contains a paginated list of comments.
 message CaseCommentList {
+  // Current page number.
   int64 page = 1;
+
+  // Flag to indicate if more pages are available.
   bool next = 2;
+
+  // List of comments on the current page.
   repeated CaseComment items = 3;
 }
 
-
+// Service to manage case comments.
 service CaseComments {
-  /*  Itself  */
+
+  // Retrieves a specific comment based on its etag.
   rpc LocateComment(LocateCommentRequest) returns (CaseComment) {
-     option (google.api.http) = {
+    option (google.api.http) = {
       get: "/cases/comments/{etag}"
     };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Retrieve a specific comment by its etag"
+    };
   }
+
+  // Updates a specific comment based on the provided data.
   rpc UpdateComment(UpdateCommentRequest) returns (CaseComment) {
     option (google.api.http) = {
       put: "/cases/comments/{input.etag}"
@@ -49,99 +74,135 @@ service CaseComments {
         body: "input"
       }
     };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Update a specific comment by its etag"
+    };
   }
+
+  // Deletes a specific comment based on its etag.
   rpc DeleteComment(DeleteCommentRequest) returns (CaseComment) {
     option (google.api.http) = {
       delete: "/cases/comments/{etag}"
     };
-  }
-
-
-  /*   With Case   */
-
-  rpc ListComments(ListCommentsRequest) returns (CaseCommentList) {
-     option (google.api.http) = {
-      get: "/cases/{case_etag}/comments"
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Delete a specific comment by its etag"
     };
   }
-  rpc MergeComments(MergeCommentsRequest) returns (CaseCommentList) {
+
+  // Lists all comments associated with a specific case.
+  rpc ListComments(ListCommentsRequest) returns (CaseCommentList) {
+    option (google.api.http) = {
+      get: "/cases/{case_etag}/comments"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Retrieve a list of comments associated with a specific case"
+    };
+  }
+
+  // Publish comment into a case.
+  rpc PublishComment(PublishCommentRequest) returns (CaseComment) {
     option (google.api.http) = {
       post: "/cases/{case_etag}/comments"
       body: "input"
     };
-  }
-  rpc ResetComments(ResetCommentsRequest) returns (CaseCommentList) {
-    option (google.api.http) = {
-      put: "/cases/{case_etag}/comments"
-      body: "input"
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Publish comment into a specific case"
     };
   }
 }
 
-
+// Input structure for creating or updating a case comment.
 message InputCaseComment {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    // POST /cases/{case_etag}/comments
+    example: "{\"text\":\"My new comment\"}"
+  };
+  // Identifier for the comment.
   string etag = 1;
+
+  // Content of the comment.
   string text = 2;
 }
 
-
+// Request to locate a comment based on its etag.
 message LocateCommentRequest {
-    string etag = 1;
-    repeated string fields = 2;
+  // Identifier of the comment to retrieve.
+  string etag = 1;
+
+  // Specific fields to return for the comment.
+  repeated string fields = 2;
 }
 
+// Request to update a comment with specified data.
 message UpdateCommentRequest {
-    repeated string x_json_mask = 1 // list of json fields specified in front-end request (patch)
-  [(google.api.field_visibility) = {
-    restriction: "PREVIEW" // "INTERNAL"
-  },
-  (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    read_only: true
-    pattern: "^$"
-  }];
-    repeated string fields = 3;
-    InputCaseComment input = 4;
+  // JSON fields specified in front-end request (patch).
+  repeated string x_json_mask = 1
+    [(google.api.field_visibility) = {
+      restriction: "PREVIEW"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      read_only: true
+      pattern: "^$"
+    }];
+
+  // Fields to include in the response.
+  repeated string fields = 3;
+
+  // Data for the comment to update.
+  InputCaseComment input = 4;
 }
 
+// Request to delete a comment based on its etag.
 message DeleteCommentRequest {
-    string etag = 1;
-    repeated string fields = 2;
+  // Identifier of the comment to delete.
+  string etag = 1;
+
+  // Fields to return after deletion.
+  repeated string fields = 2;
 }
 
+// Request to list comments for a specific case.
 message ListCommentsRequest {
+  // Page number for pagination.
   int32 page = 1;
+
+  // Number of comments per page.
   int32 size = 2;
+
+  // Query string for search.
   string q = 3;
+
+  // List of search terms.
   repeated string qin = 4;
+
+  // Sorting order.
   string sort = 5;
+
+  // Fields to return for each comment.
   repeated string fields = 6;
-  string case_etag = 9; // (id accepted)
+
+  // Etag or ID of the case for which comments are requested.
+  string case_etag = 9;
 }
 
-message MergeCommentsRequest {
-  repeated string x_json_mask = 1 // list of json fields specified in front-end request (patch)
-  [(google.api.field_visibility) = {
-    restriction: "PREVIEW" // "INTERNAL"
-  },
-  (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    read_only: true
-    pattern: "^$"
-  }];
-  repeated string fields = 2; // result fields needed on the front-end for each comment
-  string case_etag = 3; // new/existing comments belong to (id accepted)
-  repeated InputCaseComment input = 4;
-}
+// Request to publish comment into a case.
+message PublishCommentRequest {
+  // JSON fields specified in the front-end request.
+  repeated string x_json_mask = 1
+    [(google.api.field_visibility) = {
+      restriction: "PREVIEW"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      read_only: true
+      pattern: "^$"
+    }];
 
-message ResetCommentsRequest {
-  repeated string x_json_mask = 1 // list of json fields specified in front-end request (patch)
-  [(google.api.field_visibility) = {
-    restriction: "PREVIEW" // "INTERNAL"
-  },
-  (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    read_only: true
-    pattern: "^$"
-  }];
-  repeated string fields = 2; // result fields needed on the front-end for each comment
-  string case_etag = 3; // new/existing comments belong to (id accepted)
-  repeated InputCaseComment input = 4;
+  // Result fields to include in the response.
+  repeated string fields = 2;
+
+  // Etag or ID of the case to which comments belong.
+  string case_etag = 3;
+
+  // Comment to publish.
+  InputCaseComment input = 4;
 }
