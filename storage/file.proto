@@ -19,6 +19,43 @@ service FileService {
             body: "*"
         };
     }
+
+    rpc SearchFiles(SearchFilesRequest) returns (ListFile) {
+        option (google.api.http) = {
+            get: "/storage/file"
+        };
+    }
+}
+
+message SearchFilesRequest {
+    repeated int64 id = 1;
+    engine.FilterBetween uploaded_at = 2;
+    repeated engine.Lookup uploaded_by = 3;
+    repeated string reference_id = 4;
+    repeated UploadFileChannel channel = 5;
+    engine.FilterBetween retention_until = 6;
+}
+
+message ListFile {
+    bool next = 1;
+    repeated File items = 2;
+}
+
+message File {
+    int64 id = 1;
+    int64 uploaded_at = 2;
+    engine.Lookup uploaded_by = 3;
+    string name = 4;
+    string mime_type = 5;
+    string reference_id = 6;
+    int64 size = 7;
+    string sha256sum = 8;
+    Thumbnail thumbnail = 9;
+    string view_name = 10;
+    UploadFileChannel channel = 11;
+    int64 retention_until = 12;
+
+    string uuid = 20; // deprecated use reference_id
 }
 
 enum UploadStatusCode {
