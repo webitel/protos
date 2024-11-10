@@ -1,0 +1,328 @@
+syntax = "proto3";
+package webitel.knowledgebase;
+option go_package = "webitel.go/api/spaces;spaces";
+
+import "knowledgebase/space.proto";
+
+import "google/api/visibility.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+service Spaces{
+
+rpc ListSpaces(ListSpacesRequest) returns (SpaceList) {
+    option (google.api.http) = {
+      get: "/spaces"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description:
+      "| Field       | Type \n"
+      "| ----------- | ---- \n"
+      "| **----------- READ-ONLY -----------** | \n"
+      "| `id`        | int64 \n"
+      "| `ver`       | int32 \n"
+      "| `etag`      | string \n"
+      "| **---------- OPERATIONAL ----------** | \n"
+      "| `created_at` | int64(epoch:milli) \n"
+      "| `created_by` | lookup(user) \n"
+      "| `updated_at` | int64(epoch:milli) \n"
+      "| `updated_by` | lookup(user) \n"
+      "| **---------- ATTRIBUTES -----------** | \n"
+      "| `name`      | name! \n"
+      "| `home_page`   | string (home_page) \n"  
+      "| `state`       | bool \n"  
+      "| `has_children`| bool \n" 
+    };
+  }
+
+  // Locate spaces source
+  rpc LocateSpaces(LocateSpacesRequest) returns (Space) {
+    option (google.api.http) = {
+      get: "/spaces/{etag}"
+    };
+  }
+
+  // Create NEW Space
+  rpc CreateSpace(InputSpaceRequest) returns (Space) {
+    option (google.api.http) = {
+      post: "/spaces"
+      body: "input"
+    };
+  }
+
+  // NEW Update of the Space source
+  rpc UpdateSpace(UpdateSpaceRequest) returns (Space) {
+    option (google.api.http) = {
+      patch:  "/spaces/{input.etag}"
+      body: "input"
+    };
+  }
+
+  // Remove Space source
+  rpc DeleteSpace(DeleteSpaceRequest) returns (Space) {
+    option (google.api.http) = {
+      delete: "/spaces/{etag}"
+    };
+  }
+}
+
+message SpaceList {
+  
+    // Space(s) dataset page.
+    repeated Space data = 1;
+    // The page number of the partial result.
+    int32 page = 2;
+    // Indicates that this is a partial result.
+    // More data available upon query: ?size=${data.len}&page=${page++}
+    bool next = 3;
+  }
+
+  // ---------- SEARCH Operation ---------- //
+
+message LocateSpacesRequest {
+
+    // ------- Result Options ------- //
+  
+    // Source Fields to return into result.
+    repeated string fields = 1;
+  
+    // ------- Locate Options ------- //
+  
+    // The Space source IDentifier.
+    // Accept: `etag` (obsolete+) or `id`.
+    string etag = 2;
+    
+  }
+  
+  message ListSpacesRequest {
+    
+    int32 page = 2;
+    
+    // Limit of result page records count.   _default(16); limit=(size<=0?-1:size+1);_
+    //
+    // ```javascript
+    // const
+    //     default = 16
+    //   , maximum = 32
+    // ;
+    // 
+    // ```
+    int32 size = 1;
+  
+    // Search term:
+    // `?` - matches any character
+    // `*` - matches 0 or more characters
+    // Used to query records within a set of `qin` fields, eg: name, etc...
+    string q = 5;
+  
+    // Sort result dataset of records by fields.
+    // ```
+    // sort ::= *( ORDER name )
+    //
+    // ORDER  = ASC / DESC
+    // DESC   = "-" / "!"
+    // ASC    = [ "+" ]   ; Default
+    // ```
+    //
+    // Fields available
+    //
+    // - `id`(seq)
+    // - `domain`{name}
+    // - `state`
+    repeated string sort = 3
+    [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        type: ARRAY,
+        // title: "sort",
+        pattern: "^[+|-|!]?\\w+$",
+        // description: "Fields [Q]uery to build result record",
+        // format: "name[.func(args)][{fields}],..",
+        default: "id",
+        example: "\"!updated_at,tag\"",
+        unique_items: true,
+        // array: "id",
+        // array: "names",
+        // array: "labels",
+        // array: "emails",
+      }
+    ];
+  
+    // Fields [Q]uery to build result dataset record.
+    
+    repeated string fields = 4
+    [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        // type: ARRAY,
+        // title: "fields",
+        // pattern: "(\\w+(\\.\\w+\\(([^\\)]*)\\))*(\\{\\1\\})*(,\\1)*)+",
+        // description: "Fields [Q]uery to build result record",
+        // format: "name[.func(args)][{fields}],..",
+        default: "*",
+        example: "\"*,labels.size(3).sort(!updated_at){updated_at,label}\"",
+        unique_items: true,
+        // array: "id",
+        // array: "names"
+      }
+    ];
+  
+    // ----- Search Options ---------------------------
+    
+    // Records with unique IDentifier(s).
+    // Accept: `id` -or- `etag`.
+    repeated string id = 6;
+  
+  }
+  
+  
+  // ---------- CREATE Operation ----------
+  
+  message UpdateSpaceRequest {
+  
+    // ------- PATCH Options ------- //
+  
+    // JSON PATCH fields mask.
+    // List of JPath fields specified in body(input).
+    repeated string x_json_mask = 1
+    [(google.api.field_visibility) = {
+      restriction: "PREVIEW" // "INTERNAL"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      read_only: true
+      pattern: "^$"
+    }];
+  
+    // ------- Result Options ------- //
+  
+    // Source Fields to return into result.
+    repeated string fields = 2;
+  
+    // ------- Update Options ------- //
+  
+    // NEW Space source changes
+    InputSpace input = 3;
+  
+  }
+  
+  message InputSpaceRequest {
+  
+    // ------- PATCH Options ------- //
+  
+    // JSON PATCH fields mask.
+    // List of JPath fields specified in body(input).
+    repeated string x_json_mask = 1
+    [(google.api.field_visibility) = {
+      restriction: "INTERNAL"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      read_only: true
+      pattern: "^$"
+    }];
+  
+    // ------- Result Options ------- //
+  
+    // Source Fields to return into result.
+    repeated string fields = 2;
+  
+    // ------- Update Options ------- //
+  
+    // NEW Spaces source changes
+    repeated InputSpace input = 3;
+  
+  }
+  
+  
+  
+  message CreateSpacesRequest {
+  
+    // --------- Result Options -------- //
+  
+    // Fields to be retrieved into result of changes.
+    repeated string fields = 1;
+  
+    // --------- Create Options -------- //
+  
+    // Data is a set of Spaces to be created.
+    repeated InputSpace input = 2
+    [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      // example: ""
+      min_items: 1
+      unique_items: true
+    }];
+  
+  }
+  
+  // ---------- UPDATE Operation ----------
+  
+  // message UpdateSpaceRequest InputSpaceRequest
+  
+  // ---------- DELETE Operation ----------
+  
+  message DeleteSpacesRequest {
+  
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["etag"]
+      }
+    };
+  
+    // --------- Result Options -------- //
+  
+    // Fields to be retrieved into result of changes.
+    repeated string fields = 1;
+  
+    // --------- Delete Options -------- //
+  
+    // Set of unique Space IDs to deal with
+    repeated string etag = 2
+    [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        field_configuration: {
+          path_param_name: "etag"
+        }
+        unique_items: true
+        pattern: "^\\w+$"
+        min_items: 1
+      }
+    ];
+  
+    // // Indicates whether do:
+    // // - `false` - just mark source(s) as inactive
+    // // - `true` - delete permanently; cannot be undone
+    // bool permanent = 3; // YES !
+  
+  }
+  
+  message DeleteSpaceRequest {
+  
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["etag"]
+      }
+    };
+  
+    // --------- Result Options -------- //
+  
+    // Fields to be retrieved into result of changes.
+    repeated string fields = 1;
+  
+    // --------- Delete Options -------- //
+  
+    // Unique Space ID to deal with
+  
+    // Unique ID of the latest version of a resource.
+    string etag = 2
+    [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        field_configuration: {
+          path_param_name: "etag"
+        }
+        pattern: "^\\w+$"
+      }
+    ];
+  
+    // // Indicates whether do:
+    // // - `false` - just mark source(s) as inactive
+    // // - `true` - delete permanently; cannot be undone
+    // bool permanent = 3; // YES !
+  
+  }
