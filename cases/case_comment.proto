@@ -7,10 +7,10 @@ import "general.proto";
 import "google/api/visibility.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
+import "proto/webitel/option.proto";
 
 // Represents a comment associated with a case.
 message CaseComment {
-
   // Main identifier for read, update, and delete operations.
   string id = 1;
 
@@ -53,9 +53,10 @@ message CaseCommentList {
 
 // Service to manage case comments.
 service CaseComments {
-
+  option (option.objclass) = "cases";
   // Retrieves a specific comment based on its etag.
   rpc LocateComment(LocateCommentRequest) returns (CaseComment) {
+    option (option.access) = ACTION_READ;
     option (google.api.http) = {
       get: "/cases/comments/{etag}"
     };
@@ -66,6 +67,7 @@ service CaseComments {
 
   // Updates a specific comment based on the provided data.
   rpc UpdateComment(UpdateCommentRequest) returns (CaseComment) {
+    option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
       put: "/cases/comments/{input.etag}"
       body: "input"
@@ -81,6 +83,7 @@ service CaseComments {
 
   // Deletes a specific comment based on its etag.
   rpc DeleteComment(DeleteCommentRequest) returns (CaseComment) {
+    option (option.access) = ACTION_DELETE;
     option (google.api.http) = {
       delete: "/cases/comments/{etag}"
     };
@@ -91,6 +94,7 @@ service CaseComments {
 
   // Lists all comments associated with a specific case.
   rpc ListComments(ListCommentsRequest) returns (CaseCommentList) {
+    option (option.access) = ACTION_READ;
     option (google.api.http) = {
       get: "/cases/{case_etag}/comments"
     };
@@ -101,6 +105,7 @@ service CaseComments {
 
   // Publish comment into a case.
   rpc PublishComment(PublishCommentRequest) returns (CaseComment) {
+    option (option.access) = ACTION_CREATE;
     option (google.api.http) = {
       post: "/cases/{case_etag}/comments"
       body: "input"
