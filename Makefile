@@ -144,7 +144,7 @@ contacts_proto:
 
 swagger_mix:
 	go run github.com/msample/swagger-mixin@latest ./swagger/engine.swagger.json ./swagger/storage.swagger.json \
- 	 ./swagger/messages.swagger.json ./swagger/logger.swagger.json ./swagger/contacts.swagger.json ./swagger/webitel-go.swagger.json ./swagger/wfm.swagger.json  > ./swagger/api.json | true
+ 	 ./swagger/messages.swagger.json ./swagger/logger.swagger.json ./swagger/contacts.swagger.json ./swagger/webitel-go.swagger.json ./swagger/wfm.swagger.json ./swagger/knowledgebase.swagger.json > ./swagger/api.json | true
 
 
 .PHONY: clean
