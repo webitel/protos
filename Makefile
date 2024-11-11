@@ -7,8 +7,8 @@ all: engine_swagger engine_proto fs storage_swagger storage_proto logger_swagger
 .PHONY: engine_swagger
 
 engine_swagger:
-	protoc -I/usr/local/include -I./engine -I./  \
-      --swagger_out=version=false,json_names_for_fields=false,allow_delete_body=true,include_package_in_tags=false,allow_repeated_fields_in_body=false,fqn_for_swagger_name=false,merge_file_name=engine,allow_merge=true:./swagger \
+	protoc -I/usr/local/include -I./engine -I./ -I./annotations  \
+      --swagger_out=version=false,disable_default_errors=true,json_names_for_fields=false,allow_delete_body=true,include_package_in_tags=false,allow_repeated_fields_in_body=false,fqn_for_swagger_name=false,merge_file_name=engine,allow_merge=true:./swagger \
       ./engine/*.proto
 
 .PHONY: engine_proto
@@ -47,7 +47,7 @@ fs:
 .PHONY: storage_swagger
 
 storage_swagger:
-	protoc -I/usr/local/include -I./storage \
+	protoc -I/usr/local/include -I./storage -I./engine -I./annotations \
       -I. \
       --swagger_out=version=false,json_names_for_fields=false,allow_delete_body=true,include_package_in_tags=false,allow_repeated_fields_in_body=false,fqn_for_swagger_name=false,merge_file_name=storage,allow_merge=true:./swagger \
       ./storage/*.proto
