@@ -13,6 +13,7 @@ service FileService {
     rpc DownloadFile (DownloadFileRequest) returns (stream StreamFile) {}
     rpc UploadFileUrl (UploadFileUrlRequest) returns (UploadFileUrlResponse) {}
     rpc GenerateFileLink (GenerateFileLinkRequest) returns (GenerateFileLinkResponse) {}
+    rpc BulkGenerateFileLink (BulkGenerateFileLinkRequest) returns (BulkGenerateFileLinkResponse) {}
 
     rpc DeleteFiles (DeleteFilesRequest) returns (DeleteFilesResponse) {
         option (google.api.http) = {
@@ -26,6 +27,14 @@ service FileService {
             get: "/storage/file"
         };
     }
+}
+
+message BulkGenerateFileLinkRequest {
+    repeated GenerateFileLinkRequest files = 1;
+}
+
+message BulkGenerateFileLinkResponse {
+    repeated GenerateFileLinkResponse links = 1;
 }
 
 message SearchFilesRequest {
