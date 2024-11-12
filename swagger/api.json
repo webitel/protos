@@ -22283,6 +22283,37 @@
         }
       }
     },
+    "/spaces/tags": {
+      "get": {
+        "tags": [
+          "Tags"
+        ],
+        "summary": "List of the all Articles's Tag(s).",
+        "operationId": "Tags_ListTags",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.knowledgebase.TagsList"
+            }
+          }
+        }
+      }
+    },
     "/spaces/{etag}": {
       "get": {
         "tags": [
@@ -22477,6 +22508,16 @@
             "description": "Active Article only.",
             "name": "state",
             "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Tags associated with the article.",
+            "name": "tags",
+            "in": "query"
           }
         ],
         "responses": {
@@ -22597,6 +22638,16 @@
             "type": "boolean",
             "description": "Active Article only.",
             "name": "state",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Tags associated with the article.",
+            "name": "tags",
             "in": "query"
           }
         ],
@@ -44799,6 +44850,34 @@
         },
         "page": {
           "description": "The page number of the partial result.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "webitel.knowledgebase.Tag": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The name of the tag.",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.knowledgebase.TagsList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.knowledgebase.Tag"
+          }
+        },
+        "next": {
+          "type": "boolean"
+        },
+        "page": {
           "type": "integer",
           "format": "int32"
         }
