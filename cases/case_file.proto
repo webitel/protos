@@ -58,12 +58,10 @@ service CaseFiles {
   rpc ListFiles(ListFilesRequest) returns (CaseFileList) {
     option (option.access) = ACTION_READ;
     option (google.api.http) = {
-      get: "/cases/{case_id}/files"
+      get: "/cases/{case_etag}/files"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Retrieve a list of files associated with a case",
-      description: "Fetches list of files attached to a specific case based on case ID.",
-      tags: "Case Files"
     };
   }
 }
@@ -72,12 +70,12 @@ service CaseFiles {
 message ListFilesRequest {
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["case_id"]
+      required: ["case_etag"]
     }
   };
 
   // ID of the case to fetch files for (required).
-  string case_id = 1;
+  string case_etag = 1;
 
   // The page number to retrieve.
   int32 page = 2;
