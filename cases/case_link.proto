@@ -47,8 +47,14 @@ service CaseLinks {
       get: "/cases/links/{etag}"
     };
   }
+  rpc CreateLink(CreateLinkRequest) returns (CaseLink) {
+    option (option.access) = ACTION_UPDATE;
+    option (google.api.http) = {
+      post: "/cases/links/{case_etag}"
+    };
+  }
   rpc UpdateLink(UpdateLinkRequest) returns (CaseLink) {
-    option (option.access) = ACTION_READ;
+    option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
       put: "/cases/links/{input.etag}"
       body: "input"
@@ -59,7 +65,7 @@ service CaseLinks {
     };
   }
   rpc DeleteLink(DeleteLinkRequest) returns (CaseLink) {
-    option (option.access) = ACTION_READ;
+    option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
       delete: "/cases/links/{etag}"
     };
@@ -68,18 +74,9 @@ service CaseLinks {
 
 
   /*   With Case   */
-
-  // how we can upload file and create a link between case and file simultaneously
-
   rpc ListLinks(ListLinksRequest) returns (CaseLinkList) {
     option (google.api.http) = {
       get: "/cases/{case_etag}/links"
-    };
-  }
-  rpc MergeLinks(MergeLinksRequest) returns (CaseLinkList) {
-    option (google.api.http) = {
-      post: "/cases/{case_etag}/links"
-      body: "input"
     };
   }
 }
@@ -126,18 +123,10 @@ message ListLinksRequest {
 }
 
 
-message MergeLinksRequest {
- repeated string x_json_mask = 1 // list of json fields specified in front-end request (patch)
-  [(google.api.field_visibility) = {
-    restriction: "PREVIEW" // "INTERNAL"
-  },
-  (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    read_only: true
-    pattern: "^$"
-  }];
+message CreateLinkRequest {
   repeated string fields = 2; // result fields needed on the front-end for each comment
-  string case_etag = 3; // new/existing comments belong to (id accepted)
-  repeated InputCaseLink input = 4;
+  string case_etag = 3; // new comment link
+  InputCaseLink input = 4;
 }
 
 message ResetLinksRequest {
