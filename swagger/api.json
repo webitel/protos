@@ -22283,6 +22283,37 @@
         }
       }
     },
+    "/spaces/tags": {
+      "get": {
+        "tags": [
+          "Tags"
+        ],
+        "summary": "List of the all Articles's Tag(s).",
+        "operationId": "Tags_ListTags",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.knowledgebase.TagsList"
+            }
+          }
+        }
+      }
+    },
     "/spaces/{etag}": {
       "get": {
         "tags": [
@@ -22441,12 +22472,6 @@
             "in": "query"
           },
           {
-            "type": "string",
-            "description": "Search term: location name;\n`?` - matches any one character\n`*` - matches 0 or more characters",
-            "name": "q",
-            "in": "query"
-          },
-          {
             "type": "array",
             "items": {
               "type": "string"
@@ -22467,19 +22492,31 @@
             "in": "query"
           },
           {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
+            "type": "string",
+            "description": "Search term: location name;\n`?` - matches any one character\n`*` - matches 0 or more characters",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
             "description": "Record(s) with unique ID only.",
-            "name": "id",
+            "name": "article_id",
             "in": "query"
           },
           {
             "type": "boolean",
             "description": "Active Article only.",
             "name": "state",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Tags associated with the article.",
+            "name": "tags",
             "in": "query"
           }
         ],
@@ -22540,11 +22577,12 @@
         "tags": [
           "Articles"
         ],
-        "operationId": "Articles_ListArticlesChildren",
+        "summary": "List of the Space's Article(s).",
+        "operationId": "Articles_ListArticles2",
         "parameters": [
           {
             "type": "string",
-            "description": "space ID associated with.",
+            "description": "Space ID associated with.",
             "name": "space_id",
             "in": "path",
             "required": true
@@ -22555,6 +22593,20 @@
             "name": "article_id",
             "in": "path",
             "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page number of result dataset records. offset = (page*size)",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Size count of records on result page. limit = (size++)",
+            "name": "size",
+            "in": "query"
           },
           {
             "type": "array",
@@ -22577,23 +22629,25 @@
             "in": "query"
           },
           {
-            "type": "integer",
-            "format": "int32",
-            "description": "Page number of result dataset records. offset = (page*size)",
-            "name": "page",
-            "in": "query"
-          },
-          {
-            "type": "integer",
-            "format": "int32",
-            "description": "Size count of records on result page. limit = (size++)",
-            "name": "size",
+            "type": "string",
+            "description": "Search term: location name;\n`?` - matches any one character\n`*` - matches 0 or more characters",
+            "name": "q",
             "in": "query"
           },
           {
             "type": "boolean",
             "description": "Active Article only.",
             "name": "state",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Tags associated with the article.",
+            "name": "tags",
             "in": "query"
           }
         ],
@@ -22650,87 +22704,6 @@
           }
         }
       },
-      "post": {
-        "tags": [
-          "Articles"
-        ],
-        "summary": "Update the space's Article details.",
-        "operationId": "Articles_UpdateArticle",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "Link space ID.",
-            "name": "space_id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "Unique ID of the latest version of an existing resource.",
-            "name": "etag",
-            "in": "path",
-            "required": true
-          },
-          {
-            "description": "NEW Update of the Article link.",
-            "name": "input",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "title": "NEW Update of the Article link.",
-              "properties": {
-                "parent_article": {
-                  "description": "The parent article ID.",
-                  "type": "string"
-                },
-                "space_id": {
-                  "description": "[VALUE]: --------------------------------------\nSpace ID associated with.",
-                  "type": "string",
-                  "format": "int64"
-                },
-                "state": {
-                  "description": "Indicates the state of the article.",
-                  "type": "boolean"
-                },
-                "tags": {
-                  "description": "Tags associated with the article.",
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "text": {
-                  "description": "The text content of the article.",
-                  "type": "string"
-                },
-                "title": {
-                  "description": "The title of the article.",
-                  "type": "string"
-                }
-              }
-            }
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
-            "description": "Fields to be retrieved into result of changes.",
-            "name": "fields",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.knowledgebase.ArticleList"
-            }
-          }
-        }
-      },
       "delete": {
         "tags": [
           "Articles"
@@ -22768,6 +22741,92 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/webitel.knowledgebase.Article"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Articles"
+        ],
+        "summary": "Update the space's Article details.",
+        "operationId": "Articles_UpdateArticle",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Link space ID.",
+            "name": "space_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Unique ID of the latest version of an existing resource.",
+            "name": "etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "NEW Update of the Article link.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "title": "NEW Update of the Article link.",
+              "properties": {
+                "parent_article": {
+                  "description": "The parent article ID.",
+                  "type": "string",
+                  "format": "int64"
+                },
+                "pinned": {
+                  "description": "Indicates that the article is pinned on the top of list.",
+                  "type": "boolean"
+                },
+                "space_id": {
+                  "description": "[VALUE]: --------------------------------------\nSpace ID associated with.",
+                  "type": "string",
+                  "format": "int64"
+                },
+                "state": {
+                  "description": "Indicates if article is active and actual.",
+                  "type": "boolean"
+                },
+                "tags": {
+                  "description": "Tags associated with the article.",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "text": {
+                  "description": "The text content of the article.",
+                  "type": "string"
+                },
+                "title": {
+                  "description": "The title of the article.",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved into result of changes.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.knowledgebase.ArticleList"
             }
           }
         }
@@ -38342,6 +38401,13 @@
           "type": "integer",
           "format": "int32"
         },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "created_by": {
+          "$ref": "#/definitions/engineLookup"
+        },
         "description": {
           "type": "string"
         },
@@ -38359,6 +38425,13 @@
         "total_agents": {
           "type": "integer",
           "format": "int32"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_by": {
+          "$ref": "#/definitions/engineLookup"
         }
       }
     },
@@ -44544,7 +44617,12 @@
         },
         "parent_article": {
           "description": "The parent article ID.",
-          "type": "string"
+          "type": "string",
+          "format": "int64"
+        },
+        "pinned": {
+          "description": "Indicates that the article is pinned on the top of list.",
+          "type": "boolean"
         },
         "space_id": {
           "description": "Space ID associated with.",
@@ -44578,6 +44656,11 @@
         "updated_by": {
           "description": "The user who performed last Update.",
           "$ref": "#/definitions/webitel.knowledgebase.Lookup"
+        },
+        "ver": {
+          "description": "READONLY. Operational attributes\nVersion of the latest update. Numeric sequence.",
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -44617,7 +44700,12 @@
         },
         "parent_article": {
           "description": "The parent article ID.",
-          "type": "string"
+          "type": "string",
+          "format": "int64"
+        },
+        "pinned": {
+          "description": "Indicates that the article is pinned on the top of list.",
+          "type": "boolean"
         },
         "space_id": {
           "description": "[VALUE]: --------------------------------------\nSpace ID associated with.",
@@ -44625,7 +44713,7 @@
           "format": "int64"
         },
         "state": {
-          "description": "Indicates the state of the article.",
+          "description": "Indicates if article is active and actual.",
           "type": "boolean"
         },
         "tags": {
@@ -44762,6 +44850,34 @@
         },
         "page": {
           "description": "The page number of the partial result.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "webitel.knowledgebase.Tag": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The name of the tag.",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.knowledgebase.TagsList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.knowledgebase.Tag"
+          }
+        },
+        "next": {
+          "type": "boolean"
+        },
+        "page": {
           "type": "integer",
           "format": "int32"
         }

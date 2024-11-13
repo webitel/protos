@@ -1,0 +1,29 @@
+syntax = "proto3";
+package webitel.knowledgebase;
+option go_package = "webitel.go/api/spaces;spaces";
+
+import "google/api/annotations.proto";
+
+message Tag {
+  // The name of the tag.
+  string name = 2;
+}
+service Tags{
+// List of the all Articles's Tag(s).
+rpc ListTags(ListTagsRequest) returns (TagsList) {
+    option (google.api.http) = {
+      get: "/spaces/tags"
+    };
+  }
+}
+
+message TagsList {
+  repeated Tag data = 1;
+  int32 page = 2;
+  bool next = 3;
+}
+
+message ListTagsRequest {
+  int32 page = 1;
+  int32 size = 2;
+}

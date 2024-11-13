@@ -1,0 +1,347 @@
+syntax = "proto3";
+package webitel.knowledgebase;
+option go_package = "webitel.go/api/spaces;spaces";
+
+import "knowledgebase/fields.proto";
+import "google/protobuf/wrappers.proto";
+
+import "google/api/visibility.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+
+message Article {
+
+  // The unique ID of the association. Never changes.
+  string id = 1;
+
+  // READONLY. Operational attributes
+  // Version of the latest update. Numeric sequence.
+  int32 ver = 2;
+  
+  // Unique ID of the latest version of the update.
+  // This ID changes after any update to the underlying value(s).
+  string etag = 3;
+
+  // The user who created this Field.
+  int64 created_at = 4;
+
+  // Timestamp(milli) of the Field creation.
+  webitel.knowledgebase.Lookup created_by = 5;
+  
+  // Timestamp(milli) of the last Field update.
+  // Take part in Etag generation.
+  int64 updated_at = 6;
+  
+  // The user who performed last Update.
+  webitel.knowledgebase.Lookup updated_by = 7;
+
+  // Space ID associated with.
+  int64 space_id = 8;
+
+  // Indicates the state of the article.
+  bool state = 9;
+
+  // The text content of the article.
+  string text = 10;
+
+  // Tags associated with the article.
+  repeated string tags = 11;
+
+  // The title of the article.
+  string title = 12;
+
+  // The parent article ID.
+  int64 parent_article = 13;
+
+  // Indicates that the article has children.
+  bool has_children = 14;
+
+  // Indicates that the article is pinned on the top of list.
+  bool pinned = 15;
+}
+
+// An input of the Space's Articles.
+message InputArticle {
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    // PUT /space/{source.id}/Articles/{etag}
+    // example: "{\"state\":false,\"Article\":{\"id\":\"416\"}}"
+    json_schema: {
+      required: ["etag"]
+    }
+  };
+  
+  // [META]: --------------------------------------
+
+  // Unique ID of the latest version of an existing resource.
+  string etag = 1
+  [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    field_configuration: {
+      path_param_name: "etag"
+    }
+  }];
+
+  // [VALUE]: --------------------------------------
+  // Space ID associated with.
+  int64 space_id = 8;
+
+  // Indicates if article is active and actual.
+  bool state = 9;
+
+  // The text content of the article.
+  string text = 10;
+
+  // Tags associated with the article.
+  repeated string tags = 11;
+
+  // The title of the article.
+  string title = 12;
+
+  // The parent article ID.
+  int64 parent_article = 13;
+
+  // Indicates that the article is pinned on the top of list.
+  bool pinned = 15;
+}
+
+// Articles service catalogs.
+service Articles {
+
+  // ------------------ [WITH] Space ------------------- //
+
+  // List of the Space's Article(s).
+  rpc ListArticles(ListArticlesRequest) returns (ArticleList) {
+    option (google.api.http) = {
+      get: "/spaces/{space_id}/articles"
+      additional_bindings {
+        get: "/spaces/{space_id}/articles/{article_id}/childrens"
+      }
+    };
+  }
+
+  // rpc ListArticlesChildren(ListArticlesRequest) returns (ArticleList) {
+  //   option (google.api.http) = {
+  //     get: "/spaces/{space_id}/articles/{article_id}/childrens"
+  //   };
+  // }
+
+  // ------------------ [WITH] Record ------------------- //
+
+  // Locate the space's Article association.
+  rpc LocateArticle(LocateArticleRequest) returns (Article) {
+    option (google.api.http) = {
+      get: "/spaces/{space_id}/articles/{etag}"
+    };
+  }
+
+  rpc CreateArticle(CreateArticleRequest) returns (ArticleList) {
+    option (google.api.http) = {
+      post: "/spaces/{space_id}/articles"
+      // response_body: "data"
+      body: "input"
+    };
+  }
+
+  // Update the space's Article details.
+  rpc UpdateArticle(UpdateArticleRequest) returns (ArticleList) {
+    option (google.api.http) = {
+      patch: "/spaces/{space_id}/articles/{input.etag}"
+      // response_body: "data"
+      body: "input"
+    };
+  }
+
+  // Remove the space's Article association.
+  rpc DeleteArticle(DeleteArticleRequest) returns (Article) {
+    option (google.api.http) = {
+      delete: "/spaces/{space_id}/articles/{etag}"
+    };
+  }
+}
+
+// Article dataset.
+// NOTE: Edge represents connection between two nodes.
+// So this spaceArticles.data are always subordinate to some space.id.
+message ArticleList {
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    // example: "{\"data\":[{\"id\":\"7\",\"ver\":\"3\",\"etag\":\"FqaTCDLbhpaoUreL\",\"created_at\":\"1680268507698\",\"created_by\":{\"id\":\"34\",\"name\":\"John Doe\"},\"updated_at\":\"1680516785357\",\"updated_by\":{\"name\":\"Jane Lee (deleted)\"},\"primary\":true,\"location\":\"Europe/Kyiv\"}],\"page\":1,\"next\":true}"
+  };
+
+  // Article dataset page.
+  repeated Article data = 1;
+  // The page number of the partial result.
+  int32 page = 2;
+  // Indicates that this is a partial result.
+  // More data available upon query: ?size=${data.len}&page=${page++}
+  bool next = 3;
+
+}
+
+// Search for the space's Article(s) request.
+message ListArticlesRequest {
+
+  // ----- Result Options ----- //
+
+  // Page number of result dataset records. offset = (page*size)
+  int32 page = 2;
+  
+  // Size count of records on result page. limit = (size++)
+  int32 size = 1;
+
+  // Sort the result according to fields.
+  repeated string sort = 3;
+
+  // Fields to be retrieved as a result.
+  repeated string fields = 4;
+  
+  // Search term: location name;
+  // `?` - matches any one character
+  // `*` - matches 0 or more characters
+  string q = 6;
+
+  // ----- Search Options ----- //
+
+  // Space ID associated with.
+  string space_id = 5;
+
+  // Record(s) with unique ID only.
+  string article_id = 7;
+
+  // Active Article only.
+  google.protobuf.BoolValue state = 8;
+
+  // Tags associated with the article.
+  repeated string tags = 9;
+
+}
+
+// Locate single Link by unique IDentifier.
+message LocateArticleRequest {
+
+  // ------- Result Options ------
+
+  // Fields to be retrieved into result.
+  repeated string fields = 1;
+
+  // ------- Locate Options ------ //
+  
+  // Space ID associated with.
+  string space_id = 2;
+  
+  // Unique Article link IDentifier.
+  // Accept: `etag` (obsolete+) or `id`.
+  string etag = 3
+  [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    format: "\\w+"
+  }];
+
+}
+
+message CreateArticleRequest {
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: "space_id"
+      required: "input"
+    }
+  };
+
+  // --------- PATCH Options -------- //
+
+  // JSON PATCH fields mask.
+  // List of JPath fields specified in body(input).
+  repeated string x_json_mask = 1
+  [(google.api.field_visibility) = {
+    restriction: "PREVIEW"
+  },
+  (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    read_only: true
+    pattern: "^$"
+  }];
+
+  // --------- Result Options -------- //
+
+  // Fields to be retrieved into result of changes.
+  repeated string fields = 2;
+
+  // ------- Reference Options ------- //
+
+  // Link space ID.
+  string space_id = 3;
+
+  // --------- Update Options -------- //
+
+  // NEW Update of the Article link.
+  InputArticle input = 4;
+
+}
+
+message UpdateArticleRequest {
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: "space_id"
+      required: "input"
+    }
+  };
+
+  // --------- PATCH Options -------- //
+
+  // JSON PATCH fields mask.
+  // List of JPath fields specified in body(input).
+  repeated string x_json_mask = 1
+  [(google.api.field_visibility) = {
+    restriction: "PREVIEW"
+  },
+  (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    read_only: true
+    pattern: "^$"
+  }];
+
+  // --------- Result Options -------- //
+
+  // Fields to be retrieved into result of changes.
+  repeated string fields = 2;
+
+  // ------- Reference Options ------- //
+
+  // Link space ID.
+  string space_id = 3;
+
+  // --------- Update Options -------- //
+
+  // NEW Update of the Article link.
+  InputArticle input = 4;
+
+}
+
+message DeleteArticleRequest {
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: "space_id"
+      required: "etag"
+    }
+  };
+
+  // --------- Result Options -------- //
+
+  // Fields to be retrieved as a result.
+  repeated string fields = 1;
+
+  // ------- Delete Options ------- //
+
+  // Space ID associated with.
+  string space_id = 2;
+
+  // Unique ID to remove.
+  string etag = 3
+  [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      pattern: "^\\.+$"
+    }
+  ];
+
+}
