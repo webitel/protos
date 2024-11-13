@@ -6,62 +6,88 @@ option go_package = "github.com/webitel/cases/api/cases;cases";
 import "general.proto";
 import "google/api/annotations.proto";
 import "proto/webitel/option.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
+// Represents a file associated with a case, including author information and file details.
 message CaseFile {
-  general.Lookup author = 6; // contact of the creator
+  // The contact information of the creator (author) of the file.
+  general.Lookup author = 6;
+
+  // File metadata and details.
   File file = 7;
 }
 
-
+// Contains a list of case files with pagination.
 message CaseFileList {
+  // Current page number.
   int64 page = 1;
+
+  // Indicator if there is a next page.
   bool next = 2;
+
+  // List of case files.
   repeated CaseFile items = 3;
 }
 
+// Metadata for a file associated with a case.
 message File {
-  int64 id = 1; // storage.file id
+  // Storage file ID.
+  int64 id = 1;
+
+  // Creator of the file.
   general.Lookup created_by = 2;
-  int64 created_at = 3; // unixmilli
+
+  // Creation timestamp in Unix milliseconds.
+  int64 created_at = 3;
+
+  // File size in bytes.
   int64 size = 4;
-  string mime = 5; // MIME type
+
+  // MIME type of the file.
+  string mime = 5;
+
+  // File name.
   string name = 6;
 }
 
-
+// Service for managing files associated with cases.
 service CaseFiles {
   option (option.objclass) = "cases";
-  /*   With Case   */
+
+  // Retrieves a list of files associated with a specific case.
   rpc ListFiles(ListFilesRequest) returns (CaseFileList) {
     option (option.access) = ACTION_READ;
     option (google.api.http) = {
-      get: "/cases/{case_etag}/files"
+      get: "/cases/{case_id}/files"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Retrieve a list of files associated with a case",
+      description: "Fetches list of files attached to a specific case based on case ID.",
+      tags: "Case Files"
     };
   }
 }
 
+// Request message for listing files associated with a case.
 message ListFilesRequest {
-  int32 page = 1;
-  int32 size = 2;
-  string q = 3; // covered by filters?
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["case_id"]
+    }
+  };
+
+  // ID of the case to fetch files for (required).
+  string case_id = 1;
+
+  // The page number to retrieve.
+  int32 page = 2;
+
+  // Number of items per page.
+  int32 size = 3;
+
+  // Query parameters for filtering.
   repeated string qin = 4;
-  string sort = 5;
-  repeated string fields = 6;
-  string filter = 7;
-  // simple filter query language [SFQL]
-  // ( -> start of the filter or filter node
-  // ) -> end of the filter or the filter node
-  // last ( -> always start of the filter
-  // [ -> start of the operator
-  // ] -> end of the operator
-  // operands - simple strings, first string should always be a valid field name, second should
-  // operators:
-  // [and] [or] -- only applied to the filter node, after them always should be a ( as filter or another filter node
-  // [eq], [gte], [gt], [lte], [lt], [regex], [neq] -- only applied to the filter, value after them and to the ) symbol considered as string
-  //...?size=10&page=1&filter=((file[eq]fghj)[and](name[eq]yehor))[or])
-//  oneof filters {
-//    FilterNode node = 7;
-//    Filter filter = 8;
-//  }
-  string case_etag = 9;
+
+  // Fields to include in the response.
+  repeated string fields = 5;
 }
