@@ -43,10 +43,9 @@ message CreatePriorityRequest {
       required: ["name"]
     }
   };
-
-  string name = 1;
-  string description = 3;
-  string color = 4;
+  InputPriority input = 1;
+  // Fields to be retrieved as a result.
+  repeated string fields = 2;
 }
 
 
@@ -70,11 +69,13 @@ message UpdatePriorityRequest {
   };
 
   int64 id = 1;
-  InputPriority input = 2;
+  // Fields to be retrieved as a result.
+  repeated string fields = 2;
+  InputPriority input = 3;
 
      // ---- JSON PATCH fields mask ----
   // List of JPath fields specified in body(input).
-  repeated string x_json_mask = 3
+  repeated string x_json_mask = 4
   [(google.api.field_visibility) = {
     restriction: "PREVIEW" // "INTERNAL"
   },
@@ -148,7 +149,7 @@ service Priorities {
   rpc CreatePriority(CreatePriorityRequest) returns (Priority) {
     option (google.api.http) = {
       post: "/cases/priorities"
-      body: "*"
+      body: "input"
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {

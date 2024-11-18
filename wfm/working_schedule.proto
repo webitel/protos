@@ -28,13 +28,26 @@ service WorkingScheduleService {
     option (option.access) = ACTION_READ;
     option (google.api.http) = {get: "/wfm/lookups/working_schedules"};
   }
-  
+
   rpc UpdateWorkingSchedule(UpdateWorkingScheduleRequest) returns (UpdateWorkingScheduleResponse) {
     option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
       put: "/wfm/lookups/working_schedules/{item.id}"
       body: "*"
     };
+  }
+
+  rpc UpdateWorkingScheduleAddAgents(UpdateWorkingScheduleAddAgentsRequest) returns (UpdateWorkingScheduleAddAgentsResponse) {
+    option (option.access) = ACTION_UPDATE;
+    option (google.api.http) = {
+      post: "/wfm/lookups/working_schedules/{working_schedule_id}/agents"
+      body: "*"
+    };
+  }
+
+  rpc UpdateWorkingScheduleRemoveAgents(UpdateWorkingScheduleRemoveAgentsRequest) returns (UpdateWorkingScheduleRemoveAgentsResponse) {
+    option (option.access) = ACTION_UPDATE;
+    option (google.api.http) = {delete: "/wfm/lookups/working_schedules/{working_schedule_id}/agents"};
   }
 
   rpc DeleteWorkingSchedule(DeleteWorkingScheduleRequest) returns (DeleteWorkingScheduleResponse) {
@@ -139,6 +152,26 @@ message UpdateWorkingScheduleRequest {
 
 message UpdateWorkingScheduleResponse {
   WorkingSchedule item = 1;
+}
+
+message UpdateWorkingScheduleAddAgentsRequest {
+  int64 working_schedule_id = 1;
+
+  repeated LookupEntity agents = 2;
+}
+
+message UpdateWorkingScheduleAddAgentsResponse {
+  repeated LookupEntity agents = 1;
+}
+
+message UpdateWorkingScheduleRemoveAgentsRequest {
+  int64 working_schedule_id = 1;
+
+  repeated LookupEntity agents = 2;
+}
+
+message UpdateWorkingScheduleRemoveAgentsResponse {
+  repeated LookupEntity agents = 1;
 }
 
 message DeleteWorkingScheduleRequest {
