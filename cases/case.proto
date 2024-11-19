@@ -82,8 +82,44 @@ message LocateCaseRequest {
   repeated string fields = 2;
 }
 
+message InputCreateCase {
+  string etag = 1;
+  string name = 2; // create: required;
+  string subject = 3; // create: required;
+  string description = 4; // create: not required;
+  string contact_info = 5; // create: not required;
+  int64 assignee = 6; // create: not required, default from service or set by UI;
+  int64 reporter = 7; // create: required (if empty recognize as anonymous contact);
+  int64 impacted = 8; // create: required, default is reporter or ui (if empty recognize as anonymous);
+  int64 group = 9; // create: not required, default from service or set by UI;
+  int64 status = 10; // create: not required, default initial value from status lookup or ui;
+  int64 close_reason = 11; // create: not required;
+  int64 priority = 12; // create: not required, default first value from priority lookup
+  int64 source = 13; // source of the case
+  int64 service = 14; // on this field base many other readonly fields on return
+  CreateCaseCloseInput close = 15; // create: not required; update: required only when case status goes to the final state
+  RateInfo rate = 16; // only for API, not UI
+
+
+  repeated InputCaseComment comments = 17;
+//  repeated InputCaseFile files = 17;
+  repeated InputCaseLink links = 18;
+  repeated CreateCaseRelatedCaseInput related = 19;
+}
+
+message CreateCaseCloseInput {
+    string close_result = 1; // rich text with comment on resulting case
+    int64 close_reason = 2; // actual close reason value from the close_reason lookup
+}
+
+message CreateCaseRelatedCaseInput{
+  string etag = 1;
+  RelationType relation_type = 3;
+  int64 related_to = 4;
+}
+
 message CreateCaseRequest {
-  InputCase input = 1;
+  InputCreateCase input = 1;
 }
 
 message UpdateCaseRequest {
@@ -195,12 +231,13 @@ message InputCase {
   general.Lookup status = 10; // create: not required, default initial value from status lookup or ui;
   general.Lookup close_reason = 11; // create: not required;
   general.Lookup priority = 12; // create: not required, default first value from priority lookup
-  general.Lookup service = 13; // on this field base many other readonly fields on return
-  CloseInfo close = 14; // create: not required; update: required only when case status goes to the final state
-  RateInfo rate = 15; // only for API, not UI
+  general.Lookup source = 13; // source of the case
+  general.Lookup service = 14; // on this field base many other readonly fields on return
+  CloseInfo close = 15; // create: not required; update: required only when case status goes to the final state
+  RateInfo rate = 16; // only for API, not UI
 
 
-  repeated InputCaseComment comments = 16;
+  repeated InputCaseComment comments = 17;
 //  repeated InputCaseFile files = 17;
   repeated InputCaseLink links = 18;
   repeated InputRelatedCase related = 19;
