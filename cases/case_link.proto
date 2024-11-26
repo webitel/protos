@@ -18,8 +18,8 @@ message CaseLink {
   int64 created_at = 5; // unixmilli
   general.Lookup updated_by = 6;
   int64 updated_at = 7;
-  general.Lookup author = 8; // contact-author calculated on-flight
-  string name = 9; // link name
+  general.Lookup author = 8; // contact-author calculated on-flight (optional)
+  string name = 9; // link name (optional)
   string url = 11; // URL
 }
 
@@ -103,8 +103,8 @@ message UpdateLinkRequest {
 }
 
 message DeleteLinkRequest {
-  string etag = 1; // (etag only)
-  repeated string fields = 2;
+  string etag = 1; //
+//  repeated string fields = 2; // output
 }
 
 
@@ -112,13 +112,9 @@ message ListLinksRequest {
   int32 page = 1;
   int32 size = 2;
   string q = 3;
-  repeated string qin = 4;
+  repeated string ids = 4;
   string sort = 5;
   repeated string fields = 6;
-//  oneof filters {
-//    FilterNode node = 7;
-//    Filter filter = 8;
-//  }
   string case_etag = 9;
 }
 
@@ -127,18 +123,4 @@ message CreateLinkRequest {
   repeated string fields = 2; // result fields needed on the front-end for each comment
   string case_etag = 3; // new comment link
   InputCaseLink input = 4;
-}
-
-message ResetLinksRequest {
-  repeated string x_json_mask = 1 // list of json fields specified in front-end request (patch)
-  [(google.api.field_visibility) = {
-    restriction: "PREVIEW" // "INTERNAL"
-  },
-  (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    read_only: true
-    pattern: "^$"
-  }];
-  repeated string fields = 2; // result fields needed on the front-end for each comment
-  string case_etag = 3; // new/existing comments belong to (id accepted)
-  repeated InputCaseLink input = 4;
 }

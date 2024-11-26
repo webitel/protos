@@ -1,16 +1,8 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "Webitel API",
-    "version": "24.04.0",
-    "contact": {
-      "name": "Webitel",
-      "url": "https://webitel.com",
-      "email": "support@webitel.com"
-    },
-    "license": {
-      "name": "MIT"
-    }
+    "title": "service.proto",
+    "version": "version not set"
   },
   "tags": [
     {
@@ -58,11 +50,6 @@
     {
       "name": "StatusConditions"
     }
-  ],
-  "host": "dev.webitel.com",
-  "basePath": "/api",
-  "schemes": [
-    "https"
   ],
   "consumes": [
     "application/json"
@@ -164,8 +151,19 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/casesInputCase"
+              "$ref": "#/definitions/casesInputCreateCase"
             }
+          },
+          {
+            "name": "fields",
+            "description": "Result fields to include in the response.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -1042,20 +1040,9 @@
         "parameters": [
           {
             "name": "etag",
-            "description": "(etag only)",
             "in": "path",
             "required": true,
             "type": "string"
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -1898,6 +1885,21 @@
           },
           {
             "name": "input.relatedTo.links.next",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "input.relatedTo.files.page",
+            "description": "Current page number.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "input.relatedTo.files.next",
+            "description": "Indicator if there is a next page.",
             "in": "query",
             "required": false,
             "type": "boolean"
@@ -3246,8 +3248,8 @@
             "type": "string"
           },
           {
-            "name": "qin",
-            "description": "List of search terms.",
+            "name": "ids",
+            "description": "Array of requested id.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -3373,8 +3375,15 @@
             "format": "int32"
           },
           {
-            "name": "qin",
-            "description": "Query parameters for filtering.",
+            "name": "q",
+            "description": "Search term.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "description": "Fields to include in the response.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -3384,8 +3393,8 @@
             "collectionFormat": "multi"
           },
           {
-            "name": "fields",
-            "description": "Fields to include in the response.",
+            "name": "ids",
+            "description": "Array of requested id.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -3421,7 +3430,6 @@
         "parameters": [
           {
             "name": "caseEtag",
-            "description": "oneof filters {\n   FilterNode node = 7;\n   Filter filter = 8;\n }",
             "in": "path",
             "required": true,
             "type": "string"
@@ -3447,7 +3455,7 @@
             "type": "string"
           },
           {
-            "name": "qin",
+            "name": "ids",
             "in": "query",
             "required": false,
             "type": "array",
@@ -3714,6 +3722,10 @@
                   "$ref": "#/definitions/generalLookup",
                   "title": "create: not required, default first value from priority lookup"
                 },
+                "source": {
+                  "$ref": "#/definitions/generalLookup",
+                  "title": "source of the case"
+                },
                 "service": {
                   "$ref": "#/definitions/generalLookup",
                   "title": "on this field base many other readonly fields on return"
@@ -3843,6 +3855,10 @@
                 "priority": {
                   "$ref": "#/definitions/generalLookup",
                   "title": "create: not required, default first value from priority lookup"
+                },
+                "source": {
+                  "$ref": "#/definitions/generalLookup",
+                  "title": "source of the case"
                 },
                 "service": {
                   "$ref": "#/definitions/generalLookup",
@@ -5022,6 +5038,10 @@
           "$ref": "#/definitions/casesCaseLinkList",
           "title": "attached links"
         },
+        "files": {
+          "$ref": "#/definitions/casesCaseFileList",
+          "title": "attached files"
+        },
         "sla": {
           "$ref": "#/definitions/generalLookup",
           "title": "sla from the service"
@@ -5152,11 +5172,11 @@
         },
         "author": {
           "$ref": "#/definitions/generalLookup",
-          "title": "contact-author calculated on-flight"
+          "title": "contact-author calculated on-flight (optional)"
         },
         "name": {
           "type": "string",
-          "title": "link name"
+          "title": "link name (optional)"
         },
         "url": {
           "type": "string",
@@ -5441,6 +5461,35 @@
         }
       },
       "title": "CloseReasonList message contains a list of CloseReason items with pagination"
+    },
+    "casesCreateCaseCloseInput": {
+      "type": "object",
+      "properties": {
+        "closeResult": {
+          "type": "string",
+          "title": "rich text with comment on resulting case"
+        },
+        "closeReason": {
+          "type": "string",
+          "format": "int64",
+          "title": "actual close reason value from the close_reason lookup"
+        }
+      }
+    },
+    "casesCreateCaseRelatedCaseInput": {
+      "type": "object",
+      "properties": {
+        "etag": {
+          "type": "string"
+        },
+        "relationType": {
+          "$ref": "#/definitions/casesRelationType"
+        },
+        "relatedTo": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
     },
     "casesCreateCatalogRequest": {
       "type": "object",
@@ -5734,6 +5783,10 @@
           "$ref": "#/definitions/generalLookup",
           "title": "create: not required, default first value from priority lookup"
         },
+        "source": {
+          "$ref": "#/definitions/generalLookup",
+          "title": "source of the case"
+        },
         "service": {
           "$ref": "#/definitions/generalLookup",
           "title": "on this field base many other readonly fields on return"
@@ -5880,6 +5933,105 @@
         },
         "description": {
           "type": "string"
+        }
+      }
+    },
+    "casesInputCreateCase": {
+      "type": "object",
+      "properties": {
+        "etag": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "title": "create: required;"
+        },
+        "subject": {
+          "type": "string",
+          "title": "create: required;"
+        },
+        "description": {
+          "type": "string",
+          "title": "create: not required;"
+        },
+        "contactInfo": {
+          "type": "string",
+          "title": "create: not required;"
+        },
+        "assignee": {
+          "type": "string",
+          "format": "int64",
+          "title": "create: not required, default from service or set by UI;"
+        },
+        "reporter": {
+          "type": "string",
+          "format": "int64",
+          "title": "create: required (if empty recognize as anonymous contact);"
+        },
+        "impacted": {
+          "type": "string",
+          "format": "int64",
+          "title": "create: required, default is reporter or ui (if empty recognize as anonymous);"
+        },
+        "group": {
+          "type": "string",
+          "format": "int64",
+          "title": "create: not required, default from service or set by UI;"
+        },
+        "status": {
+          "type": "string",
+          "format": "int64",
+          "title": "create: not required, default initial value from status lookup or ui;"
+        },
+        "closeReason": {
+          "type": "string",
+          "format": "int64",
+          "title": "create: not required;"
+        },
+        "priority": {
+          "type": "string",
+          "format": "int64",
+          "title": "create: not required, default first value from priority lookup"
+        },
+        "source": {
+          "type": "string",
+          "format": "int64",
+          "title": "source of the case"
+        },
+        "service": {
+          "type": "string",
+          "format": "int64",
+          "title": "on this field base many other readonly fields on return"
+        },
+        "close": {
+          "$ref": "#/definitions/casesCreateCaseCloseInput",
+          "title": "create: not required; update: required only when case status goes to the final state"
+        },
+        "rate": {
+          "$ref": "#/definitions/casesRateInfo",
+          "title": "only for API, not UI"
+        },
+        "comments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/casesInputCaseComment"
+          }
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/casesInputCaseLink"
+          },
+          "title": "repeated InputCaseFile files = 17;"
+        },
+        "related": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/casesCreateCaseRelatedCaseInput"
+          }
         }
       }
     },
@@ -6860,17 +7012,5 @@
       "default": "TYPE_UNSPECIFIED",
       "description": "Represents a source type for the source entity.\n\n - TYPE_UNSPECIFIED: Unspecified source type.\n - CALL: Phone call source type.\n - CHAT: Chat source type.\n - SOCIAL_MEDIA: Social media source type.\n - EMAIL: Email source type.\n - API: API source type.\n - MANUAL: Manual source type."
     }
-  },
-  "securityDefinitions": {
-    "AccessToken": {
-      "type": "apiKey",
-      "name": "X-Webitel-Access",
-      "in": "header"
-    }
-  },
-  "security": [
-    {
-      "AccessToken": []
-    }
-  ]
+  }
 }
