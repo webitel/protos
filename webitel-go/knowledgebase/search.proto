@@ -1,0 +1,66 @@
+syntax = "proto3";
+package webitel.knowledgebase;
+option go_package = "webitel.go/api/spaces;spaces";
+
+import "google/protobuf/wrappers.proto";
+
+import "google/api/annotations.proto";
+
+
+// Articles service catalogs.
+service KnowledgebaseSearch {
+
+  
+rpc SpacesArticlesSearch(CombinedSearchRequest) returns (CombinedList) {
+    option (google.api.http) = {
+      get: "/spaces/search"
+    };
+  }
+}
+
+message Combined {
+    // Id of the record (article or space)
+    string id = 1;
+    // Display name of the record (article or space)
+    string name = 2;
+    // Type of the record: article/space
+    string type = 3;
+}
+
+
+message CombinedList {
+
+  repeated Combined data = 1;
+  // The page number of the partial result.
+  int32 page = 2;
+  // Indicates that this is a partial result.
+  // More data available upon query: ?size=${data.len}&page=${page++}
+  bool next = 3;
+
+}
+
+// Search for the space's Article(s) request.
+message CombinedSearchRequest {
+      
+  // Size count of records on result page. limit = (size++)
+  int32 size = 1;
+
+  // Page number of result dataset records. offset = (page*size)
+  int32 page = 2;
+
+  // Sort the result according to fields.
+  repeated string sort = 3;
+
+  // Search term: location name;
+  // `?` - matches any one character
+  // `*` - matches 0 or more characters
+  string q = 4;
+
+  // Active Article only.
+  google.protobuf.BoolValue state = 5;
+
+  // Tags associated with the article.
+  repeated string tags = 6;
+
+}
+

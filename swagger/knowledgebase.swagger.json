@@ -21,6 +21,9 @@
     },
     {
       "name": "Tags"
+    },
+    {
+      "name": "KnowledgebaseSearch"
     }
   ],
   "host": "nx.webitel.org",
@@ -154,6 +157,76 @@
         ]
       }
     },
+    "/spaces/search": {
+      "get": {
+        "operationId": "KnowledgebaseSearch_SpacesArticlesSearch",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.knowledgebase.CombinedList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "size",
+            "description": "Size count of records on result page. limit = (size++)",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "page",
+            "description": "Page number of result dataset records. offset = (page*size)",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "sort",
+            "description": "Sort the result according to fields.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "q",
+            "description": "Search term: location name;\n`?` - matches any one character\n`*` - matches 0 or more characters",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "state",
+            "description": "Active Article only.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "tags",
+            "description": "Tags associated with the article.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "KnowledgebaseSearch"
+        ]
+      }
+    },
     "/spaces/tags": {
       "get": {
         "summary": "List of the all Articles's Tag(s).",
@@ -190,7 +263,7 @@
     "/spaces/{etag}": {
       "get": {
         "summary": "Locate spaces source",
-        "operationId": "Spaces_LocateSpaces",
+        "operationId": "Spaces_LocateSpace",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -443,6 +516,65 @@
           {
             "name": "fields",
             "description": "Fields to be retrieved into result of changes.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Articles"
+        ]
+      }
+    },
+    "/spaces/{space_id}/articles/{article_id}/attachments": {
+      "get": {
+        "operationId": "Articles_ArticlesAttachmentList",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.knowledgebase.AttachmentList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "space_id",
+            "description": "Space ID associated with.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "article_id",
+            "description": "Record(s) with unique ID only.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "description": "Page number of result dataset records. offset = (page*size)",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "description": "Size count of records on result page. limit = (size++)",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "sort",
+            "description": "Sort the result according to fields.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -824,6 +956,88 @@
         }
       },
       "description": "Article dataset.\nNOTE: Edge represents connection between two nodes.\nSo this spaceArticles.data are always subordinate to some space.id."
+    },
+    "webitel.knowledgebase.Attachment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique ID of the association. Never changes."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the article."
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The size of the attachment."
+        },
+        "uploaded_by": {
+          "$ref": "#/definitions/webitel.knowledgebase.Lookup",
+          "description": "The user who loaded this attachment."
+        }
+      }
+    },
+    "webitel.knowledgebase.AttachmentList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.knowledgebase.Attachment"
+          },
+          "description": "Attachment dataset page."
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The page number of the partial result."
+        },
+        "next": {
+          "type": "boolean",
+          "title": "Indicates that this is a partial result.\nMore data available upon query: ?size=${data.len}\u0026page=${page++}"
+        }
+      }
+    },
+    "webitel.knowledgebase.Combined": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id of the record (article or space)"
+        },
+        "name": {
+          "type": "string",
+          "title": "Display name of the record (article or space)"
+        },
+        "type": {
+          "type": "string",
+          "title": "Type of the record: article/space"
+        }
+      }
+    },
+    "webitel.knowledgebase.CombinedList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.knowledgebase.Combined"
+          }
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The page number of the partial result."
+        },
+        "next": {
+          "type": "boolean",
+          "title": "Indicates that this is a partial result.\nMore data available upon query: ?size=${data.len}\u0026page=${page++}"
+        }
+      }
     },
     "webitel.knowledgebase.InputArticle": {
       "type": "object",

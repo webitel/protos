@@ -158,6 +158,12 @@ service Articles {
       delete: "/spaces/{space_id}/articles/{etag}"
     };
   }
+
+  rpc ArticlesAttachmentList(ListAttachmentsRequest) returns (AttachmentList) {
+    option (google.api.http) = {
+      get: "/spaces/{space_id}/articles/{article_id}/attachments"
+    };
+  }
 }
 
 // Article dataset.
@@ -344,4 +350,42 @@ message DeleteArticleRequest {
     }
   ];
 
+}
+
+message ListAttachmentsRequest {
+    // Page number of result dataset records. offset = (page*size)
+    int32 page = 2;
+    
+    // Size count of records on result page. limit = (size++)
+    int32 size = 1;
+  
+    // Sort the result according to fields.
+    repeated string sort = 3;
+  
+    // Space ID associated with.
+    string space_id = 5;
+  
+    // Record(s) with unique ID only.
+    string article_id = 7;
+}
+
+message AttachmentList {
+    // Attachment dataset page.
+    repeated webitel.knowledgebase.Attachment data = 1;
+    // The page number of the partial result.
+    int32 page = 2;
+    // Indicates that this is a partial result.
+    // More data available upon query: ?size=${data.len}&page=${page++}
+    bool next = 3;
+}
+
+message Attachment {
+    // The unique ID of the association. Never changes.
+    string id = 1;
+    // The title of the article.
+    string title = 2;
+    // The size of the attachment.
+    int32 size = 3;
+    // The user who loaded this attachment.
+    webitel.knowledgebase.Lookup uploaded_by = 4;
 }
