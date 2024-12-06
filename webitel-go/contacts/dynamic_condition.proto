@@ -1,0 +1,239 @@
+syntax = "proto3";
+package webitel.contacts;
+option go_package = "webitel.go/api/contacts;contacts";
+
+import "google/api/visibility.proto";
+import "contacts/fields.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/wrappers.proto";
+
+// Condition
+message Condition {
+  // The unique ID of the condition.
+  int64 id = 1;
+
+  // The query or condition expression used to evaluate the group.
+  string expression = 2;
+
+  // The ID of the static group that should be assigned if the condition is met.
+  webitel.contacts.Lookup group = 3;
+
+  // The ID of the assignee that should be assigned if the condition is met (optional).
+  webitel.contacts.Lookup assignee = 4;
+
+  // The user who created this condition.
+  webitel.contacts.Lookup created_by = 5;
+
+  // The user who performed the last update.
+  webitel.contacts.Lookup updated_by = 6;
+
+  // The timestamp (in milliseconds) of when the condition was created.
+  int64 created_at = 7;
+
+  // The timestamp (in milliseconds) of the last update.
+  int64 updated_at = 8;
+}
+
+// Request message for listing conditions.
+message ListConditionsRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["group_id"]
+    }
+  };
+  // Page number of result dataset records. offset = (page*size)
+  int32 page = 1;
+
+  // Size count of records on result page. limit = (size++)
+  int32 size = 2;
+
+  // Fields to be retrieved as a result.
+  repeated string fields = 3;
+
+  // Sort the result according to fields.
+  repeated string sort = 4;
+
+  // Search term for conditions.
+  string q = 5;
+
+   // Filter by unique IDs.
+   repeated int64 id = 6;
+
+  // The ID of the group to which the conditions belong.
+  int64 group_id = 7;
+}
+
+// A list of Conditions.
+message ConditionList {
+  // Page number of the partial result.
+  int32 page = 1;
+
+  // Have more records.
+  bool next = 2;
+
+  // List of conditions.
+  repeated Condition items = 3;
+}
+
+// Request message for creating a new condition.
+message CreateConditionRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["group_id"]
+    }
+  };
+
+  // The ID of the group to which the condition belongs.
+  int64 group_id = 1;
+
+  // The query or condition expression used to evaluate the group.
+  string expression = 2;
+
+  // The ID of the static group that should be assigned if the condition is met.
+  int64 group = 3;
+
+  // The ID of the assignee that should be assigned if the condition is met (optional).
+  int64 assignee = 4;
+}
+
+// Position details for conditions in the group.
+message Position {
+  // The current position of the condition in the list.
+  int64 current_position = 1;
+
+  // The target position where the condition should be moved.
+  int64 target_position = 2;
+}
+
+
+// Input message for creating/updating a condition.
+message InputCondition {
+  // The query or condition expression used to evaluate the group.
+  string expression = 1;
+
+  // The ID of the static group that should be assigned if the condition is met.
+  int64 group = 2;
+
+  // The ID of the assignee that should be assigned if the condition is met (optional).
+  google.protobuf.Int64Value assignee = 3;
+
+  // The position of the condition in the group.
+  Position position = 4;
+}
+
+
+
+// Request message for locating a condition by ID.
+message LocateConditionRequest {
+  int64 id = 1;  // Unique ID of the condition.
+
+  // Fields to be retrieved as a result.
+   repeated string fields = 2;
+}
+
+// Response message for locating a condition by ID.
+message LocateConditionResponse {
+  Condition condition = 1;
+}
+
+// Request message for updating an existing condition.
+message UpdateConditionRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"]
+    }
+  };
+
+  // The unique ID of the condition to update.
+  int64 id = 1;
+
+  // Input details for the condition.
+  InputCondition input = 2;
+
+  // ---- JSON PATCH fields mask ----
+  // List of JPath fields specified in body(input).
+  repeated string x_json_mask = 3
+  [(google.api.field_visibility) = {
+    restriction: "PREVIEW" // "INTERNAL"
+  },
+  (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    read_only: true
+    pattern: "^$"
+  }];
+}
+
+// Request message for deleting a condition.
+message DeleteConditionRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"]
+    }
+  };
+
+  // The unique ID of the condition to delete.
+  int64 id = 1;  // Unique ID of the condition.
+}
+
+// Service for managing conditions.
+service DynamicConditions {
+    // Retrieve a list of conditions.
+  rpc ListConditions(ListConditionsRequest) returns (ConditionList) {
+      option (google.api.http) = {
+        get: "/contacts/groups/{group_id}/conditions"
+      };
+
+      option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        summary: "Retrieve a list of conditions"
+      };
+    }
+  // Create a new condition.
+  rpc CreateCondition(CreateConditionRequest) returns (Condition) {
+    option (google.api.http) = {
+      post: "/contacts/groups/{group_id}/conditions"
+      body: "*"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Create a new condition"
+    };
+  }
+
+  // Update an existing condition.
+  rpc UpdateCondition(UpdateConditionRequest) returns (Condition) {
+    option (google.api.http) = {
+      put: "/contacts/groups/conditions/{id}"
+      body: "input"
+      additional_bindings {
+        patch: "/contacts/groups/conditions/{id}"
+        body: "input"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Update an existing condition"
+    };
+  }
+
+  // Delete a condition.
+  rpc DeleteCondition(DeleteConditionRequest) returns (Condition) {
+    option (google.api.http) = {
+      delete: "/contacts/groups/conditions/{id}"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Delete a condition"
+    };
+  }
+
+  // Locate a condition by ID.
+  rpc LocateCondition(LocateConditionRequest) returns (LocateConditionResponse) {
+    option (google.api.http) = {
+      get: "/contacts/groups/conditions/{id}"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Locate a condition by ID"
+    };
+  }
+}

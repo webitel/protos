@@ -1,0 +1,359 @@
+
+syntax = "proto3";
+package webitel.contacts;
+option go_package = "webitel.go/api/contacts;contacts";
+
+import "contacts/fields.proto";
+import "google/api/annotations.proto";
+import "google/api/visibility.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+// The Contact's Group association.
+message ContactGroup {
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    // GET /contacts/{source.id}/groups/{id}
+    example: ""
+  };
+
+  // [META]: --------------------------------------
+
+  // The unique ID of the association. Never changes.
+  string id = 1;
+
+  // Version of the latest update. Numeric sequence.
+  int32 ver = 2;
+
+  // Unique ID of the latest version of the update.
+  // This ID changes after any update to the underlying value(s).
+  string etag = 3;
+
+  // The user who created this Field.
+  int64 created_at = 5;
+
+  // Timestamp(milli) of the Field creation.
+  webitel.contacts.Lookup created_by = 6;
+
+  // Timestamp(milli) of the last Field update.
+  // Take part in Etag generation.
+  int64 updated_at = 7;
+
+  // The user who performed last Update.
+  webitel.contacts.Lookup updated_by = 8;
+
+  // [VALUE]: --------------------------------------
+
+  // Group of contacts associated.
+  webitel.contacts.Lookup group = 11;
+}
+
+// An input of the Contact's groups.
+message InputContactGroup {
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["etag"]
+    }
+  };
+
+  // Unique ID of the latest version of an existing resource.
+  string etag = 1
+  [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    field_configuration: {
+      path_param_name: "etag"
+    }
+  }];
+
+  // [VALUE]: --------------------------------------
+
+  // Group of contacts associated.
+  webitel.contacts.Lookup group = 11;
+}
+
+// Contact groups dataset.
+// NOTE: Edge represents connection between two nodes.
+// So this ContactGroupList.data are always subordinate to some contact.id.
+message ContactGroupList {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {};
+
+  // Group dataset page.
+  repeated ContactGroup data = 1;
+  // The page number of the partial result.
+  int32 page = 2;
+  // Indicates that this is a partial result.
+  // More data available upon query: ?size=${data.len}&page=${page++}
+  bool next = 3;
+}
+
+// Search for the Contact's group(s) request.
+message ListContactGroupsRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["contact_id"]
+    }
+  };
+
+  // ----- Result Options ----- //
+
+  // Page number of result dataset records. offset = (page*size)
+  int32 page = 1;
+
+  // Size count of records on result page. limit = (size++)
+  int32 size = 2;
+
+  // Search term: group name;
+  // `?` - matches any one character
+  // `*` - matches 0 or more characters
+  string query = 3;
+
+  // Sort the result according to fields.
+  repeated string sort = 4;
+
+  // Fields to be retrieved as a result.
+  repeated string fields = 5;
+
+  // Contact ID associated with.
+  string contact_id = 6;
+
+  // Record(s) with unique ID only.
+  repeated string id = 7;
+}
+
+message MergeContactGroupsRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: "contact_id"
+      required: "input"
+    }
+  };
+
+  // --------- PATCH Options -------- //
+
+  // JSON PATCH fields mask.
+  // List of JPath fields specified in body(input).
+  repeated string x_json_mask = 1
+  [(google.api.field_visibility) = {
+    restriction: "PREVIEW"
+  },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      read_only: true
+      pattern: "^$"
+    }];
+
+  // ------- Result Options -------
+
+  // Fields to be retrieved as a result.
+  repeated string fields = 2;
+
+  // Link contact ID.
+  string contact_id = 3;
+
+  // Array of the unique User(s) to associate with the Contact.
+  // Any duplicate of an already linked user{id} will result in an error.
+  repeated InputContactGroup input = 4
+  [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      // example: "[{\"group\":{\"id\":\"416\",\"name\":\"Admin Group\"}},{\"group\":{\"id\":\"414\",\"name\":\"User Group\"}}]"
+    }
+  ];
+}
+
+message ResetContactGroupsRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: "contact_id"
+      required: "input"
+    }
+  };
+
+  // --------- Result Options -------- //
+
+  // Fields to be retrieved into result of changes.
+  repeated string fields = 1;
+
+  // Link contact ID.
+  string contact_id = 2;
+
+  // Final set of group(s) to be linked with the contact.
+  // Group(s) that are already linked with the contact
+  // but not given in here will be removed.
+  repeated InputContactGroup input = 3
+  [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      // example: "[{\"etag\":\"k0WqvUn4IJGnuCyG\",\"group\":{\"id\":\"11\",\"name\":\"New Group\"}}]"
+      min_items: 1
+      unique_items: true
+    }
+  ];
+}
+
+message DeleteContactGroupsRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: "contact_id"
+      required: "etag"
+    }
+  };
+
+  // ----- Result Options ----- //
+
+  // Fields to be retrieved as a result.
+  repeated string fields = 1;
+
+  // Contact ID associated with.
+  string contact_id = 2;
+
+  // Set of unique ID(s) to remove.
+  repeated string etag = 3
+  [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      unique_items: true
+      min_items: 1
+    }
+  ];
+}
+
+// Locate single Link by unique IDentifier.
+message LocateContactGroupRequest {
+  // ------- Result Options ------
+
+  // Fields to be retrieved into result.
+  repeated string fields = 1;
+
+  // Contact source ID.
+  string contact_id = 2;
+
+  // Unique group link IDentifier.
+  // Accept: `etag` (obsolete+) or `id`.
+  string etag = 3
+  [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    format: "\\w+"
+  }];
+}
+
+message UpdateContactGroupRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: "contact_id"
+      required: "input"
+    }
+  };
+
+  // --------- PATCH Options -------- //
+
+  // JSON PATCH fields mask.
+  // List of JPath fields specified in body(input).
+  repeated string x_json_mask = 1
+  [(google.api.field_visibility) = {
+    restriction: "PREVIEW"
+  },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      read_only: true
+      pattern: "^$"
+    }];
+
+  // --------- Result Options -------- //
+
+  // Fields to be retrieved into result of changes.
+  repeated string fields = 2;
+
+  // Link contact ID.
+  string contact_id = 3;
+
+  // NEW Update of the group link.
+  InputContactGroup input = 4;
+}
+
+message DeleteContactGroupRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: "contact_id"
+      required: "etag"
+    }
+  };
+
+  // --------- Result Options -------- //
+
+  // Fields to be retrieved as a result.
+  repeated string fields = 1;
+
+  // Contact ID associated with.
+  string contact_id = 2;
+
+  // Unique ID to remove.
+  string etag = 3
+  [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      pattern: "^\\.+$"
+    }
+  ];
+}
+
+// Service for managing contact groups.
+service ContactGroups {
+
+  // ------------------ [WITH] Contact ------------------- //
+
+  // List of the Contact's group(s).
+  rpc ListContactGroups(ListContactGroupsRequest) returns (ContactGroupList) {
+    option (google.api.http) = {
+      get: "/contacts/{contact_id}/groups"
+    };
+  }
+
+  // Associate more group(s) with the Contact.
+  rpc MergeContactGroups(MergeContactGroupsRequest) returns (ContactGroupList) {
+    option (google.api.http) = {
+      post: "/contacts/{contact_id}/groups"
+      // response_body
+      body: "input"
+    };
+  }
+
+  // Resets all groups of the contact according to the input dataset.
+  rpc ResetContactGroups(ResetContactGroupsRequest) returns (ContactGroupList) {
+    option (google.api.http) = {
+      put: "/contacts/{contact_id}/groups"
+      // response_body: "data"
+      body: "input"
+    };
+  }
+
+  // Remove the Contact's group(s).
+  rpc DeleteContactGroups(DeleteContactGroupsRequest) returns (ContactGroupList) {
+    option (google.api.http) = {
+      delete: "/contacts/{contact_id}/groups"
+      // response_body: "data"
+    };
+  }
+
+  // ------------------ [WITH] Record ------------------- //
+
+  // Locate the Contact's group association.
+  rpc LocateContactGroup(LocateContactGroupRequest) returns (ContactGroup) {
+    option (google.api.http) = {
+      get: "/contacts/{contact_id}/groups/{etag}"
+    };
+  }
+
+  // Update the Contact's group details.
+  rpc UpdateContactGroup(UpdateContactGroupRequest) returns (ContactGroupList) {
+    option (google.api.http) = {
+      put: "/contacts/{contact_id}/groups/{input.etag}"
+      // response_body: "data"
+      body: "input"
+      additional_bindings: {
+        patch: "/contacts/{contact_id}/groups/{input.etag}"
+        // response_body: "data"
+        body: "input"
+      }
+    };
+  }
+
+  // Remove the Contact's group association.
+  rpc DeleteContactGroup(DeleteContactGroupRequest) returns (ContactGroup) {
+    option (google.api.http) = {
+      delete: "/contacts/{contact_id}/groups/{etag}"
+    };
+  }
+}

@@ -1,0 +1,258 @@
+syntax = "proto3";
+package webitel.contacts;
+option go_package = "webitel.go/api/contacts;contacts";
+
+import "google/api/visibility.proto";
+import "contacts/fields.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+// Dynamic Group condition
+message DynamicCondition {
+  // The unique ID of the condition.
+  int64 id = 1;
+
+  // The query or condition expression used to evaluate the group.
+  string expression = 2;
+
+  // The ID of the static group that should be assigned if the condition is met.
+  webitel.contacts.Lookup group = 3;
+
+  // The ID of the assignee that should be assigned if the condition is met (optional).
+  webitel.contacts.Lookup assignee = 4;
+}
+
+// Dynamic Group condition
+message InputDynamicCondition {
+  // The query or condition expression used to evaluate the group.
+  string expression = 1;
+
+  // The ID of the static group that should be assigned if the condition is met.
+  int64 group = 2;
+
+  // The ID of the assignee that should be assigned if the condition is met (optional).
+  int64 assignee = 3;
+}
+
+
+// Dynamic Group
+message DynamicGroup {
+  // The unique ID of the dynamic group. Never changes.
+  int64 id = 1;
+
+  // The name of the dynamic group.
+  string name = 2;
+
+  // The description of the dynamic group.
+  string description = 4;
+
+  // Timestamp(milli) of the group's creation.
+  int64 created_at = 5;
+
+  // Timestamp(milli) of the last group update.
+  int64 updated_at = 6;
+
+  // The user who created this dynamic group.
+  webitel.contacts.Lookup created_by = 7;
+
+  // The user who performed the last update.
+  webitel.contacts.Lookup updated_by = 8;
+
+  // List of dynamic conditions associated with the group.
+  repeated DynamicCondition conditions = 9;
+
+  // Default static group to be assigned if no conditions are met.
+  webitel.contacts.Lookup default_group = 10;
+
+  // Enabled status of the group: active or inactive.
+  bool enabled = 11;
+}
+
+// A list of Dynamic Groups.
+message DynamicGroupList {
+  // Page number of the partial result.
+  int32 page = 1;
+
+  // Have more records.
+  bool next = 2;
+
+  // List of dynamic groups.
+  repeated DynamicGroup items = 3;
+}
+
+// Input message for creating/updating a dynamic group.
+message DynamicGroupInput {
+  // The name of the dynamic group.
+  string name = 1;
+
+  // The description of the dynamic group.
+  string description = 2;
+
+  // Default static group to assign if no conditions are met.
+  int64 default_group = 3;
+
+  // Enabled status of the dynamic group: active/inactive.
+  bool enabled = 6;
+}
+
+// Request message for creating a new dynamic group.
+message CreateDynamicGroupRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["name"]
+    }
+  };
+
+    // The name of the dynamic group.
+    string name = 1;
+
+    // The description of the dynamic group.
+    string description = 2;
+
+    // Default static group to assign if no conditions are met.
+    int64 default_group_id = 3;
+
+    // Enabled status of the dynamic group: active/inactive.
+    bool enabled = 4;
+
+    // Input details for the dynamic group.
+   repeated InputDynamicCondition condition = 5;
+}
+
+// Request message for locating a dynamic group by ID.
+message LocateDynamicGroupRequest {
+  int64 id = 1;
+  repeated string fields = 2;
+}
+
+// Response message for locating a dynamic group by ID.
+message LocateDynamicGroupResponse {
+  DynamicGroup group = 1;
+}
+
+// Request message for updating an existing dynamic group.
+message UpdateDynamicGroupRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"]
+    }
+  };
+
+  // The unique ID of the dynamic group to update.
+  int64 id = 1;
+
+  // Input details for the dynamic group.
+  DynamicGroupInput input = 2;
+
+  // ---- JSON PATCH fields mask ----
+  // List of JPath fields specified in body(input).
+  repeated string x_json_mask = 3
+  [(google.api.field_visibility) = {
+    restriction: "PREVIEW" // "INTERNAL"
+  },
+  (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    read_only: true
+    pattern: "^$"
+  }];
+}
+
+// Request message for deleting a dynamic group.
+message DeleteDynamicGroupRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"]
+    }
+  };
+
+  // The unique ID of the dynamic group to delete.
+  int64 id = 1;
+}
+
+// Request message for listing dynamic groups.
+message ListDynamicGroupsRequest {
+  // Page number of result dataset records. offset = (page*size)
+  int32 page = 1;
+
+  // Size count of records on result page. limit = (size++)
+  int32 size = 2;
+
+  // Fields to be retrieved as a result.
+  repeated string fields = 3;
+
+  // Sort the result according to fields.
+  repeated string sort = 4;
+
+  // Filter by unique IDs.
+  repeated int64 id = 5;
+
+  // Search term: group name;
+  // `?` - matches any one character
+  // `*` - matches 0 or more characters
+  string q = 6;
+
+  // Filter by group name.
+  string name = 7;
+}
+
+// Service for managing dynamic groups.
+service DynamicGroups {
+  // Retrieve a list of dynamic groups or search dynamic groups.
+  rpc ListDynamicGroups(ListDynamicGroupsRequest) returns (DynamicGroupList) {
+    option (google.api.http) = {
+      get: "/contacts/groups/dynamic"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Retrieve a list of dynamic groups or search dynamic groups"
+    };
+  }
+
+  // Create a new dynamic group.
+  rpc CreateDynamicGroup(CreateDynamicGroupRequest) returns (DynamicGroup) {
+    option (google.api.http) = {
+      post: "/contacts/groups/dynamic"
+      body: "*"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Create a new dynamic group"
+    };
+  }
+
+  // Update an existing dynamic group.
+  rpc UpdateDynamicGroup(UpdateDynamicGroupRequest) returns (DynamicGroup) {
+    option (google.api.http) = {
+      put: "/contacts/groups/{id}/dynamic"
+      body: "input"
+      additional_bindings {
+        patch: "/contacts/groups/{id}/dynamic"
+        body: "input"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Update an existing dynamic group"
+    };
+  }
+
+  // Delete a dynamic group.
+  rpc DeleteDynamicGroup(DeleteDynamicGroupRequest) returns (DynamicGroup) {
+    option (google.api.http) = {
+      delete: "/contacts/groups/{id}/dynamic"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Delete a dynamic group"
+    };
+  }
+   // Locate a dynamic group by ID.
+   rpc LocateDynamicGroup(LocateDynamicGroupRequest) returns (LocateDynamicGroupResponse) {
+    option (google.api.http) = {
+      get: "/contacts/groups/{id}/dynamic"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Locate a dynamic group by ID"
+    };
+  }
+}

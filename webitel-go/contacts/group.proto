@@ -1,0 +1,277 @@
+syntax = "proto3";
+package webitel.contacts;
+option go_package = "webitel.go/api/contacts;contacts";
+
+import "contacts/fields.proto";
+import "contacts/dynamic_group.proto";
+import "contacts/contacts.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/api/visibility.proto";
+
+// Enum for Group Type
+enum GroupType {
+  GROUP_TYPE_UNSPECIFIED = 0; // Default value
+  STATIC = 1;                 // Static group
+  DYNAMIC = 2;                // Dynamic group
+}
+
+// Group of Contacts
+message Group {
+  // The unique ID of the group. Never changes.
+  string id = 1;
+
+  // The name of the group.
+  string name = 2;
+
+  // The description of the group.
+  string description = 4;
+
+  // Timestamp(milli) of the group's creation.
+  int64 created_at = 5;
+
+  // Timestamp(milli) of the last group update.
+  int64 updated_at = 6;
+
+  // The user who created this group.
+  webitel.contacts.Lookup created_by = 7;
+
+  // The user who performed the last update.
+  webitel.contacts.Lookup updated_by = 8;
+
+  bool enabled = 9;
+
+  // List of dynamic conditions associated with the group.
+  repeated DynamicCondition conditions = 10;
+
+  // Default static group to be assigned if no conditions are met.
+  webitel.contacts.Lookup default_group = 11;
+
+  GroupType type = 12;
+}
+
+// A list of Groups.
+message GroupList {
+  // Page number of the partial result.
+  int32 page = 1;
+  // Have more records.
+  bool next = 2;
+  // List of groups.
+  repeated Group items = 3;
+}
+
+// Request message for creating a new group.
+message CreateGroupRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["name"]
+    }
+  };
+
+  // The name of the group.
+  string name = 1;
+
+  // The description of the group.
+  string description = 3;
+
+  // The enabled status of the group.
+  bool enabled = 4;
+}
+
+// Input message for creating/updating a group
+message InputGroup {
+   // The new name of the group.
+   string name = 1;
+
+   // The new description of the group.
+   string description = 2;
+
+   // The new enabled status of the group.
+   bool enabled = 3;
+}
+
+// Request message for updating an existing group.
+message UpdateGroupRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"]
+    }
+  };
+
+  // The unique ID of the group to update.
+  string id = 1;
+
+  InputGroup input = 2;
+
+    // ---- JSON PATCH fields mask ----
+  // List of JPath fields specified in body(input).
+  repeated string x_json_mask = 3
+  [(google.api.field_visibility) = {
+    restriction: "PREVIEW" // "INTERNAL"
+  },
+  (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    read_only: true
+    pattern: "^$"
+  }];
+}
+
+// Request message for deleting a group.
+message DeleteGroupRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"]
+    }
+  };
+
+  // The unique ID of the group to delete.
+  string id = 1;
+}
+
+// Request message for adding contacts to a group.
+message AddContactsToGroupRequest {
+  // The unique ID of the group.
+  int64 group_id = 1;
+
+  // List of contact IDs to add to the group.
+  repeated int64 contact_ids = 2;
+}
+
+// Request message for removing contacts from a group.
+message RemoveContactsFromGroupRequest {
+  // The unique ID of the group.
+  int64 group_id = 1;
+
+  // List of contact IDs to remove from the group.
+  repeated int64 contact_ids = 2;
+}
+
+// Request message for listing groups.
+message ListGroupsRequest {
+  // Page number of result dataset records. offset = (page*size)
+  int32 page = 1;
+
+  // Size count of records on result page. limit = (size++)
+  int32 size = 2;
+
+  // Fields to be retrieved as a result.
+  repeated string fields = 3;
+
+  // Sort the result according to fields.
+  repeated string sort = 4;
+
+  // Filter by unique IDs.
+  repeated string id = 5;
+
+  // Search term: group name;
+  // `?` - matches any one character
+  // `*` - matches 0 or more characters
+  string q = 6;
+
+  // Filter by group name.
+  string name = 7;
+
+  // Filter by group type.
+  GroupType type = 8;
+}
+
+// Request message for locating a group by ID.
+message LocateGroupRequest {
+  // The unique ID of the group to locate.
+  string id = 1;
+
+  // Fields to be retrieved into result.
+  repeated string fields = 2;
+}
+
+// Response message for locating a group.
+message LocateGroupResponse {
+  // The located group.
+  Group group = 1;
+}
+
+// Service for managing groups.
+service Groups {
+
+  // Retrieve a list of groups or search groups.
+  rpc ListGroups(ListGroupsRequest) returns (GroupList) {
+    option (google.api.http) = {
+      get: "/contacts/groups"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Retrieve a list of groups or search groups"
+    };
+  }
+
+  // Create a new group.
+  rpc CreateGroup(CreateGroupRequest) returns (Group) {
+    option (google.api.http) = {
+      post: "/contacts/groups"
+      body: "*"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Create a new group"
+    };
+  }
+
+  // Update an existing group.
+  rpc UpdateGroup(UpdateGroupRequest) returns (Group) {
+    option (google.api.http) = {
+      put: "/contacts/groups/{id}"
+      body: "input"
+      additional_bindings {
+        patch: "/contacts/groups/{id}"
+        body: "input"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Update an existing group"
+    };
+  }
+
+  // Delete a group.
+  rpc DeleteGroup(DeleteGroupRequest) returns (Group) {
+    option (google.api.http) = {
+      delete: "/contacts/groups/{id}"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Delete a group"
+    };
+  }
+
+  // Add contacts to a group.
+  rpc AddContactsToGroup(AddContactsToGroupRequest) returns (contacts.ContactList) {
+    option (google.api.http) = {
+      post: "/contacts/groups/{group_id}/contact"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Add contacts to a group"
+    };
+  }
+
+  // Remove contacts from a group.
+  rpc RemoveContactsFromGroup(RemoveContactsFromGroupRequest) returns (contacts.ContactList) {
+    option (google.api.http) = {
+      delete: "/contacts/groups/{group_id}/contact"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Remove contacts from a group"
+    };
+  }
+
+  // Locate a group by ID.
+  rpc LocateGroup(LocateGroupRequest) returns (LocateGroupResponse) {
+    option (google.api.http) = {
+      get: "/contacts/groups/{id}"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Locate a group by ID"
+    };
+  }
+}
