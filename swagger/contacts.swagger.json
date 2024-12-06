@@ -44,6 +44,12 @@
       "name": "Groups"
     },
     {
+      "name": "DynamicGroups"
+    },
+    {
+      "name": "DynamicConditions"
+    },
+    {
       "name": "ContactGroups"
     }
   ],
@@ -157,6 +163,22 @@
               "DELETE"
             ],
             "default": "READ"
+          },
+          {
+            "name": "group_id",
+            "description": "Filter by group ID.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "not_id_group",
+            "description": "Filter contacts that are not attached to the provided group.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
           }
         ],
         "tags": [
@@ -276,6 +298,19 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "type",
+            "description": "Filter by group type.\n\n - GROUP_TYPE_UNSPECIFIED: Default value\n - STATIC: Static group\n - DYNAMIC: Dynamic group",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "GROUP_TYPE_UNSPECIFIED",
+              "STATIC",
+              "DYNAMIC"
+            ],
+            "default": "GROUP_TYPE_UNSPECIFIED"
           }
         ],
         "tags": [
@@ -302,6 +337,439 @@
             "schema": {
               "$ref": "#/definitions/webitel.contacts.CreateGroupRequest"
             }
+          }
+        ],
+        "tags": [
+          "Groups"
+        ]
+      }
+    },
+    "/contacts/groups/conditions/{id}": {
+      "get": {
+        "summary": "Locate a condition by ID",
+        "operationId": "DynamicConditions_LocateCondition",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.LocateConditionResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Unique ID of the condition.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved as a result.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "DynamicConditions"
+        ]
+      },
+      "delete": {
+        "summary": "Delete a condition",
+        "operationId": "DynamicConditions_DeleteCondition",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.Condition"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "The unique ID of the condition to delete.\n\nUnique ID of the condition.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "DynamicConditions"
+        ]
+      },
+      "put": {
+        "summary": "Update an existing condition",
+        "operationId": "DynamicConditions_UpdateCondition",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.Condition"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "The unique ID of the condition to update.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "input",
+            "description": "Input details for the condition.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.InputCondition"
+            }
+          }
+        ],
+        "tags": [
+          "DynamicConditions"
+        ]
+      },
+      "patch": {
+        "summary": "Update an existing condition",
+        "operationId": "DynamicConditions_UpdateCondition2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.Condition"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "The unique ID of the condition to update.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "input",
+            "description": "Input details for the condition.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.InputCondition"
+            }
+          }
+        ],
+        "tags": [
+          "DynamicConditions"
+        ]
+      }
+    },
+    "/contacts/groups/dynamic": {
+      "get": {
+        "summary": "Retrieve a list of dynamic groups or search dynamic groups",
+        "operationId": "DynamicGroups_ListDynamicGroups",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.DynamicGroupList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "description": "Page number of result dataset records. offset = (page*size)",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "description": "Size count of records on result page. limit = (size++)",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved as a result.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "sort",
+            "description": "Sort the result according to fields.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "id",
+            "description": "Filter by unique IDs.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "q",
+            "description": "Search term: group name;\n`?` - matches any one character\n`*` - matches 0 or more characters",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Filter by group name.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "DynamicGroups"
+        ]
+      },
+      "post": {
+        "summary": "Create a new dynamic group",
+        "operationId": "DynamicGroups_CreateDynamicGroup",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.DynamicGroup"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "Request message for creating a new dynamic group.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.CreateDynamicGroupRequest"
+            }
+          }
+        ],
+        "tags": [
+          "DynamicGroups"
+        ]
+      }
+    },
+    "/contacts/groups/{group_id}/conditions": {
+      "get": {
+        "summary": "Retrieve a list of conditions",
+        "operationId": "DynamicConditions_ListConditions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.ConditionList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "group_id",
+            "description": "The ID of the group to which the conditions belong.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "description": "Page number of result dataset records. offset = (page*size)",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "description": "Size count of records on result page. limit = (size++)",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved as a result.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "sort",
+            "description": "Sort the result according to fields.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "q",
+            "description": "Search term for conditions.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "description": "Filter by unique IDs.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "DynamicConditions"
+        ]
+      },
+      "post": {
+        "summary": "Create a new condition",
+        "operationId": "DynamicConditions_CreateCondition",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.Condition"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "group_id",
+            "description": "The ID of the group to which the condition belongs.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.DynamicConditions.CreateConditionBody"
+            }
+          }
+        ],
+        "tags": [
+          "DynamicConditions"
+        ]
+      }
+    },
+    "/contacts/groups/{group_id}/contact": {
+      "delete": {
+        "summary": "Remove contacts from a group",
+        "operationId": "Groups_RemoveContactsFromGroup",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.ContactList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "group_id",
+            "description": "The unique ID of the group.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "contact_ids",
+            "description": "List of contact IDs to remove from the group.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Groups"
+        ]
+      },
+      "post": {
+        "summary": "Add contacts to a group",
+        "operationId": "Groups_AddContactsToGroup",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.ContactList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "group_id",
+            "description": "The unique ID of the group.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "contact_ids",
+            "description": "List of contact IDs to add to the group.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -389,11 +857,11 @@
             "type": "string"
           },
           {
-            "name": "body",
+            "name": "input",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/webitel.contacts.Groups.UpdateGroupBody"
+              "$ref": "#/definitions/webitel.contacts.InputGroup"
             }
           }
         ],
@@ -421,16 +889,145 @@
             "type": "string"
           },
           {
-            "name": "body",
+            "name": "input",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/webitel.contacts.Groups.UpdateGroupBody"
+              "$ref": "#/definitions/webitel.contacts.InputGroup"
             }
           }
         ],
         "tags": [
           "Groups"
+        ]
+      }
+    },
+    "/contacts/groups/{id}/dynamic": {
+      "get": {
+        "summary": "Locate a dynamic group by ID",
+        "operationId": "DynamicGroups_LocateDynamicGroup",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.LocateDynamicGroupResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "DynamicGroups"
+        ]
+      },
+      "delete": {
+        "summary": "Delete a dynamic group",
+        "operationId": "DynamicGroups_DeleteDynamicGroup",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.DynamicGroup"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "The unique ID of the dynamic group to delete.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "DynamicGroups"
+        ]
+      },
+      "put": {
+        "summary": "Update an existing dynamic group",
+        "operationId": "DynamicGroups_UpdateDynamicGroup",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.DynamicGroup"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "The unique ID of the dynamic group to update.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "input",
+            "description": "Input details for the dynamic group.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.DynamicGroupInput"
+            }
+          }
+        ],
+        "tags": [
+          "DynamicGroups"
+        ]
+      },
+      "patch": {
+        "summary": "Update an existing dynamic group",
+        "operationId": "DynamicGroups_UpdateDynamicGroup2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.DynamicGroup"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "The unique ID of the dynamic group to update.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "input",
+            "description": "Input details for the dynamic group.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.DynamicGroupInput"
+            }
+          }
+        ],
+        "tags": [
+          "DynamicGroups"
         ]
       }
     },
@@ -4368,6 +4965,70 @@
       },
       "description": "Comment dataset."
     },
+    "webitel.contacts.Condition": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "description": "The unique ID of the condition."
+        },
+        "expression": {
+          "type": "string",
+          "description": "The query or condition expression used to evaluate the group."
+        },
+        "group": {
+          "$ref": "#/definitions/webitel.contacts.Lookup",
+          "description": "The ID of the static group that should be assigned if the condition is met."
+        },
+        "assignee": {
+          "$ref": "#/definitions/webitel.contacts.Lookup",
+          "description": "The ID of the assignee that should be assigned if the condition is met (optional)."
+        },
+        "created_by": {
+          "$ref": "#/definitions/webitel.contacts.Lookup",
+          "description": "The user who created this condition."
+        },
+        "updated_by": {
+          "$ref": "#/definitions/webitel.contacts.Lookup",
+          "description": "The user who performed the last update."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "The timestamp (in milliseconds) of when the condition was created."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "The timestamp (in milliseconds) of the last update."
+        }
+      },
+      "title": "Condition"
+    },
+    "webitel.contacts.ConditionList": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number of the partial result."
+        },
+        "next": {
+          "type": "boolean",
+          "description": "Have more records."
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.contacts.Condition"
+          },
+          "description": "List of conditions."
+        }
+      },
+      "description": "A list of Conditions."
+    },
     "webitel.contacts.Contact": {
       "type": "object",
       "properties": {
@@ -4557,6 +5218,40 @@
       },
       "description": "Contact dataset."
     },
+    "webitel.contacts.CreateDynamicGroupRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the dynamic group."
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of the dynamic group."
+        },
+        "default_group_id": {
+          "type": "string",
+          "format": "int64",
+          "description": "Default static group to assign if no conditions are met."
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "Enabled status of the dynamic group: active/inactive."
+        },
+        "condition": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.contacts.InputDynamicCondition"
+          },
+          "description": "Input details for the dynamic group."
+        }
+      },
+      "description": "Request message for creating a new dynamic group.",
+      "required": [
+        "name"
+      ]
+    },
     "webitel.contacts.CreateGroupRequest": {
       "type": "object",
       "properties": {
@@ -4567,6 +5262,10 @@
         "description": {
           "type": "string",
           "description": "The description of the group."
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "The enabled status of the group."
         }
       },
       "description": "Request message for creating a new group.",
@@ -4601,6 +5300,148 @@
           "format": "int64"
         }
       }
+    },
+    "webitel.contacts.DynamicCondition": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "description": "The unique ID of the condition."
+        },
+        "expression": {
+          "type": "string",
+          "description": "The query or condition expression used to evaluate the group."
+        },
+        "group": {
+          "$ref": "#/definitions/webitel.contacts.Lookup",
+          "description": "The ID of the static group that should be assigned if the condition is met."
+        },
+        "assignee": {
+          "$ref": "#/definitions/webitel.contacts.Lookup",
+          "description": "The ID of the assignee that should be assigned if the condition is met (optional)."
+        }
+      },
+      "title": "Dynamic Group condition"
+    },
+    "webitel.contacts.DynamicConditions.CreateConditionBody": {
+      "type": "object",
+      "properties": {
+        "expression": {
+          "type": "string",
+          "description": "The query or condition expression used to evaluate the group."
+        },
+        "group": {
+          "type": "string",
+          "format": "int64",
+          "description": "The ID of the static group that should be assigned if the condition is met."
+        },
+        "assignee": {
+          "type": "string",
+          "format": "int64",
+          "description": "The ID of the assignee that should be assigned if the condition is met (optional)."
+        }
+      },
+      "description": "Request message for creating a new condition."
+    },
+    "webitel.contacts.DynamicGroup": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "description": "The unique ID of the dynamic group. Never changes."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the dynamic group."
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of the dynamic group."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Timestamp(milli) of the group's creation."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Timestamp(milli) of the last group update."
+        },
+        "created_by": {
+          "$ref": "#/definitions/webitel.contacts.Lookup",
+          "description": "The user who created this dynamic group."
+        },
+        "updated_by": {
+          "$ref": "#/definitions/webitel.contacts.Lookup",
+          "description": "The user who performed the last update."
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.contacts.DynamicCondition"
+          },
+          "description": "List of dynamic conditions associated with the group."
+        },
+        "default_group": {
+          "$ref": "#/definitions/webitel.contacts.Lookup",
+          "description": "Default static group to be assigned if no conditions are met."
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "Enabled status of the group: active or inactive."
+        }
+      },
+      "title": "Dynamic Group"
+    },
+    "webitel.contacts.DynamicGroupInput": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the dynamic group."
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of the dynamic group."
+        },
+        "default_group": {
+          "type": "string",
+          "format": "int64",
+          "description": "Default static group to assign if no conditions are met."
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "Enabled status of the dynamic group: active/inactive."
+        }
+      },
+      "description": "Input message for creating/updating a dynamic group."
+    },
+    "webitel.contacts.DynamicGroupList": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number of the partial result."
+        },
+        "next": {
+          "type": "boolean",
+          "description": "Have more records."
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.contacts.DynamicGroup"
+          },
+          "description": "List of dynamic groups."
+        }
+      },
+      "description": "A list of Dynamic Groups."
     },
     "webitel.contacts.EmailAddress": {
       "type": "object",
@@ -4850,6 +5691,24 @@
         "updated_by": {
           "$ref": "#/definitions/webitel.contacts.Lookup",
           "description": "The user who performed the last update."
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.contacts.DynamicCondition"
+          },
+          "description": "List of dynamic conditions associated with the group."
+        },
+        "default_group": {
+          "$ref": "#/definitions/webitel.contacts.Lookup",
+          "description": "Default static group to be assigned if no conditions are met."
+        },
+        "type": {
+          "$ref": "#/definitions/webitel.contacts.GroupType"
         }
       },
       "title": "Group of Contacts"
@@ -4877,19 +5736,16 @@
       },
       "description": "A list of Groups."
     },
-    "webitel.contacts.Groups.UpdateGroupBody": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "The new name of the group."
-        },
-        "description": {
-          "type": "string",
-          "description": "The new description of the group."
-        }
-      },
-      "description": "Request message for updating an existing group."
+    "webitel.contacts.GroupType": {
+      "type": "string",
+      "enum": [
+        "GROUP_TYPE_UNSPECIFIED",
+        "STATIC",
+        "DYNAMIC"
+      ],
+      "default": "GROUP_TYPE_UNSPECIFIED",
+      "description": "- GROUP_TYPE_UNSPECIFIED: Default value\n - STATIC: Static group\n - DYNAMIC: Dynamic group",
+      "title": "Enum for Group Type"
     },
     "webitel.contacts.IMClient": {
       "type": "object",
@@ -4997,6 +5853,30 @@
       "required": [
         "text"
       ]
+    },
+    "webitel.contacts.InputCondition": {
+      "type": "object",
+      "properties": {
+        "expression": {
+          "type": "string",
+          "description": "The query or condition expression used to evaluate the group."
+        },
+        "group": {
+          "type": "string",
+          "format": "int64",
+          "description": "The ID of the static group that should be assigned if the condition is met."
+        },
+        "assignee": {
+          "type": "string",
+          "format": "int64",
+          "description": "The ID of the assignee that should be assigned if the condition is met (optional)."
+        },
+        "position": {
+          "$ref": "#/definitions/webitel.contacts.Position",
+          "description": "The position of the condition in the group."
+        }
+      },
+      "description": "Input message for creating/updating a condition."
     },
     "webitel.contacts.InputContact": {
       "type": "object",
@@ -5122,6 +6002,26 @@
         "etag"
       ]
     },
+    "webitel.contacts.InputDynamicCondition": {
+      "type": "object",
+      "properties": {
+        "expression": {
+          "type": "string",
+          "description": "The query or condition expression used to evaluate the group."
+        },
+        "group": {
+          "type": "string",
+          "format": "int64",
+          "description": "The ID of the static group that should be assigned if the condition is met."
+        },
+        "assignee": {
+          "type": "string",
+          "format": "int64",
+          "description": "The ID of the assignee that should be assigned if the condition is met (optional)."
+        }
+      },
+      "title": "Dynamic Group condition"
+    },
     "webitel.contacts.InputEmailAddress": {
       "type": "object",
       "example": {
@@ -5159,6 +6059,24 @@
       "required": [
         "email"
       ]
+    },
+    "webitel.contacts.InputGroup": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The new name of the group."
+        },
+        "description": {
+          "type": "string",
+          "description": "The new description of the group."
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "The new enabled status of the group."
+        }
+      },
+      "title": "Input message for creating/updating a group"
     },
     "webitel.contacts.InputIMClient": {
       "type": "object",
@@ -5608,6 +6526,24 @@
       },
       "description": "LabelsData\nNOTE: Edge represents connection between two nodes.\nSo this ContactLabels.data are always subordinate to some contact.id."
     },
+    "webitel.contacts.LocateConditionResponse": {
+      "type": "object",
+      "properties": {
+        "condition": {
+          "$ref": "#/definitions/webitel.contacts.Condition"
+        }
+      },
+      "description": "Response message for locating a condition by ID."
+    },
+    "webitel.contacts.LocateDynamicGroupResponse": {
+      "type": "object",
+      "properties": {
+        "group": {
+          "$ref": "#/definitions/webitel.contacts.DynamicGroup"
+        }
+      },
+      "description": "Response message for locating a dynamic group by ID."
+    },
     "webitel.contacts.LocateGroupResponse": {
       "type": "object",
       "properties": {
@@ -5878,6 +6814,22 @@
         }
       },
       "description": "Photo dataset."
+    },
+    "webitel.contacts.Position": {
+      "type": "object",
+      "properties": {
+        "current_position": {
+          "type": "string",
+          "format": "int64",
+          "description": "The current position of the condition in the list."
+        },
+        "target_position": {
+          "type": "string",
+          "format": "int64",
+          "description": "The target position where the condition should be moved."
+        }
+      },
+      "description": "Position details for conditions in the group."
     },
     "webitel.contacts.TimelineEventType": {
       "type": "string",
