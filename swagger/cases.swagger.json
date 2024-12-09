@@ -92,13 +92,12 @@
           },
           {
             "name": "q",
-            "description": "covered by filters?",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "qin",
+            "name": "ids",
             "in": "query",
             "required": false,
             "type": "array",
@@ -122,6 +121,13 @@
               "type": "string"
             },
             "collectionFormat": "multi"
+          },
+          {
+            "name": "filters",
+            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -2562,13 +2568,6 @@
             "required": true,
             "type": "string",
             "format": "int64"
-          },
-          {
-            "name": "slaId",
-            "in": "query",
-            "required": true,
-            "type": "string",
-            "format": "int64"
           }
         ],
         "tags": [
@@ -3585,8 +3584,7 @@
             "name": "etag",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "string"
           },
           {
             "name": "fields",
@@ -5086,6 +5084,14 @@
           "type": "boolean",
           "description": "Indicates if the comment was edited; true if created_at \u003c updated_at."
         },
+        "canEdit": {
+          "type": "boolean",
+          "description": "Indicates if the comment can be edited by current user."
+        },
+        "author": {
+          "$ref": "#/definitions/generalLookup",
+          "description": "Contact-author of the comment."
+        },
         "caseId": {
           "type": "string",
           "format": "int64",
@@ -5939,13 +5945,6 @@
     "casesInputCreateCase": {
       "type": "object",
       "properties": {
-        "etag": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string",
-          "title": "create: required;"
-        },
         "subject": {
           "type": "string",
           "title": "create: required;"
@@ -6011,20 +6010,12 @@
           "$ref": "#/definitions/casesRateInfo",
           "title": "only for API, not UI"
         },
-        "comments": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/casesInputCaseComment"
-          }
-        },
         "links": {
           "type": "array",
           "items": {
             "type": "object",
             "$ref": "#/definitions/casesInputCaseLink"
-          },
-          "title": "repeated InputCaseFile files = 17;"
+          }
         },
         "related": {
           "type": "array",
