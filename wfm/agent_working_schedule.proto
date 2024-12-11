@@ -29,23 +29,41 @@ message SearchAgentsWorkingScheduleResponse {
   repeated AgentWorkingSchedule items = 2;
 }
 
-enum AgentWorkingScheduleType {
-  AGENT_WORKING_SCHEDULE_TYPE_UNSPECIFIED = 0;
-  AGENT_WORKING_SCHEDULE_TYPE_LOCKED = 1;
-  AGENT_WORKING_SCHEDULE_TYPE_SHIFT = 3;
-  AGENT_WORKING_SCHEDULE_TYPE_PAUSE = 4;
+enum AgentScheduleShiftType {
+  AGENT_SCHEDULE_SHIFT_TYPE_UNSPECIFIED = 0;
+  AGENT_SCHEDULE_SHIFT_TYPE_SHIFT = 1;
+  AGENT_SCHEDULE_SHIFT_TYPE_PAUSE = 2;
+}
+
+message AgentScheduleShift {
+  int64 id = 1;
+  int64 domain_id = 2;
+
+  AgentScheduleShiftType type = 3;
+  int64 start = 4;
+  int64 end = 5;
+
+  int64 created_at = 6;
+  LookupEntity created_by = 7;
+  int64 updated_at = 8;
+  LookupEntity updated_by = 9;
+}
+
+enum AgentScheduleType {
+  AGENT_SCHEDULE_TYPE_UNSPECIFIED = 0;
+  AGENT_SCHEDULE_TYPE_ABSENT = 1;
+  AGENT_SCHEDULE_TYPE_LOCKED = 2;
+}
+
+message AgentSchedule {
+  int64 date = 1;
+  string holiday = 2;
+  AgentScheduleType type = 3;
+  AgentAbsenceType absence = 4;
+  repeated AgentScheduleShift shifts = 5;
 }
 
 message AgentWorkingSchedule {
-  message WorkingSchedule {
-    int64 date = 1;
-    string holiday = 2;
-    AgentAbsenceType absence = 3;
-    AgentWorkingScheduleType type = 4;
-    int64 start = 5;
-    int64 end = 6;
-  }
-
   LookupEntity agent = 1;
-  repeated WorkingSchedule schedule = 2;
+  repeated AgentSchedule schedule = 2;
 }
