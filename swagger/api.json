@@ -10527,7 +10527,6 @@
           },
           {
             "type": "string",
-            "description": "covered by filters?",
             "name": "q",
             "in": "query"
           },
@@ -10537,7 +10536,7 @@
               "type": "string"
             },
             "collectionFormat": "multi",
-            "name": "qin",
+            "name": "ids",
             "in": "query"
           },
           {
@@ -10552,6 +10551,12 @@
             },
             "collectionFormat": "multi",
             "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
+            "name": "filters",
             "in": "query"
           }
         ],
@@ -12914,13 +12919,6 @@
             "name": "id",
             "in": "path",
             "required": true
-          },
-          {
-            "type": "string",
-            "format": "int64",
-            "name": "slaId",
-            "in": "query",
-            "required": true
           }
         ],
         "responses": {
@@ -13858,7 +13856,6 @@
         "parameters": [
           {
             "type": "string",
-            "format": "int64",
             "name": "etag",
             "in": "path",
             "required": true
@@ -30919,6 +30916,43 @@
         }
       }
     },
+    "/wfm/agents/working_schedules/{working_schedule_id}": {
+      "get": {
+        "tags": [
+          "AgentWorkingScheduleService"
+        ],
+        "operationId": "AgentWorkingScheduleService_SearchAgentsWorkingSchedule",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "working_schedule_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "date.from",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "date.to",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/wfmSearchAgentsWorkingScheduleResponse"
+            }
+          }
+        }
+      }
+    },
     "/wfm/agents/{agent_id}/absences": {
       "get": {
         "tags": [
@@ -35784,6 +35818,10 @@
       "description": "User profile.",
       "type": "object",
       "properties": {
+        "chat_name": {
+          "description": "The \"chat_name\" field is used to store the name displayed externally on the platform.\nFor example, \"chat_name\" is shown when an agent connects to chats with clients.",
+          "type": "string"
+        },
         "contact": {
           "description": "[optional] contact connected to this user",
           "title": "repeated Call calls = 13; // order by created_at\nrepeated Registration reged = 13; // order by register_last",
@@ -36396,6 +36434,14 @@
       "description": "Represents a comment associated with a case.",
       "type": "object",
       "properties": {
+        "author": {
+          "description": "Contact-author of the comment.",
+          "$ref": "#/definitions/generalLookup"
+        },
+        "canEdit": {
+          "description": "Indicates if the comment can be edited by current user.",
+          "type": "boolean"
+        },
         "caseId": {
           "description": "Optional relation to the associated case.",
           "type": "string",
@@ -37297,13 +37343,6 @@
           "format": "int64",
           "title": "create: not required;"
         },
-        "comments": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/casesInputCaseComment"
-          }
-        },
         "contactInfo": {
           "type": "string",
           "title": "create: not required;"
@@ -37311,9 +37350,6 @@
         "description": {
           "type": "string",
           "title": "create: not required;"
-        },
-        "etag": {
-          "type": "string"
         },
         "group": {
           "type": "string",
@@ -37327,15 +37363,10 @@
         },
         "links": {
           "type": "array",
-          "title": "repeated InputCaseFile files = 17;",
           "items": {
             "type": "object",
             "$ref": "#/definitions/casesInputCaseLink"
           }
-        },
-        "name": {
-          "type": "string",
-          "title": "create: required;"
         },
         "priority": {
           "type": "string",
@@ -52979,6 +53010,85 @@
         }
       }
     },
+    "wfmAgentSchedule": {
+      "type": "object",
+      "properties": {
+        "absence": {
+          "$ref": "#/definitions/wfmAgentAbsenceType"
+        },
+        "date": {
+          "type": "string",
+          "format": "int64"
+        },
+        "shifts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmAgentScheduleShift"
+          }
+        },
+        "type": {
+          "$ref": "#/definitions/wfmAgentScheduleType"
+        }
+      }
+    },
+    "wfmAgentScheduleShift": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "created_by": {
+          "$ref": "#/definitions/wfmLookupEntity"
+        },
+        "domain_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "end": {
+          "type": "string",
+          "format": "int64"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "start": {
+          "type": "string",
+          "format": "int64"
+        },
+        "type": {
+          "$ref": "#/definitions/wfmAgentScheduleShiftType"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_by": {
+          "$ref": "#/definitions/wfmLookupEntity"
+        }
+      }
+    },
+    "wfmAgentScheduleShiftType": {
+      "type": "string",
+      "default": "AGENT_SCHEDULE_SHIFT_TYPE_UNSPECIFIED",
+      "enum": [
+        "AGENT_SCHEDULE_SHIFT_TYPE_UNSPECIFIED",
+        "AGENT_SCHEDULE_SHIFT_TYPE_SHIFT",
+        "AGENT_SCHEDULE_SHIFT_TYPE_PAUSE"
+      ]
+    },
+    "wfmAgentScheduleType": {
+      "type": "string",
+      "default": "AGENT_SCHEDULE_TYPE_UNSPECIFIED",
+      "enum": [
+        "AGENT_SCHEDULE_TYPE_UNSPECIFIED",
+        "AGENT_SCHEDULE_TYPE_ABSENT",
+        "AGENT_SCHEDULE_TYPE_LOCKED",
+        "AGENT_SCHEDULE_TYPE_SHIFT"
+      ]
+    },
     "wfmAgentWorkingConditions": {
       "type": "object",
       "properties": {
@@ -52987,6 +53097,21 @@
         },
         "working_condition": {
           "$ref": "#/definitions/wfmLookupEntity"
+        }
+      }
+    },
+    "wfmAgentWorkingSchedule": {
+      "type": "object",
+      "properties": {
+        "agent": {
+          "$ref": "#/definitions/wfmLookupEntity"
+        },
+        "schedule": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmAgentSchedule"
+          }
         }
       }
     },
@@ -53230,6 +53355,18 @@
         }
       }
     },
+    "wfmHoliday": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
     "wfmLookupEntity": {
       "type": "object",
       "properties": {
@@ -53362,6 +53499,29 @@
         },
         "next": {
           "type": "boolean"
+        }
+      }
+    },
+    "wfmSearchAgentsWorkingScheduleResponse": {
+      "type": "object",
+      "properties": {
+        "holidays": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmHoliday"
+          }
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmAgentWorkingSchedule"
+          }
+        },
+        "total": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -53717,9 +53877,9 @@
       "default": "WORKING_SCHEDULE_STATE_UNSPECIFIED",
       "enum": [
         "WORKING_SCHEDULE_STATE_UNSPECIFIED",
-        "WORKING_SCHEDULE_STATE_DRAFT",
-        "WORKING_SCHEDULE_STATE_PENDING",
         "WORKING_SCHEDULE_STATE_ACTIVE",
+        "WORKING_SCHEDULE_STATE_PENDING",
+        "WORKING_SCHEDULE_STATE_DRAFT",
         "WORKING_SCHEDULE_STATE_ARCHIVED"
       ]
     }

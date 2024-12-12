@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+package wfm;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "proto/webitel/option.proto";
+import "lookup.proto";
+import "filter.proto";
+import "agent_absence.proto";
+
+option go_package = "github.com/webitel/protos/wfm;wfm";
+
+service AgentWorkingScheduleService {
+  option (option.objclass) = "working_schedules";
+  rpc SearchAgentsWorkingSchedule(SearchAgentsWorkingScheduleRequest) returns (SearchAgentsWorkingScheduleResponse) {
+    option (option.access) = ACTION_READ;
+    option (google.api.http) = {get: "/wfm/agents/working_schedules/{working_schedule_id}"};
+  }
+}
+
+message SearchAgentsWorkingScheduleRequest {
+  int64 working_schedule_id = 1;
+  FilterBetween date = 2;
+}
+
+message SearchAgentsWorkingScheduleResponse {
+  repeated Holiday holidays = 1;
+  repeated AgentWorkingSchedule items = 2;
+  int64 total = 3;
+}
+
+message Holiday {
+  int64 date = 1;
+  string name = 2;
+}
+
+enum AgentScheduleShiftType {
+  AGENT_SCHEDULE_SHIFT_TYPE_UNSPECIFIED = 0;
+  AGENT_SCHEDULE_SHIFT_TYPE_SHIFT = 1;
+  AGENT_SCHEDULE_SHIFT_TYPE_PAUSE = 2;
+}
+
+message AgentScheduleShift {
+  int64 id = 1;
+  int64 domain_id = 2;
+
+  AgentScheduleShiftType type = 3;
+  int64 start = 4;
+  int64 end = 5;
+
+  int64 created_at = 6;
+  LookupEntity created_by = 7;
+  int64 updated_at = 8;
+  LookupEntity updated_by = 9;
+}
+
+enum AgentScheduleType {
+  AGENT_SCHEDULE_TYPE_UNSPECIFIED = 0;
+  AGENT_SCHEDULE_TYPE_ABSENT = 1;
+  AGENT_SCHEDULE_TYPE_LOCKED = 2;
+  AGENT_SCHEDULE_TYPE_SHIFT = 3;
+}
+
+message AgentSchedule {
+  int64 date = 1;
+  AgentScheduleType type = 3;
+  AgentAbsenceType absence = 4;
+  repeated AgentScheduleShift shifts = 5;
+}
+
+message AgentWorkingSchedule {
+  LookupEntity agent = 1;
+  repeated AgentSchedule schedule = 2;
+}
