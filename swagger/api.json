@@ -30916,6 +30916,43 @@
         }
       }
     },
+    "/wfm/agents/working_schedules/{working_schedule_id}": {
+      "get": {
+        "tags": [
+          "AgentWorkingScheduleService"
+        ],
+        "operationId": "AgentWorkingScheduleService_SearchAgentsWorkingSchedule",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "working_schedule_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "date.from",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "date.to",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/wfmSearchAgentsWorkingScheduleResponse"
+            }
+          }
+        }
+      }
+    },
     "/wfm/agents/{agent_id}/absences": {
       "get": {
         "tags": [
@@ -52973,6 +53010,85 @@
         }
       }
     },
+    "wfmAgentSchedule": {
+      "type": "object",
+      "properties": {
+        "absence": {
+          "$ref": "#/definitions/wfmAgentAbsenceType"
+        },
+        "date": {
+          "type": "string",
+          "format": "int64"
+        },
+        "shifts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmAgentScheduleShift"
+          }
+        },
+        "type": {
+          "$ref": "#/definitions/wfmAgentScheduleType"
+        }
+      }
+    },
+    "wfmAgentScheduleShift": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "created_by": {
+          "$ref": "#/definitions/wfmLookupEntity"
+        },
+        "domain_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "end": {
+          "type": "string",
+          "format": "int64"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "start": {
+          "type": "string",
+          "format": "int64"
+        },
+        "type": {
+          "$ref": "#/definitions/wfmAgentScheduleShiftType"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_by": {
+          "$ref": "#/definitions/wfmLookupEntity"
+        }
+      }
+    },
+    "wfmAgentScheduleShiftType": {
+      "type": "string",
+      "default": "AGENT_SCHEDULE_SHIFT_TYPE_UNSPECIFIED",
+      "enum": [
+        "AGENT_SCHEDULE_SHIFT_TYPE_UNSPECIFIED",
+        "AGENT_SCHEDULE_SHIFT_TYPE_SHIFT",
+        "AGENT_SCHEDULE_SHIFT_TYPE_PAUSE"
+      ]
+    },
+    "wfmAgentScheduleType": {
+      "type": "string",
+      "default": "AGENT_SCHEDULE_TYPE_UNSPECIFIED",
+      "enum": [
+        "AGENT_SCHEDULE_TYPE_UNSPECIFIED",
+        "AGENT_SCHEDULE_TYPE_ABSENT",
+        "AGENT_SCHEDULE_TYPE_LOCKED",
+        "AGENT_SCHEDULE_TYPE_SHIFT"
+      ]
+    },
     "wfmAgentWorkingConditions": {
       "type": "object",
       "properties": {
@@ -52981,6 +53097,21 @@
         },
         "working_condition": {
           "$ref": "#/definitions/wfmLookupEntity"
+        }
+      }
+    },
+    "wfmAgentWorkingSchedule": {
+      "type": "object",
+      "properties": {
+        "agent": {
+          "$ref": "#/definitions/wfmLookupEntity"
+        },
+        "schedule": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmAgentSchedule"
+          }
         }
       }
     },
@@ -53224,6 +53355,18 @@
         }
       }
     },
+    "wfmHoliday": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
     "wfmLookupEntity": {
       "type": "object",
       "properties": {
@@ -53356,6 +53499,29 @@
         },
         "next": {
           "type": "boolean"
+        }
+      }
+    },
+    "wfmSearchAgentsWorkingScheduleResponse": {
+      "type": "object",
+      "properties": {
+        "holidays": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmHoliday"
+          }
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmAgentWorkingSchedule"
+          }
+        },
+        "total": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
