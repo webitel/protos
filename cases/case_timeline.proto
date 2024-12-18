@@ -1,0 +1,166 @@
+syntax = "proto3";
+package webitel.cases;
+
+option go_package = "github.com/webitel/cases/api/cases;cases";
+
+import "general.proto";
+import "google/api/visibility.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "proto/webitel/option.proto";
+
+
+// CloseReasons service definition with RPC methods for managing close reasons
+service CaseTimeline {
+  option (option.objclass) = "cases";
+  rpc GetTimeline(GetTimelineRequest) returns (GetTimelineResponse) {
+    option (option.access) = ACTION_READ;
+    option (google.api.http) = {
+      get: "/cases/{case_etag}/timeline"
+    };
+  }
+  rpc GetTimelineCounter(GetTimelineCounterRequest) returns (GetTimelineCounterResponse) {
+    option (option.access) = ACTION_READ;
+    option (google.api.http) = {
+      get: "/cases/{case_etag}/timeline/counter"
+    };
+  }
+}
+
+
+
+
+
+message GetTimelineRequest {
+  int32 page = 1;
+  int32 size = 2;
+  string q = 3;
+  string sort = 4;
+  repeated string fields = 5;
+
+  // filters
+
+  string case_etag = 6;
+   repeated string ids = 7;
+  int64 date_from = 8;
+  int64 date_to = 9;
+  repeated CaseTimelineEventType type = 10;
+}
+
+
+
+message GetTimelineResponse {
+  repeated DayTimeline days = 2;
+  int32 page = 3;
+  bool next = 4;
+}
+
+
+message GetTimelineCounterRequest {
+  string case_etag = 1;
+}
+
+message GetTimelineCounterResponse {
+  // filter dates
+  int64 date_from = 1;
+  int64 date_to = 2;
+  // defined event types
+  int64 chats_count = 3;
+  int64 calls_count = 4;
+  int64 emails_count = 5;
+}
+
+message CallEvent {
+  string id = 1;
+  int64 closed_at = 3;
+  int64 duration = 4;
+  bool is_inbound = 6;
+  bool is_missed = 7;
+  repeated general.Lookup participants = 9;
+  general.Lookup gateway = 10;
+  general.Lookup flow_scheme = 11;
+  general.Lookup queue = 12;
+  bool is_detailed = 13;
+  repeated CallFile files = 14;
+  repeated TranscriptLookup transcripts = 15;
+  int64 total_duration = 16;
+}
+
+message ChatEvent {
+  string id = 1;
+  int64 closed_at = 3;
+  int64 duration = 4;
+  bool is_inbound = 6;
+  bool is_missed = 7;
+  repeated general.Lookup participants = 9;
+  general.Lookup gateway = 10;
+  general.Lookup flow_scheme = 11;
+  general.Lookup queue = 12;
+  bool is_detailed = 13;
+}
+
+message EmailEvent {
+  string id = 1;
+  repeated string from = 3; // array of senders (email addresses)
+  repeated string to = 4; // array of receivers (email addresses)
+  repeated string sender = 5; // array of receivers (email addresses)
+  repeated string cc = 6; // array of ccs (email addresses)
+  bool is_inbound = 7; // inbound/outbound email
+  string subject = 8; //
+  string body = 9; // plain text of email
+  string html = 10; // html body of email
+  general.Lookup owner = 11; // Agent who sent/accepted
+  repeated Attachment attachments = 12;
+  general.Lookup profile = 13; // email profile
+  bool is_detailed = 14; // reserved for the open
+}
+
+message DayTimeline {
+  repeated Event items = 1;
+  int64 day_timestamp = 2;
+  int64 chats_count = 3;
+  int64 calls_count = 4;
+  int64 emails_count = 5;
+
+}
+
+message Event {
+  CaseTimelineEventType type = 1;
+  int64 created_at = 2;
+  oneof event {
+    ChatEvent chat = 3;
+    CallEvent call = 4;
+    EmailEvent email = 5;
+  }
+}
+
+message Attachment {
+  int64 id = 1;
+  string url = 2;
+  string mime = 3;
+
+  string name = 4;
+  int64 size = 5;
+}
+
+message CallFile {
+  int64 id = 1;
+  string name = 2;
+  int64 size = 3;
+  string mime_type = 4;
+  int64 start_at = 5;
+  int64 stop_at = 6;
+}
+
+message TranscriptLookup {
+  int64 id = 1;
+  string locale = 2;
+  general.Lookup file = 3;
+}
+
+
+enum CaseTimelineEventType{
+  chat = 0;
+  call = 1;
+  email = 2;
+}
