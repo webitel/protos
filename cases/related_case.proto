@@ -1,0 +1,248 @@
+syntax = "proto3";
+
+package webitel.cases;
+option go_package = "github.com/webitel/cases/api/cases;cases";
+
+import "general.proto";
+import "google/api/visibility.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "proto/webitel/option.proto";
+
+// Represents a related case with its relationship details.
+message RelatedCase {
+  // Unique identifier for the related case.
+  string id = 1;
+
+  // Version number of the related case, used for concurrency control.
+  int32 ver = 2;
+
+  // User who created the relation.
+  general.Lookup created_by = 3;
+
+  // Timestamp (in milliseconds) of when the relation was created.
+  int64 created_at = 4;
+
+  // User who last updated the relation.
+  general.Lookup updated_by = 5;
+
+  // Timestamp (in milliseconds) of the last update.
+  int64 updated_at = 6;
+
+  // Relation type between cases.
+  RelationType relation_type = 7;
+
+  // Related case details.
+  general.Lookup related_case = 8;
+}
+
+// Enum for relation types between cases.
+enum RelationType {
+  RELATION_TYPE_UNSPECIFIED = 0;
+  DUPLICATES = 1;
+  IS_DUPLICATED_BY = 2;
+  BLOCKS = 3;
+  IS_BLOCKED_BY = 4;
+  CAUSES = 5;
+  IS_CAUSED_BY = 6;
+  IS_CHILD_OF = 7;
+  IS_PARENT_OF = 8;
+  RELATES_TO = 9;
+}
+
+// Paginated list of related cases.
+message RelatedCaseList {
+  // Current page number.
+  int64 page = 1;
+
+  // Flag to indicate if more pages are available.
+  bool next = 2;
+
+  // List of related cases on the current page.
+  repeated RelatedCase data = 3;
+}
+
+// Service to manage related cases.
+service RelatedCases {
+  option (option.objclass) = "cases";
+
+  // Retrieve a specific related case.
+  rpc LocateRelatedCase(LocateRelatedCaseRequest) returns (RelatedCase) {
+    option (option.access) = ACTION_READ;
+    option (google.api.http) = {
+      get: "/cases/related/{id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Retrieve a specific related case by ID"
+    };
+  }
+
+  // Create a new related case.
+  rpc CreateRelatedCase(CreateRelatedCaseRequest) returns (RelatedCase) {
+    option (option.access) = ACTION_CREATE;
+    option (google.api.http) = {
+      post: "/cases/{primary_case_id}/related"
+      body: "input"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Create a new related case"
+    };
+  }
+
+  // Update an existing related case.
+  rpc UpdateRelatedCase(UpdateRelatedCaseRequest) returns (RelatedCase) {
+    option (option.access) = ACTION_UPDATE;
+    option (google.api.http) = {
+      put: "/cases/related/{id}"
+      body: "input"
+      additional_bindings {
+        patch: "/cases/related/{id}"
+        body: "input"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Update an existing related case"
+    };
+  }
+
+  // Delete a specific related case.
+  rpc DeleteRelatedCase(DeleteRelatedCaseRequest) returns (RelatedCase) {
+    option (option.access) = ACTION_DELETE;
+    option (google.api.http) = {
+      delete: "/cases/related/{id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Delete a specific related case"
+    };
+  }
+
+  // List all related cases for a specific case.
+  rpc ListRelatedCases(ListRelatedCasesRequest) returns (RelatedCaseList) {
+    option (option.access) = ACTION_READ;
+    option (google.api.http) = {
+      get: "/cases/{primary_case_id}/related"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "List all related cases for a specific case"
+    };
+  }
+}
+
+// Input for creating or updating a related case.
+message InputRelatedCase {
+  // Relation type.
+  RelationType relation_type = 1;
+
+  // Primary case details.
+  string primary_case_id = 2;
+
+  // Related case details.
+  string related_case_id = 3;
+}
+
+// Request to locate a related case.
+message LocateRelatedCaseRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"]
+    }
+  };
+  // Identifier of the related case.
+  string id = 1;
+
+  // Fields to return in the response.
+  repeated string fields = 2;
+}
+
+// Input for creating a related case.
+message CreateInputRelatedCase {
+    // Related case details.
+    string related_case_id = 2;
+
+    // Relation type between the cases.
+    RelationType relation_type = 3;
+}
+
+// Request to create a related case.
+message CreateRelatedCaseRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["primary_case_id"]
+    }
+  };
+    // Primary case details.
+    string primary_case_id = 1;
+
+    // Input data for the related case.
+    CreateInputRelatedCase input = 2;
+
+    // Fields to include in the response.
+    repeated string fields = 3;
+}
+
+
+// Request to update a related case.
+message UpdateRelatedCaseRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"]
+    }
+  };
+  // Identifier of the related case to update.
+  string id = 1;
+
+  // Input data for the related case update.
+  InputRelatedCase input = 2;
+
+  // Fields to include in the response.
+  repeated string fields = 3;
+
+  repeated string x_json_mask = 4
+  [(google.api.field_visibility) = {
+    restriction: "PREVIEW"
+  },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      read_only: true
+      pattern: "^$"
+    }];
+}
+
+// Request to delete a related case.
+message DeleteRelatedCaseRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"]
+    }
+  };
+  // Identifier of the related case to delete.
+  string id = 1;
+}
+
+// Request to list related cases.
+message ListRelatedCasesRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["primary_case_id"]
+    }
+  };
+  // Primary Case ID for which related cases are requested.
+  string primary_case_id = 1;
+
+  // Page number for pagination.
+  int32 page = 2;
+
+  // Number of related cases per page.
+  int32 size = 3;
+
+  // Query string for search.
+  string q = 4;
+
+  // Sorting order.
+  string sort = 5;
+
+  // Fields to return for each related case.
+  repeated string fields = 6;
+
+  // Filter by ids
+  repeated string ids = 7;
+}
