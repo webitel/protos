@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package webitel.chat; 
+
+option go_package = "github.com/webitel/protos/chat/messages";
+
+import "google/rpc/status.proto";
+
+import "messages/peer.proto";
+import "messages/message.proto";
+
+message BroadcastMessageRequest {
+  repeated InputPeer peers = 1;
+  InputMessage message = 2;
+}
+
+message BroadcastMessageResponse {
+  repeated BroadcastError failure = 1;
+}
+
+message BroadcastError {
+  string peer_id = 1;
+  google.rpc.Status error = 2;
+}
