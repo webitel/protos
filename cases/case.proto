@@ -7,6 +7,7 @@ option go_package = "github.com/webitel/cases/api/cases;cases";
 import "general.proto";
 import "service.proto";
 import "case_comment.proto";
+import "related_case.proto";
 import "case_file.proto";
 import "case_link.proto";
 import "sla_condition.proto";
@@ -111,7 +112,7 @@ message CreateCaseCloseInput {
 message CreateCaseRelatedCaseInput{
   string etag = 1;
   RelationType relation_type = 3;
-  int64 related_to = 4;
+  string related_to = 4;
 }
 
 message CreateCaseRequest {
@@ -239,144 +240,4 @@ message InputCase {
 //  repeated InputCaseFile files = 17;
   repeated InputCaseLink links = 18;
   repeated InputRelatedCase related = 19;
-}
-
-
-message RelatedCase {
-  int64 id = 1;
-  int32 ver = 2;
-  string etag = 3; // main field required for read, update and delete
-  general.Lookup created_by = 4;
-  int64 created_at = 5; // unixmilli
-  general.Lookup updated_by = 6;
-  int64 updated_at = 7; // unixmilli
-
-
-  Case child = 8;
-//  Case parent = 9; // (optional, always a case that requested)
-  RelationType relation_type = 10;
-
-}
-
-message RelatedCaseList {
-  int64 page = 1;
-  bool next = 2;
-  repeated RelatedCase items = 3;
-}
-
-message InputRelatedCase {
-  string etag = 1;
-  RelationType relation_type = 3;
-  Case related_to = 4; // child
-}
-
-
-enum RelationType {
-  BlockedBy = 0;
-  Blocks = 1; // inversed
-  Duplicates = 2;
-  DuplicatedBy = 3; // inversed
-  Causes = 4;
-  CausedBy = 5; // inversed
-  IsChildOf = 6;
-  IsParentOf = 7; // inversed
-  RelatesTo = 8; // bidirectional
-}
-
-
-service RelatedCases {
-    option (option.objclass) = "cases";
-  /*  Itself  */
-
-  rpc LocateRelatedCase(LocateRelatedCaseRequest) returns (RelatedCase) {
-    option (option.access) = ACTION_READ;
-    option (google.api.http) = {
-      get: "/cases/related/{etag}"
-    };
-  }
-  rpc CreateRelatedCase(CreateRelatedCaseRequest) returns (RelatedCase) {
-    option (option.access) = ACTION_READ;
-    option (google.api.http) = {
-      post: "/cases/related/{case_etag}"
-    };
-  }
-  rpc UpdateRelatedCase(UpdateRelatedCaseRequest) returns (RelatedCase) {
-    option (option.access) = ACTION_READ;
-    option (google.api.http) = {
-      put: "/cases/related/{input.etag}"
-      body: "input"
-      additional_bindings {
-        patch: "/cases/related/{input.etag}"
-        body: "input"
-      }
-    };
-  }
-  rpc DeleteRelatedCase(DeleteRelatedCaseRequest) returns (RelatedCase) {
-    option (option.access) = ACTION_READ;
-    option (google.api.http) = {
-      delete: "/cases/related/{etag}"
-    };
-  }
-
-
-  /*   With Case   */
-
-  // The related cases can be obtained bidirectionally as child or parent, but we should consider them from the perspective of the requested case, by inverting their connection type
-  // Requested case always a parent and related cases a children
-  rpc ListRelatedCases(ListRelatedCasesRequest) returns (RelatedCaseList) {
-    option (option.access) = ACTION_DELETE;
-    option (google.api.http) = {
-      get: "/cases/{case_etag}/related"
-    };
-  }
-}
-
-
-message LocateRelatedCaseRequest {
-  string etag = 1; // (id allowed)
-  repeated string fields = 2;
-}
-
-message UpdateRelatedCaseRequest {
-  repeated string fields = 2; // on return
-  repeated string x_json_mask = 3 // on input
-  [(google.api.field_visibility) = {
-    restriction: "PREVIEW"
-  },
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      read_only: true
-      pattern: "^$"
-    }];
-  InputRelatedCase input = 4;
-}
-
-message DeleteRelatedCaseRequest {
-  string etag = 1; // (etag only)
-  repeated string fields = 2; // fields on return
-}
-
-
-message ListRelatedCasesRequest {
-  int64 page = 1;
-  int64 size = 2;
-  string q = 3;
-  repeated string qin = 4;
-  string sort = 5;
-  repeated string fields = 6;
-  string case_etag = 9;
-}
-
-
-message CreateRelatedCaseRequest {
- repeated string x_json_mask = 1 // list of json fields specified in front-end request (patch)
-  [(google.api.field_visibility) = {
-    restriction: "PREVIEW" // "INTERNAL"
-  },
-  (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    read_only: true
-    pattern: "^$"
-  }];
-  repeated string fields = 2; // result fields needed on the front-end for each comment
-  string case_etag = 3; // new/existing comments belong to (id accepted)
-  InputRelatedCase input = 4;
 }
