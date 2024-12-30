@@ -238,6 +238,56 @@
         "tags": [
           "AgentWorkingScheduleService"
         ]
+      },
+      "post": {
+        "operationId": "AgentWorkingScheduleService_CreateAgentsWorkingScheduleShifts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/wfmCreateAgentsWorkingScheduleShiftsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "working_schedule_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "$ref": "#/definitions/wfmFilterBetween"
+                },
+                "agents": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/wfmLookupEntity"
+                  }
+                },
+                "items": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/definitions/wfmAgentScheduleShift"
+                  },
+                  "description": "Map key is a day of week: 0 - Sunday, ..., 6 - Saturday."
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "AgentWorkingScheduleService"
+        ]
       }
     },
     "/wfm/agents/{agent_id}/absences": {
@@ -1825,18 +1875,14 @@
           "type": "string",
           "format": "int64"
         },
-        "type": {
-          "$ref": "#/definitions/wfmAgentScheduleType"
+        "locked": {
+          "type": "boolean"
         },
         "absence": {
           "$ref": "#/definitions/wfmAgentAbsenceType"
         },
-        "shifts": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/wfmAgentScheduleShift"
-          }
+        "shift": {
+          "$ref": "#/definitions/wfmAgentScheduleShift"
         }
       }
     },
@@ -1934,23 +1980,13 @@
           "$ref": "#/definitions/wfmLookupEntity"
         },
         "capacity": {
-          "type": "integer",
-          "format": "int32"
+          "type": "string",
+          "format": "int64"
         },
         "enabled": {
           "type": "boolean"
         }
       }
-    },
-    "wfmAgentScheduleType": {
-      "type": "string",
-      "enum": [
-        "AGENT_SCHEDULE_TYPE_UNSPECIFIED",
-        "AGENT_SCHEDULE_TYPE_ABSENT",
-        "AGENT_SCHEDULE_TYPE_LOCKED",
-        "AGENT_SCHEDULE_TYPE_SHIFT"
-      ],
-      "default": "AGENT_SCHEDULE_TYPE_UNSPECIFIED"
     },
     "wfmAgentWorkingConditions": {
       "type": "object",
@@ -2013,6 +2049,18 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/wfmAgentAbsences"
+          }
+        }
+      }
+    },
+    "wfmCreateAgentsWorkingScheduleShiftsResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmAgentWorkingSchedule"
           }
         }
       }
