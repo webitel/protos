@@ -164,6 +164,18 @@ service Articles {
       get: "/spaces/{space_id}/articles/{article_id}/attachments"
     };
   }
+
+  rpc ArticleVersionsList(ListArticleVersionsRequest) returns (ArticleVersionList) {
+    option (google.api.http) = {
+      get: "/spaces/{space_id}/articles/{article_id}/history"
+    };
+  }
+
+  rpc LocateArticleVersion(LocateArticleVersionRequest) returns (ArticleVersion) {
+    option (google.api.http) = {
+      get: "/spaces/{space_id}/articles/{article_id}/history/{version_id}"
+    };
+  }
 }
 
 // Article dataset.
@@ -388,4 +400,61 @@ message Attachment {
     int32 size = 3;
     // The user who loaded this attachment.
     webitel.knowledgebase.Lookup uploaded_by = 4;
+}
+
+message ArticleVersion {
+    // The unique ID of the association. Never changes.
+    string id = 1;
+    // The title of the article.
+    string title = 2;
+    // The text content of the article.
+    string text = 3;
+    // The user who loaded this attachment.
+    webitel.knowledgebase.Lookup updated_by = 4;
+    // Timestamp(milli) of the last Field update.
+    int64 updated_at = 5;
+    // The parent article ID.
+    int64 parent_article = 6;
+    // Tags associated with the article.
+    repeated string tags = 7;
+    // Space ID associated with.
+    int64 space_id = 8;
+    // Version of the latest update. Numeric sequence.
+    int32 ver = 9;
+}
+
+message ArticleVersionList {
+  // 
+  repeated webitel.knowledgebase.ArticleVersion data = 1;
+  // The page number of the partial result.
+  int32 page = 2;
+  // Indicates that this is a partial result.
+  // More data available upon query: ?size=${data.len}&page=${page++}
+  bool next = 3;
+}
+
+message ListArticleVersionsRequest {
+  // Page number of result dataset records. offset = (page*size)
+  int32 page = 2;
+  
+  // Size count of records on result page. limit = (size++)
+  int32 size = 1;
+
+  // Sort the result according to fields.
+  repeated string sort = 3;
+  
+  // Record(s) with unique ID only.
+  string article_id = 7;
+
+  // Space ID associated with.
+  string space_id = 5;
+}
+
+message LocateArticleVersionRequest {
+  // Record(s) with unique ID only.
+  string article_id = 1;
+  // The unique ID of version record
+  int64 version_id = 2;
+  // Space ID associated with.
+  string space_id = 3;
 }
