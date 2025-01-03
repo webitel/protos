@@ -685,6 +685,105 @@
         ]
       }
     },
+    "/spaces/{space_id}/articles/{article_id}/history": {
+      "get": {
+        "operationId": "Articles_ArticleVersionsList",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.knowledgebase.ArticleVersionList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "space_id",
+            "description": "Space ID associated with.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "article_id",
+            "description": "Record(s) with unique ID only.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "description": "Page number of result dataset records. offset = (page*size)",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "description": "Size count of records on result page. limit = (size++)",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "sort",
+            "description": "Sort the result according to fields.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Articles"
+        ]
+      }
+    },
+    "/spaces/{space_id}/articles/{article_id}/history/{version_id}": {
+      "get": {
+        "operationId": "Articles_LocateArticleVersion",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.knowledgebase.ArticleVersion"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "space_id",
+            "description": "Space ID associated with.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "article_id",
+            "description": "Record(s) with unique ID only.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "version_id",
+            "description": "The unique ID of version record",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "Articles"
+        ]
+      }
+    },
     "/spaces/{space_id}/articles/{etag}": {
       "get": {
         "summary": "Locate the space's Article association.",
@@ -956,6 +1055,75 @@
         }
       },
       "description": "Article dataset.\nNOTE: Edge represents connection between two nodes.\nSo this spaceArticles.data are always subordinate to some space.id."
+    },
+    "webitel.knowledgebase.ArticleVersion": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique ID of the association. Never changes."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the article."
+        },
+        "text": {
+          "type": "string",
+          "description": "The text content of the article."
+        },
+        "updated_by": {
+          "$ref": "#/definitions/webitel.knowledgebase.Lookup",
+          "description": "The user who loaded this attachment."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Timestamp(milli) of the last Field update."
+        },
+        "parent_article": {
+          "type": "string",
+          "format": "int64",
+          "description": "The parent article ID."
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Tags associated with the article."
+        },
+        "space_id": {
+          "type": "string",
+          "format": "int64",
+          "description": "Space ID associated with."
+        },
+        "ver": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Version of the latest update. Numeric sequence."
+        }
+      }
+    },
+    "webitel.knowledgebase.ArticleVersionList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.knowledgebase.ArticleVersion"
+          }
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The page number of the partial result."
+        },
+        "next": {
+          "type": "boolean",
+          "title": "Indicates that this is a partial result.\nMore data available upon query: ?size=${data.len}\u0026page=${page++}"
+        }
+      }
     },
     "webitel.knowledgebase.Attachment": {
       "type": "object",
