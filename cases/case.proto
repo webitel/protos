@@ -33,7 +33,7 @@ service Cases {
   rpc LocateCase(LocateCaseRequest) returns (Case) {
     option (option.access) = ACTION_READ;
     option (google.api.http) = {
-      get: "/cases/{etag}"              // Maps this RPC to an HTTP GET endpoint with a path parameter.
+      get: "/cases/{id}"
     };
   }
 
@@ -50,10 +50,10 @@ service Cases {
   rpc UpdateCase(UpdateCaseRequest) returns (Case) {
     option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
-      put: "/cases/{input.etag}"        // Maps this RPC to an HTTP PUT endpoint.
-      body: "input"                     // Specifies that the request body contains the "input" field.
-      additional_bindings {              // Additional binding for PATCH requests.
-          patch: "/cases/{input.etag}"  // Maps this RPC to an HTTP PATCH endpoint.
+      put: "/cases/{input.id}"
+      body: "input"
+      additional_bindings {
+          patch: "/cases/{input.id}"
           body: "input"
       }
     };
@@ -63,7 +63,7 @@ service Cases {
   rpc DeleteCase(DeleteCaseRequest) returns (Case) {
     option (option.access) = ACTION_DELETE;
     option (google.api.http) = {
-      delete: "/cases/{etag}"           // Maps this RPC to an HTTP DELETE endpoint.
+      delete: "/cases/{id}"
     };
   }
 }
@@ -81,8 +81,8 @@ message SearchCasesRequest {
 
 // Request message for locating a specific case by its etag identifier.
 message LocateCaseRequest {
-  string etag = 1;                      // Unique etag identifier of the case.
-  repeated string fields = 2;           // List of fields to include in the response.
+  string id = 1;
+  repeated string fields = 2;
 }
 
 // Input structure for creating a new case.
@@ -112,11 +112,10 @@ message CreateCaseCloseInput {
     int64 close_reason = 2;             // Close reason ID from lookup.
 }
 
-// Structure for related cases input when creating a case.
-message CreateCaseRelatedCaseInput {
-  string etag = 1;                      // Etag of the related case.
-  RelationType relation_type = 3;       // Type of relation (e.g., duplicate, linked).
-  string related_to = 4;                // Identifier of the related case.
+message CreateCaseRelatedCaseInput{
+  string id = 1;
+  RelationType relation_type = 3;
+  string related_to = 4;
 }
 
 // Request message for creating a case.
@@ -134,8 +133,8 @@ message UpdateCaseRequest {
 
 // Request message for deleting a case.
 message DeleteCaseRequest {
-  repeated string fields = 1;           // List of fields to include in the deleted case response.
-  string etag = 2;                      // Unique etag identifier of the case.
+  repeated string fields = 1;// fields to return in deleted object
+  string id = 2; // identifier of the object
 }
 
 // Response message containing a list of cases.
@@ -147,13 +146,13 @@ message CaseList {
 
 // Message representing a case.
 message Case {
-  int64 id = 1;                         // Unique case ID.
-  int32 ver = 2;                        // Version number of the case.
-  string etag = 3;                      // Unique etag identifier.
-  general.Lookup created_by = 4;        // Creator of the case.
-  int64 created_at = 5;                 // Creation timestamp (in milliseconds since Unix epoch).
-  general.Lookup updated_by = 6;        // Last updater of the case.
-  int64 updated_at = 7;                 // Last update timestamp (in milliseconds since Unix epoch).
+  // default, readonly system fields
+  string id = 1;
+  int32 ver = 2;
+  general.Lookup created_by = 4;
+  int64 created_at = 5; // unixmilli
+  general.Lookup updated_by = 6;
+  int64 updated_at = 7; // unixmilli
 
   string name = 8;                      // Name of the case (may serve as an ID in docs).
   string subject = 9;                   // Subject of the case.
@@ -211,7 +210,7 @@ message TimingInfo {
 
 
 message InputCase {
-  string etag = 1;
+  string id = 1;
   string name = 2; // create: required;
   string subject = 3; // create: required;
   string description = 4; // create: not required;

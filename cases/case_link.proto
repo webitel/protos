@@ -11,9 +11,8 @@ import "proto/webitel/option.proto";
 
 
 message CaseLink {
-  int64 id = 1;
+  string id = 1;
   int32 ver = 2;
-  string etag = 3; // main field required for read, update and delete
   general.Lookup created_by = 4;
   int64 created_at = 5; // unixmilli
   general.Lookup updated_by = 6;
@@ -24,7 +23,7 @@ message CaseLink {
 }
 
 message InputCaseLink {
-  string etag = 1;
+  string id = 1;
   string url = 2;
   string name = 3;
 }
@@ -44,22 +43,22 @@ service CaseLinks {
   rpc LocateLink(LocateLinkRequest) returns (CaseLink) {
     option (option.access) = ACTION_READ;
     option (google.api.http) = {
-      get: "/cases/links/{etag}"
+      get: "/cases/links/{id}"
     };
   }
   rpc CreateLink(CreateLinkRequest) returns (CaseLink) {
     option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
-      post: "/cases/links/{case_etag}"
+      post: "/cases/links/{case_id}"
     };
   }
   rpc UpdateLink(UpdateLinkRequest) returns (CaseLink) {
     option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
-      put: "/cases/links/{input.etag}"
+      put: "/cases/links/{input.id}"
       body: "input"
       additional_bindings {
-        patch: "/cases/links/{input.etag}"
+        patch: "/cases/links/{input.id}"
         body: "input"
       }
     };
@@ -67,7 +66,7 @@ service CaseLinks {
   rpc DeleteLink(DeleteLinkRequest) returns (CaseLink) {
     option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
-      delete: "/cases/links/{etag}"
+      delete: "/cases/links/{id}"
     };
 
   }
@@ -76,20 +75,20 @@ service CaseLinks {
   /*   With Case   */
   rpc ListLinks(ListLinksRequest) returns (CaseLinkList) {
     option (google.api.http) = {
-      get: "/cases/{case_etag}/links"
+      get: "/cases/{case_id}/links"
     };
   }
 }
 
 
 message LocateLinkRequest {
-  string etag = 1; // (id allowed)
+  string id = 1; // (id allowed)
   repeated string fields = 2;
 }
 
 
 message UpdateLinkRequest {
-  string etag = 1;
+  string id = 1;
   repeated string fields = 2; // on return
   repeated string x_json_mask = 3 // on input
   [(google.api.field_visibility) = {
@@ -103,7 +102,7 @@ message UpdateLinkRequest {
 }
 
 message DeleteLinkRequest {
-  string etag = 1; //
+  string id = 1; //
 //  repeated string fields = 2; // output
 }
 
@@ -115,12 +114,12 @@ message ListLinksRequest {
   repeated string ids = 4;
   string sort = 5;
   repeated string fields = 6;
-  string case_etag = 9;
+  string case_id = 9;
 }
 
 
 message CreateLinkRequest {
   repeated string fields = 2; // result fields needed on the front-end for each comment
-  string case_etag = 3; // new comment link
+  string case_id = 3; // new comment link
   InputCaseLink input = 4;
 }
