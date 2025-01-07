@@ -10516,22 +10516,26 @@
         "tags": [
           "Cases"
         ],
+        "summary": "RPC method for searching cases.",
         "operationId": "Cases_SearchCases",
         "parameters": [
           {
             "type": "integer",
             "format": "int32",
+            "description": "Page number for pagination.",
             "name": "page",
             "in": "query"
           },
           {
             "type": "integer",
             "format": "int32",
+            "description": "Number of results per page.",
             "name": "size",
             "in": "query"
           },
           {
             "type": "string",
+            "description": "Query string for searching cases.",
             "name": "q",
             "in": "query"
           },
@@ -10541,11 +10545,13 @@
               "type": "string"
             },
             "collectionFormat": "multi",
+            "description": "List of specific case IDs to retrieve.",
             "name": "ids",
             "in": "query"
           },
           {
             "type": "string",
+            "description": "Sorting criteria (e.g., field:asc).",
             "name": "sort",
             "in": "query"
           },
@@ -10555,6 +10561,7 @@
               "type": "string"
             },
             "collectionFormat": "multi",
+            "description": "List of fields to include in the response.",
             "name": "fields",
             "in": "query"
           },
@@ -10584,10 +10591,11 @@
         "tags": [
           "Cases"
         ],
-        "summary": "on create, we should accept service and all parameters that correspond to it,\npriority have the fields that were directly set from the front-end and if they are empty we should\nfill them from service (we can't change the SLA and SLA conditions)\netag doesn't play any role on this API",
+        "summary": "RPC method for creating a new case.",
         "operationId": "Cases_CreateCase",
         "parameters": [
           {
+            "description": "Input data for creating the case.",
             "name": "input",
             "in": "body",
             "required": true,
@@ -10601,7 +10609,7 @@
               "type": "string"
             },
             "collectionFormat": "multi",
-            "description": "Result fields to include in the response.",
+            "description": "List of fields to include in the response.",
             "name": "fields",
             "in": "query"
           }
@@ -13405,15 +13413,299 @@
         }
       }
     },
+    "/cases/{caseEtag}/timeline": {
+      "get": {
+        "tags": [
+          "CaseTimeline"
+        ],
+        "operationId": "CaseTimeline_GetTimeline",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "caseEtag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "ids",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "dateFrom",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "dateTo",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "enum": [
+                "TIMELINE_CHAT",
+                "TIMELINE_CALL",
+                "TIMELINE_EMAIL"
+              ],
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "type",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/casesGetTimelineResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        }
+      }
+    },
+    "/cases/{caseEtag}/timeline/counter": {
+      "get": {
+        "tags": [
+          "CaseTimeline"
+        ],
+        "operationId": "CaseTimeline_GetTimelineCounter",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "caseEtag",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/casesGetTimelineCounterResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        }
+      }
+    },
+    "/cases/{caseId}/communication": {
+      "get": {
+        "tags": [
+          "CaseCommunications"
+        ],
+        "summary": "Lists all communications linked to a specific case.\nCurrently a feature for future development.",
+        "operationId": "CaseCommunications_ListCommunications",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Case identifier.",
+            "name": "caseId",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "List of fields to include in the response.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Query string for filtering results.",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of records per page.",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page number for pagination.",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Sorting order.",
+            "name": "sort",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/casesListCommunicationsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "CaseCommunications"
+        ],
+        "summary": "Links a communication to a specific case.",
+        "operationId": "CaseCommunications_LinkCommunication",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Case identifier.",
+            "name": "caseId",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "List of fields to include in the response.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/casesLinkCommunicationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        }
+      }
+    },
+    "/cases/{caseId}/communication/{id}": {
+      "delete": {
+        "tags": [
+          "CaseCommunications"
+        ],
+        "summary": "Unlinks a communication from a specific case.",
+        "operationId": "CaseCommunications_UnlinkCommunication",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "caseId",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Communication identifier.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "List of fields to include in the response.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/casesUnlinkCommunicationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        }
+      }
+    },
     "/cases/{etag}": {
       "get": {
         "tags": [
           "Cases"
         ],
+        "summary": "RPC method to retrieve a specific case by its etag identifier.",
         "operationId": "Cases_LocateCase",
         "parameters": [
           {
             "type": "string",
+            "description": "Unique etag identifier of the case.",
             "name": "etag",
             "in": "path",
             "required": true
@@ -13424,6 +13716,7 @@
               "type": "string"
             },
             "collectionFormat": "multi",
+            "description": "List of fields to include in the response.",
             "name": "fields",
             "in": "query"
           }
@@ -13447,12 +13740,12 @@
         "tags": [
           "Cases"
         ],
-        "summary": "on delete, we should require etag, to understand if user has right version of the case\nalso will be deleted all objects connected to the case, such as comments, related cases, links and files",
+        "summary": "RPC method for deleting an existing case by its etag.",
         "operationId": "Cases_DeleteCase",
         "parameters": [
           {
             "type": "string",
-            "description": "identifier of the object",
+            "description": "Unique etag identifier of the case.",
             "name": "etag",
             "in": "path",
             "required": true
@@ -13463,7 +13756,7 @@
               "type": "string"
             },
             "collectionFormat": "multi",
-            "description": "fields to return in deleted object",
+            "description": "List of fields to include in the deleted case response.",
             "name": "fields",
             "in": "query"
           }
@@ -13489,7 +13782,7 @@
         "tags": [
           "Cases"
         ],
-        "summary": "on update, we should be able to accept service and all parameters that correspond to it,\nif service and corresponding to it fields were changed simultaneously then priority have\nservice and dependent fields set from the service automatically (we can't change the SLA, SLA conditions )\netag is required to update the true version of the case",
+        "summary": "RPC method for updating an existing case.",
         "operationId": "Cases_UpdateCase",
         "parameters": [
           {
@@ -13499,13 +13792,13 @@
             "required": true
           },
           {
-            "description": "changes",
+            "description": "Input data with updated fields.",
             "name": "input",
             "in": "body",
             "required": true,
             "schema": {
               "type": "object",
-              "title": "changes",
+              "title": "Input data with updated fields.",
               "properties": {
                 "assignee": {
                   "title": "create: not required, default from service or set by UI;",
@@ -13598,7 +13891,17 @@
               "type": "string"
             },
             "collectionFormat": "multi",
-            "description": "fields to return in resulting object",
+            "description": "List of JSON fields to update.",
+            "name": "xJsonMask",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "List of fields to include in the response.",
             "name": "fields",
             "in": "query"
           }
@@ -13622,7 +13925,7 @@
         "tags": [
           "Cases"
         ],
-        "summary": "on update, we should be able to accept service and all parameters that correspond to it,\nif service and corresponding to it fields were changed simultaneously then priority have\nservice and dependent fields set from the service automatically (we can't change the SLA, SLA conditions )\netag is required to update the true version of the case",
+        "summary": "RPC method for updating an existing case.",
         "operationId": "Cases_UpdateCase2",
         "parameters": [
           {
@@ -13632,13 +13935,13 @@
             "required": true
           },
           {
-            "description": "changes",
+            "description": "Input data with updated fields.",
             "name": "input",
             "in": "body",
             "required": true,
             "schema": {
               "type": "object",
-              "title": "changes",
+              "title": "Input data with updated fields.",
               "properties": {
                 "assignee": {
                   "title": "create: not required, default from service or set by UI;",
@@ -13731,7 +14034,17 @@
               "type": "string"
             },
             "collectionFormat": "multi",
-            "description": "fields to return in resulting object",
+            "description": "List of JSON fields to update.",
+            "name": "xJsonMask",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "List of fields to include in the response.",
             "name": "fields",
             "in": "query"
           }
@@ -36162,108 +36475,216 @@
         }
       }
     },
-    "casesCase": {
+    "casesAttachment": {
       "type": "object",
       "properties": {
-        "assignee": {
-          "title": "contact that assigned to resolve this case (optional)",
-          "$ref": "#/definitions/generalLookup"
-        },
-        "author": {
-          "title": "contact that created the case",
-          "$ref": "#/definitions/generalLookup"
-        },
-        "close": {
-          "title": "close information, required when case is in final state",
-          "$ref": "#/definitions/casesCloseInfo"
-        },
-        "closeReasonGroup": {
-          "title": "defines what close reason lookup we should use for this case, should not be changed when service changed",
-          "$ref": "#/definitions/generalLookup"
-        },
-        "comments": {
-          "title": "all case's comments",
-          "$ref": "#/definitions/casesCaseCommentList"
-        },
-        "contactInfo": {
+        "id": {
           "type": "string",
-          "title": "free-form text to describe contact information"
+          "format": "int64"
         },
-        "createdAt": {
+        "mime": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "size": {
           "type": "string",
-          "format": "int64",
-          "title": "unixmilli"
+          "format": "int64"
         },
-        "createdBy": {
-          "$ref": "#/definitions/generalLookup"
-        },
-        "description": {
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "casesCallEvent": {
+      "type": "object",
+      "properties": {
+        "closedAt": {
           "type": "string",
-          "title": "free-form text to describe case"
+          "format": "int64"
         },
-        "etag": {
+        "duration": {
           "type": "string",
-          "title": "main field required for read, update and delete"
+          "format": "int64"
         },
         "files": {
-          "title": "attached files",
-          "$ref": "#/definitions/casesCaseFileList"
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/casesCallFile"
+          }
         },
-        "group": {
-          "title": "contact group from the service (optional)",
+        "flowScheme": {
+          "$ref": "#/definitions/generalLookup"
+        },
+        "gateway": {
           "$ref": "#/definitions/generalLookup"
         },
         "id": {
+          "type": "string"
+        },
+        "isDetailed": {
+          "type": "boolean"
+        },
+        "isInbound": {
+          "type": "boolean"
+        },
+        "isMissed": {
+          "type": "boolean"
+        },
+        "participants": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/generalLookup"
+          }
+        },
+        "queue": {
+          "$ref": "#/definitions/generalLookup"
+        },
+        "totalDuration": {
           "type": "string",
-          "format": "int64",
-          "title": "default, readonly system fields"
+          "format": "int64"
+        },
+        "transcripts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/casesTranscriptLookup"
+          }
+        }
+      }
+    },
+    "casesCallFile": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "int64"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "mimeType": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "size": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "casesCase": {
+      "description": "Message representing a case.",
+      "type": "object",
+      "properties": {
+        "assignee": {
+          "description": "Assignee responsible for resolving the case.",
+          "$ref": "#/definitions/generalLookup"
+        },
+        "author": {
+          "description": "Author or reporter of the case.",
+          "$ref": "#/definitions/generalLookup"
+        },
+        "close": {
+          "description": "Close information (if applicable).",
+          "$ref": "#/definitions/casesCloseInfo"
+        },
+        "closeReasonGroup": {
+          "description": "Close reason group, immutable once set.",
+          "$ref": "#/definitions/generalLookup"
+        },
+        "comments": {
+          "description": "List of comments on the case.",
+          "$ref": "#/definitions/casesCaseCommentList"
+        },
+        "contactInfo": {
+          "description": "Contact information for the case.",
+          "type": "string"
+        },
+        "createdAt": {
+          "description": "Creation timestamp (in milliseconds since Unix epoch).",
+          "type": "string",
+          "format": "int64"
+        },
+        "createdBy": {
+          "description": "Creator of the case.",
+          "$ref": "#/definitions/generalLookup"
+        },
+        "description": {
+          "description": "Detailed description of the case.",
+          "type": "string"
+        },
+        "etag": {
+          "description": "Unique etag identifier.",
+          "type": "string"
+        },
+        "files": {
+          "description": "List of attached files.",
+          "$ref": "#/definitions/casesCaseFileList"
+        },
+        "group": {
+          "description": "Group associated with the case.",
+          "$ref": "#/definitions/generalLookup"
+        },
+        "id": {
+          "description": "Unique case ID.",
+          "type": "string",
+          "format": "int64"
         },
         "impacted": {
-          "title": "contact that can be impacted by this case, by default the reporter of the case, can be null if reporter is anonymous contact",
+          "description": "Impacted contact (defaults to reporter if null).",
           "$ref": "#/definitions/generalLookup"
         },
         "links": {
-          "title": "attached links",
+          "description": "List of attached links.",
           "$ref": "#/definitions/casesCaseLinkList"
         },
         "name": {
-          "type": "string",
-          "title": "name of the case, formed by the prefix defined in Catalog and int, in docs uses as id"
+          "description": "Name of the case (may serve as an ID in docs).",
+          "type": "string"
         },
         "plannedReactionAt": {
+          "description": "Planned reaction time (in milliseconds).",
           "type": "string",
-          "format": "int64",
-          "title": "planned reaction time calculated by sla and conditions, taking into account the calendar (unixmilli)"
+          "format": "int64"
         },
         "plannedResolveAt": {
+          "description": "Planned resolution time (in milliseconds).",
           "type": "string",
-          "format": "int64",
-          "title": "planned resolve time calculated on-flight by sla and conditions, taking into account the calendar (unixmilli)"
+          "format": "int64"
         },
         "priority": {
-          "title": "priority",
+          "description": "Priority level of the case.",
           "$ref": "#/definitions/generalLookup"
         },
         "rate": {
-          "title": "rating information, not required (filled by internal services)",
+          "description": "Rating information.",
           "$ref": "#/definitions/casesRateInfo"
         },
         "related": {
-          "title": "related cases",
+          "description": "List of related cases.",
           "$ref": "#/definitions/casesRelatedCaseList"
         },
         "reporter": {
-          "title": "contact that reported that issue, if null - anonymous contact",
+          "description": "Reporter of the issue (null if anonymous).",
           "$ref": "#/definitions/generalLookup"
         },
         "service": {
+          "description": "Service associated with the case.",
           "$ref": "#/definitions/generalLookup"
         },
         "sla": {
-          "title": "sla from the service",
+          "description": "SLA associated with the case.",
           "$ref": "#/definitions/generalLookup"
         },
         "slaCondition": {
+          "description": "List of SLA conditions.",
           "type": "array",
           "items": {
             "type": "object",
@@ -36271,33 +36692,36 @@
           }
         },
         "source": {
-          "title": "source of the case",
+          "description": "Source of the case.",
           "$ref": "#/definitions/generalLookup"
         },
         "status": {
-          "title": "initialized from service/subservice of the catalog, should not be changed when service changed",
+          "description": "Current status of the case.",
           "$ref": "#/definitions/generalLookup"
         },
         "statusCondition": {
-          "title": "case state value from the status_lookup",
+          "description": "Status condition from status lookup.",
           "$ref": "#/definitions/generalLookup"
         },
         "subject": {
+          "description": "Subject of the case.",
           "type": "string"
         },
         "timing": {
-          "title": "planned timings calculated on-flight by the SLA and it's conditions",
+          "description": "SLA timing details.",
           "$ref": "#/definitions/casesTimingInfo"
         },
         "updatedAt": {
+          "description": "Last update timestamp (in milliseconds since Unix epoch).",
           "type": "string",
-          "format": "int64",
-          "title": "unixmilli"
+          "format": "int64"
         },
         "updatedBy": {
+          "description": "Last updater of the case.",
           "$ref": "#/definitions/generalLookup"
         },
         "ver": {
+          "description": "Version number of the case.",
           "type": "integer",
           "format": "int32"
         }
@@ -36384,6 +36808,40 @@
           "format": "int64"
         }
       }
+    },
+    "casesCaseCommunication": {
+      "description": "Represents a single case communication.",
+      "type": "object",
+      "properties": {
+        "communicationId": {
+          "description": "External communication ID.",
+          "type": "string"
+        },
+        "communicationType": {
+          "description": "Type of the communication (e.g., Chat, Call).",
+          "$ref": "#/definitions/casesCaseCommunicationsTypes"
+        },
+        "id": {
+          "description": "Database ID of the communication.",
+          "type": "string"
+        },
+        "ver": {
+          "description": "Version of the communication record.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "casesCaseCommunicationsTypes": {
+      "description": "Enum to define types of case communications.\n\n - NO_TYPE: Default value, no type specified.\n - COMMUNICATION_CHAT: Communication type: Chat.\n - COMMUNICATION_CALL: Communication type: Call.\n - COMMUNICATION_EMAIL: Communication type: Email.",
+      "type": "string",
+      "default": "NO_TYPE",
+      "enum": [
+        "NO_TYPE",
+        "COMMUNICATION_CHAT",
+        "COMMUNICATION_CALL",
+        "COMMUNICATION_EMAIL"
+      ]
     },
     "casesCaseFileList": {
       "description": "Contains a list of case files with pagination.",
@@ -36472,9 +36930,11 @@
       }
     },
     "casesCaseList": {
+      "description": "Response message containing a list of cases.",
       "type": "object",
       "properties": {
         "items": {
+          "description": "List of cases.",
           "type": "array",
           "items": {
             "type": "object",
@@ -36482,13 +36942,24 @@
           }
         },
         "next": {
+          "description": "Flag indicating if there are more pages.",
           "type": "boolean"
         },
         "page": {
+          "description": "Current page number.",
           "type": "string",
           "format": "int64"
         }
       }
+    },
+    "casesCaseTimelineEventType": {
+      "type": "string",
+      "default": "TIMELINE_CHAT",
+      "enum": [
+        "TIMELINE_CHAT",
+        "TIMELINE_CALL",
+        "TIMELINE_EMAIL"
+      ]
     },
     "casesCatalog": {
       "type": "object",
@@ -36602,16 +37073,58 @@
         }
       }
     },
+    "casesChatEvent": {
+      "type": "object",
+      "properties": {
+        "closedAt": {
+          "type": "string",
+          "format": "int64"
+        },
+        "duration": {
+          "type": "string",
+          "format": "int64"
+        },
+        "flowScheme": {
+          "$ref": "#/definitions/generalLookup"
+        },
+        "gateway": {
+          "$ref": "#/definitions/generalExtendedLookup"
+        },
+        "id": {
+          "type": "string"
+        },
+        "isDetailed": {
+          "type": "boolean"
+        },
+        "isInbound": {
+          "type": "boolean"
+        },
+        "isMissed": {
+          "type": "boolean"
+        },
+        "participants": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/generalLookup"
+          }
+        },
+        "queue": {
+          "$ref": "#/definitions/generalLookup"
+        }
+      }
+    },
     "casesCloseInfo": {
+      "description": "Message representing close information for a case.",
       "type": "object",
       "properties": {
         "closeReason": {
-          "title": "actual close reason value from the close_reason lookup",
+          "description": "Lookup for the close reason.",
           "$ref": "#/definitions/generalLookup"
         },
         "closeResult": {
-          "type": "string",
-          "title": "rich text with comment on resulting case"
+          "description": "Result or reason for closing the case.",
+          "type": "string"
         }
       }
     },
@@ -36735,29 +37248,34 @@
       }
     },
     "casesCreateCaseCloseInput": {
+      "description": "Structure for close information when a case is closed.",
       "type": "object",
       "properties": {
         "closeReason": {
+          "description": "Close reason ID from lookup.",
           "type": "string",
-          "format": "int64",
-          "title": "actual close reason value from the close_reason lookup"
+          "format": "int64"
         },
         "closeResult": {
-          "type": "string",
-          "title": "rich text with comment on resulting case"
+          "description": "Comment or reason for closing the case.",
+          "type": "string"
         }
       }
     },
     "casesCreateCaseRelatedCaseInput": {
+      "description": "Structure for related cases input when creating a case.",
       "type": "object",
       "properties": {
         "etag": {
+          "description": "Etag of the related case.",
           "type": "string"
         },
         "relatedTo": {
+          "description": "Identifier of the related case.",
           "type": "string"
         },
         "relationType": {
+          "description": "Type of relation (e.g., duplicate, linked).",
           "$ref": "#/definitions/casesRelationType"
         }
       }
@@ -36976,6 +37494,125 @@
         }
       }
     },
+    "casesDayTimeline": {
+      "type": "object",
+      "properties": {
+        "callsCount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "chatsCount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "dayTimestamp": {
+          "type": "string",
+          "format": "int64"
+        },
+        "emailsCount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/casesEvent"
+          }
+        }
+      }
+    },
+    "casesEmailEvent": {
+      "type": "object",
+      "properties": {
+        "attachments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/casesAttachment"
+          }
+        },
+        "body": {
+          "type": "string",
+          "title": "plain text of email"
+        },
+        "cc": {
+          "type": "array",
+          "title": "array of ccs (email addresses)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "from": {
+          "type": "array",
+          "title": "array of senders (email addresses)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "html": {
+          "type": "string",
+          "title": "html body of email"
+        },
+        "id": {
+          "type": "string"
+        },
+        "isDetailed": {
+          "type": "boolean",
+          "title": "reserved for the open"
+        },
+        "isInbound": {
+          "type": "boolean",
+          "title": "inbound/outbound email"
+        },
+        "owner": {
+          "title": "Agent who sent/accepted",
+          "$ref": "#/definitions/generalLookup"
+        },
+        "profile": {
+          "title": "email profile",
+          "$ref": "#/definitions/generalLookup"
+        },
+        "sender": {
+          "type": "array",
+          "title": "array of receivers (email addresses)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "subject": {
+          "type": "string"
+        },
+        "to": {
+          "type": "array",
+          "title": "array of receivers (email addresses)",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "casesEvent": {
+      "type": "object",
+      "properties": {
+        "call": {
+          "$ref": "#/definitions/casesCallEvent"
+        },
+        "chat": {
+          "$ref": "#/definitions/casesChatEvent"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "int64"
+        },
+        "email": {
+          "$ref": "#/definitions/casesEmailEvent"
+        },
+        "type": {
+          "$ref": "#/definitions/casesCaseTimelineEventType"
+        }
+      }
+    },
     "casesFile": {
       "description": "Metadata for a file associated with a case.",
       "type": "object",
@@ -37012,6 +37649,52 @@
         },
         "url": {
           "type": "string"
+        }
+      }
+    },
+    "casesGetTimelineCounterResponse": {
+      "type": "object",
+      "properties": {
+        "callsCount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "chatsCount": {
+          "type": "string",
+          "format": "int64",
+          "title": "defined event types"
+        },
+        "dateFrom": {
+          "type": "string",
+          "format": "int64",
+          "title": "filter dates"
+        },
+        "dateTo": {
+          "type": "string",
+          "format": "int64"
+        },
+        "emailsCount": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "casesGetTimelineResponse": {
+      "type": "object",
+      "properties": {
+        "days": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/casesDayTimeline"
+          }
+        },
+        "next": {
+          "type": "boolean"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -37122,6 +37805,20 @@
         "text": "My new comment"
       }
     },
+    "casesInputCaseCommunication": {
+      "description": "Represents input data for creating or linking a communication.",
+      "type": "object",
+      "properties": {
+        "communicationId": {
+          "description": "External communication ID.",
+          "type": "string"
+        },
+        "communicationType": {
+          "description": "Type of the communication.",
+          "$ref": "#/definitions/casesCaseCommunicationsTypes"
+        }
+      }
+    },
     "casesInputCaseLink": {
       "type": "object",
       "properties": {
@@ -37219,41 +37916,43 @@
       }
     },
     "casesInputCreateCase": {
+      "description": "Input structure for creating a new case.",
       "type": "object",
       "properties": {
         "assignee": {
+          "description": "Optional assignee ID.",
           "type": "string",
-          "format": "int64",
-          "title": "create: not required, default from service or set by UI;"
+          "format": "int64"
         },
         "close": {
-          "title": "create: not required; update: required only when case status goes to the final state",
+          "description": "Optional close information.",
           "$ref": "#/definitions/casesCreateCaseCloseInput"
         },
         "closeReason": {
+          "description": "Optional close reason.",
           "type": "string",
-          "format": "int64",
-          "title": "create: not required;"
+          "format": "int64"
         },
         "contactInfo": {
-          "type": "string",
-          "title": "create: not required;"
+          "description": "Optional contact information.",
+          "type": "string"
         },
         "description": {
-          "type": "string",
-          "title": "create: not required;"
+          "description": "Optional description of the case.",
+          "type": "string"
         },
         "group": {
+          "description": "Optional group ID.",
           "type": "string",
-          "format": "int64",
-          "title": "create: not required, default from service or set by UI;"
+          "format": "int64"
         },
         "impacted": {
+          "description": "Required impacted user ID (default: reporter).",
           "type": "string",
-          "format": "int64",
-          "title": "create: required, default is reporter or ui (if empty recognize as anonymous);"
+          "format": "int64"
         },
         "links": {
+          "description": "List of links attached to the case.",
           "type": "array",
           "items": {
             "type": "object",
@@ -37261,15 +37960,16 @@
           }
         },
         "priority": {
+          "description": "Optional priority level.",
           "type": "string",
-          "format": "int64",
-          "title": "create: not required, default first value from priority lookup"
+          "format": "int64"
         },
         "rate": {
-          "title": "only for API, not UI",
+          "description": "API-only rating information.",
           "$ref": "#/definitions/casesRateInfo"
         },
         "related": {
+          "description": "List of related cases.",
           "type": "array",
           "items": {
             "type": "object",
@@ -37277,28 +37977,28 @@
           }
         },
         "reporter": {
+          "description": "Required reporter ID (if empty, anonymous contact).",
           "type": "string",
-          "format": "int64",
-          "title": "create: required (if empty recognize as anonymous contact);"
+          "format": "int64"
         },
         "service": {
+          "description": "Service ID (affects many other readonly fields).",
           "type": "string",
-          "format": "int64",
-          "title": "on this field base many other readonly fields on return"
+          "format": "int64"
         },
         "source": {
+          "description": "Source of the case.",
           "type": "string",
-          "format": "int64",
-          "title": "source of the case"
+          "format": "int64"
         },
         "status": {
+          "description": "Initial case status (default from lookup or UI).",
           "type": "string",
-          "format": "int64",
-          "title": "create: not required, default initial value from status lookup or ui;"
+          "format": "int64"
         },
         "subject": {
-          "type": "string",
-          "title": "create: required;"
+          "description": "Required subject of the case.",
+          "type": "string"
         }
       }
     },
@@ -37502,6 +38202,42 @@
         }
       }
     },
+    "casesLinkCommunicationResponse": {
+      "description": "Response message after linking communications to a case.",
+      "type": "object",
+      "properties": {
+        "data": {
+          "description": "List of linked communications.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/casesCaseCommunication"
+          }
+        }
+      }
+    },
+    "casesListCommunicationsResponse": {
+      "description": "Response message for listing communications linked to a case.",
+      "type": "object",
+      "properties": {
+        "data": {
+          "description": "List of communications.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/casesCaseCommunication"
+          }
+        },
+        "next": {
+          "type": "boolean"
+        },
+        "page": {
+          "description": "Current page number.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
     "casesLocateCatalogResponse": {
       "type": "object",
       "title": "LocateCatalogResponse message contains a single catalog entity",
@@ -37657,16 +38393,17 @@
       }
     },
     "casesRateInfo": {
+      "description": "Message representing rating information.",
       "type": "object",
       "properties": {
         "rating": {
+          "description": "Rating value.",
           "type": "string",
-          "format": "int64",
-          "title": "rating, formed from api calls"
+          "format": "int64"
         },
         "ratingComment": {
-          "type": "string",
-          "title": "(optional)"
+          "description": "Optional comment for the rating.",
+          "type": "string"
         }
       }
     },
@@ -38191,27 +38928,54 @@
       }
     },
     "casesTimingInfo": {
+      "description": "Message representing SLA timing information.",
       "type": "object",
       "properties": {
         "differenceInReaction": {
+          "description": "Difference between actual and planned reaction time.",
           "type": "string",
-          "format": "int64",
-          "title": "difference between actual and planned reaction time, taking into account the calendar"
+          "format": "int64"
         },
         "differenceInResolve": {
+          "description": "Difference between actual and planned resolution time.",
           "type": "string",
-          "format": "int64",
-          "title": "difference between actual and planned resolve time, taking into account the calendar"
+          "format": "int64"
         },
         "reactedAt": {
+          "description": "Actual reaction timestamp (in milliseconds).",
           "type": "string",
-          "format": "int64",
-          "title": "actual time when this case changed it's status from initial"
+          "format": "int64"
         },
         "resolvedAt": {
+          "description": "Actual resolution timestamp (in milliseconds).",
           "type": "string",
-          "format": "int64",
-          "title": "actual time when this case was resolved"
+          "format": "int64"
+        }
+      }
+    },
+    "casesTranscriptLookup": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "$ref": "#/definitions/generalLookup"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "locale": {
+          "type": "string"
+        }
+      }
+    },
+    "casesUnlinkCommunicationResponse": {
+      "description": "Response message after unlinking a communication from a case.",
+      "type": "object",
+      "properties": {
+        "affected": {
+          "description": "Affected rows.",
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -47415,6 +48179,21 @@
         },
         "updated_by": {
           "$ref": "#/definitions/engineLookup"
+        }
+      }
+    },
+    "generalExtendedLookup": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
         }
       }
     },
