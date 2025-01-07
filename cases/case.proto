@@ -1,219 +1,212 @@
-syntax = "proto3";
+syntax = "proto3"; // Specifies the syntax version of Protocol Buffers (proto3 is used here)
 
+package webitel.cases; // Defines the package name for the proto file, ensuring proper namespacing in generated code.
+option go_package = "github.com/webitel/cases/api/cases;cases"; // Specifies the Go package path for generated Go code.
 
-package webitel.cases;
-option go_package = "github.com/webitel/cases/api/cases;cases";
+// Import statements for dependencies used in the proto definitions.
+import "general.proto";                  // General shared types and lookups.
+import "service.proto";                  // Service-related definitions.
+import "case_comment.proto";             // Case comment-related definitions.
+import "related_case.proto";             // Related case structures.
+import "case_file.proto";                // Case file attachments.
+import "case_link.proto";                // Links attached to a case.
+import "sla_condition.proto";            // SLA condition definitions.
+import "google/api/visibility.proto";    // API visibility annotations.
+import "google/api/annotations.proto";   // HTTP annotation support.
+import "protoc-gen-openapiv2/options/annotations.proto"; // OpenAPI annotation support.
+import "protoc-gen-openapiv2/options/openapiv2.proto";   // OpenAPI v2 options.
+import "proto/webitel/option.proto";     // Custom Webitel option annotations.
 
-import "general.proto";
-import "service.proto";
-import "case_comment.proto";
-import "related_case.proto";
-import "case_file.proto";
-import "case_link.proto";
-import "sla_condition.proto";
-import "google/api/visibility.proto";
-import "google/api/annotations.proto";
-import "protoc-gen-openapiv2/options/annotations.proto";
-import "protoc-gen-openapiv2/options/openapiv2.proto";
-import "proto/webitel/option.proto";
-
-
+// Service definition for managing cases.
 service Cases {
-  option (option.objclass) = "cases";
-  rpc SearchCases(SearchCasesRequest) returns (CaseList) {
-    option (option.access) = ACTION_READ;
-    option (google.api.http) = {
-      get: "/cases"
-    };
+  option (option.objclass) = "cases";  // Custom object class option for "cases".
 
+  // RPC method for searching cases.
+  rpc SearchCases(SearchCasesRequest) returns (CaseList) {
+    option (option.access) = ACTION_READ; // Specifies read access level.
+    option (google.api.http) = {
+      get: "/cases"                     // Maps this RPC to an HTTP GET endpoint.
+    };
   }
+
+  // RPC method to retrieve a specific case by its etag identifier.
   rpc LocateCase(LocateCaseRequest) returns (Case) {
     option (option.access) = ACTION_READ;
     option (google.api.http) = {
-      get: "/cases/{etag}"
+      get: "/cases/{etag}"              // Maps this RPC to an HTTP GET endpoint with a path parameter.
     };
   }
-  // on create, we should accept service and all parameters that correspond to it,
-  // priority have the fields that were directly set from the front-end and if they are empty we should
-  // fill them from service (we can't change the SLA and SLA conditions)
-  // etag doesn't play any role on this API
+
+  // RPC method for creating a new case.
   rpc CreateCase(CreateCaseRequest) returns (Case) {
     option (option.access) = ACTION_CREATE;
     option (google.api.http) = {
-      post: "/cases"
-      body: "input"
+      post: "/cases"                    // Maps this RPC to an HTTP POST endpoint.
+      body: "input"                     // Specifies that the request body contains the "input" field.
     };
   }
-  // on update, we should be able to accept service and all parameters that correspond to it,
-  // if service and corresponding to it fields were changed simultaneously then priority have
-  // service and dependent fields set from the service automatically (we can't change the SLA, SLA conditions )
-  // etag is required to update the true version of the case
+
+  // RPC method for updating an existing case.
   rpc UpdateCase(UpdateCaseRequest) returns (Case) {
     option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
-      put: "/cases/{input.etag}"
-      body: "input"
-      additional_bindings {
-          patch: "/cases/{input.etag}"
+      put: "/cases/{input.etag}"        // Maps this RPC to an HTTP PUT endpoint.
+      body: "input"                     // Specifies that the request body contains the "input" field.
+      additional_bindings {              // Additional binding for PATCH requests.
+          patch: "/cases/{input.etag}"  // Maps this RPC to an HTTP PATCH endpoint.
           body: "input"
       }
     };
   }
-  // on delete, we should require etag, to understand if user has right version of the case
-  // also will be deleted all objects connected to the case, such as comments, related cases, links and files
+
+  // RPC method for deleting an existing case by its etag.
   rpc DeleteCase(DeleteCaseRequest) returns (Case) {
     option (option.access) = ACTION_DELETE;
     option (google.api.http) = {
-      delete: "/cases/{etag}"
+      delete: "/cases/{etag}"           // Maps this RPC to an HTTP DELETE endpoint.
     };
   }
 }
 
+// Request message for searching cases with optional filters, pagination, and sorting.
 message SearchCasesRequest {
-  int32 page = 1;
-  int32 size = 2;
-  string q = 3;
-  repeated string ids = 4;
-  string sort = 5;
-  repeated string fields = 6;
-  map<string, string> filters = 7;
+  int32 page = 1;                       // Page number for pagination.
+  int32 size = 2;                       // Number of results per page.
+  string q = 3;                         // Query string for searching cases.
+  repeated string ids = 4;              // List of specific case IDs to retrieve.
+  string sort = 5;                      // Sorting criteria (e.g., field:asc).
+  repeated string fields = 6;           // List of fields to include in the response.
+  map<string, string> filters = 7;      // Key-value pairs for additional filtering.
 }
 
+// Request message for locating a specific case by its etag identifier.
 message LocateCaseRequest {
-  string etag = 1;
-  repeated string fields = 2;
+  string etag = 1;                      // Unique etag identifier of the case.
+  repeated string fields = 2;           // List of fields to include in the response.
 }
 
+// Input structure for creating a new case.
 message InputCreateCase {
-  string subject = 1; // create: required;
-  string description = 2; // create: not required;
-  string contact_info = 3; // create: not required;
-  int64 assignee = 4; // create: not required, default from service or set by UI;
-  int64 reporter = 5; // create: required (if empty recognize as anonymous contact);
-  int64 impacted = 6; // create: required, default is reporter or ui (if empty recognize as anonymous);
-  int64 group = 7; // create: not required, default from service or set by UI;
-  int64 status = 8; // create: not required, default initial value from status lookup or ui;
-  int64 close_reason = 9; // create: not required;
-  int64 priority = 10; // create: not required, default first value from priority lookup
-  int64 source = 11; // source of the case
-  int64 service = 12; // on this field base many other readonly fields on return
-  CreateCaseCloseInput close = 13; // create: not required; update: required only when case status goes to the final state
-  RateInfo rate = 14; // only for API, not UI
+  string subject = 1;                   // Required subject of the case.
+  string description = 2;               // Optional description of the case.
+  string contact_info = 3;              // Optional contact information.
+  int64 assignee = 4;                   // Optional assignee ID.
+  int64 reporter = 5;                   // Required reporter ID (if empty, anonymous contact).
+  int64 impacted = 6;                   // Required impacted user ID (default: reporter).
+  int64 group = 7;                      // Optional group ID.
+  int64 status = 8;                     // Initial case status (default from lookup or UI).
+  int64 close_reason = 9;               // Optional close reason.
+  int64 priority = 10;                  // Optional priority level.
+  int64 source = 11;                    // Source of the case.
+  int64 service = 12;                   // Service ID (affects many other readonly fields).
+  CreateCaseCloseInput close = 13;      // Optional close information.
+  RateInfo rate = 14;                   // API-only rating information.
 
-  repeated InputCaseLink links = 15;
-  repeated CreateCaseRelatedCaseInput related = 16;
+  repeated InputCaseLink links = 15;    // List of links attached to the case.
+  repeated CreateCaseRelatedCaseInput related = 16; // List of related cases.
 }
 
+// Structure for close information when a case is closed.
 message CreateCaseCloseInput {
-    string close_result = 1; // rich text with comment on resulting case
-    int64 close_reason = 2; // actual close reason value from the close_reason lookup
+    string close_result = 1;            // Comment or reason for closing the case.
+    int64 close_reason = 2;             // Close reason ID from lookup.
 }
 
-message CreateCaseRelatedCaseInput{
-  string etag = 1;
-  RelationType relation_type = 3;
-  string related_to = 4;
+// Structure for related cases input when creating a case.
+message CreateCaseRelatedCaseInput {
+  string etag = 1;                      // Etag of the related case.
+  RelationType relation_type = 3;       // Type of relation (e.g., duplicate, linked).
+  string related_to = 4;                // Identifier of the related case.
 }
 
+// Request message for creating a case.
 message CreateCaseRequest {
-  InputCreateCase input = 1;
-  // Result fields to include in the response.
-  repeated string fields = 2;
+  InputCreateCase input = 1;            // Input data for creating the case.
+  repeated string fields = 2;           // List of fields to include in the response.
 }
 
+// Request message for updating an existing case.
 message UpdateCaseRequest {
-  repeated string x_json_mask = 1 // list of json fields specified in front-end request (patch)
-  [(google.api.field_visibility) = {
-    restriction: "PREVIEW" // "INTERNAL"
-  },
-  (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    read_only: true
-    pattern: "^$"
-  }];
-  repeated string fields = 2;  // fields to return in resulting object
-  InputCase input = 3;   // changes
+  repeated string x_json_mask = 1;      // List of JSON fields to update.
+  repeated string fields = 2;           // List of fields to include in the response.
+  InputCase input = 3;                  // Input data with updated fields.
 }
 
+// Request message for deleting a case.
 message DeleteCaseRequest {
-  repeated string fields = 1;// fields to return in deleted object
-  string etag = 2; // identifier of the object
+  repeated string fields = 1;           // List of fields to include in the deleted case response.
+  string etag = 2;                      // Unique etag identifier of the case.
 }
 
-
-
+// Response message containing a list of cases.
 message CaseList {
-  int64 page = 1;
-  bool next = 2;
-  repeated Case items = 3;
+  int64 page = 1;                       // Current page number.
+  bool next = 2;                        // Flag indicating if there are more pages.
+  repeated Case items = 3;              // List of cases.
 }
 
-
-
+// Message representing a case.
 message Case {
-  // default, readonly system fields
-  int64 id = 1;
-  int32 ver = 2;
-  string etag = 3; // main field required for read, update and delete
-  general.Lookup created_by = 4;
-  int64 created_at = 5; // unixmilli
-  general.Lookup updated_by = 6;
-  int64 updated_at = 7; // unixmilli
+  int64 id = 1;                         // Unique case ID.
+  int32 ver = 2;                        // Version number of the case.
+  string etag = 3;                      // Unique etag identifier.
+  general.Lookup created_by = 4;        // Creator of the case.
+  int64 created_at = 5;                 // Creation timestamp (in milliseconds since Unix epoch).
+  general.Lookup updated_by = 6;        // Last updater of the case.
+  int64 updated_at = 7;                 // Last update timestamp (in milliseconds since Unix epoch).
 
-  string name = 8; // name of the case, formed by the prefix defined in Catalog and int, in docs uses as id
-  string subject = 9;
-  string description = 10; // free-form text to describe case
-  string contact_info = 11; // free-form text to describe contact information
-  int64 planned_reaction_at = 12; // planned reaction time calculated by sla and conditions, taking into account the calendar (unixmilli)
-  int64 planned_resolve_at = 13; // planned resolve time calculated on-flight by sla and conditions, taking into account the calendar (unixmilli)
-  general.Lookup status = 14; // initialized from service/subservice of the catalog, should not be changed when service changed
-  general.Lookup close_reason_group = 15;  // defines what close reason lookup we should use for this case, should not be changed when service changed
+  string name = 8;                      // Name of the case (may serve as an ID in docs).
+  string subject = 9;                   // Subject of the case.
+  string description = 10;              // Detailed description of the case.
+  string contact_info = 11;             // Contact information for the case.
+  int64 planned_reaction_at = 12;       // Planned reaction time (in milliseconds).
+  int64 planned_resolve_at = 13;        // Planned resolution time (in milliseconds).
+  general.Lookup status = 14;           // Current status of the case.
+  general.Lookup close_reason_group = 15; // Close reason group, immutable once set.
 
-  general.Lookup author = 16; // contact that created the case
-  general.Lookup assignee = 17; // contact that assigned to resolve this case (optional)
-  general.Lookup reporter = 18; // contact that reported that issue, if null - anonymous contact
-  general.Lookup impacted = 19; // contact that can be impacted by this case, by default the reporter of the case, can be null if reporter is anonymous contact
-  general.Lookup group = 20; // contact group from the service (optional)
+  general.Lookup author = 16;           // Author or reporter of the case.
+  general.Lookup assignee = 17;         // Assignee responsible for resolving the case.
+  general.Lookup reporter = 18;         // Reporter of the issue (null if anonymous).
+  general.Lookup impacted = 19;         // Impacted contact (defaults to reporter if null).
+  general.Lookup group = 20;            // Group associated with the case.
 
-  general.Lookup priority = 21; // priority
-  general.Lookup source = 22; // source of the case
-  general.Lookup status_condition = 23; // case state value from the status_lookup
+  general.Lookup priority = 21;         // Priority level of the case.
+  general.Lookup source = 22;           // Source of the case.
+  general.Lookup status_condition = 23; // Status condition from status lookup.
 
-  CloseInfo close = 24; // close information, required when case is in final state
-  RateInfo rate = 25; // rating information, not required (filled by internal services)
-  TimingInfo timing = 26; // planned timings calculated on-flight by the SLA and it's conditions
+  CloseInfo close = 24;                 // Close information (if applicable).
+  RateInfo rate = 25;                   // Rating information.
+  TimingInfo timing = 26;               // SLA timing details.
 
+  repeated SLACondition sla_condition = 27; // List of SLA conditions.
+  general.Lookup service = 28;          // Service associated with the case.
 
-  // from catalog we got sla, status_lookup, close_reason_lookup, teams, skills
-  // general.general.Lookup catalog = 24; // main service where we got information
-  // from the service we got sla, group, assignee
+  CaseCommentList comments = 29;        // List of comments on the case.
+  RelatedCaseList related = 30;         // List of related cases.
+  CaseLinkList links = 31;              // List of attached links.
+  CaseFileList files = 32;              // List of attached files.
 
-  repeated SLACondition sla_condition = 27;
-  general.Lookup service = 28;
-
-
-
-  CaseCommentList comments = 29; // all case's comments
-  RelatedCaseList related = 30; // related cases
-  CaseLinkList links = 31; // attached links
-  CaseFileList files = 32; // attached files
-
- general.Lookup sla = 33; // sla from the service
+  general.Lookup sla = 33;              // SLA associated with the case.
 }
 
+// Message representing close information for a case.
 message CloseInfo {
-  string close_result = 1; // rich text with comment on resulting case
-  general.Lookup close_reason = 2; // actual close reason value from the close_reason lookup
+  string close_result = 1;              // Result or reason for closing the case.
+  general.Lookup close_reason = 2;      // Lookup for the close reason.
 }
 
+// Message representing rating information.
 message RateInfo {
-  int64 rating = 1; // rating, formed from api calls
-  string rating_comment = 2; // (optional)
+  int64 rating = 1;                     // Rating value.
+  string rating_comment = 2;            // Optional comment for the rating.
 }
+
+// Message representing SLA timing information.
 message TimingInfo {
-  int64 resolved_at = 1; // actual time when this case was resolved
-  int64 reacted_at = 2; // actual time when this case changed it's status from initial
-  int64 difference_in_reaction = 3;  // difference between actual and planned reaction time, taking into account the calendar
-  int64 difference_in_resolve = 4;  // difference between actual and planned resolve time, taking into account the calendar
+  int64 resolved_at = 1;                // Actual resolution timestamp (in milliseconds).
+  int64 reacted_at = 2;                 // Actual reaction timestamp (in milliseconds).
+  int64 difference_in_reaction = 3;     // Difference between actual and planned reaction time.
+  int64 difference_in_resolve = 4;      // Difference between actual and planned resolution time.
 }
 
 

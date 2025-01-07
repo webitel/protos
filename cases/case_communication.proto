@@ -1,0 +1,115 @@
+// Specifies the syntax version of the protocol buffer.
+syntax = "proto3";
+
+// Defines the package for the generated Go files.
+package webitel.cases;
+
+// Specifies the Go package path for the generated code.
+option go_package = "github.com/webitel/cases/api/cases;cases";
+
+// Import other proto files and necessary Google API annotations.
+import "general.proto"; // General shared definitions.
+import "google/api/visibility.proto"; // API visibility annotations.
+import "google/api/annotations.proto"; // HTTP annotations for REST mappings.
+import "protoc-gen-openapiv2/options/annotations.proto"; // OpenAPI annotations for documentation.
+import "proto/webitel/option.proto"; // Custom Webitel options for defining metadata.
+
+// CaseCommunications service provides operations to manage communications within cases.
+service CaseCommunications {
+  // Specifies the object class for this service.
+  option (option.objclass) = "cases";
+
+  // Links a communication to a specific case.
+  rpc LinkCommunication(LinkCommunicationRequest) returns (LinkCommunicationResponse) {
+    // Defines the required access level for this operation.
+    option (option.access) = ACTION_READ;
+    // Maps the RPC to an HTTP POST request for REST API.
+    option (google.api.http) = {
+      post: "/cases/{case_id}/communication"
+    };
+  }
+
+  // Unlinks a communication from a specific case.
+  rpc UnlinkCommunication(UnlinkCommunicationRequest) returns (UnlinkCommunicationResponse) {
+    // Defines the required access level for this operation.
+    option (option.access) = ACTION_UPDATE;
+    // Maps the RPC to an HTTP DELETE request for REST API.
+    option (google.api.http) = {
+      delete: "/cases/{case_id}/communication/{id}"
+    };
+  }
+
+  // Lists all communications linked to a specific case.
+  // Currently a feature for future development.
+  rpc ListCommunications(ListCommunicationsRequest) returns (ListCommunicationsResponse) {
+    // Defines the required access level for this operation.
+    option (option.access) = ACTION_READ;
+    // Maps the RPC to an HTTP GET request for REST API.
+    option (google.api.http) = {
+      get: "/cases/{case_id}/communication"
+    };
+  }
+}
+
+// Enum to define types of case communications.
+enum CaseCommunicationsTypes {
+  NO_TYPE = 0;               // Default value, no type specified.
+  COMMUNICATION_CHAT = 1;    // Communication type: Chat.
+  COMMUNICATION_CALL = 2;    // Communication type: Call.
+  COMMUNICATION_EMAIL = 3;   // Communication type: Email.
+}
+
+// Represents a single case communication.
+message CaseCommunication {
+  string id = 2;                            // Database ID of the communication.
+  int32 ver = 3;                           // Version of the communication record.
+  CaseCommunicationsTypes communication_type = 4; // Type of the communication (e.g., Chat, Call).
+  string communication_id = 5;             // External communication ID.
+}
+
+// Represents input data for creating or linking a communication.
+message InputCaseCommunication {
+  CaseCommunicationsTypes communication_type = 2; // Type of the communication.
+  string communication_id = 3;             // External communication ID.
+}
+
+// Request message for linking communications to a case.
+message LinkCommunicationRequest {
+  string case_id = 1;                    // Case identifier.
+  repeated string fields = 2;              // List of fields to include in the response.
+  repeated InputCaseCommunication input = 3; // Input data for the communications to link.
+}
+
+// Response message after linking communications to a case.
+message LinkCommunicationResponse {
+  repeated CaseCommunication data = 1;     // List of linked communications.
+}
+
+// Request message for unlinking communications from a case.
+message UnlinkCommunicationRequest {
+  string id = 1;                         // Communication identifier.
+  string case_id = 2;
+  repeated string fields = 3;              // List of fields to include in the response.
+}
+
+// Response message after unlinking a communication from a case.
+message UnlinkCommunicationResponse {
+  int64 affected = 1;              // Affected rows.
+}
+
+// Request message for listing communications linked to a case.
+message ListCommunicationsRequest {
+  string case_id = 1;                    // Case identifier.
+  repeated string fields = 2;              // List of fields to include in the response.
+  string q = 3;                            // Query string for filtering results.
+  int32 size = 4;                          // Number of records per page.
+  int32 page = 5;                          // Page number for pagination.
+  string sort = 6;                         // Sorting order.
+}
+
+// Response message for listing communications linked to a case.
+message ListCommunicationsResponse {
+  repeated CaseCommunication data = 1;     // List of communications.
+  int32 page = 5;                          // Current page number.
+  bool next = 6;
+}
