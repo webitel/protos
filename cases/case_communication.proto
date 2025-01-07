@@ -61,8 +61,7 @@ enum CaseCommunicationsTypes {
 
 // Represents a single case communication.
 message CaseCommunication {
-  string etag = 1;                         // Unique identifier for the communication.
-  int64 id = 2;                            // Database ID of the communication.
+  string id = 2;                            // Database ID of the communication.
   int32 ver = 3;                           // Version of the communication record.
   CaseCommunicationsTypes communication_type = 4; // Type of the communication (e.g., Chat, Call).
   string communication_id = 5;             // External communication ID.
@@ -76,7 +75,7 @@ message InputCaseCommunication {
 
 // Request message for linking communications to a case.
 message LinkCommunicationRequest {
-  string case_etag = 1;                    // Case identifier.
+  string case_id = 1;                    // Case identifier.
   repeated string fields = 2;              // List of fields to include in the response.
   repeated InputCaseCommunication input = 3; // Input data for the communications to link.
 }
@@ -88,19 +87,18 @@ message LinkCommunicationResponse {
 
 // Request message for unlinking communications from a case.
 message UnlinkCommunicationRequest {
-  string etag = 1;                         // Communication identifier.
-  string case_etag = 2;                    // Case identifier.
+  string id = 1;                         // Communication identifier.
   repeated string fields = 3;              // List of fields to include in the response.
 }
 
 // Response message after unlinking a communication from a case.
 message UnlinkCommunicationResponse {
-  CaseCommunication data = 1;              // The unlinked communication.
+  int64 affected = 1;              // Affected rows.
 }
 
 // Request message for listing communications linked to a case.
 message ListCommunicationsRequest {
-  string case_etag = 1;                    // Case identifier.
+  string case_id = 1;                    // Case identifier.
   repeated string fields = 2;              // List of fields to include in the response.
   string q = 3;                            // Query string for filtering results.
   int32 size = 4;                          // Number of records per page.
