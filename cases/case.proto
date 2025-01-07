@@ -10,6 +10,7 @@ import "case_comment.proto";             // Case comment-related definitions.
 import "related_case.proto";             // Related case structures.
 import "case_file.proto";                // Case file attachments.
 import "case_link.proto";                // Links attached to a case.
+import "source.proto";                // Source attached to a case.
 import "sla_condition.proto";            // SLA condition definitions.
 import "google/api/visibility.proto";    // API visibility annotations.
 import "google/api/annotations.proto";   // HTTP annotation support.
@@ -170,7 +171,7 @@ message Case {
   general.Lookup group = 20;            // Group associated with the case.
 
   general.Lookup priority = 21;         // Priority level of the case.
-  general.Lookup source = 22;           // Source of the case.
+  SourceTypeLookup source = 22;           // Source of the case.
   general.Lookup status_condition = 23; // Status condition from status lookup.
 
   CloseInfo close = 24;                 // Close information (if applicable).
@@ -192,6 +193,12 @@ message Case {
 message CloseInfo {
   string close_result = 1;              // Result or reason for closing the case.
   general.Lookup close_reason = 2;      // Lookup for the close reason.
+}
+
+message SourceTypeLookup {
+  int64 id = 1;
+  Type type = 2;
+  string name = 3;
 }
 
 // Message representing rating information.
