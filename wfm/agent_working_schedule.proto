@@ -13,10 +13,46 @@ option go_package = "github.com/webitel/protos/wfm;wfm";
 
 service AgentWorkingScheduleService {
   option (option.objclass) = "working_schedules";
+  rpc CreateAgentsWorkingScheduleShifts(CreateAgentsWorkingScheduleShiftsRequest) returns (CreateAgentsWorkingScheduleShiftsResponse) {
+    option (option.access) = ACTION_CREATE;
+    option (google.api.http) = {
+      post: "/wfm/agents/working_schedules/{working_schedule_id}"
+      body: "*"
+    };
+  }
+
   rpc SearchAgentsWorkingSchedule(SearchAgentsWorkingScheduleRequest) returns (SearchAgentsWorkingScheduleResponse) {
     option (option.access) = ACTION_READ;
     option (google.api.http) = {get: "/wfm/agents/working_schedules/{working_schedule_id}"};
   }
+}
+
+message CreateAgentsWorkingScheduleShiftsRequest {
+  int64 working_schedule_id = 1;
+  FilterBetween date = 2 [(buf.validate.field).required = true];
+  repeated LookupEntity agents = 3 [(buf.validate.field).repeated.min_items = 1];
+
+  // Map key is a day of week: 0 - Sunday, ..., 6 - Saturday.
+  map<int64, AgentScheduleShift> items = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).map = {
+      min_pairs: 1
+      max_pairs: 7
+      values: {
+        required: true
+      }
+      keys: {
+        int64: {
+          gte: 0
+          lte: 6
+        }
+      }
+    }
+  ];
+}
+
+message CreateAgentsWorkingScheduleShiftsResponse {
+  repeated AgentWorkingSchedule items = 1;
 }
 
 message SearchAgentsWorkingScheduleRequest {
@@ -41,47 +77,86 @@ message Holiday {
   string name = 2;
 }
 
-message AgentSchedulePause {
+message AgentScheduleShiftPause {
+  option (buf.validate.message).cel = {
+    id: "time",
+    message: "end time cannot be earlier than start time",
+    expression: "this.start < this.end"
+  };
+
   int64 id = 1;
   int64 domain_id = 2;
+  int64 created_at = 3;
+  LookupEntity created_by = 4;
+  int64 updated_at = 5;
+  LookupEntity updated_by = 6;
 
-  int64 start = 3;
-  int64 end = 4;
+  int64 start = 7 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64 = {
+      gte: 0
+      lte: 1440
+    }
+  ];
 
-  int64 created_at = 5;
-  LookupEntity created_by = 6;
-  int64 updated_at = 7;
-  LookupEntity updated_by = 8;
+  int64 end = 8 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64 = {
+      gte: 0
+      lte: 1440
+    }
+  ];
 
   optional LookupEntity cause = 9;
 }
 
-message AgentScheduleShift {
-  int64 id = 1;
-  int64 domain_id = 2;
-
-  int64 start = 3;
-  int64 end = 4;
-  repeated AgentSchedulePause pauses = 5;
-
-  int64 created_at = 6;
-  LookupEntity created_by = 7;
-  int64 updated_at = 8;
-  LookupEntity updated_by = 9;
+message AgentScheduleShiftSkill {
+  LookupEntity skill = 1 [(buf.validate.field).required = true];
+  int64 capacity = 2 [(buf.validate.field).required = true];
+  bool enabled = 3;
 }
 
-enum AgentScheduleType {
-  AGENT_SCHEDULE_TYPE_UNSPECIFIED = 0;
-  AGENT_SCHEDULE_TYPE_ABSENT = 1;
-  AGENT_SCHEDULE_TYPE_LOCKED = 2;
-  AGENT_SCHEDULE_TYPE_SHIFT = 3;
+message AgentScheduleShift {
+  option (buf.validate.message).cel = {
+    id: "time",
+    message: "end time cannot be earlier than start time",
+    expression: "this.start < this.end"
+  };
+
+  int64 id = 1;
+  int64 domain_id = 2;
+  int64 created_at = 3;
+  LookupEntity created_by = 4;
+  int64 updated_at = 5;
+  LookupEntity updated_by = 6;
+
+  int64 start = 7 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64 = {
+      gte: 0
+      lte: 1440
+    }
+  ];
+
+  int64 end = 8 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64 = {
+      gte: 0
+      lte: 1440
+    }
+  ];
+
+  repeated AgentScheduleShiftPause pauses = 9;
+  repeated AgentScheduleShiftSkill skills = 10;
 }
 
 message AgentSchedule {
   int64 date = 1;
-  AgentScheduleType type = 3;
-  AgentAbsenceType absence = 4;
-  repeated AgentScheduleShift shifts = 5;
+  bool locked = 2;
+  oneof type {
+    AgentAbsenceType absence = 3;
+    AgentScheduleShift shift = 4;
+  }
 }
 
 message AgentWorkingSchedule {

@@ -166,7 +166,12 @@ message ExecuteForecastCalculationResponse {
 message ForecastCalculation {
   int64 id = 1;
   int64 domain_id = 2;
-  string name = 3 [
+  int64 created_at = 3;
+  LookupEntity created_by = 4;
+  int64 updated_at = 5;
+  LookupEntity updated_by = 6;
+
+  string name = 7 [
     (buf.validate.field).required = true,
     (buf.validate.field).string = {
       min_len: 1,
@@ -174,8 +179,8 @@ message ForecastCalculation {
     }
   ];
 
-  optional string description = 4;
-  string procedure = 5 [
+  optional string description = 8;
+  string procedure = 9 [
     (buf.validate.field).required = true,
     (buf.validate.field).cel = {
       id: "procedure"
@@ -184,16 +189,11 @@ message ForecastCalculation {
     }
   ];
 
-  repeated string args = 6 [
+  repeated string args = 10 [
     (buf.validate.field).required = true,
     (buf.validate.field).repeated = {
       unique: true,
       min_items: 3
     }
   ];
-
-  int64 created_at = 7;
-  LookupEntity created_by = 8;
-  int64 updated_at = 9;
-  LookupEntity updated_by = 10;
 }

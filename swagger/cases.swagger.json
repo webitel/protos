@@ -261,23 +261,11 @@
             "collectionFormat": "multi"
           },
           {
-            "name": "q.query",
+            "name": "query",
             "description": "Search query string for filtering by name. Supports:\n- Wildcards (*) for substring matching\n- Placeholder (?) for single character substitution\n- Exact match for full names",
             "in": "query",
             "required": false,
             "type": "string"
-          },
-          {
-            "name": "q.fetchType",
-            "description": "The type of data fetching for catalog services\n\n - PARTIAL: Only essential fields like [ Id, Name, Description, Created/Updated at ].\n\nPartial info includes only essential fields.\n - FULL: The fetch type indicates whether to retrieve\nall available data for the catalog ( FULL ) or only essential fields ( PARTIAL ).\n\nFull info includes all fields of the catalog.",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "PARTIAL",
-              "FULL"
-            ],
-            "default": "PARTIAL"
           },
           {
             "name": "state",
@@ -288,11 +276,22 @@
           },
           {
             "name": "depth",
-            "description": "Filter by the depth of the hierarchy to retrieve services.\nThe depth indicates how many ancestor levels of services\nwill be included for each catalog.\n- A depth of 0 includes only the direct catalog.\n- A depth of 1 includes the catalog and its immediate services.\n- By default the depth is unlimited,\n  meaning all nested services and sub-services will be included.",
+            "description": "Filter by the depth of the hierarchy to retrieve services.\nThe depth indicates how many ancestor levels of services\nwill be included for each catalog.\n- A depth of 0 includes only the direct catalog.\n- A depth of 1 includes the catalog and its immediate services.\n- By default the depth is limited by 3,\n  meaning all nested services and sub-services will be included.",
             "in": "query",
             "required": false,
             "type": "string",
             "format": "int64"
+          },
+          {
+            "name": "subFields",
+            "description": "Fields to be retrieved as a result for [SUBSERVICES].\nIf the user passes \"-\" as the value for fields,\nit will retrieve all available fields for each catalog subservices.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -357,6 +356,28 @@
             "required": true,
             "type": "string",
             "format": "int64"
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved as a result.\nIf the user passes \"-\" as the value for fields,\nit will retrieve all available fields for each catalog.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "subFields",
+            "description": "Fields to be retrieved as a result for [SUBSERVICES].\nIf the user passes \"-\" as the value for fields,\nit will retrieve all available fields for each catalog subservices.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -1742,6 +1763,17 @@
             "in": "query",
             "required": false,
             "type": "boolean"
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved as a result.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -1806,6 +1838,17 @@
             "required": true,
             "type": "string",
             "format": "int64"
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved as a result.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -5399,6 +5442,10 @@
             "$ref": "#/definitions/casesService"
           },
           "title": "Service associated with the catalog"
+        },
+        "searched": {
+          "type": "boolean",
+          "title": "flag showing whether the catalog was searched"
         }
       },
       "title": "Catalog message represents the main catalog entity with metadata"
@@ -5965,15 +6012,6 @@
           "$ref": "#/definitions/casesEmailEvent"
         }
       }
-    },
-    "casesFetchType": {
-      "type": "string",
-      "enum": [
-        "PARTIAL",
-        "FULL"
-      ],
-      "default": "PARTIAL",
-      "description": " - PARTIAL: Only essential fields like [ Id, Name, Description, Created/Updated at ].\n\nPartial info includes only essential fields.\n - FULL: The fetch type indicates whether to retrieve\nall available data for the catalog ( FULL ) or only essential fields ( PARTIAL ).\n\nFull info includes all fields of the catalog."
     },
     "casesFile": {
       "type": "object",
@@ -7033,19 +7071,6 @@
       },
       "title": "SLAList message contains a list of SLA items with pagination"
     },
-    "casesSearch": {
-      "type": "object",
-      "properties": {
-        "query": {
-          "type": "string",
-          "title": "Search query string for filtering by name. Supports:\n- Wildcards (*) for substring matching\n- Placeholder (?) for single character substitution\n- Exact match for full names"
-        },
-        "fetchType": {
-          "$ref": "#/definitions/casesFetchType",
-          "title": "The type of data fetching for catalog services"
-        }
-      }
-    },
     "casesService": {
       "type": "object",
       "properties": {
@@ -7117,6 +7142,10 @@
             "$ref": "#/definitions/casesService"
           },
           "title": "Service associated with the service"
+        },
+        "searched": {
+          "type": "boolean",
+          "title": "flag showing whether the catalog was searched"
         }
       },
       "title": "Service message represents a service entity within a catalog"

@@ -238,6 +238,56 @@
         "tags": [
           "AgentWorkingScheduleService"
         ]
+      },
+      "post": {
+        "operationId": "AgentWorkingScheduleService_CreateAgentsWorkingScheduleShifts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/wfmCreateAgentsWorkingScheduleShiftsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "working_schedule_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "$ref": "#/definitions/wfmFilterBetween"
+                },
+                "agents": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/wfmLookupEntity"
+                  }
+                },
+                "items": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/definitions/wfmAgentScheduleShift"
+                  },
+                  "description": "Map key is a day of week: 0 - Sunday, ..., 6 - Saturday."
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "AgentWorkingScheduleService"
+        ]
       }
     },
     "/wfm/agents/{agent_id}/absences": {
@@ -474,13 +524,6 @@
                           "type": "string",
                           "format": "int64"
                         },
-                        "type_id": {
-                          "$ref": "#/definitions/wfmAgentAbsenceType"
-                        },
-                        "absent_at": {
-                          "type": "string",
-                          "format": "int64"
-                        },
                         "created_at": {
                           "type": "string",
                           "format": "int64"
@@ -494,6 +537,13 @@
                         },
                         "updated_by": {
                           "$ref": "#/definitions/wfmLookupEntity"
+                        },
+                        "type_id": {
+                          "$ref": "#/definitions/wfmAgentAbsenceType"
+                        },
+                        "absent_at": {
+                          "type": "string",
+                          "format": "int64"
                         }
                       }
                     }
@@ -723,6 +773,20 @@
                       "type": "string",
                       "format": "int64"
                     },
+                    "created_at": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "created_by": {
+                      "$ref": "#/definitions/wfmLookupEntity"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "updated_by": {
+                      "$ref": "#/definitions/wfmLookupEntity"
+                    },
                     "name": {
                       "type": "string"
                     },
@@ -737,20 +801,6 @@
                       "items": {
                         "type": "string"
                       }
-                    },
-                    "created_at": {
-                      "type": "string",
-                      "format": "int64"
-                    },
-                    "created_by": {
-                      "$ref": "#/definitions/wfmLookupEntity"
-                    },
-                    "updated_at": {
-                      "type": "string",
-                      "format": "int64"
-                    },
-                    "updated_by": {
-                      "$ref": "#/definitions/wfmLookupEntity"
                     }
                   }
                 }
@@ -933,19 +983,6 @@
                       "type": "string",
                       "format": "int64"
                     },
-                    "name": {
-                      "type": "string"
-                    },
-                    "description": {
-                      "type": "string"
-                    },
-                    "causes": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "$ref": "#/definitions/wfmPauseTemplateCause"
-                      }
-                    },
                     "created_at": {
                       "type": "string",
                       "format": "int64"
@@ -959,6 +996,19 @@
                     },
                     "updated_by": {
                       "$ref": "#/definitions/wfmLookupEntity"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "causes": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "$ref": "#/definitions/wfmPauseTemplateCause"
+                      }
                     }
                   }
                 }
@@ -1141,19 +1191,6 @@
                       "type": "string",
                       "format": "int64"
                     },
-                    "name": {
-                      "type": "string"
-                    },
-                    "description": {
-                      "type": "string"
-                    },
-                    "times": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "$ref": "#/definitions/wfmShiftTemplateTime"
-                      }
-                    },
                     "created_at": {
                       "type": "string",
                       "format": "int64"
@@ -1167,6 +1204,19 @@
                     },
                     "updated_by": {
                       "$ref": "#/definitions/wfmLookupEntity"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "times": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "$ref": "#/definitions/wfmShiftTemplateTime"
+                      }
                     }
                   }
                 }
@@ -1348,6 +1398,20 @@
                       "type": "string",
                       "format": "int64"
                     },
+                    "created_at": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "created_by": {
+                      "$ref": "#/definitions/wfmLookupEntity"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "updated_by": {
+                      "$ref": "#/definitions/wfmLookupEntity"
+                    },
                     "name": {
                       "type": "string"
                     },
@@ -1382,20 +1446,6 @@
                       "$ref": "#/definitions/wfmLookupEntity"
                     },
                     "shift_template": {
-                      "$ref": "#/definitions/wfmLookupEntity"
-                    },
-                    "created_at": {
-                      "type": "string",
-                      "format": "int64"
-                    },
-                    "created_by": {
-                      "$ref": "#/definitions/wfmLookupEntity"
-                    },
-                    "updated_at": {
-                      "type": "string",
-                      "format": "int64"
-                    },
-                    "updated_by": {
                       "$ref": "#/definitions/wfmLookupEntity"
                     }
                   }
@@ -1578,6 +1628,20 @@
                       "type": "string",
                       "format": "int64"
                     },
+                    "created_at": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "created_by": {
+                      "$ref": "#/definitions/wfmLookupEntity"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "updated_by": {
+                      "$ref": "#/definitions/wfmLookupEntity"
+                    },
                     "name": {
                       "type": "string"
                     },
@@ -1626,20 +1690,6 @@
                     "total_agents": {
                       "type": "string",
                       "format": "int64"
-                    },
-                    "created_at": {
-                      "type": "string",
-                      "format": "int64"
-                    },
-                    "created_by": {
-                      "$ref": "#/definitions/wfmLookupEntity"
-                    },
-                    "updated_at": {
-                      "type": "string",
-                      "format": "int64"
-                    },
-                    "updated_by": {
-                      "$ref": "#/definitions/wfmLookupEntity"
                     }
                   }
                 }
@@ -1759,13 +1809,6 @@
           "type": "string",
           "format": "int64"
         },
-        "type_id": {
-          "$ref": "#/definitions/wfmAgentAbsenceType"
-        },
-        "absent_at": {
-          "type": "string",
-          "format": "int64"
-        },
         "created_at": {
           "type": "string",
           "format": "int64"
@@ -1779,6 +1822,13 @@
         },
         "updated_by": {
           "$ref": "#/definitions/wfmLookupEntity"
+        },
+        "type_id": {
+          "$ref": "#/definitions/wfmAgentAbsenceType"
+        },
+        "absent_at": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -1825,56 +1875,14 @@
           "type": "string",
           "format": "int64"
         },
-        "type": {
-          "$ref": "#/definitions/wfmAgentScheduleType"
+        "locked": {
+          "type": "boolean"
         },
         "absence": {
           "$ref": "#/definitions/wfmAgentAbsenceType"
         },
-        "shifts": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/wfmAgentScheduleShift"
-          }
-        }
-      }
-    },
-    "wfmAgentSchedulePause": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "int64"
-        },
-        "domain_id": {
-          "type": "string",
-          "format": "int64"
-        },
-        "start": {
-          "type": "string",
-          "format": "int64"
-        },
-        "end": {
-          "type": "string",
-          "format": "int64"
-        },
-        "created_at": {
-          "type": "string",
-          "format": "int64"
-        },
-        "created_by": {
-          "$ref": "#/definitions/wfmLookupEntity"
-        },
-        "updated_at": {
-          "type": "string",
-          "format": "int64"
-        },
-        "updated_by": {
-          "$ref": "#/definitions/wfmLookupEntity"
-        },
-        "cause": {
-          "$ref": "#/definitions/wfmLookupEntity"
+        "shift": {
+          "$ref": "#/definitions/wfmAgentScheduleShift"
         }
       }
     },
@@ -1889,6 +1897,20 @@
           "type": "string",
           "format": "int64"
         },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "created_by": {
+          "$ref": "#/definitions/wfmLookupEntity"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_by": {
+          "$ref": "#/definitions/wfmLookupEntity"
+        },
         "start": {
           "type": "string",
           "format": "int64"
@@ -1901,8 +1923,28 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/wfmAgentSchedulePause"
+            "$ref": "#/definitions/wfmAgentScheduleShiftPause"
           }
+        },
+        "skills": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmAgentScheduleShiftSkill"
+          }
+        }
+      }
+    },
+    "wfmAgentScheduleShiftPause": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "domain_id": {
+          "type": "string",
+          "format": "int64"
         },
         "created_at": {
           "type": "string",
@@ -1917,18 +1959,34 @@
         },
         "updated_by": {
           "$ref": "#/definitions/wfmLookupEntity"
+        },
+        "start": {
+          "type": "string",
+          "format": "int64"
+        },
+        "end": {
+          "type": "string",
+          "format": "int64"
+        },
+        "cause": {
+          "$ref": "#/definitions/wfmLookupEntity"
         }
       }
     },
-    "wfmAgentScheduleType": {
-      "type": "string",
-      "enum": [
-        "AGENT_SCHEDULE_TYPE_UNSPECIFIED",
-        "AGENT_SCHEDULE_TYPE_ABSENT",
-        "AGENT_SCHEDULE_TYPE_LOCKED",
-        "AGENT_SCHEDULE_TYPE_SHIFT"
-      ],
-      "default": "AGENT_SCHEDULE_TYPE_UNSPECIFIED"
+    "wfmAgentScheduleShiftSkill": {
+      "type": "object",
+      "properties": {
+        "skill": {
+          "$ref": "#/definitions/wfmLookupEntity"
+        },
+        "capacity": {
+          "type": "string",
+          "format": "int64"
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      }
     },
     "wfmAgentWorkingConditions": {
       "type": "object",
@@ -1991,6 +2049,18 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/wfmAgentAbsences"
+          }
+        }
+      }
+    },
+    "wfmCreateAgentsWorkingScheduleShiftsResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmAgentWorkingSchedule"
           }
         }
       }
@@ -2165,6 +2235,20 @@
           "type": "string",
           "format": "int64"
         },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "created_by": {
+          "$ref": "#/definitions/wfmLookupEntity"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_by": {
+          "$ref": "#/definitions/wfmLookupEntity"
+        },
         "name": {
           "type": "string"
         },
@@ -2179,20 +2263,6 @@
           "items": {
             "type": "string"
           }
-        },
-        "created_at": {
-          "type": "string",
-          "format": "int64"
-        },
-        "created_by": {
-          "$ref": "#/definitions/wfmLookupEntity"
-        },
-        "updated_at": {
-          "type": "string",
-          "format": "int64"
-        },
-        "updated_by": {
-          "$ref": "#/definitions/wfmLookupEntity"
         }
       }
     },
@@ -2231,19 +2301,6 @@
           "type": "string",
           "format": "int64"
         },
-        "name": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "causes": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/wfmPauseTemplateCause"
-          }
-        },
         "created_at": {
           "type": "string",
           "format": "int64"
@@ -2257,6 +2314,19 @@
         },
         "updated_by": {
           "$ref": "#/definitions/wfmLookupEntity"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "causes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmPauseTemplateCause"
+          }
         }
       }
     },
@@ -2452,19 +2522,6 @@
           "type": "string",
           "format": "int64"
         },
-        "name": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "times": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/wfmShiftTemplateTime"
-          }
-        },
         "created_at": {
           "type": "string",
           "format": "int64"
@@ -2478,6 +2535,19 @@
         },
         "updated_by": {
           "$ref": "#/definitions/wfmLookupEntity"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "times": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmShiftTemplateTime"
+          }
         }
       }
     },
@@ -2585,6 +2655,20 @@
           "type": "string",
           "format": "int64"
         },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "created_by": {
+          "$ref": "#/definitions/wfmLookupEntity"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_by": {
+          "$ref": "#/definitions/wfmLookupEntity"
+        },
         "name": {
           "type": "string"
         },
@@ -2620,6 +2704,19 @@
         },
         "shift_template": {
           "$ref": "#/definitions/wfmLookupEntity"
+        }
+      }
+    },
+    "wfmWorkingSchedule": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "domain_id": {
+          "type": "string",
+          "format": "int64"
         },
         "created_at": {
           "type": "string",
@@ -2634,19 +2731,6 @@
         },
         "updated_by": {
           "$ref": "#/definitions/wfmLookupEntity"
-        }
-      }
-    },
-    "wfmWorkingSchedule": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "int64"
-        },
-        "domain_id": {
-          "type": "string",
-          "format": "int64"
         },
         "name": {
           "type": "string"
@@ -2696,20 +2780,6 @@
         "total_agents": {
           "type": "string",
           "format": "int64"
-        },
-        "created_at": {
-          "type": "string",
-          "format": "int64"
-        },
-        "created_by": {
-          "$ref": "#/definitions/wfmLookupEntity"
-        },
-        "updated_at": {
-          "type": "string",
-          "format": "int64"
-        },
-        "updated_by": {
-          "$ref": "#/definitions/wfmLookupEntity"
         }
       }
     },

@@ -10678,18 +10678,7 @@
           {
             "type": "string",
             "description": "Search query string for filtering by name. Supports:\n- Wildcards (*) for substring matching\n- Placeholder (?) for single character substitution\n- Exact match for full names",
-            "name": "q.query",
-            "in": "query"
-          },
-          {
-            "enum": [
-              "PARTIAL",
-              "FULL"
-            ],
-            "type": "string",
-            "default": "PARTIAL",
-            "description": "The type of data fetching for catalog services\n\n - PARTIAL: Only essential fields like [ Id, Name, Description, Created/Updated at ].\n\nPartial info includes only essential fields.\n - FULL: The fetch type indicates whether to retrieve\nall available data for the catalog ( FULL ) or only essential fields ( PARTIAL ).\n\nFull info includes all fields of the catalog.",
-            "name": "q.fetchType",
+            "name": "query",
             "in": "query"
           },
           {
@@ -10701,8 +10690,18 @@
           {
             "type": "string",
             "format": "int64",
-            "description": "Filter by the depth of the hierarchy to retrieve services.\nThe depth indicates how many ancestor levels of services\nwill be included for each catalog.\n- A depth of 0 includes only the direct catalog.\n- A depth of 1 includes the catalog and its immediate services.\n- By default the depth is unlimited,\n  meaning all nested services and sub-services will be included.",
+            "description": "Filter by the depth of the hierarchy to retrieve services.\nThe depth indicates how many ancestor levels of services\nwill be included for each catalog.\n- A depth of 0 includes only the direct catalog.\n- A depth of 1 includes the catalog and its immediate services.\n- By default the depth is limited by 3,\n  meaning all nested services and sub-services will be included.",
             "name": "depth",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved as a result for [SUBSERVICES].\nIf the user passes \"-\" as the value for fields,\nit will retrieve all available fields for each catalog subservices.",
+            "name": "subFields",
             "in": "query"
           }
         ],
@@ -10768,6 +10767,26 @@
             "name": "id",
             "in": "path",
             "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved as a result.\nIf the user passes \"-\" as the value for fields,\nit will retrieve all available fields for each catalog.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved as a result for [SUBSERVICES].\nIf the user passes \"-\" as the value for fields,\nit will retrieve all available fields for each catalog subservices.",
+            "name": "subFields",
+            "in": "query"
           }
         ],
         "responses": {
@@ -12113,6 +12132,16 @@
             "description": "Filter by state (true for active, false for inactive)",
             "name": "state",
             "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved as a result.",
+            "name": "fields",
+            "in": "query"
           }
         ],
         "responses": {
@@ -12177,6 +12206,16 @@
             "name": "id",
             "in": "path",
             "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved as a result.",
+            "name": "fields",
+            "in": "query"
           }
         ],
         "responses": {
@@ -27298,6 +27337,102 @@
         }
       }
     },
+    "/spaces/{space_id}/articles/{article_id}/history": {
+      "get": {
+        "tags": [
+          "Articles"
+        ],
+        "operationId": "Articles_ArticleVersionsList",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Space ID associated with.",
+            "name": "space_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Record(s) with unique ID only.",
+            "name": "article_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page number of result dataset records. offset = (page*size)",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Size count of records on result page. limit = (size++)",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Sort the result according to fields.",
+            "name": "sort",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.knowledgebase.ArticleVersionList"
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{space_id}/articles/{article_id}/history/{version_id}": {
+      "get": {
+        "tags": [
+          "Articles"
+        ],
+        "operationId": "Articles_LocateArticleVersion",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Space ID associated with.",
+            "name": "space_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Record(s) with unique ID only.",
+            "name": "article_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "The unique ID of version record",
+            "name": "version_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.knowledgebase.ArticleVersion"
+            }
+          }
+        }
+      }
+    },
     "/spaces/{space_id}/articles/{etag}": {
       "get": {
         "tags": [
@@ -30636,6 +30771,56 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/wfmSearchAgentsWorkingScheduleResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "AgentWorkingScheduleService"
+        ],
+        "operationId": "AgentWorkingScheduleService_CreateAgentsWorkingScheduleShifts",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "working_schedule_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "agents": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/wfmLookupEntity"
+                  }
+                },
+                "date": {
+                  "$ref": "#/definitions/wfmFilterBetween"
+                },
+                "items": {
+                  "description": "Map key is a day of week: 0 - Sunday, ..., 6 - Saturday.",
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/definitions/wfmAgentScheduleShift"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/wfmCreateAgentsWorkingScheduleShiftsResponse"
             }
           }
         }
@@ -36343,6 +36528,10 @@
           "type": "string",
           "title": "Prefix used for case identification (optional)"
         },
+        "searched": {
+          "type": "boolean",
+          "title": "flag showing whether the catalog was searched"
+        },
         "service": {
           "type": "array",
           "title": "Service associated with the catalog",
@@ -36786,15 +36975,6 @@
           "type": "string"
         }
       }
-    },
-    "casesFetchType": {
-      "description": " - PARTIAL: Only essential fields like [ Id, Name, Description, Created/Updated at ].\n\nPartial info includes only essential fields.\n - FULL: The fetch type indicates whether to retrieve\nall available data for the catalog ( FULL ) or only essential fields ( PARTIAL ).\n\nFull info includes all fields of the catalog.",
-      "type": "string",
-      "default": "PARTIAL",
-      "enum": [
-        "PARTIAL",
-        "FULL"
-      ]
     },
     "casesFile": {
       "description": "Metadata for a file associated with a case.",
@@ -37754,19 +37934,6 @@
         }
       }
     },
-    "casesSearch": {
-      "type": "object",
-      "properties": {
-        "fetchType": {
-          "title": "The type of data fetching for catalog services",
-          "$ref": "#/definitions/casesFetchType"
-        },
-        "query": {
-          "type": "string",
-          "title": "Search query string for filtering by name. Supports:\n- Wildcards (*) for substring matching\n- Placeholder (?) for single character substitution\n- Exact match for full names"
-        }
-      }
-    },
     "casesService": {
       "type": "object",
       "title": "Service message represents a service entity within a catalog",
@@ -37814,6 +37981,10 @@
           "type": "string",
           "format": "int64",
           "title": "ID of the parent catalog"
+        },
+        "searched": {
+          "type": "boolean",
+          "title": "flag showing whether the catalog was searched"
         },
         "service": {
           "type": "array",
@@ -52359,6 +52530,75 @@
         }
       }
     },
+    "webitel.knowledgebase.ArticleVersion": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The unique ID of the association. Never changes.",
+          "type": "string"
+        },
+        "parent_article": {
+          "description": "The parent article ID.",
+          "type": "string",
+          "format": "int64"
+        },
+        "space_id": {
+          "description": "Space ID associated with.",
+          "type": "string",
+          "format": "int64"
+        },
+        "tags": {
+          "description": "Tags associated with the article.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "text": {
+          "description": "The text content of the article.",
+          "type": "string"
+        },
+        "title": {
+          "description": "The title of the article.",
+          "type": "string"
+        },
+        "updated_at": {
+          "description": "Timestamp(milli) of the last Field update.",
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_by": {
+          "description": "The user who loaded this attachment.",
+          "$ref": "#/definitions/webitel.knowledgebase.Lookup"
+        },
+        "ver": {
+          "description": "Version of the latest update. Numeric sequence.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "webitel.knowledgebase.ArticleVersionList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.knowledgebase.ArticleVersion"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "title": "Indicates that this is a partial result.\nMore data available upon query: ?size=${data.len}\u0026page=${page++}"
+        },
+        "page": {
+          "description": "The page number of the partial result.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
     "webitel.knowledgebase.Attachment": {
       "type": "object",
       "properties": {
@@ -52768,19 +53008,64 @@
           "type": "string",
           "format": "int64"
         },
-        "shifts": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/wfmAgentScheduleShift"
-          }
+        "locked": {
+          "type": "boolean"
         },
-        "type": {
-          "$ref": "#/definitions/wfmAgentScheduleType"
+        "shift": {
+          "$ref": "#/definitions/wfmAgentScheduleShift"
         }
       }
     },
-    "wfmAgentSchedulePause": {
+    "wfmAgentScheduleShift": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "created_by": {
+          "$ref": "#/definitions/wfmLookupEntity"
+        },
+        "domain_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "end": {
+          "type": "string",
+          "format": "int64"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "pauses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmAgentScheduleShiftPause"
+          }
+        },
+        "skills": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmAgentScheduleShiftSkill"
+          }
+        },
+        "start": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_by": {
+          "$ref": "#/definitions/wfmLookupEntity"
+        }
+      }
+    },
+    "wfmAgentScheduleShiftPause": {
       "type": "object",
       "properties": {
         "cause": {
@@ -52818,57 +53103,20 @@
         }
       }
     },
-    "wfmAgentScheduleShift": {
+    "wfmAgentScheduleShiftSkill": {
       "type": "object",
       "properties": {
-        "created_at": {
+        "capacity": {
           "type": "string",
           "format": "int64"
         },
-        "created_by": {
-          "$ref": "#/definitions/wfmLookupEntity"
+        "enabled": {
+          "type": "boolean"
         },
-        "domain_id": {
-          "type": "string",
-          "format": "int64"
-        },
-        "end": {
-          "type": "string",
-          "format": "int64"
-        },
-        "id": {
-          "type": "string",
-          "format": "int64"
-        },
-        "pauses": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/wfmAgentSchedulePause"
-          }
-        },
-        "start": {
-          "type": "string",
-          "format": "int64"
-        },
-        "updated_at": {
-          "type": "string",
-          "format": "int64"
-        },
-        "updated_by": {
+        "skill": {
           "$ref": "#/definitions/wfmLookupEntity"
         }
       }
-    },
-    "wfmAgentScheduleType": {
-      "type": "string",
-      "default": "AGENT_SCHEDULE_TYPE_UNSPECIFIED",
-      "enum": [
-        "AGENT_SCHEDULE_TYPE_UNSPECIFIED",
-        "AGENT_SCHEDULE_TYPE_ABSENT",
-        "AGENT_SCHEDULE_TYPE_LOCKED",
-        "AGENT_SCHEDULE_TYPE_SHIFT"
-      ]
     },
     "wfmAgentWorkingConditions": {
       "type": "object",
@@ -52931,6 +53179,18 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/wfmAgentAbsences"
+          }
+        }
+      }
+    },
+    "wfmCreateAgentsWorkingScheduleShiftsResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmAgentWorkingSchedule"
           }
         }
       }

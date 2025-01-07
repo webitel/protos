@@ -41,6 +41,8 @@ message Service {
   int64 catalog_id = 15;
   // Service associated with the service
   repeated Service service = 16;
+    // flag showing whether the catalog was searched
+    bool searched = 17;
 }
 
 // ServiceList message contains a list of services with pagination
@@ -125,27 +127,39 @@ message DeleteServiceRequest {
 message ListServiceRequest {
   // Page number for pagination
   int32 page = 1;
+
   // Number of records per page
   int32 size = 2;
+
   // Sorting options by fields
   repeated string sort = 3;
+
   // List of IDs to filter the services
   repeated int64 id = 4;
+
   // Search query string for filtering by name. Supports:
   // - Wildcards (*) for substring matching
   // - Placeholder (?) for single character substitution
   // - Exact match for full names
   string q = 5;
+
   // Filter services by catalog ID (required)
   int64 root_id = 6;
+
   // Filter by state (true for active, false for inactive)
   bool state = 7;
+
+  // Fields to be retrieved as a result.
+  repeated string fields = 8;
 }
 
 // LocateServiceRequest message for locating a specific service by ID
 message LocateServiceRequest {
   // ID of the service to be located
   int64 id = 1;
+
+  // Fields to be retrieved as a result.
+  repeated string fields = 2;
 }
 
 // LocateServiceResponse message contains a single service entity
