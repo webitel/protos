@@ -45,9 +45,9 @@ service WorkingScheduleService {
     };
   }
 
-  rpc UpdateWorkingScheduleRemoveAgents(UpdateWorkingScheduleRemoveAgentsRequest) returns (UpdateWorkingScheduleRemoveAgentsResponse) {
+  rpc UpdateWorkingScheduleRemoveAgent(UpdateWorkingScheduleRemoveAgentRequest) returns (UpdateWorkingScheduleRemoveAgentResponse) {
     option (option.access) = ACTION_UPDATE;
-    option (google.api.http) = {delete: "/wfm/lookups/working_schedules/{working_schedule_id}/agents"};
+    option (google.api.http) = {delete: "/wfm/lookups/working_schedules/{working_schedule_id}/agents/{agent_id}"};
   }
 
   rpc DeleteWorkingSchedule(DeleteWorkingScheduleRequest) returns (DeleteWorkingScheduleResponse) {
@@ -164,14 +164,20 @@ message UpdateWorkingScheduleAddAgentsResponse {
   repeated LookupEntity agents = 1;
 }
 
-message UpdateWorkingScheduleRemoveAgentsRequest {
-  int64 working_schedule_id = 1;
+message UpdateWorkingScheduleRemoveAgentRequest {
+  int64 working_schedule_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64.gt = 0
+  ];
 
-  repeated LookupEntity agents = 2;
+  int64 agent_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64.gt = 0
+  ];
 }
 
-message UpdateWorkingScheduleRemoveAgentsResponse {
-  repeated LookupEntity agents = 1;
+message UpdateWorkingScheduleRemoveAgentResponse {
+  int64 id = 1;
 }
 
 message DeleteWorkingScheduleRequest {
