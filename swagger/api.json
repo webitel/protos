@@ -32397,6 +32397,117 @@
         }
       }
     },
+    "/wfm/lookups/working_schedules/{id}/agents": {
+      "post": {
+        "tags": [
+          "WorkingScheduleService"
+        ],
+        "operationId": "WorkingScheduleService_UpdateWorkingScheduleAddAgents",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "agents": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/wfmLookupEntity"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/wfmUpdateWorkingScheduleAddAgentsResponse"
+            }
+          }
+        }
+      }
+    },
+    "/wfm/lookups/working_schedules/{id}/agents/{agent_id}": {
+      "delete": {
+        "tags": [
+          "WorkingScheduleService"
+        ],
+        "operationId": "WorkingScheduleService_UpdateWorkingScheduleRemoveAgent",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "agent_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/wfmUpdateWorkingScheduleRemoveAgentResponse"
+            }
+          }
+        }
+      }
+    },
+    "/wfm/lookups/working_schedules/{id}/forecast": {
+      "get": {
+        "tags": [
+          "WorkingScheduleService"
+        ],
+        "operationId": "WorkingScheduleService_ReadWorkingScheduleForecast",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "date.from",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "date.to",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/wfmReadWorkingScheduleForecastResponse"
+            }
+          }
+        }
+      }
+    },
     "/wfm/lookups/working_schedules/{item.id}": {
       "put": {
         "tags": [
@@ -32499,71 +32610,6 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/wfmUpdateWorkingScheduleResponse"
-            }
-          }
-        }
-      }
-    },
-    "/wfm/lookups/working_schedules/{working_schedule_id}/agents": {
-      "post": {
-        "tags": [
-          "WorkingScheduleService"
-        ],
-        "operationId": "WorkingScheduleService_UpdateWorkingScheduleAddAgents",
-        "parameters": [
-          {
-            "type": "string",
-            "format": "int64",
-            "name": "working_schedule_id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "agents": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "$ref": "#/definitions/wfmLookupEntity"
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/wfmUpdateWorkingScheduleAddAgentsResponse"
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "WorkingScheduleService"
-        ],
-        "operationId": "WorkingScheduleService_UpdateWorkingScheduleRemoveAgents",
-        "parameters": [
-          {
-            "type": "string",
-            "format": "int64",
-            "name": "working_schedule_id",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/wfmUpdateWorkingScheduleRemoveAgentsResponse"
             }
           }
         }
@@ -32932,19 +32978,6 @@
         },
         "redirect_url": {
           "type": "string"
-        }
-      }
-    },
-    "ExecuteForecastCalculationResponseForecast": {
-      "type": "object",
-      "properties": {
-        "agents": {
-          "type": "string",
-          "format": "int64"
-        },
-        "timestamp": {
-          "type": "string",
-          "format": "int64"
         }
       }
     },
@@ -54092,8 +54125,21 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/ExecuteForecastCalculationResponseForecast"
+            "$ref": "#/definitions/wfmExecuteForecastCalculationResponseForecast"
           }
+        }
+      }
+    },
+    "wfmExecuteForecastCalculationResponseForecast": {
+      "type": "object",
+      "properties": {
+        "agents": {
+          "type": "string",
+          "format": "int64"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -54273,6 +54319,17 @@
       "properties": {
         "item": {
           "$ref": "#/definitions/wfmWorkingCondition"
+        }
+      }
+    },
+    "wfmReadWorkingScheduleForecastResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/wfmWorkingScheduleForecast"
+          }
         }
       }
     },
@@ -54510,15 +54567,12 @@
         }
       }
     },
-    "wfmUpdateWorkingScheduleRemoveAgentsResponse": {
+    "wfmUpdateWorkingScheduleRemoveAgentResponse": {
       "type": "object",
       "properties": {
-        "agents": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/wfmLookupEntity"
-          }
+        "id": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -54666,6 +54720,31 @@
         },
         "updated_by": {
           "$ref": "#/definitions/wfmLookupEntity"
+        }
+      }
+    },
+    "wfmWorkingScheduleForecast": {
+      "type": "object",
+      "properties": {
+        "forecast": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmWorkingScheduleForecastForecast"
+          }
+        }
+      }
+    },
+    "wfmWorkingScheduleForecastForecast": {
+      "type": "object",
+      "properties": {
+        "agents": {
+          "type": "string",
+          "format": "int64"
+        },
+        "hour": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
