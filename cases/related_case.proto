@@ -90,7 +90,7 @@ service RelatedCases {
   rpc LocateRelatedCase(LocateRelatedCaseRequest) returns (RelatedCase) {
     option (option.access) = ACTION_READ;
     option (google.api.http) = {
-      get: "/cases/related/{id}"
+      get: "/cases/{primary_case_id}/related/{id}"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Retrieve a specific related case by ID"
@@ -99,7 +99,7 @@ service RelatedCases {
 
   // Create a new related case.
   rpc CreateRelatedCase(CreateRelatedCaseRequest) returns (RelatedCase) {
-    option (option.access) = ACTION_CREATE;
+    option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
       post: "/cases/{primary_case_id}/related"
       body: "input"
@@ -113,10 +113,10 @@ service RelatedCases {
   rpc UpdateRelatedCase(UpdateRelatedCaseRequest) returns (RelatedCase) {
     option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
-      put: "/cases/related/{id}"
+      put: "/cases/{input.primary_case.id}/related/{id}"
       body: "input"
       additional_bindings {
-        patch: "/cases/related/{id}"
+        patch: "/cases/{input.primary_case.id}/related/{id}"
         body: "input"
       }
     };
@@ -127,9 +127,9 @@ service RelatedCases {
 
   // Delete a specific related case.
   rpc DeleteRelatedCase(DeleteRelatedCaseRequest) returns (RelatedCase) {
-    option (option.access) = ACTION_DELETE;
+    option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
-      delete: "/cases/related/{id}"
+      delete: "/cases/{primary_case_id}/related/{id}"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Delete a specific related case"
@@ -172,6 +172,8 @@ message LocateRelatedCaseRequest {
 
   // Fields to return in the response.
   repeated string fields = 2;
+  // Primary case identifier.
+  string primary_case_id = 3;
 }
 
 // Input for creating a related case.
@@ -236,6 +238,8 @@ message DeleteRelatedCaseRequest {
   };
   // Identifier of the related case to delete.
   string id = 1;
+  // Primary case identifier.
+  string primary_case_id = 2;
 }
 
 // Request to list related cases.

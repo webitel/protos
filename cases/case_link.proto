@@ -43,22 +43,22 @@ service CaseLinks {
   rpc LocateLink(LocateLinkRequest) returns (CaseLink) {
     option (option.access) = ACTION_READ;
     option (google.api.http) = {
-      get: "/cases/links/{id}"
+      get: "/cases/{case_id}/links/{id}"
     };
   }
   rpc CreateLink(CreateLinkRequest) returns (CaseLink) {
     option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
-      post: "/cases/links/{case_id}"
+      post: "/cases/{case_id}/links"
     };
   }
   rpc UpdateLink(UpdateLinkRequest) returns (CaseLink) {
     option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
-      put: "/cases/links/{input.id}"
+      put: "/cases/{case_id}/links/{input.id}"
       body: "input"
       additional_bindings {
-        patch: "/cases/links/{input.id}"
+        patch: "/cases/{case_id}/links/{input.id}"
         body: "input"
       }
     };
@@ -66,12 +66,10 @@ service CaseLinks {
   rpc DeleteLink(DeleteLinkRequest) returns (CaseLink) {
     option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
-      delete: "/cases/links/{id}"
+      delete: "/cases/{case_id}/links/{id}"
     };
 
   }
-
-
   /*   With Case   */
   rpc ListLinks(ListLinksRequest) returns (CaseLinkList) {
     option (google.api.http) = {
@@ -84,11 +82,12 @@ service CaseLinks {
 message LocateLinkRequest {
   string id = 1; // (id allowed)
   repeated string fields = 2;
+  string case_id = 3;
 }
 
 
 message UpdateLinkRequest {
-//  string id = 1;
+  string case_id = 1;
   repeated string fields = 2; // on return
   repeated string x_json_mask = 3 // on input
   [(google.api.field_visibility) = {
@@ -102,8 +101,8 @@ message UpdateLinkRequest {
 }
 
 message DeleteLinkRequest {
-  string id = 1; //
-//  repeated string fields = 2; // output
+  string id = 1;
+  string case_id = 2;
 }
 
 
