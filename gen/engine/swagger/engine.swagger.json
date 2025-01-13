@@ -50,9 +50,6 @@
       "name": "CallService"
     },
     {
-      "name": "ChatHelperService"
-    },
-    {
       "name": "EmailProfileService"
     },
     {
@@ -10864,77 +10861,6 @@
         ]
       }
     },
-    "/chat/bots/{profile_id}/broadcast": {
-      "post": {
-        "operationId": "Broadcast",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/engineBroadcastResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "profile_id",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "format": "int64"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/ChatHelperServiceBroadcastBody"
-            }
-          }
-        ],
-        "tags": [
-          "ChatHelperService"
-        ]
-      }
-    },
-    "/chat/broadcast": {
-      "post": {
-        "operationId": "BroadcastV2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chatBroadcastMessageResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/chatBroadcastMessageRequest"
-            }
-          }
-        ],
-        "tags": [
-          "ChatHelperService"
-        ]
-      }
-    },
     "/email/profile": {
       "get": {
         "summary": "Search EmailProfile",
@@ -14683,31 +14609,6 @@
         }
       }
     },
-    "ChatHelperServiceBroadcastBody": {
-      "type": "object",
-      "properties": {
-        "peer": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "text": {
-          "type": "string"
-        },
-        "file": {
-          "$ref": "#/definitions/engineBroadcastFile",
-          "description": "Message Media. Attachment."
-        },
-        "buttons": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/engineBroadcastButtons"
-          }
-        }
-      }
-    },
     "CommunicationTypeServicePatchCommunicationTypeBody": {
       "type": "object",
       "properties": {
@@ -16903,131 +16804,6 @@
         }
       }
     },
-    "chatBroadcastError": {
-      "type": "object",
-      "properties": {
-        "peer_id": {
-          "type": "string"
-        },
-        "error": {
-          "$ref": "#/definitions/rpcStatus"
-        }
-      }
-    },
-    "chatBroadcastMessageRequest": {
-      "type": "object",
-      "properties": {
-        "peers": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/chatInputPeer"
-          }
-        },
-        "message": {
-          "$ref": "#/definitions/chatInputMessage"
-        }
-      }
-    },
-    "chatBroadcastMessageResponse": {
-      "type": "object",
-      "properties": {
-        "failure": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/chatBroadcastError"
-          }
-        }
-      }
-    },
-    "chatInputButton": {
-      "type": "object",
-      "properties": {
-        "caption": {
-          "type": "string"
-        },
-        "text": {
-          "type": "string"
-        },
-        "type": {
-          "type": "string"
-        },
-        "url": {
-          "type": "string"
-        },
-        "code": {
-          "type": "string"
-        }
-      }
-    },
-    "chatInputButtonRow": {
-      "type": "object",
-      "properties": {
-        "buttons": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/chatInputButton"
-          }
-        }
-      }
-    },
-    "chatInputFile": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "url": {
-          "type": "string"
-        }
-      }
-    },
-    "chatInputKeyboard": {
-      "type": "object",
-      "properties": {
-        "rows": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/chatInputButtonRow"
-          }
-        }
-      }
-    },
-    "chatInputMessage": {
-      "type": "object",
-      "properties": {
-        "text": {
-          "type": "string"
-        },
-        "file": {
-          "$ref": "#/definitions/chatInputFile"
-        },
-        "keyboard": {
-          "$ref": "#/definitions/chatInputKeyboard"
-        }
-      }
-    },
-    "chatInputPeer": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "type": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "via": {
-          "type": "string"
-        }
-      },
-      "description": "InputPeer identity."
-    },
     "engineAcceptOfDay": {
       "type": "object",
       "properties": {
@@ -18574,64 +18350,6 @@
       }
     },
     "engineBlindTransferCallResponse": {
-      "type": "object"
-    },
-    "engineBroadcastButton": {
-      "type": "object",
-      "properties": {
-        "caption": {
-          "type": "string"
-        },
-        "text": {
-          "type": "string"
-        },
-        "type": {
-          "type": "string"
-        },
-        "url": {
-          "type": "string"
-        },
-        "code": {
-          "type": "string"
-        }
-      }
-    },
-    "engineBroadcastButtons": {
-      "type": "object",
-      "properties": {
-        "button": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/engineBroadcastButton"
-          }
-        }
-      }
-    },
-    "engineBroadcastFile": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "int64"
-        },
-        "url": {
-          "type": "string"
-        },
-        "mime": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "size": {
-          "type": "string",
-          "format": "int64"
-        }
-      },
-      "description": "Media File."
-    },
-    "engineBroadcastResponse": {
       "type": "object"
     },
     "engineBucket": {
