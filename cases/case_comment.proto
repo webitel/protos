@@ -12,7 +12,10 @@ import "proto/webitel/option.proto";
 // Represents a comment associated with a case.
 message CaseComment {
   // Main identifier for read, update, and delete operations.
-  string id = 1;
+  int64 id = 1;
+
+  // entity tag representing id + ver
+  string etag = 2;
 
   // Version number of the comment, used for concurrency control.
   int32 ver = 3;
@@ -64,10 +67,10 @@ service CaseComments {
   rpc LocateComment(LocateCommentRequest) returns (CaseComment) {
     option (option.access) = ACTION_READ;
     option (google.api.http) = {
-      get: "/cases/comments/{id}"
+      get: "/cases/comments/{etag}"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Retrieve a specific comment by its id"
+      summary: "Retrieve a specific comment by its etag"
     };
   }
 
@@ -75,15 +78,15 @@ service CaseComments {
   rpc UpdateComment(UpdateCommentRequest) returns (CaseComment) {
     option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
-      put: "/cases/comments/{input.id}"
+      put: "/cases/comments/{input.etag}"
       body: "input"
       additional_bindings {
-        patch: "/cases/comments/{input.id}"
+        patch: "/cases/comments/{input.etag}"
         body: "input"
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Update a specific comment by its id"
+      summary: "Update a specific comment by its etag"
     };
   }
 
@@ -91,10 +94,10 @@ service CaseComments {
   rpc DeleteComment(DeleteCommentRequest) returns (CaseComment) {
     option (option.access) = ACTION_DELETE;
     option (google.api.http) = {
-      delete: "/cases/comments/{id}"
+      delete: "/cases/comments/{etag}"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Delete a specific comment by its id"
+      summary: "Delete a specific comment by its etag"
     };
   }
 
@@ -102,7 +105,7 @@ service CaseComments {
   rpc ListComments(ListCommentsRequest) returns (CaseCommentList) {
     option (option.access) = ACTION_READ;
     option (google.api.http) = {
-      get: "/cases/{case_id}/comments"
+      get: "/cases/{case_etag}/comments"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Retrieve a list of comments associated with a specific case"
@@ -113,7 +116,7 @@ service CaseComments {
   rpc PublishComment(PublishCommentRequest) returns (CaseComment) {
     option (option.access) = ACTION_CREATE;
     option (google.api.http) = {
-      post: "/cases/{case_id}/comments"
+      post: "/cases/{case_etag}/comments"
       body: "input"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -129,7 +132,7 @@ message InputCaseComment {
     example: "{\"text\":\"My new comment\"}"
   };
   // Identifier for the comment.
-  string id = 1;
+  string etag = 1;
 
   // Content of the comment.
   string text = 2;
@@ -138,7 +141,7 @@ message InputCaseComment {
 // Request to locate a comment based on its etag.
 message LocateCommentRequest {
   // Identifier of the comment to retrieve.
-  string id = 1;
+  string etag = 1;
 
   // Specific fields to return for the comment.
   repeated string fields = 2;
@@ -166,7 +169,7 @@ message UpdateCommentRequest {
 // Request to delete a comment based on its etag.
 message DeleteCommentRequest {
   // Identifier of the comment to delete.
-  string id = 1;
+  string etag = 1;
 
   // Fields to return after deletion.
   repeated string fields = 2;
@@ -193,7 +196,7 @@ message ListCommentsRequest {
   repeated string fields = 6;
 
   // Etag or ID of the case for which comments are requested.
-  string case_id = 9;
+  string case_etag = 9;
 }
 
 // Request to publish comment into a case.
@@ -212,7 +215,7 @@ message PublishCommentRequest {
   repeated string fields = 2;
 
   // Etag or ID of the case to which comments belong.
-  string case_id = 3;
+  string case_etag = 3;
 
   // Comment to publish.
   InputCaseComment input = 4;
