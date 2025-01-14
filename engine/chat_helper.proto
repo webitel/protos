@@ -6,10 +6,21 @@ option go_package = "github.com/webitel/protos/engine";
 
 import "google/api/annotations.proto";
 
+import "messages/broadcast.proto";
+
 service ChatHelperService {
-  rpc Broadcast (BroadcastRequest) returns (BroadcastResponse) {
+  rpc Broadcast(BroadcastRequest) returns (BroadcastResponse) {
     option (google.api.http) = {
       post: "/chat/bots/{profile_id}/broadcast"
+      body: "*"
+    };
+
+    option deprecated = true;
+  }
+
+  rpc BroadcastV2(webitel.chat.BroadcastMessageRequest) returns (webitel.chat.BroadcastMessageResponse) {
+    option (google.api.http) = {
+      post: "/chat/broadcast"
       body: "*"
     };
   }
@@ -46,6 +57,4 @@ message BroadcastFile {
   int64 size = 5;
 }
 
-message BroadcastResponse {
-
-}
+message BroadcastResponse {}
