@@ -5,8 +5,7 @@ package engine;
 option go_package = "github.com/webitel/protos/engine";
 
 import "google/api/annotations.proto";
-
-import "messages/broadcast.proto";
+import "google/rpc/status.proto";
 
 service ChatHelperService {
   rpc Broadcast(BroadcastRequest) returns (BroadcastResponse) {
@@ -18,7 +17,7 @@ service ChatHelperService {
     option deprecated = true;
   }
 
-  rpc BroadcastV2(webitel.chat.BroadcastMessageRequest) returns (webitel.chat.BroadcastMessageResponse) {
+  rpc BroadcastV2(BroadcastV2MessageRequest) returns (BroadcastV2MessageResponse) {
     option (google.api.http) = {
       post: "/chat/broadcast"
       body: "*"
@@ -58,3 +57,54 @@ message BroadcastFile {
 }
 
 message BroadcastResponse {}
+
+// BroadcastV2 (messages below are copy from chat module)
+message BroadcastV2MessageRequest {
+  repeated InputPeer peers = 1;
+  InputMessage message = 2;
+}
+
+message BroadcastV2MessageResponse {
+  repeated BroadcastV2Error failure = 1;
+}
+
+message BroadcastV2Error {
+  string peer_id = 1;
+  google.rpc.Status error = 2;
+}
+
+message InputPeer {
+  string id = 1;
+  string type = 2;
+  string name = 3;
+  string via = 4;
+}
+
+message InputMessage {
+  string text = 1;
+  InputFile file = 2;
+  InputKeyboard keyboard = 3;
+}
+
+message InputFile {
+  oneof file_source {
+    string id = 1;
+    string url = 2;
+  };
+}
+
+message InputKeyboard {
+  repeated InputButtonRow rows = 1;
+}
+
+message InputButtonRow {
+  repeated InputButton buttons = 1;
+}
+
+message InputButton {
+  string caption  = 1;
+  string text = 2;
+  string type = 3;
+  string url = 4;
+  string code = 5;
+}
