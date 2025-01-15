@@ -145,7 +145,7 @@ service RelatedCases {
   rpc ListRelatedCases(ListRelatedCasesRequest) returns (RelatedCaseList) {
     option (option.access) = ACTION_READ;
     option (google.api.http) = {
-      get: "/cases/{primary_case_id}/related"
+      get: "/cases/{primary_case_etag}/related"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "List all related cases for a specific case"
@@ -169,7 +169,7 @@ message InputRelatedCase {
 message LocateRelatedCaseRequest {
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["id"]
+      required: ["etag"]
     }
   };
   // Identifier of the related case.
@@ -192,7 +192,7 @@ message CreateInputRelatedCase {
 message CreateRelatedCaseRequest {
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["primary_case_id"]
+      required: ["primary_case_etag"]
     }
   };
     // Primary case details.
@@ -210,7 +210,7 @@ message CreateRelatedCaseRequest {
 message UpdateRelatedCaseRequest {
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["id"]
+      required: ["etag"]
     }
   };
   // Identifier of the related case to update.
@@ -236,7 +236,7 @@ message UpdateRelatedCaseRequest {
 message DeleteRelatedCaseRequest {
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["id"]
+      required: ["etag"]
     }
   };
   // Identifier of the related case to delete.
@@ -247,11 +247,11 @@ message DeleteRelatedCaseRequest {
 message ListRelatedCasesRequest {
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["primary_case_id"]
+      required: ["primary_case_etag"]
     }
   };
   // Primary Case ID for which related cases are requested.
-  string primary_case_id = 1;
+  string primary_case_etag = 1;
 
   // Page number for pagination.
   int32 page = 2;
