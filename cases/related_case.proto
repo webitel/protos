@@ -13,47 +13,52 @@ import "proto/webitel/option.proto";
 // RelatedCaseLookup is created specifically to include the subject field.
 message RelatedCaseLookup {
   // id
-  string id = 1;
+  int64 id = 1;
+
+  string etag = 2;
 
   // name
-  string name = 2;
+  string name = 3;
 
   // subject
-  string subject = 3;
+  string subject =43;
 
   //ver
-  int32 ver = 4;
+  int32 ver = 5;
 }
 
 
 // Represents a related case with its relationship details.
 message RelatedCase {
   // Unique identifier for the related case.
-  string id = 1;
+  int64 id = 1;
+
+   // Etag for the related case entity.
+  string etag = 2;
 
   // Version number of the related case, used for concurrency control.
-  int32 ver = 2;
+  int32 ver = 3;
 
   // User who created the relation.
-  general.Lookup created_by = 3;
+  general.Lookup created_by = 4;
 
   // Timestamp (in milliseconds) of when the relation was created.
-  int64 created_at = 4;
+  int64 created_at = 5;
 
   // User who last updated the relation.
-  general.Lookup updated_by = 5;
+  general.Lookup updated_by = 6;
 
   // Timestamp (in milliseconds) of the last update.
-  int64 updated_at = 6;
+  int64 updated_at = 7;
 
   // Relation type between cases.
-  RelationType relation_type = 7;
+  RelationType relation_type = 8;
 
   // Related case details.
-  RelatedCaseLookup related_case = 8;
+  RelatedCaseLookup related_case = 9;
 
   // Primary case details.
-  RelatedCaseLookup primary_case = 9;
+  RelatedCaseLookup primary_case = 10;
 }
 
 // Enum for relation types between cases.
@@ -90,7 +95,7 @@ service RelatedCases {
   rpc LocateRelatedCase(LocateRelatedCaseRequest) returns (RelatedCase) {
     option (option.access) = ACTION_READ;
     option (google.api.http) = {
-      get: "/cases/related/{id}"
+      get: "/cases/related/{etag}"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Retrieve a specific related case by ID"
@@ -101,7 +106,7 @@ service RelatedCases {
   rpc CreateRelatedCase(CreateRelatedCaseRequest) returns (RelatedCase) {
     option (option.access) = ACTION_CREATE;
     option (google.api.http) = {
-      post: "/cases/{primary_case_id}/related"
+      post: "/cases/{primary_case_etag}/related"
       body: "input"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -113,10 +118,10 @@ service RelatedCases {
   rpc UpdateRelatedCase(UpdateRelatedCaseRequest) returns (RelatedCase) {
     option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
-      put: "/cases/related/{id}"
+      put: "/cases/related/{etag}"
       body: "input"
       additional_bindings {
-        patch: "/cases/related/{id}"
+        patch: "/cases/related/{etag}"
         body: "input"
       }
     };
@@ -129,7 +134,7 @@ service RelatedCases {
   rpc DeleteRelatedCase(DeleteRelatedCaseRequest) returns (RelatedCase) {
     option (option.access) = ACTION_DELETE;
     option (google.api.http) = {
-      delete: "/cases/related/{id}"
+      delete: "/cases/related/{etag}"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Delete a specific related case"
@@ -168,7 +173,7 @@ message LocateRelatedCaseRequest {
     }
   };
   // Identifier of the related case.
-  string id = 1;
+  string etag = 1;
 
   // Fields to return in the response.
   repeated string fields = 2;
@@ -191,7 +196,7 @@ message CreateRelatedCaseRequest {
     }
   };
     // Primary case details.
-    string primary_case_id = 1;
+    string primary_case_etag = 1;
 
     // Input data for the related case.
     CreateInputRelatedCase input = 2;
@@ -209,7 +214,7 @@ message UpdateRelatedCaseRequest {
     }
   };
   // Identifier of the related case to update.
-  string id = 1;
+  string etag = 1;
 
   // Input data for the related case update.
   InputRelatedCase input = 2;
@@ -235,7 +240,7 @@ message DeleteRelatedCaseRequest {
     }
   };
   // Identifier of the related case to delete.
-  string id = 1;
+  string etag = 1;
 }
 
 // Request to list related cases.
