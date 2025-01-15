@@ -756,9 +756,9 @@
         ]
       }
     },
-    "/cases/comments/{id}": {
+    "/cases/comments/{etag}": {
       "get": {
-        "summary": "Retrieve a specific comment by its id",
+        "summary": "Retrieve a specific comment by its etag",
         "operationId": "LocateComment",
         "responses": {
           "200": {
@@ -776,7 +776,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "etag",
             "description": "Identifier of the comment to retrieve.",
             "in": "path",
             "required": true,
@@ -799,7 +799,7 @@
         ]
       },
       "delete": {
-        "summary": "Delete a specific comment by its id",
+        "summary": "Delete a specific comment by its etag",
         "operationId": "DeleteComment",
         "responses": {
           "200": {
@@ -817,7 +817,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "etag",
             "description": "Identifier of the comment to delete.",
             "in": "path",
             "required": true,
@@ -840,9 +840,9 @@
         ]
       }
     },
-    "/cases/comments/{input.id}": {
+    "/cases/comments/{input.etag}": {
       "put": {
-        "summary": "Update a specific comment by its id",
+        "summary": "Update a specific comment by its etag",
         "operationId": "UpdateComment",
         "responses": {
           "200": {
@@ -860,7 +860,7 @@
         },
         "parameters": [
           {
-            "name": "input.id",
+            "name": "input.etag",
             "description": "Identifier for the comment.",
             "in": "path",
             "required": true,
@@ -902,7 +902,7 @@
         ]
       },
       "patch": {
-        "summary": "Update a specific comment by its id",
+        "summary": "Update a specific comment by its etag",
         "operationId": "UpdateComment2",
         "responses": {
           "200": {
@@ -920,7 +920,7 @@
         },
         "parameters": [
           {
-            "name": "input.id",
+            "name": "input.etag",
             "description": "Identifier for the comment.",
             "in": "path",
             "required": true,
@@ -962,7 +962,7 @@
         ]
       }
     },
-    "/cases/links/{case_id}": {
+    "/cases/links/{case_etag}": {
       "post": {
         "operationId": "CreateLink",
         "responses": {
@@ -981,7 +981,7 @@
         },
         "parameters": [
           {
-            "name": "case_id",
+            "name": "case_etag",
             "description": "new comment link",
             "in": "path",
             "required": true,
@@ -999,7 +999,7 @@
             "collectionFormat": "multi"
           },
           {
-            "name": "input.id",
+            "name": "input.etag",
             "in": "query",
             "required": false,
             "type": "string"
@@ -1022,7 +1022,7 @@
         ]
       }
     },
-    "/cases/links/{id}": {
+    "/cases/links/{etag}": {
       "get": {
         "operationId": "LocateLink",
         "responses": {
@@ -1041,7 +1041,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "etag",
             "description": "(id allowed)",
             "in": "path",
             "required": true,
@@ -1080,7 +1080,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "etag",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1091,7 +1091,7 @@
         ]
       }
     },
-    "/cases/links/{input.id}": {
+    "/cases/links/{input.etag}": {
       "put": {
         "operationId": "UpdateLink",
         "responses": {
@@ -1110,7 +1110,7 @@
         },
         "parameters": [
           {
-            "name": "input.id",
+            "name": "input.etag",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1165,7 +1165,7 @@
         },
         "parameters": [
           {
-            "name": "input.id",
+            "name": "input.etag",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1499,7 +1499,7 @@
         ]
       }
     },
-    "/cases/related/{id}": {
+    "/cases/related/{etag}": {
       "get": {
         "summary": "Retrieve a specific related case by ID",
         "operationId": "LocateRelatedCase",
@@ -1519,7 +1519,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "etag",
             "description": "Identifier of the related case.",
             "in": "path",
             "required": true,
@@ -1560,7 +1560,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "etag",
             "description": "Identifier of the related case to delete.",
             "in": "path",
             "required": true,
@@ -1590,7 +1590,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "etag",
             "description": "Identifier of the related case to update.",
             "in": "path",
             "required": true,
@@ -1640,7 +1640,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "etag",
             "description": "Identifier of the related case to update.",
             "in": "path",
             "required": true,
@@ -2767,6 +2767,457 @@
         ]
       }
     },
+    "/cases/{case_etag}/comments": {
+      "get": {
+        "summary": "Retrieve a list of comments associated with a specific case",
+        "operationId": "ListComments",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/casesCaseCommentList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "case_etag",
+            "description": "Etag or ID of the case for which comments are requested.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "description": "Page number for pagination.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "description": "Number of comments per page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "q",
+            "description": "Query string for search.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "ids",
+            "description": "Array of requested id.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "sort",
+            "description": "Sorting order.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "description": "Fields to return for each comment.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "CaseComments"
+        ]
+      },
+      "post": {
+        "summary": "Publish comment into a specific case",
+        "operationId": "PublishComment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/casesCaseComment"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "case_etag",
+            "description": "Etag or ID of the case to which comments belong.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "input",
+            "description": "Comment to publish.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/casesInputCaseComment"
+            }
+          },
+          {
+            "name": "fields",
+            "description": "Result fields to include in the response.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "CaseComments"
+        ]
+      }
+    },
+    "/cases/{case_etag}/communication": {
+      "get": {
+        "summary": "Lists all communications linked to a specific case.\nCurrently a feature for future development.",
+        "operationId": "ListCommunications",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/casesListCommunicationsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "case_etag",
+            "description": "Case identifier.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "description": "List of fields to include in the response.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "q",
+            "description": "Query string for filtering results.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "size",
+            "description": "Number of records per page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "page",
+            "description": "Page number for pagination.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "sort",
+            "description": "Sorting order.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CaseCommunications"
+        ]
+      },
+      "post": {
+        "summary": "Links a communication to a specific case.",
+        "operationId": "LinkCommunication",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/casesLinkCommunicationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "case_etag",
+            "description": "Case identifier.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "description": "List of fields to include in the response.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "CaseCommunications"
+        ]
+      }
+    },
+    "/cases/{case_etag}/communication/{id}": {
+      "delete": {
+        "summary": "Unlinks a communication from a specific case.",
+        "operationId": "UnlinkCommunication",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/casesUnlinkCommunicationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "case_etag",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "description": "Communication identifier.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "description": "List of fields to include in the response.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "CaseCommunications"
+        ]
+      }
+    },
+    "/cases/{case_etag}/files": {
+      "get": {
+        "summary": "Retrieve a list of files associated with a case",
+        "operationId": "ListFiles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/casesCaseFileList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "case_etag",
+            "description": "ID of the case to fetch files for (required).",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "description": "The page number to retrieve.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "description": "Number of items per page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "q",
+            "description": "Search term.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "description": "Fields to include in the response.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "ids",
+            "description": "Array of requested id.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "CaseFiles"
+        ]
+      }
+    },
+    "/cases/{case_etag}/links": {
+      "get": {
+        "summary": "With Case",
+        "operationId": "ListLinks",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/casesCaseLinkList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "case_etag",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "ids",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "CaseLinks"
+        ]
+      }
+    },
     "/cases/{case_etag}/timeline": {
       "get": {
         "operationId": "GetTimeline",
@@ -2902,458 +3353,7 @@
         ]
       }
     },
-    "/cases/{case_id}/comments": {
-      "get": {
-        "summary": "Retrieve a list of comments associated with a specific case",
-        "operationId": "ListComments",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/casesCaseCommentList"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "case_id",
-            "description": "Etag or ID of the case for which comments are requested.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "page",
-            "description": "Page number for pagination.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "size",
-            "description": "Number of comments per page.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "q",
-            "description": "Query string for search.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "ids",
-            "description": "Array of requested id.",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          },
-          {
-            "name": "sort",
-            "description": "Sorting order.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "fields",
-            "description": "Fields to return for each comment.",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          }
-        ],
-        "tags": [
-          "CaseComments"
-        ]
-      },
-      "post": {
-        "summary": "Publish comment into a specific case",
-        "operationId": "PublishComment",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/casesCaseComment"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "case_id",
-            "description": "Etag or ID of the case to which comments belong.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "input",
-            "description": "Comment to publish.",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/casesInputCaseComment"
-            }
-          },
-          {
-            "name": "fields",
-            "description": "Result fields to include in the response.",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          }
-        ],
-        "tags": [
-          "CaseComments"
-        ]
-      }
-    },
-    "/cases/{case_id}/communication": {
-      "get": {
-        "summary": "Lists all communications linked to a specific case.\nCurrently a feature for future development.",
-        "operationId": "ListCommunications",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/casesListCommunicationsResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "case_id",
-            "description": "Case identifier.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "fields",
-            "description": "List of fields to include in the response.",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          },
-          {
-            "name": "q",
-            "description": "Query string for filtering results.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "size",
-            "description": "Number of records per page.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "page",
-            "description": "Page number for pagination.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "sort",
-            "description": "Sorting order.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "CaseCommunications"
-        ]
-      },
-      "post": {
-        "summary": "Links a communication to a specific case.",
-        "operationId": "LinkCommunication",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/casesLinkCommunicationResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "case_id",
-            "description": "Case identifier.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "fields",
-            "description": "List of fields to include in the response.",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          }
-        ],
-        "tags": [
-          "CaseCommunications"
-        ]
-      }
-    },
-    "/cases/{case_id}/communication/{id}": {
-      "delete": {
-        "summary": "Unlinks a communication from a specific case.",
-        "operationId": "UnlinkCommunication",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/casesUnlinkCommunicationResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "case_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id",
-            "description": "Communication identifier.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "fields",
-            "description": "List of fields to include in the response.",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          }
-        ],
-        "tags": [
-          "CaseCommunications"
-        ]
-      }
-    },
-    "/cases/{case_id}/files": {
-      "get": {
-        "summary": "Retrieve a list of files associated with a case",
-        "operationId": "ListFiles",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/casesCaseFileList"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "case_id",
-            "description": "ID of the case to fetch files for (required).",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "page",
-            "description": "The page number to retrieve.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "size",
-            "description": "Number of items per page.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "q",
-            "description": "Search term.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "fields",
-            "description": "Fields to include in the response.",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          },
-          {
-            "name": "ids",
-            "description": "Array of requested id.",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          }
-        ],
-        "tags": [
-          "CaseFiles"
-        ]
-      }
-    },
-    "/cases/{case_id}/links": {
-      "get": {
-        "summary": "With Case",
-        "operationId": "ListLinks",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/casesCaseLinkList"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "case_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "q",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "ids",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          },
-          {
-            "name": "sort",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          }
-        ],
-        "tags": [
-          "CaseLinks"
-        ]
-      }
-    },
-    "/cases/{id}": {
+    "/cases/{etag}": {
       "get": {
         "summary": "RPC method to retrieve a specific case by its etag identifier.",
         "operationId": "LocateCase",
@@ -3373,13 +3373,15 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "etag",
+            "description": "Unique etag identifier of the case.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "fields",
+            "description": "List of fields to include in the response.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -3412,15 +3414,15 @@
         },
         "parameters": [
           {
-            "name": "id",
-            "description": "identifier of the object",
+            "name": "etag",
+            "description": "Unique etag identifier of the case.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "fields",
-            "description": "fields to return in deleted object",
+            "description": "List of fields to include in the deleted case response.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -3435,7 +3437,7 @@
         ]
       }
     },
-    "/cases/{input.id}": {
+    "/cases/{input.etag}": {
       "put": {
         "summary": "RPC method for updating an existing case.",
         "operationId": "UpdateCase",
@@ -3455,7 +3457,7 @@
         },
         "parameters": [
           {
-            "name": "input.id",
+            "name": "input.etag",
             "in": "path",
             "required": true,
             "type": "string"
@@ -3577,7 +3579,7 @@
         },
         "parameters": [
           {
-            "name": "input.id",
+            "name": "input.etag",
             "in": "path",
             "required": true,
             "type": "string"
@@ -3681,6 +3683,58 @@
         ]
       }
     },
+    "/cases/{primary_case_etag}/related": {
+      "post": {
+        "summary": "Create a new related case",
+        "operationId": "CreateRelatedCase",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/casesRelatedCase"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "primary_case_etag",
+            "description": "Primary case details.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "input",
+            "description": "Input data for the related case.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/casesCreateInputRelatedCase"
+            }
+          },
+          {
+            "name": "fields",
+            "description": "Fields to include in the response.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "RelatedCases"
+        ]
+      }
+    },
     "/cases/{primary_case_id}/related": {
       "get": {
         "summary": "List all related cases for a specific case",
@@ -3751,56 +3805,6 @@
           {
             "name": "ids",
             "description": "Filter by ids",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          }
-        ],
-        "tags": [
-          "RelatedCases"
-        ]
-      },
-      "post": {
-        "summary": "Create a new related case",
-        "operationId": "CreateRelatedCase",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/casesRelatedCase"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "primary_case_id",
-            "description": "Primary case details.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "input",
-            "description": "Input data for the related case.",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/casesCreateInputRelatedCase"
-            }
-          },
-          {
-            "name": "fields",
-            "description": "Fields to include in the response.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -4924,27 +4928,35 @@
       "properties": {
         "id": {
           "type": "string",
-          "title": "default, readonly system fields"
+          "format": "int64",
+          "description": "Unique case ID."
         },
         "ver": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Version number of the case."
+        },
+        "etag": {
+          "type": "string",
+          "description": "Unique etag identifier."
         },
         "created_by": {
-          "$ref": "#/definitions/generalLookup"
+          "$ref": "#/definitions/generalLookup",
+          "description": "Creator of the case."
         },
         "created_at": {
           "type": "string",
           "format": "int64",
-          "title": "unixmilli"
+          "description": "Creation timestamp (in milliseconds since Unix epoch)."
         },
         "updated_by": {
-          "$ref": "#/definitions/generalLookup"
+          "$ref": "#/definitions/generalLookup",
+          "description": "Last updater of the case."
         },
         "updated_at": {
           "type": "string",
           "format": "int64",
-          "title": "unixmilli"
+          "description": "Last update timestamp (in milliseconds since Unix epoch)."
         },
         "name": {
           "type": "string",
@@ -5060,7 +5072,12 @@
       "properties": {
         "id": {
           "type": "string",
+          "format": "int64",
           "description": "Main identifier for read, update, and delete operations."
+        },
+        "etag": {
+          "type": "string",
+          "title": "entity tag representing id + ver"
         },
         "ver": {
           "type": "integer",
@@ -5137,11 +5154,16 @@
       "properties": {
         "id": {
           "type": "string",
+          "format": "int64",
           "description": "Database ID of the communication."
         },
         "ver": {
           "type": "integer",
           "format": "int32",
+          "description": "Version of the communication record."
+        },
+        "etag": {
+          "type": "string",
           "description": "Version of the communication record."
         },
         "communication_type": {
@@ -5193,11 +5215,16 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         },
         "ver": {
           "type": "integer",
           "format": "int32"
+        },
+        "etag": {
+          "type": "string",
+          "title": "main field required for read, update and delete"
         },
         "created_by": {
           "$ref": "#/definitions/generalLookup"
@@ -5582,16 +5609,20 @@
     "casesCreateCaseRelatedCaseInput": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string"
+        "etag": {
+          "type": "string",
+          "description": "Etag of the related case."
         },
         "relation_type": {
-          "$ref": "#/definitions/casesRelationType"
+          "$ref": "#/definitions/casesRelationType",
+          "description": "Type of relation (e.g., duplicate, linked)."
         },
         "related_to": {
-          "type": "string"
+          "type": "string",
+          "description": "Identifier of the related case."
         }
-      }
+      },
+      "description": "Structure for related cases input when creating a case."
     },
     "casesCreateCatalogRequest": {
       "type": "object",
@@ -6007,7 +6038,7 @@
     "casesInputCase": {
       "type": "object",
       "properties": {
-        "id": {
+        "etag": {
           "type": "string"
         },
         "subject": {
@@ -6077,7 +6108,7 @@
         "text": "My new comment"
       },
       "properties": {
-        "id": {
+        "etag": {
           "type": "string",
           "description": "Identifier for the comment."
         },
@@ -6105,7 +6136,7 @@
     "casesInputCaseLink": {
       "type": "object",
       "properties": {
-        "id": {
+        "etag": {
           "type": "string"
         },
         "url": {
@@ -6679,7 +6710,12 @@
       "properties": {
         "id": {
           "type": "string",
+          "format": "int64",
           "description": "Unique identifier for the related case."
+        },
+        "etag": {
+          "type": "string",
+          "description": "Etag for the related case entity."
         },
         "ver": {
           "type": "integer",
@@ -6747,7 +6783,11 @@
       "properties": {
         "id": {
           "type": "string",
+          "format": "int64",
           "title": "id"
+        },
+        "etag": {
+          "type": "string"
         },
         "name": {
           "type": "string",
