@@ -25,7 +25,7 @@ service CaseCommunications {
     option (option.access) = ACTION_READ;
     // Maps the RPC to an HTTP POST request for REST API.
     option (google.api.http) = {
-      post: "/cases/{case_id}/communication"
+      post: "/cases/{case_etag}/communication"
     };
   }
 
@@ -35,7 +35,7 @@ service CaseCommunications {
     option (option.access) = ACTION_UPDATE;
     // Maps the RPC to an HTTP DELETE request for REST API.
     option (google.api.http) = {
-      delete: "/cases/{case_id}/communication/{id}"
+      delete: "/cases/{case_etag}/communication/{id}"
     };
   }
 
@@ -46,7 +46,7 @@ service CaseCommunications {
     option (option.access) = ACTION_READ;
     // Maps the RPC to an HTTP GET request for REST API.
     option (google.api.http) = {
-      get: "/cases/{case_id}/communication"
+      get: "/cases/{case_etag}/communication"
     };
   }
 }
@@ -61,10 +61,11 @@ enum CaseCommunicationsTypes {
 
 // Represents a single case communication.
 message CaseCommunication {
-  string id = 2;                            // Database ID of the communication.
+  int64 id = 2;                            // Database ID of the communication.
   int32 ver = 3;                           // Version of the communication record.
-  CaseCommunicationsTypes communication_type = 4; // Type of the communication (e.g., Chat, Call).
-  string communication_id = 5;             // External communication ID.
+   string etag = 4;                           // Version of the communication record.
+  CaseCommunicationsTypes communication_type = 5; // Type of the communication (e.g., Chat, Call).
+  string communication_id = 6;             // External communication ID.
 }
 
 // Represents input data for creating or linking a communication.
@@ -75,7 +76,7 @@ message InputCaseCommunication {
 
 // Request message for linking communications to a case.
 message LinkCommunicationRequest {
-  string case_id = 1;                    // Case identifier.
+  string case_etag = 1;                    // Case identifier.
   repeated string fields = 2;              // List of fields to include in the response.
   repeated InputCaseCommunication input = 3; // Input data for the communications to link.
 }
@@ -88,7 +89,7 @@ message LinkCommunicationResponse {
 // Request message for unlinking communications from a case.
 message UnlinkCommunicationRequest {
   string id = 1;                         // Communication identifier.
-  string case_id = 2;
+  string case_etag = 2;
   repeated string fields = 3;              // List of fields to include in the response.
 }
 
@@ -99,7 +100,7 @@ message UnlinkCommunicationResponse {
 
 // Request message for listing communications linked to a case.
 message ListCommunicationsRequest {
-  string case_id = 1;                    // Case identifier.
+  string case_etag = 1;                    // Case identifier.
   repeated string fields = 2;              // List of fields to include in the response.
   string q = 3;                            // Query string for filtering results.
   int32 size = 4;                          // Number of records per page.
