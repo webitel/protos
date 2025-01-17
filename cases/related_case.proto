@@ -95,7 +95,7 @@ service RelatedCases {
   rpc LocateRelatedCase(LocateRelatedCaseRequest) returns (RelatedCase) {
     option (option.access) = ACTION_READ;
     option (google.api.http) = {
-      get: "/cases/{primary_case_id}/related/{etag}"
+      get: "/cases/{primary_case_etag}/related/{etag}"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Retrieve a specific related case by ID"
@@ -134,7 +134,7 @@ service RelatedCases {
   rpc DeleteRelatedCase(DeleteRelatedCaseRequest) returns (RelatedCase) {
     option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
-      delete: "/cases/{primary_case_id}/related/{etag}"
+      delete: "/cases/{primary_case_etag}/related/{etag}"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Delete a specific related case"
@@ -178,7 +178,7 @@ message LocateRelatedCaseRequest {
   // Fields to return in the response.
   repeated string fields = 2;
   // Primary case identifier.
-  string primary_case_id = 3;
+  string primary_case_etag = 3;
 }
 
 // Input for creating a related case.
@@ -244,7 +244,7 @@ message DeleteRelatedCaseRequest {
   // Identifier of the related case to delete.
   string etag = 1;
   // Primary case identifier.
-  string primary_case_id = 2;
+  string primary_case_etag = 2;
 }
 
 // Request to list related cases.
