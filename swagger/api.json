@@ -20938,6 +20938,411 @@
         }
       }
     },
+    "/dictionaries/{repo}": {
+      "get": {
+        "tags": [
+          "Dictionaries"
+        ],
+        "summary": "Lookup a dictionary dataset.",
+        "operationId": "Dictionaries_SearchData",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "[`types.repo`]",
+            "name": "repo",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of result records (per page).\nDefault: 16.",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page number of result set of records.\nDefault: 1.",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "pattern": "^[+|-|!]?\\w+$",
+              "uniqueItems": true,
+              "type": "string",
+              "default": "*"
+            },
+            "collectionFormat": "multi",
+            "description": "Sort result dataset of records by fields.\n```\nsort ::= *( ORDER name )\n\nORDER  = ASC / DESC\nDESC   = \"-\" / \"!\"\nASC    = [ \"+\" ]   ; Default\n```\n\nFields available\n\n- `id`(seq)\n- `domain`{name}\n- `created_at`\n- `created_by`{name}\n- `updated_at`\n- `updated_by`{name}\n\nUse ?fields=`field.sort()` option to sort Edge fields.",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "uniqueItems": true,
+              "type": "string",
+              "default": "*"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields [Q]uery to build result dataset record.\n```\nfields ::= field [ *( \",\" field ) ]\nfield  ::= name [ *( func ) ] [ inner ]\ninner  ::= \"{\" fields \"}\"\nfuncs  ::= *( func )\nfunc   ::= \".\" name \"(\" [ args ] \")\"\nname   ::= ALPHA / DIGIT / USCORE\n\nALPHA    = %x41-5A / %x61-7A  ; \"A\"-\"Z\" / \"a\"-\"z\"\nDIGIT    = %x30-39            ; \"0\"-\"9\"\nUSCORE   = %x5F ; underscore  ; \"_\"\n```",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Search term:\n`?` - matches any character\n`*` - matches 0 or more characters\ne.g.: name,emails{type},labels etc...",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "[`record.id`]",
+            "name": "id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.Dataset"
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "(Record) {",
+        "tags": [
+          "Dictionaries"
+        ],
+        "summary": "Create a dictionary record.",
+        "operationId": "Dictionaries_CreateData",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "[`types.repo`]",
+            "name": "repo",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Record data.",
+            "name": "record",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "example": {
+                "capital": {
+                  "id": 44,
+                  "name": "Київ"
+                },
+                "code": 38,
+                "name": "Україна"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Dictionaries"
+        ],
+        "summary": "Delete a dictionary records.",
+        "operationId": "Dictionaries_DeleteData",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "[`types.repo`]",
+            "name": "repo",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved into result dataset.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "[`record.id`]",
+            "name": "id",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.Dataset"
+            }
+          }
+        }
+      }
+    },
+    "/dictionaries/{repo}/csv": {
+      "post": {
+        "tags": [
+          "Dictionaries"
+        ],
+        "summary": "Import dataset from CSV file.",
+        "operationId": "Dictionaries_ImportCSV",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "`types.repo`",
+            "name": "repo",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "string",
+                  "format": "byte",
+                  "title": "CSV data"
+                },
+                "fields": {
+                  "type": "object",
+                  "title": "map \u003c field, column \u003e index",
+                  "additionalProperties": {
+                    "type": "integer",
+                    "format": "int64"
+                  }
+                },
+                "line_begin": {
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "line_end": {
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "on_data_error": {
+                  "$ref": "#/definitions/webitel.proto.data.ImportCSVRequest.action"
+                },
+                "on_empty_line": {
+                  "$ref": "#/definitions/webitel.proto.data.ImportCSVRequest.action"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.Dataset"
+            }
+          }
+        }
+      }
+    },
+    "/dictionaries/{repo}/{id}": {
+      "get": {
+        "description": "(Record) {",
+        "tags": [
+          "Dictionaries"
+        ],
+        "summary": "Locate a dictionary record.",
+        "operationId": "Dictionaries_LocateData",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "[`types.repo`]",
+            "name": "repo",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "[`record.id`]",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "uniqueItems": true,
+              "type": "string",
+              "default": "*"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields [Q]uery to build result dataset record.\n```\nfields ::= field [ *( \",\" field ) ]\nfield  ::= name [ *( func ) ] [ inner ]\ninner  ::= \"{\" fields \"}\"\nfuncs  ::= *( func )\nfunc   ::= \".\" name \"(\" [ args ] \")\"\nname   ::= ALPHA / DIGIT / USCORE\n\nALPHA    = %x41-5A / %x61-7A  ; \"A\"-\"Z\" / \"a\"-\"z\"\nDIGIT    = %x30-39            ; \"0\"-\"9\"\nUSCORE   = %x5F ; underscore  ; \"_\"\n```",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "(Record) {",
+        "tags": [
+          "Dictionaries"
+        ],
+        "summary": "Update a dictionary record.",
+        "operationId": "Dictionaries_UpdateData2",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "[`types.repo`]",
+            "name": "repo",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "[`record.id`]",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Record data changes.\n\nInputRecord input = 3;",
+            "name": "record",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Dictionaries"
+        ],
+        "summary": "Delete a dictionary records.",
+        "operationId": "Dictionaries_DeleteData2",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "[`types.repo`]",
+            "name": "repo",
+            "in": "path",
+            "required": true
+          },
+          {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "csv",
+            "description": "[`record.id`]",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved into result dataset.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.Dataset"
+            }
+          }
+        }
+      },
+      "patch": {
+        "description": "(Record) {",
+        "tags": [
+          "Dictionaries"
+        ],
+        "summary": "Update a dictionary record.",
+        "operationId": "Dictionaries_UpdateData",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "[`types.repo`]",
+            "name": "repo",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "[`record.id`]",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Record data changes.\n\nInputRecord input = 3;",
+            "name": "record",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
     "/domain": {
       "get": {
         "tags": [
@@ -21510,6 +21915,181 @@
             "description": "Server error",
             "schema": {
               "$ref": "#/definitions/engineApiError"
+            }
+          }
+        }
+      }
+    },
+    "/extensions/{repo}": {
+      "delete": {
+        "tags": [
+          "Extensions"
+        ],
+        "summary": "Delete records extension data.",
+        "operationId": "Extensions_Delete",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "[`types.repo`]",
+            "name": "repo",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved into result dataset.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "[`record.id`]",
+            "name": "id",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.Dataset"
+            }
+          }
+        }
+      }
+    },
+    "/extensions/{repo}/{id}": {
+      "get": {
+        "description": "(Record) {",
+        "tags": [
+          "Extensions"
+        ],
+        "summary": "Record extension data.",
+        "operationId": "Extensions_Locate",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "[`types.repo`]",
+            "name": "repo",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "[`record.id`]",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "uniqueItems": true,
+              "type": "string",
+              "default": "*"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields [Q]uery to build result dataset record.\n```\nfields ::= field [ *( \",\" field ) ]\nfield  ::= name [ *( func ) ] [ inner ]\ninner  ::= \"{\" fields \"}\"\nfuncs  ::= *( func )\nfunc   ::= \".\" name \"(\" [ args ] \")\"\nname   ::= ALPHA / DIGIT / USCORE\n\nALPHA    = %x41-5A / %x61-7A  ; \"A\"-\"Z\" / \"a\"-\"z\"\nDIGIT    = %x30-39            ; \"0\"-\"9\"\nUSCORE   = %x5F ; underscore  ; \"_\"\n```",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "(Record) {",
+        "tags": [
+          "Extensions"
+        ],
+        "summary": "Update extension data.",
+        "operationId": "Extensions_Update2",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "[`types.repo`]",
+            "name": "repo",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "[`record.id`]",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Record data changes.\n\nInputRecord input = 3;",
+            "name": "record",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "patch": {
+        "description": "(Record) {",
+        "tags": [
+          "Extensions"
+        ],
+        "summary": "Update extension data.",
+        "operationId": "Extensions_Update",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "[`types.repo`]",
+            "name": "repo",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "[`record.id`]",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Record data changes.\n\nInputRecord input = 3;",
+            "name": "record",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object"
             }
           }
         }
@@ -30213,6 +30793,671 @@
             "description": "Server error",
             "schema": {
               "$ref": "#/definitions/engineApiError"
+            }
+          }
+        }
+      }
+    },
+    "/types": {
+      "get": {
+        "tags": [
+          "Types"
+        ],
+        "summary": "Lookup data types registry.",
+        "operationId": "Types_Search",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Search term:\n`?` - matches any character\n`*` - matches 0 or more characters\ne.g.: name,emails{type},labels etc...",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "`types.id`",
+            "name": "id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "`types.name`",
+            "name": "name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "`types.repo`",
+            "name": "repo",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "`types.path`",
+            "name": "path",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "[NOT] [ system / custom ] types only",
+            "name": "readonly",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "[NOT] Extend[able] types only.",
+            "name": "extendable",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "[NOT] Extend[ed] types only.",
+            "name": "extended",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "[NOT] Administer access control only",
+            "name": "administered",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of result records (per page).\nDefault: 16.",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page number of result set of records.\nDefault: 1.",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "pattern": "^[+|-|!]?\\w+$",
+              "uniqueItems": true,
+              "type": "string",
+              "default": "*"
+            },
+            "collectionFormat": "multi",
+            "description": "Sort result dataset of records by fields.\n```\nsort ::= *( ORDER name )\n\nORDER  = ASC / DESC\nDESC   = \"-\" / \"!\"\nASC    = [ \"+\" ]   ; Default\n```\n\nFields available\n\n- `id`(seq)\n- `domain`{name}\n- `created_at`\n- `created_by`{name}\n- `updated_at`\n- `updated_by`{name}\n\nUse ?fields=`field.sort()` option to sort Edge fields.",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "uniqueItems": true,
+              "type": "string",
+              "default": "*"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields [Q]uery to build result dataset record.\n```\nfields ::= field [ *( \",\" field ) ]\nfield  ::= name [ *( func ) ] [ inner ]\ninner  ::= \"{\" fields \"}\"\nfuncs  ::= *( func )\nfunc   ::= \".\" name \"(\" [ args ] \")\"\nname   ::= ALPHA / DIGIT / USCORE\n\nALPHA    = %x41-5A / %x61-7A  ; \"A\"-\"Z\" / \"a\"-\"z\"\nDIGIT    = %x30-39            ; \"0\"-\"9\"\nUSCORE   = %x5F ; underscore  ; \"_\"\n```",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.StructList"
+            }
+          }
+        }
+      }
+    },
+    "/types/dictionaries": {
+      "get": {
+        "tags": [
+          "Dictionaries"
+        ],
+        "summary": "Lookup dictionaries data types.",
+        "operationId": "Dictionaries_SearchType",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Search term:\n`?` - matches any character\n`*` - matches 0 or more characters\ne.g.: name,emails{type},labels etc...",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "`types.id`",
+            "name": "id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "`types.name`",
+            "name": "name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "`types.repo`",
+            "name": "repo",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "`types.path`",
+            "name": "path",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "[NOT] [ system / custom ] types only",
+            "name": "readonly",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "[NOT] Extend[able] types only.",
+            "name": "extendable",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "[NOT] Extend[ed] types only.",
+            "name": "extended",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "[NOT] Administer access control only",
+            "name": "administered",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of result records (per page).\nDefault: 16.",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page number of result set of records.\nDefault: 1.",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "pattern": "^[+|-|!]?\\w+$",
+              "uniqueItems": true,
+              "type": "string",
+              "default": "*"
+            },
+            "collectionFormat": "multi",
+            "description": "Sort result dataset of records by fields.\n```\nsort ::= *( ORDER name )\n\nORDER  = ASC / DESC\nDESC   = \"-\" / \"!\"\nASC    = [ \"+\" ]   ; Default\n```\n\nFields available\n\n- `id`(seq)\n- `domain`{name}\n- `created_at`\n- `created_by`{name}\n- `updated_at`\n- `updated_by`{name}\n\nUse ?fields=`field.sort()` option to sort Edge fields.",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "uniqueItems": true,
+              "type": "string",
+              "default": "*"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields [Q]uery to build result dataset record.\n```\nfields ::= field [ *( \",\" field ) ]\nfield  ::= name [ *( func ) ] [ inner ]\ninner  ::= \"{\" fields \"}\"\nfuncs  ::= *( func )\nfunc   ::= \".\" name \"(\" [ args ] \")\"\nname   ::= ALPHA / DIGIT / USCORE\n\nALPHA    = %x41-5A / %x61-7A  ; \"A\"-\"Z\" / \"a\"-\"z\"\nDIGIT    = %x30-39            ; \"0\"-\"9\"\nUSCORE   = %x5F ; underscore  ; \"_\"\n```",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.StructList"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "(DictionaryList) {",
+        "tags": [
+          "Dictionaries"
+        ],
+        "summary": "Delete custom dictionaries.",
+        "operationId": "Dictionaries_DeleteType",
+        "parameters": [
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to retrive into result dataset.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "`types.repo`",
+            "name": "repo",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "`record.pk`",
+            "name": "id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.StructList"
+            }
+          }
+        }
+      }
+    },
+    "/types/dictionaries/{repo}": {
+      "get": {
+        "description": "(Dictionary) {",
+        "tags": [
+          "Dictionaries"
+        ],
+        "summary": "Locate the dictionary type.",
+        "operationId": "Dictionaries_LocateType",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "`types.repo`",
+            "name": "repo",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.Struct"
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "(Dictionary) {",
+        "tags": [
+          "Dictionaries"
+        ],
+        "summary": "Update custom dictionary.",
+        "operationId": "Dictionaries_UpdateType2",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "[**types.dictionaries.id**] type name, e.g.: `country`.",
+            "name": "repo",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "The dictionary [type] changes.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.InputDictionary"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.Struct"
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "(Dictionary) {",
+        "tags": [
+          "Dictionaries"
+        ],
+        "summary": "Create custom dictionary.",
+        "operationId": "Dictionaries_CreateType",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "NEW [`types.repo`] repository name, e.g.: `countries`.",
+            "name": "repo",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "NEW dictionary [type] definition.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.InputDictionary"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.Struct"
+            }
+          }
+        }
+      },
+      "patch": {
+        "description": "(Dictionary) {",
+        "tags": [
+          "Dictionaries"
+        ],
+        "summary": "Update custom dictionary.",
+        "operationId": "Dictionaries_UpdateType",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "[**types.dictionaries.id**] type name, e.g.: `country`.",
+            "name": "repo",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "The dictionary [type] changes.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.InputDictionary"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.Struct"
+            }
+          }
+        }
+      }
+    },
+    "/types/extensions": {
+      "get": {
+        "tags": [
+          "Extensions"
+        ],
+        "summary": "Search for type extensions.",
+        "operationId": "Extensions_SearchType",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of result records (per page).\nDefault: 16.",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page number of result set of records.\nDefault: 1.",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "pattern": "^[+|-|!]?\\w+$",
+              "uniqueItems": true,
+              "type": "string",
+              "default": "*"
+            },
+            "collectionFormat": "multi",
+            "description": "Sort result dataset of records by fields.\n```\nsort ::= *( ORDER name )\n\nORDER  = ASC / DESC\nDESC   = \"-\" / \"!\"\nASC    = [ \"+\" ]   ; Default\n```\n\nFields available\n\n- `id`(seq)\n- `domain`{name}\n- `created_at`\n- `created_by`{name}\n- `updated_at`\n- `updated_by`{name}\n\nUse ?fields=`field.sort()` option to sort Edge fields.",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "uniqueItems": true,
+              "type": "string",
+              "default": "*"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields [Q]uery to build result dataset record.\n```\nfields ::= field [ *( \",\" field ) ]\nfield  ::= name [ *( func ) ] [ inner ]\ninner  ::= \"{\" fields \"}\"\nfuncs  ::= *( func )\nfunc   ::= \".\" name \"(\" [ args ] \")\"\nname   ::= ALPHA / DIGIT / USCORE\n\nALPHA    = %x41-5A / %x61-7A  ; \"A\"-\"Z\" / \"a\"-\"z\"\nDIGIT    = %x30-39            ; \"0\"-\"9\"\nUSCORE   = %x5F ; underscore  ; \"_\"\n```",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Search term:\n`?` - matches any character\n`*` - matches 0 or more characters\ne.g.: name,emails{type},labels etc...",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "extension.type.id",
+            "name": "id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.ExtensionList"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Extensions"
+        ],
+        "summary": "Delete extension for types.",
+        "operationId": "Extensions_DeleteType",
+        "parameters": [
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "extension.type.id",
+            "name": "type",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.ExtensionList"
+            }
+          }
+        }
+      }
+    },
+    "/types/extensions/{repo}": {
+      "post": {
+        "tags": [
+          "Extensions"
+        ],
+        "summary": "Create type extension.",
+        "operationId": "Extensions_CreateType",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "SUPER `types.repo` to extend, e.g.: `contacts`.\nLookup: GET /types?extendable=true",
+            "name": "repo",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Extension type fields.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.InputExtension"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.Extension"
+            }
+          }
+        }
+      }
+    },
+    "/types/extensions/{type}": {
+      "get": {
+        "tags": [
+          "Extensions"
+        ],
+        "summary": "Type extension details.",
+        "operationId": "Extensions_LocateType",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "extension.type.id as type.\n\nid",
+            "name": "type",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.Extension"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Extensions"
+        ],
+        "summary": "Update type extension.",
+        "operationId": "Extensions_UpdateType2",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "extension.type.id",
+            "name": "type",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.InputExtension"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.Extension"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Extensions"
+        ],
+        "summary": "Update type extension.",
+        "operationId": "Extensions_UpdateType",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "extension.type.id",
+            "name": "type",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.InputExtension"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.Extension"
+            }
+          }
+        }
+      }
+    },
+    "/types/{path}": {
+      "get": {
+        "tags": [
+          "Types"
+        ],
+        "summary": "Structured data type details.",
+        "operationId": "Types_Locate",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "path",
+            "description": "`types.path`",
+            "name": "path",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.Struct"
             }
           }
         }
@@ -54316,6 +55561,713 @@
         "page": {
           "type": "integer",
           "format": "int32"
+        }
+      }
+    },
+    "webitel.proto.data.Dataset": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "description": "List of the dataset page records.",
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "title": "Next page available?"
+        },
+        "page": {
+          "description": "Current page number.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "type": {
+          "description": "Type of the dataset record.",
+          "$ref": "#/definitions/webitel.proto.data.Struct"
+        }
+      }
+    },
+    "webitel.proto.data.Extension": {
+      "description": "Extension represents a set of an extra fields\nfor some [SUPER] type to be extended with.\n\nint64 dc = 0;",
+      "type": "object",
+      "properties": {
+        "fields": {
+          "type": "array",
+          "title": "Fields definitions",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.proto.data.Field"
+          }
+        },
+        "index": {
+          "type": "object",
+          "title": "INDEX fields",
+          "additionalProperties": {
+            "$ref": "#/definitions/webitel.proto.data.Index"
+          }
+        },
+        "type": {
+          "title": "SUPER type",
+          "$ref": "#/definitions/webitel.proto.data.LookupValue"
+        }
+      }
+    },
+    "webitel.proto.data.ExtensionList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.proto.data.Extension"
+          }
+        },
+        "next": {
+          "type": "boolean"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "webitel.proto.data.Field": {
+      "description": "Field of the struct.",
+      "type": "object",
+      "properties": {
+        "always": {
+          "description": "Always signifies that the field value will be computed on any write (INSERT OR UPDATE) operations.\nThe field cannot be written to, and when read the result of the last generated expression will be returned.\n\nThe generation expression can refer to other columns in the table, but not other generated columns. Any functions and operators used must be immutable. References to other tables are not allowed.",
+          "title": "[ ON INSERT OR UPDATE ]"
+        },
+        "binary": {
+          "$ref": "#/definitions/webitel.proto.data.type.Binary"
+        },
+        "bool": {
+          "$ref": "#/definitions/webitel.proto.data.type.Bool"
+        },
+        "datetime": {
+          "$ref": "#/definitions/webitel.proto.data.type.Datetime"
+        },
+        "default": {
+          "description": "The `default` expression will be used in `INSERT` operation\nthat does not specify a value for the field.\n\nIf there is no default for a field, then the default is null.",
+          "title": "[ ON INSERT ONLY ]"
+        },
+        "disabled": {
+          "type": "boolean",
+          "title": "Optional. Disable data read operation. (selection)"
+        },
+        "duration": {
+          "$ref": "#/definitions/webitel.proto.data.type.Duration"
+        },
+        "float": {
+          "$ref": "#/definitions/webitel.proto.data.type.Float"
+        },
+        "float32": {
+          "$ref": "#/definitions/webitel.proto.data.type.Float"
+        },
+        "float64": {
+          "$ref": "#/definitions/webitel.proto.data.type.Float"
+        },
+        "hidden": {
+          "type": "boolean",
+          "title": "Is hidden (system) field ?\nDo NOT display on the `view` card ?"
+        },
+        "hint": {
+          "description": "Short description. Default: {name}.",
+          "type": "string"
+        },
+        "id": {
+          "description": "Field [code] name.\n\ncode",
+          "type": "string"
+        },
+        "int": {
+          "$ref": "#/definitions/webitel.proto.data.type.Int"
+        },
+        "int32": {
+          "$ref": "#/definitions/webitel.proto.data.type.Int"
+        },
+        "int64": {
+          "$ref": "#/definitions/webitel.proto.data.type.Int"
+        },
+        "kind": {
+          "description": "Required. The field type.",
+          "$ref": "#/definitions/webitel.proto.data.type.Kind"
+        },
+        "lookup": {
+          "$ref": "#/definitions/webitel.proto.data.type.Lookup"
+        },
+        "name": {
+          "description": "Title of the field. Lang specific.\n\ntitle",
+          "type": "string"
+        },
+        "readonly": {
+          "description": "Optional. Disable any write (INSERT OR UPDATE) operations.\nREADONLY signifies that the field value will be always computed on any write (INSERT OR UPDATE) operations.\nIf selected, the `default` value MUST be specified.\n\nFIXME: Is base field ? [ id, created_, updated_ ]",
+          "type": "boolean"
+        },
+        "required": {
+          "type": "boolean",
+          "title": "Optional. Do NOT allow NULL values !"
+        },
+        "richtext": {
+          "$ref": "#/definitions/webitel.proto.data.type.Text"
+        },
+        "string": {
+          "$ref": "#/definitions/webitel.proto.data.type.Text"
+        },
+        "uint": {
+          "$ref": "#/definitions/webitel.proto.data.type.Uint"
+        },
+        "uint32": {
+          "$ref": "#/definitions/webitel.proto.data.type.Uint"
+        },
+        "uint64": {
+          "$ref": "#/definitions/webitel.proto.data.type.Uint"
+        }
+      }
+    },
+    "webitel.proto.data.ImportCSVRequest.action": {
+      "type": "string",
+      "default": "continue",
+      "enum": [
+        "continue",
+        "break"
+      ]
+    },
+    "webitel.proto.data.Index": {
+      "description": "INDEX [struct.fields].",
+      "type": "object",
+      "properties": {
+        "fields": {
+          "description": "A set of [struct.fields.id] to INDEX within [type] dataset.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "include": {
+          "description": "A set of [struct.fields.id] to INCLUDE beside the [fields] index.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unique": {
+          "description": "Indicates whether set of [fields] MUST be UNIQUE within [type].",
+          "type": "boolean"
+        }
+      }
+    },
+    "webitel.proto.data.InputDictionary": {
+      "type": "object",
+      "properties": {
+        "about": {
+          "type": "string",
+          "title": "Short description"
+        },
+        "administered": {
+          "type": "boolean",
+          "title": "Administer access control ? Enable RbAC ?"
+        },
+        "display": {
+          "description": "Required. Display [fields.id] key.\nUsed as [lookup].name setting for this [struct] type.",
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "title": "Fields definitions",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.proto.data.Field"
+          }
+        },
+        "indexes": {
+          "description": "INDEX fields.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/webitel.proto.data.Index"
+          }
+        },
+        "name": {
+          "description": "A User-friendly [type.id] name ; lang: specific.",
+          "type": "string"
+        },
+        "primary": {
+          "description": "Required. Primary [fields.id] key.\nUsed as [lookup].id setting for this [struct] type.",
+          "type": "string"
+        },
+        "repo": {
+          "description": "string id = 1; // The [type] name (singular form), e.g.: `country`.\n\nRepository (dataset) name (plural form), e.g.: `countries`.",
+          "type": "string"
+        }
+      },
+      "example": {
+        "about": "Dataset of countries we are working with ..",
+        "display": "name",
+        "fields": [
+          {
+            "hint": "+3(80)",
+            "id": "code",
+            "int32": {
+              "max": "9999",
+              "min": "10"
+            },
+            "kind": "int32",
+            "name": "Code",
+            "required": true
+          },
+          {
+            "hint": "Country name",
+            "id": "name",
+            "kind": "string",
+            "name": "Country",
+            "required": true,
+            "string": {
+              "max": 64
+            }
+          },
+          {
+            "id": "capital",
+            "kind": "lookup",
+            "lookup": {
+              "id": "name",
+              "name": "name",
+              "type": "dictionaries/cities"
+            },
+            "name": "Capital city"
+          },
+          {
+            "datetime": {
+              "part": "full",
+              "time": "s"
+            },
+            "default": "$(timestamp)",
+            "id": "created_at",
+            "kind": "datetime",
+            "name": "Creation Date",
+            "readonly": true
+          },
+          {
+            "default": "$(user)",
+            "id": "created_by",
+            "kind": "lookup",
+            "lookup": {
+              "id": "id",
+              "name": "name",
+              "type": "users"
+            },
+            "name": "Author",
+            "readonly": true
+          },
+          {
+            "always": "$(timestamp)",
+            "datetime": {
+              "part": "full",
+              "time": "s"
+            },
+            "id": "updated_at",
+            "kind": "datetime",
+            "name": "Last Modified",
+            "readonly": true
+          },
+          {
+            "always": "$(user)",
+            "id": "updated_by",
+            "kind": "lookup",
+            "lookup": {
+              "type": "users"
+            },
+            "name": "Editor",
+            "readonly": true
+          }
+        ],
+        "indexes": {
+          "capital_city": {
+            "fields": [
+              "capital"
+            ],
+            "unique": true
+          },
+          "code": {
+            "unique": true
+          }
+        },
+        "name": "Countries",
+        "primary": "code",
+        "repo": "countries"
+      }
+    },
+    "webitel.proto.data.InputExtension": {
+      "type": "object",
+      "properties": {
+        "fields": {
+          "type": "array",
+          "title": "Fields definitions",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.proto.data.Field"
+          }
+        },
+        "index": {
+          "type": "object",
+          "title": "INDEX Fields",
+          "additionalProperties": {
+            "$ref": "#/definitions/webitel.proto.data.Index"
+          }
+        }
+      },
+      "example": {
+        "fields": [
+          {
+            "id": "country",
+            "kind": "lookup",
+            "lookup": {
+              "id": "code",
+              "name": "name",
+              "type": "/dictionaries/countries"
+            },
+            "name": "Country",
+            "required": true
+          },
+          {
+            "id": "city",
+            "kind": "lookup",
+            "lookup": {
+              "id": "id",
+              "name": "name",
+              "type": "/dictionaries/cities?code={country.code}"
+            },
+            "name": "City"
+          }
+        ],
+        "indexes": {
+          "city": {},
+          "country": {}
+        }
+      }
+    },
+    "webitel.proto.data.LookupValue": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Required. Unique Identifier.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Readonly. Display name.",
+          "type": "string"
+        },
+        "type": {
+          "description": "Optional. Reference type.",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.proto.data.Struct": {
+      "description": "Type of the Structure.\n\nint64 dc = 0;",
+      "type": "object",
+      "properties": {
+        "about": {
+          "description": "Optional. Short description.",
+          "type": "string"
+        },
+        "administered": {
+          "type": "boolean",
+          "title": "Administer access control ? Enable RbAC ?"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "created_by": {
+          "$ref": "#/definitions/webitel.proto.data.LookupValue"
+        },
+        "display": {
+          "description": "Required. Display [fields.id] key.\nUsed as [lookup].name setting for this [struct] type.",
+          "type": "string"
+        },
+        "extendable": {
+          "description": "// Extension fields type.\n Extension extension = 23;",
+          "type": "boolean",
+          "title": "Readonly. System- type(s) support only !"
+        },
+        "fields": {
+          "description": "Fields of the struct type.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.proto.data.Field"
+          }
+        },
+        "id": {
+          "description": "Deprecated. Use `repo` instead. The [type] name (singular form), e.g.: `country`.",
+          "type": "string"
+        },
+        "indexes": {
+          "description": "INDEX fields.\n\nExtension extension = 15;",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/webitel.proto.data.Index"
+          }
+        },
+        "name": {
+          "description": "A User-friendly [id] name ; lang: specific.",
+          "type": "string"
+        },
+        "objclass": {
+          "description": "Readonly. RbAC objclass identity.",
+          "type": "string"
+        },
+        "path": {
+          "description": "Readonly. Relative path to access the dataset APIs, e.g.: `dictionaries/countries`.",
+          "type": "string"
+        },
+        "primary": {
+          "description": "Required. Primary [fields.id] key.\nUsed as [lookup].id setting for this [struct] type.",
+          "type": "string"
+        },
+        "readonly": {
+          "type": "boolean",
+          "title": "Readonly. Is [ system / custom ] type ?\nNOTE: Custom [types.repo] are always prefixed with `/dictionaries`"
+        },
+        "repo": {
+          "description": "Repository (dataset) name (plural form), e.g.: `countries`.",
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_by": {
+          "$ref": "#/definitions/webitel.proto.data.LookupValue"
+        }
+      }
+    },
+    "webitel.proto.data.StructList": {
+      "description": "Dataset of structured types.",
+      "type": "object",
+      "properties": {
+        "data": {
+          "description": "List of `Struct` types.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.proto.data.Struct"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "title": "Next page available ?"
+        },
+        "page": {
+          "description": "Page number of results.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "webitel.proto.data.type.Binary": {
+      "type": "object",
+      "properties": {
+        "max_bytes": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "violation": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "webitel.proto.data.type.Bool": {
+      "type": "object",
+      "title": "no constraints"
+    },
+    "webitel.proto.data.type.Datetime": {
+      "description": "Datetime type settings.\n\nenum Part {\n   full = 0; // date \u0026 time\n   date = 1; // date only ; YYYY-MM-DD\n   time = 2; // time only ; HH:mm:ss[.pres]\n }\n Part part = 1; // part of: [ date \u0026| time ]\n enum Stamp {\n   s  =  0; // seconds\n   ms =  1; // [milli]seconds ; E+3\n   mc =  2; // [micro]seconds ; E+6\n   ns =  3; // [nano]seconds  ; E+9\n   m  = -1; // minutes\n   h  = -2; // hours\n }\n Stamp time = 2; // time precision\n string zone = 3; // ??? [ Europe/Kyiv | +03:00 ]",
+      "type": "object",
+      "properties": {
+        "epoch": {
+          "description": "Epoch timestamp.\nIf zero - UNIX epoch (1970-01-01 00:00:00) will be used.",
+          "type": "number",
+          "format": "double"
+        },
+        "format": {
+          "type": "string",
+          "title": "Display format.\nSee [layouts](https://pkg.go.dev/time#pkg-constants) for details.\nDefault: `Mon, 02 Jan 2006 15:04:05 -0700`; [time.RFC1123Z]"
+        },
+        "zone": {
+          "description": "Timezone associated.\nDefault: `UTC`.",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.proto.data.type.Duration": {
+      "type": "object",
+      "title": "Duration",
+      "properties": {
+        "format": {
+          "type": "string",
+          "title": "Display format.\nTODO: `hh:mm:ss.ms`"
+        },
+        "max": {
+          "type": "string",
+          "format": "int64"
+        },
+        "min": {
+          "type": "string",
+          "format": "int64"
+        },
+        "violation": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "webitel.proto.data.type.Float": {
+      "type": "object",
+      "properties": {
+        "frac": {
+          "type": "integer",
+          "format": "int64",
+          "title": "fractional part precision"
+        },
+        "max": {
+          "type": "number",
+          "format": "double"
+        },
+        "min": {
+          "type": "number",
+          "format": "double"
+        },
+        "violation": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "webitel.proto.data.type.Int": {
+      "type": "object",
+      "properties": {
+        "max": {
+          "type": "string",
+          "format": "int64"
+        },
+        "min": {
+          "type": "string",
+          "format": "int64"
+        },
+        "violation": {
+          "type": "object",
+          "title": "DESIGN. Custom error(s) on spec. constraint violation.\nmap \u003c constraint, template \u003e to produce [status.message].\n{\n  \"min\": \"country code {value} MUST contain at least 2 digits\"\n  \"max\": \"country code {value} MAY contain at most 4 digits\"\n}",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "webitel.proto.data.type.Kind": {
+      "description": "Basic scalar type.\n\n - none: option allow_alias = true;\n - list: [array]\n - int: int32\n - uint: uint32\n - float: float32\n - datetime: date \u0026| time",
+      "type": "string",
+      "default": "none",
+      "enum": [
+        "none",
+        "list",
+        "bool",
+        "int",
+        "int32",
+        "int64",
+        "uint",
+        "uint32",
+        "uint64",
+        "float",
+        "float32",
+        "float64",
+        "binary",
+        "lookup",
+        "string",
+        "richtext",
+        "datetime",
+        "duration"
+      ]
+    },
+    "webitel.proto.data.type.Lookup": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Optional. Primary [types.fields.id] key.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Optional. Display [types.fields.id] key.",
+          "type": "string"
+        },
+        "query": {
+          "type": "object",
+          "title": "Optional. Query dataset filters ...\nmap \u003c filter, template \u003e",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "type": {
+          "description": "Required. Dataset [types.repo] to search in.",
+          "type": "string"
+        },
+        "violation": {
+          "type": "object",
+          "title": "[ \"not_found\", \"too_much_records\" ]",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "webitel.proto.data.type.Text": {
+      "type": "object",
+      "properties": {
+        "max_bytes": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "max_chars": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "multiline": {
+          "type": "boolean"
+        },
+        "violation": {
+          "type": "object",
+          "title": "// accept format\n string accept_regex = 7;\n // equality strategy\n bool ignore_case = 8;",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "webitel.proto.data.type.Uint": {
+      "type": "object",
+      "properties": {
+        "max": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "min": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "violation": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
         }
       }
     },
