@@ -28982,6 +28982,125 @@
       }
     },
     "/storage/file": {
+      "get": {
+        "tags": [
+          "FileService"
+        ],
+        "operationId": "SearchFiles",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "name": "id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "uploaded_at.from",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "uploaded_at.to",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "name": "uploaded_by",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "reference_id",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "enum": [
+                "UnknownChannel",
+                "ChatChannel",
+                "MailChannel",
+                "CallChannel",
+                "LogChannel",
+                "MediaChannel",
+                "KnowledgebaseChannel",
+                "CasesChannel"
+              ],
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "channel",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "retention_until.from",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "retention_until.to",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storageListFile"
+            }
+          }
+        }
+      },
       "delete": {
         "tags": [
           "FileService"
@@ -49100,6 +49219,17 @@
         }
       }
     },
+    "storageBulkGenerateFileLinkResponse": {
+      "type": "object",
+      "properties": {
+        "links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/storageGenerateFileLinkResponse"
+          }
+        }
+      }
+    },
     "storageCognitiveProfile": {
       "type": "object",
       "properties": {
@@ -49239,7 +49369,7 @@
         "channels": {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/storageUploadFileChannel"
           }
         },
         "description": {
@@ -49352,13 +49482,61 @@
     "storageDeleteFilesResponse": {
       "type": "object"
     },
+    "storageFile": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "$ref": "#/definitions/storageUploadFileChannel"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "mime_type": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "reference_id": {
+          "type": "string"
+        },
+        "retention_until": {
+          "type": "string",
+          "format": "int64"
+        },
+        "sha256sum": {
+          "type": "string"
+        },
+        "size": {
+          "type": "string",
+          "format": "int64"
+        },
+        "thumbnail": {
+          "$ref": "#/definitions/storageThumbnail"
+        },
+        "uploaded_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "uploaded_by": {
+          "$ref": "#/definitions/engineLookup"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "view_name": {
+          "type": "string"
+        }
+      }
+    },
     "storageFilePolicy": {
       "type": "object",
       "properties": {
         "channels": {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/storageUploadFileChannel"
           }
         },
         "created_at": {
@@ -49460,9 +49638,37 @@
         }
       }
     },
+    "storageGenerateFileLinkRequest": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string"
+        },
+        "domain_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "file_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "query": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "source": {
+          "type": "string"
+        }
+      }
+    },
     "storageGenerateFileLinkResponse": {
       "type": "object",
       "properties": {
+        "base_url": {
+          "type": "string"
+        },
         "url": {
           "type": "string"
         }
@@ -49542,6 +49748,21 @@
           "items": {
             "$ref": "#/definitions/storageCognitiveProfileVoice"
           }
+        }
+      }
+    },
+    "storageListFile": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/storageFile"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -49751,7 +49972,7 @@
         "channels": {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/storageUploadFileChannel"
           }
         },
         "description": {
@@ -50156,7 +50377,7 @@
         "channels": {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/storageUploadFileChannel"
           }
         },
         "description": {
@@ -50233,7 +50454,9 @@
         "MailChannel",
         "CallChannel",
         "LogChannel",
-        "MediaChannel"
+        "MediaChannel",
+        "KnowledgebaseChannel",
+        "CasesChannel"
       ]
     },
     "storageUploadFileRequestMetadata": {
