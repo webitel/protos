@@ -171,7 +171,7 @@ message Case {
   general.Lookup assignee = 17;         // Assignee responsible for resolving the case.
   general.Lookup reporter = 18;         // Reporter of the issue (null if anonymous).
   general.Lookup impacted = 19;         // Impacted contact (defaults to reporter if null).
-  general.Lookup group = 20;            // Group associated with the case.
+  ContactGroup group = 20;            // Group associated with the case.
 
   Priority priority = 21;         // Priority level of the case.
   SourceTypeLookup source = 22;           // Source of the case.
@@ -198,7 +198,45 @@ message CloseInfo {
   general.Lookup close_reason = 2;      // Lookup for the close reason.
 }
 
+// Enum for Group Type
+enum GroupType {
+  GROUP_TYPE_UNSPECIFIED = 0; // Default value
+  STATIC = 1;                 // Static group
+  DYNAMIC = 2;                // Dynamic group
+}
 
+message ContactGroup{
+    // The unique ID of the group. Never changes.
+    string id = 1;
+
+    // The name of the group.
+    string name = 2;
+
+    // List of dynamic conditions associated with the group.
+    repeated DynamicCondition conditions = 3;
+
+    //Default group ; could not be NULL
+    general.Lookup default_group = 4;
+
+    //Type of the group
+    GroupType type = 5;
+}
+
+
+// Dynamic Group condition
+message DynamicCondition {
+  // The unique ID of the condition.
+  int64 id = 1;
+
+  // The query or condition expression used to evaluate the group.
+  string expression = 2;
+
+  // The ID of the static group that should be assigned if the condition is met.
+  general.Lookup group = 3;
+
+  // The ID of the assignee that should be assigned if the condition is met (optional).
+  general.Lookup assignee = 4;
+}
 
 
 message SourceTypeLookup {
