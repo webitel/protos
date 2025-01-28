@@ -495,6 +495,138 @@
       }
     },
     "/storage/file": {
+      "get": {
+        "operationId": "SearchFiles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storageListFile"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "uploaded_at.from",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "uploaded_at.to",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "uploaded_by",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "reference_id",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "channel",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "UnknownChannel",
+                "ChatChannel",
+                "MailChannel",
+                "CallChannel",
+                "LogChannel",
+                "MediaChannel",
+                "KnowledgebaseChannel",
+                "CasesChannel"
+              ]
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "retention_until.from",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "retention_until.to",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "FileService"
+        ]
+      },
       "delete": {
         "operationId": "DeleteFiles",
         "responses": {
@@ -1286,6 +1418,19 @@
         }
       }
     },
+    "engineFilterBetween": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "string",
+          "format": "int64"
+        },
+        "to": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "engineLookup": {
       "type": "object",
       "properties": {
@@ -1402,6 +1547,17 @@
         "disabled": {
           "type": "boolean",
           "format": "boolean"
+        }
+      }
+    },
+    "storageBulkGenerateFileLinkResponse": {
+      "type": "object",
+      "properties": {
+        "links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/storageGenerateFileLinkResponse"
+          }
         }
       }
     },
@@ -1568,7 +1724,7 @@
         "channels": {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/storageUploadFileChannel"
           }
         },
         "retention_days": {
@@ -1657,6 +1813,54 @@
     "storageDeleteFilesResponse": {
       "type": "object"
     },
+    "storageFile": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "uploaded_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "uploaded_by": {
+          "$ref": "#/definitions/engineLookup"
+        },
+        "name": {
+          "type": "string"
+        },
+        "mime_type": {
+          "type": "string"
+        },
+        "reference_id": {
+          "type": "string"
+        },
+        "size": {
+          "type": "string",
+          "format": "int64"
+        },
+        "sha256sum": {
+          "type": "string"
+        },
+        "thumbnail": {
+          "$ref": "#/definitions/storageThumbnail"
+        },
+        "view_name": {
+          "type": "string"
+        },
+        "channel": {
+          "$ref": "#/definitions/storageUploadFileChannel"
+        },
+        "retention_until": {
+          "type": "string",
+          "format": "int64"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
     "storageFilePolicy": {
       "type": "object",
       "properties": {
@@ -1705,7 +1909,7 @@
         "channels": {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/storageUploadFileChannel"
           }
         },
         "retention_days": {
@@ -1765,10 +1969,38 @@
         }
       }
     },
+    "storageGenerateFileLinkRequest": {
+      "type": "object",
+      "properties": {
+        "domain_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "file_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "source": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        },
+        "query": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "storageGenerateFileLinkResponse": {
       "type": "object",
       "properties": {
         "url": {
+          "type": "string"
+        },
+        "base_url": {
           "type": "string"
         }
       }
@@ -1846,6 +2078,21 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/storageCognitiveProfileVoice"
+          }
+        }
+      }
+    },
+    "storageListFile": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/storageFile"
           }
         }
       }
@@ -2090,7 +2337,7 @@
         "channels": {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/storageUploadFileChannel"
           }
         },
         "retention_days": {
@@ -2489,7 +2736,7 @@
         "channels": {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/storageUploadFileChannel"
           }
         },
         "retention_days": {
@@ -2537,7 +2784,9 @@
         "MailChannel",
         "CallChannel",
         "LogChannel",
-        "MediaChannel"
+        "MediaChannel",
+        "KnowledgebaseChannel",
+        "CasesChannel"
       ],
       "default": "UnknownChannel"
     },
