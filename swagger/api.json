@@ -38314,7 +38314,7 @@
         },
         "group": {
           "description": "Group associated with the case.",
-          "$ref": "#/definitions/generalLookup"
+          "$ref": "#/definitions/casesContactGroup"
         },
         "id": {
           "description": "Unique case ID.",
@@ -38932,6 +38932,35 @@
         }
       }
     },
+    "casesContactGroup": {
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "description": "List of dynamic conditions associated with the group.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/casesDynamicCondition"
+          }
+        },
+        "default_group": {
+          "title": "Default group ; could not be NULL",
+          "$ref": "#/definitions/generalLookup"
+        },
+        "id": {
+          "description": "The unique ID of the group. Never changes.",
+          "type": "string"
+        },
+        "name": {
+          "description": "The name of the group.",
+          "type": "string"
+        },
+        "type": {
+          "title": "Type of the group",
+          "$ref": "#/definitions/casesGroupType"
+        }
+      }
+    },
     "casesCreateCaseCloseInput": {
       "description": "Structure for close information when a case is closed.",
       "type": "object",
@@ -39199,6 +39228,29 @@
         }
       }
     },
+    "casesDynamicCondition": {
+      "type": "object",
+      "title": "Dynamic Group condition",
+      "properties": {
+        "assignee": {
+          "description": "The ID of the assignee that should be assigned if the condition is met (optional).",
+          "$ref": "#/definitions/generalLookup"
+        },
+        "expression": {
+          "description": "The query or condition expression used to evaluate the group.",
+          "type": "string"
+        },
+        "group": {
+          "description": "The ID of the static group that should be assigned if the condition is met.",
+          "$ref": "#/definitions/generalLookup"
+        },
+        "id": {
+          "description": "The unique ID of the condition.",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "casesEmailEvent": {
       "type": "object",
       "properties": {
@@ -39374,6 +39426,17 @@
           "format": "int32"
         }
       }
+    },
+    "casesGroupType": {
+      "description": "- GROUP_TYPE_UNSPECIFIED: Default value\n - STATIC: Static group\n - DYNAMIC: Dynamic group",
+      "type": "string",
+      "title": "Enum for Group Type",
+      "default": "GROUP_TYPE_UNSPECIFIED",
+      "enum": [
+        "GROUP_TYPE_UNSPECIFIED",
+        "STATIC",
+        "DYNAMIC"
+      ]
     },
     "casesInputCase": {
       "type": "object",
