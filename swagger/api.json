@@ -27267,6 +27267,70 @@
         }
       }
     },
+    "/search": {
+      "get": {
+        "tags": [
+          "FTSService"
+        ],
+        "operationId": "Search",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "object_name",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ftsSearchResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        }
+      }
+    },
     "/settings": {
       "get": {
         "tags": [
@@ -50029,6 +50093,35 @@
         }
       }
     },
+    "ftsSearchData": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "object_name": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    },
+    "ftsSearchResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ftsSearchData"
+          }
+        },
+        "next": {
+          "type": "boolean"
+        }
+      }
+    },
     "generalExtendedLookup": {
       "type": "object",
       "properties": {
@@ -50425,6 +50518,25 @@
       "enum": [
         "NULL_VALUE"
       ]
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        },
+        "message": {
+          "type": "string"
+        }
+      }
     },
     "runtimeError": {
       "type": "object",
