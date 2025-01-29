@@ -4,14 +4,24 @@ package fts;
 
 option go_package = "github.com/webitel/protos/fts;fts";
 
+import "google/api/annotations.proto"; // HTTP annotations for REST mappings.
+
 service FTSService {
-    rpc Search(SearchRequest) returns (SearchResponse) {}
+    rpc Search(SearchRequest) returns (SearchResponse) {
+        option (google.api.http) = {
+            get: "/search"
+        };
+    }
 }
 
 message SearchRequest {
-    string q = 1;
-    int32 limit = 2;
-    repeated string object_name = 3;
+    int32 page = 1;
+    int32 size = 2;
+    string q = 3;
+
+    string sort = 4;
+    repeated string fields = 5;
+    repeated string object_name = 6;
 }
 
 message SearchData {
