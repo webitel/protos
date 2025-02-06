@@ -5193,9 +5193,9 @@
         "operationId": "Users_UpdateUser",
         "responses": {
           "200": {
-            "description": "A successful response.",
+            "description": "",
             "schema": {
-              "$ref": "#/definitions/api.UpdateUserResponse"
+              "$ref": "#/definitions/api.User"
             }
           }
         },
@@ -5209,12 +5209,304 @@
             "format": "int64"
           },
           {
-            "name": "body",
+            "name": "user",
+            "description": "body: modifications/changes",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/api.Users.UpdateUserBody"
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "title": "Caller-ID-Name: Display Name"
+                },
+                "email": {
+                  "type": "string"
+                },
+                "username": {
+                  "type": "string",
+                  "title": "alphanumeric username (login)"
+                },
+                "password": {
+                  "type": "string"
+                },
+                "extension": {
+                  "type": "string",
+                  "title": "Caller-ID-Number:"
+                },
+                "presence": {
+                  "$ref": "#/definitions/api.UserPresence",
+                  "description": "string presence = 7; // unique set of \u003cuser\u003e presentity \u003cstatus:basic\u003e tuples open[ed]\n string status = 8; // short display status (short description)",
+                  "title": "CallerId caller = 5; // extension\nPresenceStatus presence = 8;"
+                },
+                "device": {
+                  "$ref": "#/definitions/api.ObjectId",
+                  "title": "[optional] default device assigned ? WebRTC register ?"
+                },
+                "devices": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/api.ObjectId"
+                  },
+                  "description": "[editable] list of unique `regular` devices, attached to this user",
+                  "title": "map\u003cint64, string\u003e devices = 13;"
+                },
+                "hotdesks": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/api.ObjectId"
+                  },
+                  "title": "[readonly] list of unique `hotdesk` devices, assigned to this user"
+                },
+                "profile": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "list of variables, assigned to this user as an environment unit"
+                },
+                "permissions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/api.Permission"
+                  },
+                  "title": "set of operational permission grants"
+                },
+                "license": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/api.LicenseUser"
+                  },
+                  "title": "list of unique licenses, granted to this user"
+                },
+                "roles": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/api.ObjectId"
+                  },
+                  "title": "roles, member of which is this user"
+                },
+                "totp_url": {
+                  "type": "string",
+                  "title": "[readonly][optional] one time password if setting (2fa) is enabled"
+                },
+                "contact": {
+                  "$ref": "#/definitions/api.ObjectId",
+                  "description": "[optional] contact connected to this user",
+                  "title": "repeated Call calls = 13; // order by created_at\nrepeated Registration reged = 13; // order by register_last"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "unix"
+                },
+                "created_by": {
+                  "$ref": "#/definitions/api.UserId",
+                  "title": "user"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "unix"
+                },
+                "updated_by": {
+                  "$ref": "#/definitions/api.UserId",
+                  "title": "user"
+                },
+                "deleted_at": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "unix"
+                },
+                "deleted_by": {
+                  "$ref": "#/definitions/api.UserId",
+                  "title": "user"
+                },
+                "chat_name": {
+                  "type": "string",
+                  "description": "The \"chat_name\" field is used to store the name displayed externally on the platform.\nFor example, \"chat_name\" is shown when an agent connects to chats with clients."
+                }
+              },
+              "title": "body: modifications/changes"
             }
+          },
+          {
+            "name": "fields",
+            "description": "PATCH: partial update",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      },
+      "patch": {
+        "operationId": "Users_UpdateUser2",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/api.User"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user.id",
+            "description": "Object ID",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "user",
+            "description": "body: modifications/changes",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "title": "Caller-ID-Name: Display Name"
+                },
+                "email": {
+                  "type": "string"
+                },
+                "username": {
+                  "type": "string",
+                  "title": "alphanumeric username (login)"
+                },
+                "password": {
+                  "type": "string"
+                },
+                "extension": {
+                  "type": "string",
+                  "title": "Caller-ID-Number:"
+                },
+                "presence": {
+                  "$ref": "#/definitions/api.UserPresence",
+                  "description": "string presence = 7; // unique set of \u003cuser\u003e presentity \u003cstatus:basic\u003e tuples open[ed]\n string status = 8; // short display status (short description)",
+                  "title": "CallerId caller = 5; // extension\nPresenceStatus presence = 8;"
+                },
+                "device": {
+                  "$ref": "#/definitions/api.ObjectId",
+                  "title": "[optional] default device assigned ? WebRTC register ?"
+                },
+                "devices": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/api.ObjectId"
+                  },
+                  "description": "[editable] list of unique `regular` devices, attached to this user",
+                  "title": "map\u003cint64, string\u003e devices = 13;"
+                },
+                "hotdesks": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/api.ObjectId"
+                  },
+                  "title": "[readonly] list of unique `hotdesk` devices, assigned to this user"
+                },
+                "profile": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "list of variables, assigned to this user as an environment unit"
+                },
+                "permissions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/api.Permission"
+                  },
+                  "title": "set of operational permission grants"
+                },
+                "license": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/api.LicenseUser"
+                  },
+                  "title": "list of unique licenses, granted to this user"
+                },
+                "roles": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/api.ObjectId"
+                  },
+                  "title": "roles, member of which is this user"
+                },
+                "totp_url": {
+                  "type": "string",
+                  "title": "[readonly][optional] one time password if setting (2fa) is enabled"
+                },
+                "contact": {
+                  "$ref": "#/definitions/api.ObjectId",
+                  "description": "[optional] contact connected to this user",
+                  "title": "repeated Call calls = 13; // order by created_at\nrepeated Registration reged = 13; // order by register_last"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "unix"
+                },
+                "created_by": {
+                  "$ref": "#/definitions/api.UserId",
+                  "title": "user"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "unix"
+                },
+                "updated_by": {
+                  "$ref": "#/definitions/api.UserId",
+                  "title": "user"
+                },
+                "deleted_at": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "unix"
+                },
+                "deleted_by": {
+                  "$ref": "#/definitions/api.UserId",
+                  "title": "user"
+                },
+                "chat_name": {
+                  "type": "string",
+                  "description": "The \"chat_name\" field is used to store the name displayed externally on the platform.\nFor example, \"chat_name\" is shown when an agent connects to chats with clients."
+                }
+              },
+              "title": "body: modifications/changes"
+            }
+          },
+          {
+            "name": "fields",
+            "description": "PATCH: partial update",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
