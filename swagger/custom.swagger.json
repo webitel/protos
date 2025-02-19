@@ -381,26 +381,37 @@
         "parameters": [
           {
             "name": "repo",
-            "description": "[`types.repo`]",
+            "description": "[`types.repo`] data source",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "id",
-            "description": "[`record.id`]",
+            "description": "[`record.id`] for update",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "record",
-            "description": "Record data changes.\n\nInputRecord input = 3;",
+            "description": "Record data fields changes.",
             "in": "body",
             "required": true,
             "schema": {
               "type": "object"
             }
+          },
+          {
+            "name": "fields",
+            "description": "Source Fields to return into result.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -422,207 +433,41 @@
         "parameters": [
           {
             "name": "repo",
-            "description": "[`types.repo`]",
+            "description": "[`types.repo`] data source",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "id",
-            "description": "[`record.id`]",
+            "description": "[`record.id`] for update",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "record",
-            "description": "Record data changes.\n\nInputRecord input = 3;",
+            "description": "Record data fields changes.",
             "in": "body",
             "required": true,
             "schema": {
               "type": "object"
             }
+          },
+          {
+            "name": "fields",
+            "description": "Source Fields to return into result.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
           "Dictionaries"
-        ]
-      }
-    },
-    "/extensions/{repo}": {
-      "delete": {
-        "summary": "Delete records extension data.",
-        "operationId": "Extensions_Delete",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.proto.data.Dataset"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "repo",
-            "description": "[`types.repo`]",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "fields",
-            "description": "Fields to be retrieved into result dataset.",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          },
-          {
-            "name": "id",
-            "description": "[`record.id`]",
-            "in": "query",
-            "required": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          }
-        ],
-        "tags": [
-          "Extensions"
-        ]
-      }
-    },
-    "/extensions/{repo}/{id}": {
-      "get": {
-        "summary": "Record extension data.",
-        "description": "(Record) {",
-        "operationId": "Extensions_Locate",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "type": "object"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "repo",
-            "description": "[`types.repo`]",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id",
-            "description": "[`record.id`]",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "fields",
-            "description": "Fields [Q]uery to build result dataset record.\n```\nfields ::= field [ *( \",\" field ) ]\nfield  ::= name [ *( func ) ] [ inner ]\ninner  ::= \"{\" fields \"}\"\nfuncs  ::= *( func )\nfunc   ::= \".\" name \"(\" [ args ] \")\"\nname   ::= ALPHA / DIGIT / USCORE\n\nALPHA    = %x41-5A / %x61-7A  ; \"A\"-\"Z\" / \"a\"-\"z\"\nDIGIT    = %x30-39            ; \"0\"-\"9\"\nUSCORE   = %x5F ; underscore  ; \"_\"\n```",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string",
-              "default": "*",
-              "uniqueItems": true
-            },
-            "collectionFormat": "multi"
-          }
-        ],
-        "tags": [
-          "Extensions"
-        ]
-      },
-      "put": {
-        "summary": "Update extension data.",
-        "description": "(Record) {",
-        "operationId": "Extensions_Update2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "type": "object"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "repo",
-            "description": "[`types.repo`]",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id",
-            "description": "[`record.id`]",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "record",
-            "description": "Record data changes.\n\nInputRecord input = 3;",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object"
-            }
-          }
-        ],
-        "tags": [
-          "Extensions"
-        ]
-      },
-      "patch": {
-        "summary": "Update extension data.",
-        "description": "(Record) {",
-        "operationId": "Extensions_Update",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "type": "object"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "repo",
-            "description": "[`types.repo`]",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id",
-            "description": "[`record.id`]",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "record",
-            "description": "Record data changes.\n\nInputRecord input = 3;",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object"
-            }
-          }
-        ],
-        "tags": [
-          "Extensions"
         ]
       }
     },
@@ -901,20 +746,9 @@
           },
           {
             "name": "repo",
-            "description": "`types.repo`",
+            "description": "`types.repo`\n\n// `record.pk`\n repeated string id = 3;",
             "in": "query",
             "required": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          },
-          {
-            "name": "id",
-            "description": "`record.pk`",
-            "in": "query",
-            "required": false,
             "type": "array",
             "items": {
               "type": "string"
@@ -990,40 +824,6 @@
       "put": {
         "summary": "Update custom dictionary.",
         "description": "(Dictionary) {",
-        "operationId": "Dictionaries_UpdateType2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.proto.data.Struct"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "repo",
-            "description": "[**types.dictionaries.id**] type name, e.g.: `country`.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "input",
-            "description": "The dictionary [type] changes.",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/webitel.proto.data.InputDictionary"
-            }
-          }
-        ],
-        "tags": [
-          "Dictionaries"
-        ]
-      },
-      "patch": {
-        "summary": "Update custom dictionary.",
-        "description": "(Dictionary) {",
         "operationId": "Dictionaries_UpdateType",
         "responses": {
           "200": {
@@ -1036,19 +836,30 @@
         "parameters": [
           {
             "name": "repo",
-            "description": "[**types.dictionaries.id**] type name, e.g.: `country`.",
+            "description": "[**repo**] name of the dataset type, e.g.: `countries`.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "input",
-            "description": "The dictionary [type] changes.",
+            "description": "The dictionary [**type**] changes.",
             "in": "body",
             "required": true,
             "schema": {
               "$ref": "#/definitions/webitel.proto.data.InputDictionary"
             }
+          },
+          {
+            "name": "fields",
+            "description": "Fields to return into result.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -1059,12 +870,13 @@
     "/types/extensions": {
       "get": {
         "summary": "Search for type extensions.",
+        "description": "(ExtensionList) {",
         "operationId": "Extensions_SearchType",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/webitel.proto.data.ExtensionList"
+              "$ref": "#/definitions/webitel.proto.data.StructList"
             }
           }
         },
@@ -1137,12 +949,13 @@
       },
       "delete": {
         "summary": "Delete extension for types.",
-        "operationId": "Extensions_DeleteType",
+        "description": "returns (ExtensionList) {",
+        "operationId": "Extensions_DeleteType2",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/webitel.proto.data.ExtensionList"
+              "$ref": "#/definitions/webitel.proto.data.StructList"
             }
           }
         },
@@ -1158,10 +971,10 @@
             "collectionFormat": "multi"
           },
           {
-            "name": "type",
-            "description": "extension.type.id",
+            "name": "repo",
+            "description": "`type.repo`",
             "in": "query",
-            "required": true,
+            "required": false,
             "type": "array",
             "items": {
               "type": "string"
@@ -1175,14 +988,80 @@
       }
     },
     "/types/extensions/{repo}": {
+      "get": {
+        "summary": "Type extension details.",
+        "description": "returns (Extension) {",
+        "operationId": "Extensions_LocateType",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.Struct"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "repo",
+            "description": "`type.repo`\n\nid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Extensions"
+        ]
+      },
+      "delete": {
+        "summary": "Delete extension for types.",
+        "description": "returns (ExtensionList) {",
+        "operationId": "Extensions_DeleteType",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.StructList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "repo",
+            "description": "`type.repo`",
+            "in": "path",
+            "required": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "csv",
+            "minItems": 1
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Extensions"
+        ]
+      },
       "post": {
         "summary": "Create type extension.",
+        "description": "returns (Extension) {",
         "operationId": "Extensions_CreateType",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/webitel.proto.data.Extension"
+              "$ref": "#/definitions/webitel.proto.data.Struct"
             }
           }
         },
@@ -1207,80 +1086,23 @@
         "tags": [
           "Extensions"
         ]
-      }
-    },
-    "/types/extensions/{type}": {
-      "get": {
-        "summary": "Type extension details.",
-        "operationId": "Extensions_LocateType",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.proto.data.Extension"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "type",
-            "description": "extension.type.id as type.\n\nid",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "Extensions"
-        ]
       },
       "put": {
         "summary": "Update type extension.",
-        "operationId": "Extensions_UpdateType2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.proto.data.Extension"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "type",
-            "description": "extension.type.id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "input",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/webitel.proto.data.InputExtension"
-            }
-          }
-        ],
-        "tags": [
-          "Extensions"
-        ]
-      },
-      "patch": {
-        "summary": "Update type extension.",
+        "description": "returns (Extension) {",
         "operationId": "Extensions_UpdateType",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/webitel.proto.data.Extension"
+              "$ref": "#/definitions/webitel.proto.data.Struct"
             }
           }
         },
         "parameters": [
           {
-            "name": "type",
-            "description": "extension.type.id",
+            "name": "repo",
+            "description": "`type.repo`",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1358,50 +1180,6 @@
         "next": {
           "type": "boolean",
           "title": "Next page available?"
-        }
-      }
-    },
-    "webitel.proto.data.Extension": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "$ref": "#/definitions/webitel.proto.data.LookupValue",
-          "title": "SUPER type"
-        },
-        "fields": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.proto.data.Field"
-          },
-          "title": "Fields definitions"
-        },
-        "index": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/webitel.proto.data.Index"
-          },
-          "title": "INDEX fields"
-        }
-      },
-      "description": "Extension represents a set of an extra fields\nfor some [SUPER] type to be extended with.\n\nint64 dc = 0;"
-    },
-    "webitel.proto.data.ExtensionList": {
-      "type": "object",
-      "properties": {
-        "data": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.proto.data.Extension"
-          }
-        },
-        "page": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "next": {
-          "type": "boolean"
         }
       }
     },
@@ -1710,7 +1488,7 @@
           },
           "title": "Fields definitions"
         },
-        "index": {
+        "indices": {
           "type": "object",
           "additionalProperties": {
             "$ref": "#/definitions/webitel.proto.data.Index"
