@@ -10795,9 +10795,13 @@
             "in": "query"
           },
           {
-            "type": "string",
-            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
-            "name": "filters[string]",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Key-value pairs for additional filtering.",
+            "name": "filters",
             "in": "query"
           }
         ],
@@ -10892,11 +10896,7 @@
             "in": "query"
           },
           {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
+            "type": "string",
             "description": "Sorting options by fields",
             "name": "sort",
             "in": "query"
@@ -11194,11 +11194,7 @@
             "in": "query"
           },
           {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
+            "type": "string",
             "name": "sort",
             "in": "query"
           },
@@ -11647,11 +11643,7 @@
             "in": "query"
           },
           {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
+            "type": "string",
             "description": "Sort the result according to fields.",
             "name": "sort",
             "in": "query"
@@ -11683,8 +11675,8 @@
           {
             "type": "string",
             "format": "int64",
-            "description": "Filter priorities that are in filtered SLA",
-            "name": "inSla",
+            "description": "Filter priorities that are in filtered SlaCondition and not in current SLA",
+            "name": "inSlaCond",
             "in": "query"
           }
         ],
@@ -11969,11 +11961,7 @@
             "in": "query"
           },
           {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
+            "type": "string",
             "description": "Sorting options by fields",
             "name": "sort",
             "in": "query"
@@ -12258,11 +12246,7 @@
             "in": "query"
           },
           {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
+            "type": "string",
             "description": "Sort the result according to fields.",
             "name": "sort",
             "in": "query"
@@ -12512,11 +12496,7 @@
             "in": "query"
           },
           {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
+            "type": "string",
             "description": "Sort the result according to fields.",
             "name": "sort",
             "in": "query"
@@ -12789,11 +12769,7 @@
             "in": "query"
           },
           {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
+            "type": "string",
             "description": "Sort the result according to fields.",
             "name": "sort",
             "in": "query"
@@ -13219,6 +13195,15 @@
             "required": true
           },
           {
+            "description": "Input data for the communications to link.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/casesInputCaseCommunication"
+            }
+          },
+          {
             "type": "array",
             "items": {
               "type": "string"
@@ -13347,6 +13332,12 @@
             "description": "Array of requested id.",
             "name": "ids",
             "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Sorting",
+            "name": "sort",
+            "in": "query"
           }
         ],
         "responses": {
@@ -13354,6 +13345,45 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/casesCaseFileList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        }
+      }
+    },
+    "/cases/{case_etag}/files/{id}": {
+      "delete": {
+        "tags": [
+          "CaseFiles"
+        ],
+        "summary": "Delete a file",
+        "operationId": "DeleteFile",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "case_etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "The unique ID of the file to delete.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/casesFile"
             }
           },
           "default": {
@@ -13692,7 +13722,88 @@
         }
       }
     },
-    "/cases/{case_etag}/timeline": {
+    "/cases/{case_id}/chat/{chat_id}/messages": {
+      "get": {
+        "tags": [
+          "CasesChatCatalog"
+        ],
+        "operationId": "CasesChatCatalog_GetCaseChatHistory",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Contact identificator",
+            "name": "case_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Unique chat dialog",
+            "name": "chat_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Messages ONLY starting from the specified message ID",
+            "name": "offset.id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Messages ONLY been sent before the specified epochtime(milli).",
+            "name": "offset.date",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of messages to return.",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Search term: message.text",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to return into result.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
+            "name": "group[string]",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.chat.ChatMessages"
+            }
+          }
+        }
+      }
+    },
+    "/cases/{case_id}/timeline": {
       "get": {
         "tags": [
           "CaseTimeline"
@@ -13701,7 +13812,7 @@
         "parameters": [
           {
             "type": "string",
-            "name": "case_etag",
+            "name": "case_id",
             "in": "path",
             "required": true
           },
@@ -13761,9 +13872,9 @@
             "type": "array",
             "items": {
               "enum": [
-                "TIMELINE_CHAT",
-                "TIMELINE_CALL",
-                "TIMELINE_EMAIL"
+                "chat",
+                "call",
+                "email"
               ],
               "type": "string"
             },
@@ -13788,7 +13899,7 @@
         }
       }
     },
-    "/cases/{case_etag}/timeline/counter": {
+    "/cases/{case_id}/timeline/counter": {
       "get": {
         "tags": [
           "CaseTimeline"
@@ -13797,7 +13908,7 @@
         "parameters": [
           {
             "type": "string",
-            "name": "case_etag",
+            "name": "case_id",
             "in": "path",
             "required": true
           }
@@ -14469,45 +14580,6 @@
             "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        }
-      }
-    },
-    "/chat/bots/{profile_id}/broadcast": {
-      "post": {
-        "tags": [
-          "ChatHelperService"
-        ],
-        "operationId": "Broadcast",
-        "parameters": [
-          {
-            "type": "string",
-            "format": "int64",
-            "name": "profile_id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/engineBroadcastRequest"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/engineBroadcastResponse"
-            }
-          },
-          "default": {
-            "description": "Server error",
-            "schema": {
-              "$ref": "#/definitions/engineApiError"
             }
           }
         }
@@ -15220,11 +15292,7 @@
             "in": "query"
           },
           {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
+            "type": "string",
             "description": "Sort the result according to fields.",
             "name": "sort",
             "in": "query"
@@ -18867,7 +18935,7 @@
           },
           {
             "type": "string",
-            "name": "search",
+            "name": "q",
             "in": "query"
           },
           {
@@ -21259,26 +21327,36 @@
         "parameters": [
           {
             "type": "string",
-            "description": "[`types.repo`]",
+            "description": "[`types.repo`] data source",
             "name": "repo",
             "in": "path",
             "required": true
           },
           {
             "type": "string",
-            "description": "[`record.id`]",
+            "description": "[`record.id`] for update",
             "name": "id",
             "in": "path",
             "required": true
           },
           {
-            "description": "Record data changes.\n\nInputRecord input = 3;",
+            "description": "Record data fields changes.",
             "name": "record",
             "in": "body",
             "required": true,
             "schema": {
               "type": "object"
             }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Source Fields to return into result.",
+            "name": "fields",
+            "in": "query"
           }
         ],
         "responses": {
@@ -21346,26 +21424,36 @@
         "parameters": [
           {
             "type": "string",
-            "description": "[`types.repo`]",
+            "description": "[`types.repo`] data source",
             "name": "repo",
             "in": "path",
             "required": true
           },
           {
             "type": "string",
-            "description": "[`record.id`]",
+            "description": "[`record.id`] for update",
             "name": "id",
             "in": "path",
             "required": true
           },
           {
-            "description": "Record data changes.\n\nInputRecord input = 3;",
+            "description": "Record data fields changes.",
             "name": "record",
             "in": "body",
             "required": true,
             "schema": {
               "type": "object"
             }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Source Fields to return into result.",
+            "name": "fields",
+            "in": "query"
           }
         ],
         "responses": {
@@ -21950,181 +22038,6 @@
             "description": "Server error",
             "schema": {
               "$ref": "#/definitions/engineApiError"
-            }
-          }
-        }
-      }
-    },
-    "/extensions/{repo}": {
-      "delete": {
-        "tags": [
-          "Extensions"
-        ],
-        "summary": "Delete records extension data.",
-        "operationId": "Extensions_Delete",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "[`types.repo`]",
-            "name": "repo",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
-            "description": "Fields to be retrieved into result dataset.",
-            "name": "fields",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
-            "description": "[`record.id`]",
-            "name": "id",
-            "in": "query",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.proto.data.Dataset"
-            }
-          }
-        }
-      }
-    },
-    "/extensions/{repo}/{id}": {
-      "get": {
-        "description": "(Record) {",
-        "tags": [
-          "Extensions"
-        ],
-        "summary": "Record extension data.",
-        "operationId": "Extensions_Locate",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "[`types.repo`]",
-            "name": "repo",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "[`record.id`]",
-            "name": "id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "array",
-            "items": {
-              "uniqueItems": true,
-              "type": "string",
-              "default": "*"
-            },
-            "collectionFormat": "multi",
-            "description": "Fields [Q]uery to build result dataset record.\n```\nfields ::= field [ *( \",\" field ) ]\nfield  ::= name [ *( func ) ] [ inner ]\ninner  ::= \"{\" fields \"}\"\nfuncs  ::= *( func )\nfunc   ::= \".\" name \"(\" [ args ] \")\"\nname   ::= ALPHA / DIGIT / USCORE\n\nALPHA    = %x41-5A / %x61-7A  ; \"A\"-\"Z\" / \"a\"-\"z\"\nDIGIT    = %x30-39            ; \"0\"-\"9\"\nUSCORE   = %x5F ; underscore  ; \"_\"\n```",
-            "name": "fields",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "type": "object"
-            }
-          }
-        }
-      },
-      "put": {
-        "description": "(Record) {",
-        "tags": [
-          "Extensions"
-        ],
-        "summary": "Update extension data.",
-        "operationId": "Extensions_Update2",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "[`types.repo`]",
-            "name": "repo",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "[`record.id`]",
-            "name": "id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "description": "Record data changes.\n\nInputRecord input = 3;",
-            "name": "record",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "type": "object"
-            }
-          }
-        }
-      },
-      "patch": {
-        "description": "(Record) {",
-        "tags": [
-          "Extensions"
-        ],
-        "summary": "Update extension data.",
-        "operationId": "Extensions_Update",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "[`types.repo`]",
-            "name": "repo",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "[`record.id`]",
-            "name": "id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "description": "Record data changes.\n\nInputRecord input = 3;",
-            "name": "record",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "type": "object"
             }
           }
         }
@@ -27952,11 +27865,7 @@
             "in": "query"
           },
           {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
+            "type": "string",
             "description": "Sort the result according to fields.",
             "name": "sort",
             "in": "query"
@@ -28943,11 +28852,7 @@
             "in": "query"
           },
           {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
+            "type": "string",
             "description": "Sort the result according to fields.",
             "name": "sort",
             "in": "query"
@@ -31147,20 +31052,10 @@
               "type": "string"
             },
             "collectionFormat": "multi",
-            "description": "`types.repo`",
+            "description": "`types.repo`\n\n// `record.pk`\n repeated string id = 3;",
             "name": "repo",
             "in": "query",
             "required": true
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
-            "description": "`record.pk`",
-            "name": "id",
-            "in": "query"
           }
         ],
         "responses": {
@@ -31205,23 +31100,33 @@
           "Dictionaries"
         ],
         "summary": "Update custom dictionary.",
-        "operationId": "Dictionaries_UpdateType2",
+        "operationId": "Dictionaries_UpdateType",
         "parameters": [
           {
             "type": "string",
-            "description": "[**types.dictionaries.id**] type name, e.g.: `country`.",
+            "description": "[**repo**] name of the dataset type, e.g.: `countries`.",
             "name": "repo",
             "in": "path",
             "required": true
           },
           {
-            "description": "The dictionary [type] changes.",
+            "description": "The dictionary [**type**] changes.",
             "name": "input",
             "in": "body",
             "required": true,
             "schema": {
               "$ref": "#/definitions/webitel.proto.data.InputDictionary"
             }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to return into result.",
+            "name": "fields",
+            "in": "query"
           }
         ],
         "responses": {
@@ -31266,44 +31171,11 @@
             }
           }
         }
-      },
-      "patch": {
-        "description": "(Dictionary) {",
-        "tags": [
-          "Dictionaries"
-        ],
-        "summary": "Update custom dictionary.",
-        "operationId": "Dictionaries_UpdateType",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "[**types.dictionaries.id**] type name, e.g.: `country`.",
-            "name": "repo",
-            "in": "path",
-            "required": true
-          },
-          {
-            "description": "The dictionary [type] changes.",
-            "name": "input",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/webitel.proto.data.InputDictionary"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.proto.data.Struct"
-            }
-          }
-        }
       }
     },
     "/types/extensions": {
       "get": {
+        "description": "(ExtensionList) {",
         "tags": [
           "Extensions"
         ],
@@ -31370,17 +31242,18 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/webitel.proto.data.ExtensionList"
+              "$ref": "#/definitions/webitel.proto.data.StructList"
             }
           }
         }
       },
       "delete": {
+        "description": "returns (ExtensionList) {",
         "tags": [
           "Extensions"
         ],
         "summary": "Delete extension for types.",
-        "operationId": "Extensions_DeleteType",
+        "operationId": "Extensions_DeleteType2",
         "parameters": [
           {
             "type": "array",
@@ -31397,9 +31270,35 @@
               "type": "string"
             },
             "collectionFormat": "multi",
-            "description": "extension.type.id",
-            "name": "type",
-            "in": "query",
+            "description": "`type.repo`",
+            "name": "repo",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.StructList"
+            }
+          }
+        }
+      }
+    },
+    "/types/extensions/{repo}": {
+      "get": {
+        "description": "returns (Extension) {",
+        "tags": [
+          "Extensions"
+        ],
+        "summary": "Type extension details.",
+        "operationId": "Extensions_LocateType",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "`type.repo`\n\nid",
+            "name": "repo",
+            "in": "path",
             "required": true
           }
         ],
@@ -31407,14 +31306,46 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/webitel.proto.data.ExtensionList"
+              "$ref": "#/definitions/webitel.proto.data.Struct"
             }
           }
         }
-      }
-    },
-    "/types/extensions/{repo}": {
+      },
+      "put": {
+        "description": "returns (Extension) {",
+        "tags": [
+          "Extensions"
+        ],
+        "summary": "Update type extension.",
+        "operationId": "Extensions_UpdateType",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "`type.repo`",
+            "name": "repo",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.InputExtension"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.proto.data.Struct"
+            }
+          }
+        }
+      },
       "post": {
+        "description": "returns (Extension) {",
         "tags": [
           "Extensions"
         ],
@@ -31442,97 +31373,46 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/webitel.proto.data.Extension"
-            }
-          }
-        }
-      }
-    },
-    "/types/extensions/{type}": {
-      "get": {
-        "tags": [
-          "Extensions"
-        ],
-        "summary": "Type extension details.",
-        "operationId": "Extensions_LocateType",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "extension.type.id as type.\n\nid",
-            "name": "type",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.proto.data.Extension"
+              "$ref": "#/definitions/webitel.proto.data.Struct"
             }
           }
         }
       },
-      "put": {
+      "delete": {
+        "description": "returns (ExtensionList) {",
         "tags": [
           "Extensions"
         ],
-        "summary": "Update type extension.",
-        "operationId": "Extensions_UpdateType2",
+        "summary": "Delete extension for types.",
+        "operationId": "Extensions_DeleteType",
         "parameters": [
           {
-            "type": "string",
-            "description": "extension.type.id",
-            "name": "type",
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "csv",
+            "description": "`type.repo`",
+            "name": "repo",
             "in": "path",
             "required": true
           },
           {
-            "name": "input",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/webitel.proto.data.InputExtension"
-            }
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "fields",
+            "in": "query"
           }
         ],
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/webitel.proto.data.Extension"
-            }
-          }
-        }
-      },
-      "patch": {
-        "tags": [
-          "Extensions"
-        ],
-        "summary": "Update type extension.",
-        "operationId": "Extensions_UpdateType",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "extension.type.id",
-            "name": "type",
-            "in": "path",
-            "required": true
-          },
-          {
-            "name": "input",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/webitel.proto.data.InputExtension"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.proto.data.Extension"
+              "$ref": "#/definitions/webitel.proto.data.StructList"
             }
           }
         }
@@ -32439,19 +32319,309 @@
             "required": true
           },
           {
-            "name": "body",
+            "description": "body: modifications/changes",
+            "name": "user",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/api.Users.UpdateUserBody"
+              "type": "object",
+              "title": "body: modifications/changes",
+              "properties": {
+                "chat_name": {
+                  "description": "The \"chat_name\" field is used to store the name displayed externally on the platform.\nFor example, \"chat_name\" is shown when an agent connects to chats with clients.",
+                  "type": "string"
+                },
+                "contact": {
+                  "description": "[optional] contact connected to this user",
+                  "title": "repeated Call calls = 13; // order by created_at\nrepeated Registration reged = 13; // order by register_last",
+                  "$ref": "#/definitions/api.ObjectId"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "unix"
+                },
+                "created_by": {
+                  "title": "user",
+                  "$ref": "#/definitions/api.UserId"
+                },
+                "deleted_at": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "unix"
+                },
+                "deleted_by": {
+                  "title": "user",
+                  "$ref": "#/definitions/api.UserId"
+                },
+                "device": {
+                  "title": "[optional] default device assigned ? WebRTC register ?",
+                  "$ref": "#/definitions/api.ObjectId"
+                },
+                "devices": {
+                  "description": "[editable] list of unique `regular` devices, attached to this user",
+                  "type": "array",
+                  "title": "map\u003cint64, string\u003e devices = 13;",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/api.ObjectId"
+                  }
+                },
+                "email": {
+                  "type": "string"
+                },
+                "extension": {
+                  "type": "string",
+                  "title": "Caller-ID-Number:"
+                },
+                "hotdesks": {
+                  "type": "array",
+                  "title": "[readonly] list of unique `hotdesk` devices, assigned to this user",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/api.ObjectId"
+                  }
+                },
+                "license": {
+                  "type": "array",
+                  "title": "list of unique licenses, granted to this user",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/api.LicenseUser"
+                  }
+                },
+                "name": {
+                  "type": "string",
+                  "title": "Caller-ID-Name: Display Name"
+                },
+                "password": {
+                  "type": "string"
+                },
+                "permissions": {
+                  "type": "array",
+                  "title": "set of operational permission grants",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/api.Permission"
+                  }
+                },
+                "presence": {
+                  "description": "string presence = 7; // unique set of \u003cuser\u003e presentity \u003cstatus:basic\u003e tuples open[ed]\n string status = 8; // short display status (short description)",
+                  "title": "CallerId caller = 5; // extension\nPresenceStatus presence = 8;",
+                  "$ref": "#/definitions/api.UserPresence"
+                },
+                "profile": {
+                  "type": "object",
+                  "title": "list of variables, assigned to this user as an environment unit",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "roles": {
+                  "type": "array",
+                  "title": "roles, member of which is this user",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/api.ObjectId"
+                  }
+                },
+                "totp_url": {
+                  "type": "string",
+                  "title": "[readonly][optional] one time password if setting (2fa) is enabled"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "unix"
+                },
+                "updated_by": {
+                  "title": "user",
+                  "$ref": "#/definitions/api.UserId"
+                },
+                "username": {
+                  "type": "string",
+                  "title": "alphanumeric username (login)"
+                }
+              }
             }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "PATCH: partial update",
+            "name": "fields",
+            "in": "query"
           }
         ],
         "responses": {
           "200": {
-            "description": "A successful response.",
+            "description": "(empty)",
             "schema": {
-              "$ref": "#/definitions/api.UpdateUserResponse"
+              "$ref": "#/definitions/api.User"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "Users_UpdateUser2",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Object ID",
+            "name": "user.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "body: modifications/changes",
+            "name": "user",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "title": "body: modifications/changes",
+              "properties": {
+                "chat_name": {
+                  "description": "The \"chat_name\" field is used to store the name displayed externally on the platform.\nFor example, \"chat_name\" is shown when an agent connects to chats with clients.",
+                  "type": "string"
+                },
+                "contact": {
+                  "description": "[optional] contact connected to this user",
+                  "title": "repeated Call calls = 13; // order by created_at\nrepeated Registration reged = 13; // order by register_last",
+                  "$ref": "#/definitions/api.ObjectId"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "unix"
+                },
+                "created_by": {
+                  "title": "user",
+                  "$ref": "#/definitions/api.UserId"
+                },
+                "deleted_at": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "unix"
+                },
+                "deleted_by": {
+                  "title": "user",
+                  "$ref": "#/definitions/api.UserId"
+                },
+                "device": {
+                  "title": "[optional] default device assigned ? WebRTC register ?",
+                  "$ref": "#/definitions/api.ObjectId"
+                },
+                "devices": {
+                  "description": "[editable] list of unique `regular` devices, attached to this user",
+                  "type": "array",
+                  "title": "map\u003cint64, string\u003e devices = 13;",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/api.ObjectId"
+                  }
+                },
+                "email": {
+                  "type": "string"
+                },
+                "extension": {
+                  "type": "string",
+                  "title": "Caller-ID-Number:"
+                },
+                "hotdesks": {
+                  "type": "array",
+                  "title": "[readonly] list of unique `hotdesk` devices, assigned to this user",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/api.ObjectId"
+                  }
+                },
+                "license": {
+                  "type": "array",
+                  "title": "list of unique licenses, granted to this user",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/api.LicenseUser"
+                  }
+                },
+                "name": {
+                  "type": "string",
+                  "title": "Caller-ID-Name: Display Name"
+                },
+                "password": {
+                  "type": "string"
+                },
+                "permissions": {
+                  "type": "array",
+                  "title": "set of operational permission grants",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/api.Permission"
+                  }
+                },
+                "presence": {
+                  "description": "string presence = 7; // unique set of \u003cuser\u003e presentity \u003cstatus:basic\u003e tuples open[ed]\n string status = 8; // short display status (short description)",
+                  "title": "CallerId caller = 5; // extension\nPresenceStatus presence = 8;",
+                  "$ref": "#/definitions/api.UserPresence"
+                },
+                "profile": {
+                  "type": "object",
+                  "title": "list of variables, assigned to this user as an environment unit",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "roles": {
+                  "type": "array",
+                  "title": "roles, member of which is this user",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/api.ObjectId"
+                  }
+                },
+                "totp_url": {
+                  "type": "string",
+                  "title": "[readonly][optional] one time password if setting (2fa) is enabled"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "unix"
+                },
+                "updated_by": {
+                  "title": "user",
+                  "$ref": "#/definitions/api.UserId"
+                },
+                "username": {
+                  "type": "string",
+                  "title": "alphanumeric username (login)"
+                }
+              }
+            }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "PATCH: partial update",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "(empty)",
+            "schema": {
+              "$ref": "#/definitions/api.User"
             }
           }
         }
@@ -38345,10 +38515,6 @@
     "casesCallFile": {
       "type": "object",
       "properties": {
-        "created_at": {
-          "type": "string",
-          "format": "int64"
-        },
         "id": {
           "type": "string",
           "format": "int64"
@@ -38360,6 +38526,14 @@
           "type": "string"
         },
         "size": {
+          "type": "string",
+          "format": "int64"
+        },
+        "start_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "stop_at": {
           "type": "string",
           "format": "int64"
         }
@@ -38741,11 +38915,11 @@
     },
     "casesCaseTimelineEventType": {
       "type": "string",
-      "default": "TIMELINE_CHAT",
+      "default": "chat",
       "enum": [
-        "TIMELINE_CHAT",
-        "TIMELINE_CALL",
-        "TIMELINE_EMAIL"
+        "chat",
+        "call",
+        "email"
       ]
     },
     "casesCatalog": {
@@ -42502,91 +42676,6 @@
       }
     },
     "engineBlindTransferCallResponse": {
-      "type": "object"
-    },
-    "engineBroadcastButton": {
-      "type": "object",
-      "properties": {
-        "caption": {
-          "type": "string"
-        },
-        "code": {
-          "type": "string"
-        },
-        "text": {
-          "type": "string"
-        },
-        "type": {
-          "type": "string"
-        },
-        "url": {
-          "type": "string"
-        }
-      }
-    },
-    "engineBroadcastButtons": {
-      "type": "object",
-      "properties": {
-        "button": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/engineBroadcastButton"
-          }
-        }
-      }
-    },
-    "engineBroadcastFile": {
-      "description": "Media File.",
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "int64"
-        },
-        "mime": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "size": {
-          "type": "string",
-          "format": "int64"
-        },
-        "url": {
-          "type": "string"
-        }
-      }
-    },
-    "engineBroadcastRequest": {
-      "type": "object",
-      "properties": {
-        "buttons": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/engineBroadcastButtons"
-          }
-        },
-        "file": {
-          "description": "Message Media. Attachment.",
-          "$ref": "#/definitions/engineBroadcastFile"
-        },
-        "peer": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "profile_id": {
-          "type": "string",
-          "format": "int64"
-        },
-        "text": {
-          "type": "string"
-        }
-      }
-    },
-    "engineBroadcastResponse": {
       "type": "object"
     },
     "engineBucket": {
@@ -48823,7 +48912,8 @@
       "default": "default_trigger_type",
       "enum": [
         "default_trigger_type",
-        "cron"
+        "cron",
+        "case"
       ]
     },
     "engineUpdateAgentPauseCauseRequest": {
@@ -52616,6 +52706,22 @@
         }
       }
     },
+    "webitel.chat.GetCaseChatHistoryRequest.Offset": {
+      "type": "object",
+      "title": "Offset options",
+      "properties": {
+        "date": {
+          "description": "Messages ONLY been sent before the specified epochtime(milli).",
+          "type": "string",
+          "format": "int64"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "title": "Messages ONLY starting from the specified message ID"
+        }
+      }
+    },
     "webitel.chat.GetContactChatHistoryRequest.Offset": {
       "type": "object",
       "title": "Offset options",
@@ -55917,50 +56023,6 @@
         }
       }
     },
-    "webitel.proto.data.Extension": {
-      "description": "Extension represents a set of an extra fields\nfor some [SUPER] type to be extended with.\n\nint64 dc = 0;",
-      "type": "object",
-      "properties": {
-        "fields": {
-          "type": "array",
-          "title": "Fields definitions",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.proto.data.Field"
-          }
-        },
-        "index": {
-          "type": "object",
-          "title": "INDEX fields",
-          "additionalProperties": {
-            "$ref": "#/definitions/webitel.proto.data.Index"
-          }
-        },
-        "type": {
-          "title": "SUPER type",
-          "$ref": "#/definitions/webitel.proto.data.LookupValue"
-        }
-      }
-    },
-    "webitel.proto.data.ExtensionList": {
-      "type": "object",
-      "properties": {
-        "data": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.proto.data.Extension"
-          }
-        },
-        "next": {
-          "type": "boolean"
-        },
-        "page": {
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
     "webitel.proto.data.Field": {
       "description": "Field of the struct.",
       "type": "object",
@@ -56237,7 +56299,7 @@
             "$ref": "#/definitions/webitel.proto.data.Field"
           }
         },
-        "index": {
+        "indices": {
           "type": "object",
           "title": "INDEX Fields",
           "additionalProperties": {

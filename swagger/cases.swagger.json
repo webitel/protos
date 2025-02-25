@@ -1,16 +1,8 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "Webitel API",
-    "version": "24.04.0",
-    "contact": {
-      "name": "Webitel",
-      "url": "https://webitel.com",
-      "email": "support@webitel.com"
-    },
-    "license": {
-      "name": "MIT"
-    }
+    "title": "service.proto",
+    "version": "version not set"
   },
   "tags": [
     {
@@ -64,11 +56,6 @@
     {
       "name": "Statuses"
     }
-  ],
-  "host": "dev.webitel.com",
-  "basePath": "/api",
-  "schemes": [
-    "https"
   ],
   "consumes": [
     "application/json"
@@ -149,11 +136,15 @@
             "collectionFormat": "multi"
           },
           {
-            "name": "filters[string]",
-            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
+            "name": "filters",
+            "description": "Key-value pairs for additional filtering.",
             "in": "query",
             "required": false,
-            "type": "string"
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -255,11 +246,7 @@
             "description": "Sorting options by fields",
             "in": "query",
             "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
+            "type": "string"
           },
           {
             "name": "id",
@@ -568,11 +555,7 @@
             "name": "sort",
             "in": "query",
             "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
+            "type": "string"
           },
           {
             "name": "id",
@@ -1033,11 +1016,7 @@
             "description": "Sort the result according to fields.",
             "in": "query",
             "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
+            "type": "string"
           },
           {
             "name": "id",
@@ -1067,8 +1046,8 @@
             "format": "int64"
           },
           {
-            "name": "inSla",
-            "description": "Filter priorities that are in filtered SLA",
+            "name": "inSlaCond",
+            "description": "Filter priorities that are in filtered SlaCondition and not in current SLA",
             "in": "query",
             "required": false,
             "type": "string",
@@ -1366,11 +1345,7 @@
             "description": "Sorting options by fields",
             "in": "query",
             "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
+            "type": "string"
           },
           {
             "name": "id",
@@ -1665,11 +1640,7 @@
             "description": "Sort the result according to fields.",
             "in": "query",
             "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
+            "type": "string"
           },
           {
             "name": "id",
@@ -1926,11 +1897,7 @@
             "description": "Sort the result according to fields.",
             "in": "query",
             "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
+            "type": "string"
           },
           {
             "name": "id",
@@ -2211,11 +2178,7 @@
             "description": "Sort the result according to fields.",
             "in": "query",
             "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
+            "type": "string"
           },
           {
             "name": "id",
@@ -2653,6 +2616,15 @@
             "type": "string"
           },
           {
+            "name": "input",
+            "description": "Input data for the communications to link.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/casesInputCaseCommunication"
+            }
+          },
+          {
             "name": "fields",
             "description": "List of fields to include in the response.",
             "in": "query",
@@ -2788,6 +2760,52 @@
               "type": "string"
             },
             "collectionFormat": "multi"
+          },
+          {
+            "name": "sort",
+            "description": "Sorting",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CaseFiles"
+        ]
+      }
+    },
+    "/cases/{case_etag}/files/{id}": {
+      "delete": {
+        "summary": "Delete a file",
+        "operationId": "DeleteFile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/casesFile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "case_etag",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "description": "The unique ID of the file to delete.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
           }
         ],
         "tags": [
@@ -3135,7 +3153,7 @@
         ]
       }
     },
-    "/cases/{case_etag}/timeline": {
+    "/cases/{case_id}/timeline": {
       "get": {
         "operationId": "GetTimeline",
         "responses": {
@@ -3154,7 +3172,7 @@
         },
         "parameters": [
           {
-            "name": "case_etag",
+            "name": "case_id",
             "in": "path",
             "required": true,
             "type": "string"
@@ -3227,9 +3245,9 @@
             "items": {
               "type": "string",
               "enum": [
-                "TIMELINE_CHAT",
-                "TIMELINE_CALL",
-                "TIMELINE_EMAIL"
+                "chat",
+                "call",
+                "email"
               ]
             },
             "collectionFormat": "multi"
@@ -3240,7 +3258,7 @@
         ]
       }
     },
-    "/cases/{case_etag}/timeline/counter": {
+    "/cases/{case_id}/timeline/counter": {
       "get": {
         "operationId": "GetTimelineCounter",
         "responses": {
@@ -3259,7 +3277,7 @@
         },
         "parameters": [
           {
-            "name": "case_etag",
+            "name": "case_id",
             "in": "path",
             "required": true,
             "type": "string"
@@ -4001,11 +4019,7 @@
             "description": "Sort the result according to fields.",
             "in": "query",
             "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
+            "type": "string"
           },
           {
             "name": "id",
@@ -4523,11 +4537,7 @@
             "description": "Sort the result according to fields.",
             "in": "query",
             "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
+            "type": "string"
           },
           {
             "name": "id",
@@ -4629,11 +4639,7 @@
             "description": "Sort the result according to fields.",
             "in": "query",
             "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
+            "type": "string"
           },
           {
             "name": "id",
@@ -5040,7 +5046,11 @@
         "mime_type": {
           "type": "string"
         },
-        "created_at": {
+        "start_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "stop_at": {
           "type": "string",
           "format": "int64"
         }
@@ -5423,11 +5433,11 @@
     "casesCaseTimelineEventType": {
       "type": "string",
       "enum": [
-        "TIMELINE_CHAT",
-        "TIMELINE_CALL",
-        "TIMELINE_EMAIL"
+        "chat",
+        "call",
+        "email"
       ],
-      "default": "TIMELINE_CHAT"
+      "default": "chat"
     },
     "casesCatalog": {
       "type": "object",
@@ -7534,17 +7544,5 @@
       },
       "title": "Status message represents a status entity with metadata"
     }
-  },
-  "securityDefinitions": {
-    "AccessToken": {
-      "type": "apiKey",
-      "name": "X-Webitel-Access",
-      "in": "header"
-    }
-  },
-  "security": [
-    {
-      "AccessToken": []
-    }
-  ]
+  }
 }

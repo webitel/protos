@@ -14,7 +14,7 @@ engine_swagger:
 .PHONY: engine_proto
 
 engine_proto:
-	protoc -I/usr/local/include -I./engine -I./  \
+	protoc -I/usr/local/include -I./engine -I./annotations  \
       --go-grpc_out=./engine --go-grpc_opt=paths=source_relative \
       --go_opt=paths=source_relative \
       --go_out=./engine ./engine/*.proto

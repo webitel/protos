@@ -46,6 +46,21 @@ message File {
   string url = 8;
 }
 
+// Request message for deleting a file.
+message DeleteFileRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"]
+    }
+  };
+
+  // The unique ID of the file to delete.
+  int64 id = 1;
+
+  string case_etag = 2;
+}
+
+
 // Service for managing files associated with cases.
 service CaseFiles {
   option (option.objclass) = "cases";
@@ -60,6 +75,18 @@ service CaseFiles {
       summary: "Retrieve a list of files associated with a case",
     };
   }
+
+    // RPC method to delete a file.
+    rpc DeleteFile(DeleteFileRequest) returns (File) {
+      option (google.api.http) = {
+        delete: "/cases/{case_etag}/files/{id}"
+      };
+
+      option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        summary: "Delete a file"
+      };
+      option (option.access) = ACTION_DELETE;  // Added access option for delete action
+    }
 }
 
 // Request message for listing files associated with a case.
@@ -87,5 +114,8 @@ message ListFilesRequest {
 
   // Array of requested id.
   repeated string ids = 6;
+
+  // Sorting
+  string sort = 7;
 
 }

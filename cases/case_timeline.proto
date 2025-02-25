@@ -15,13 +15,13 @@ service CaseTimeline {
   rpc GetTimeline(GetTimelineRequest) returns (GetTimelineResponse) {
     option (option.access) = ACTION_READ;
     option (google.api.http) = {
-      get: "/cases/{case_etag}/timeline"
+      get: "/cases/{case_id}/timeline"
     };
   }
   rpc GetTimelineCounter(GetTimelineCounterRequest) returns (GetTimelineCounterResponse) {
     option (option.access) = ACTION_READ;
     option (google.api.http) = {
-      get: "/cases/{case_etag}/timeline/counter"
+      get: "/cases/{case_id}/timeline/counter"
     };
   }
 }
@@ -39,7 +39,7 @@ message GetTimelineRequest {
 
   // filters
 
-  string case_etag = 6;
+  string case_id = 6;
    repeated string ids = 7;
   int64 date_from = 8;
   int64 date_to = 9;
@@ -56,7 +56,7 @@ message GetTimelineResponse {
 
 
 message GetTimelineCounterRequest {
-  string case_etag = 1;
+  string case_id = 1;
 }
 
 message GetTimelineCounterResponse {
@@ -147,7 +147,8 @@ message CallFile {
   string name = 2;
   int64 size = 3;
   string mime_type = 4;
-  int64 created_at = 5;
+  int64 start_at = 5;
+  int64 stop_at = 6;
 }
 
 message TranscriptLookup {
@@ -158,7 +159,7 @@ message TranscriptLookup {
 
 
 enum CaseTimelineEventType{
-  TIMELINE_CHAT = 0;
-  TIMELINE_CALL = 1;
-  TIMELINE_EMAIL = 2;
+  chat = 0;
+  call = 1;
+  email = 2;
 }

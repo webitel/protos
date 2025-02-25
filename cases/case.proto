@@ -29,6 +29,9 @@ service Cases {
     option (option.access) = ACTION_READ; // Specifies read access level.
     option (google.api.http) = {
       get: "/cases"                     // Maps this RPC to an HTTP GET endpoint.
+      additional_bindings {
+        get: "/contacts/{contact_id}/cases"
+      }
     };
   }
 
@@ -79,7 +82,8 @@ message SearchCasesRequest {
   repeated string ids = 4;              // List of specific case IDs to retrieve.
   string sort = 5;                      // Sorting criteria (e.g., field:asc).
   repeated string fields = 6;           // List of fields to include in the response.
-  map<string, string> filters = 7;      // Key-value pairs for additional filtering.
+  repeated string filters = 7;      // Key-value pairs for additional filtering.
+  string contact_id = 8;                // Contact ID for filtering cases.
 }
 
 // Request message for locating a specific case by its etag identifier.
