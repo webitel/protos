@@ -53,17 +53,16 @@ message StatusConditionList {
   repeated StatusCondition items = 3;
 }
 
+message InputCreateStatusCondition{
+  string name = 1;
+  string description = 2;
+}
+
 // CreateStatusConditionRequest message for creating a new status
 message CreateStatusConditionRequest {
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      required: ["name", "lookup_id"]
-    }
-  };
-
-  int64 status_id = 1;
-  string name = 2;
-  string description = 3;
+  InputCreateStatusCondition input = 1;
+  int64 status_id = 2;
+  repeated string fields = 3;
 }
 
 // UpdateStatusConditionRequest message for updating an existing status
@@ -77,10 +76,11 @@ message UpdateStatusConditionRequest {
   int64 status_id = 1;
   int64 id = 2;
   InputStatusCondition input = 3;
+  repeated string fields = 4;
 
   // ---- JSON PATCH fields mask ----
   // List of JPath fields specified in body(input).
-  repeated string x_json_mask = 4
+  repeated string x_json_mask = 5
   [(google.api.field_visibility) = {
     restriction: "PREVIEW" // "INTERNAL"
   },
@@ -157,7 +157,7 @@ service StatusConditions {
   rpc CreateStatusCondition(CreateStatusConditionRequest) returns (StatusCondition) {
     option (google.api.http) = {
       post: "/statuses/{status_id}/status"
-      body: "*"
+      body: "input"
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
