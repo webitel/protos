@@ -77,8 +77,7 @@ message InputService {
   int64 root_id = 9;
 }
 
-// CreateServiceRequest message for creating a new service
-message CreateServiceRequest {
+message InputCreateService {
   // Name of the service (required)
   string name = 1;
   // Parent catalog ID (required)
@@ -99,6 +98,12 @@ message CreateServiceRequest {
   int64 catalog_id = 9;
 }
 
+// CreateServiceRequest message for creating a new service
+message CreateServiceRequest {
+  InputCreateService input = 1;
+  repeated string fields = 2;
+}
+
 // UpdateServiceRequest message for updating an existing service
 message UpdateServiceRequest {
   // ID of the service to be updated
@@ -106,8 +111,10 @@ message UpdateServiceRequest {
   // Input data for updating the service
   InputService input = 2;
 
+  repeated string fields = 3;
+
   // ---- JSON PATCH fields mask ----
-  repeated string x_json_mask = 3
+  repeated string x_json_mask = 4
   [(google.api.field_visibility) = {
     restriction: "PREVIEW"
   },
@@ -189,7 +196,7 @@ service Services {
   rpc CreateService(CreateServiceRequest) returns (Service) {
     option (google.api.http) = {
       post: "/cases/services",
-      body: "*"
+      body: "input"
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {

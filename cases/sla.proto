@@ -68,20 +68,9 @@ message CreateSLARequest {
       required: ["name", "calendar_id", "reaction_time", "resolution_time"]
     }
   };
-  // InputSLA message for creating a new SLA
-  // Name of the SLA
-  string name = 2;
-  // Description of the SLA
-  string description = 3;
-  // Validity period for the SLA
-  int64 valid_from = 4;
-  int64 valid_to = 5;
-  // Calendar ID from the "Calendars" dictionary
-  general.Lookup calendar = 6;
-  // Reaction time
-  int64 reaction_time = 7;
-  // Resolution time
-  int64 resolution_time = 8;
+  InputSLA input = 1;
+  // Fields to be retrieved as a result.
+  repeated string fields = 2;
 }
 
 // UpdateSLARequest message for updating an existing SLA
@@ -93,7 +82,9 @@ message UpdateSLARequest {
   };
 
   int64 id = 1;
-  InputSLA input = 2;
+  // Fields to be retrieved as a result.
+  repeated string fields = 2;
+  InputSLA input = 3;
 
   // ---- JSON PATCH fields mask ----
   // List of JPath fields specified in body(input).
@@ -167,7 +158,7 @@ service SLAs {
   rpc CreateSLA(CreateSLARequest) returns (SLA) {
     option (google.api.http) = {
       post: "/cases/slas"
-      body: "*"
+      body: "input"
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {

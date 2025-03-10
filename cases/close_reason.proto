@@ -52,9 +52,11 @@ message CreateCloseReasonRequest {
     }
   };
 
-  int64 close_reason_group_id = 1;
-  string name = 2;
-  string description = 3;
+  InputCloseReason input = 1;
+
+  int64 close_reason_group_id = 2;
+  // Fields to be retrieved as a result.
+  repeated string fields = 3;
 }
 
 // UpdateCloseReasonRequest message for updating an existing close reason
@@ -66,12 +68,14 @@ message UpdateCloseReasonRequest {
   };
 
   int64 close_reason_group_id = 1;
-  int64 id = 2;
-  InputCloseReason input = 3;
+  // Fields to be retrieved as a result.
+  repeated string fields = 2;
+  int64 id = 3;
+  InputCloseReason input = 4;
 
   // JSON PATCH fields mask.
   // List of JPath fields specified in body(input).
-  repeated string x_json_mask = 4
+  repeated string x_json_mask = 5
   [(google.api.field_visibility) = {
     restriction: "PREVIEW" // "INTERNAL"
   },
@@ -144,7 +148,7 @@ service CloseReasons {
   rpc CreateCloseReason(CreateCloseReasonRequest) returns (CloseReason) {
     option (google.api.http) = {
       post: "/close_reason_groups/{close_reason_group_id}/close_reasons"
-      body: "*"
+      body: "input"
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {

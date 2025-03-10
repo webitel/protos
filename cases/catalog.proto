@@ -87,26 +87,8 @@ message InputCatalog {
 
 // CreateCatalogRequest message for creating a new catalog
 message CreateCatalogRequest {
-  // Name of the catalog (required)
-  string name = 1;
-  // Description of the catalog (optional)
-  string description = 2;
-  // Prefix for case identification (optional)
-  string prefix = 3;
-  // Code for external integrations (optional)
-  string code = 4;
-  // State of the catalog (true for active, false for inactive)
-  bool state = 5;
-  // SLA ID associated with the catalog
-  general.Lookup sla = 6;
-  // Status ID associated with the catalog
-  general.Lookup status = 7;
-  // Close reason ID associated with the catalog
-  general.Lookup close_reason_group = 8;
-  // List of team IDs associated with the catalog
-  repeated general.Lookup teams = 10;
-  // List of skill IDs associated with the catalog
-  repeated general.Lookup skills = 11;
+    InputCatalog input = 1;
+    repeated string fields = 2;
 }
 
 // UpdateCatalogRequest message for updating an existing catalog
@@ -116,8 +98,10 @@ message UpdateCatalogRequest {
   // Input data for updating the catalog
   InputCatalog input = 2;
 
+  repeated string fields = 3;
+
   // ---- JSON PATCH fields mask ----
-  repeated string x_json_mask = 3
+  repeated string x_json_mask = 4
   [(google.api.field_visibility) = {
     restriction: "PREVIEW"
   },
@@ -221,7 +205,7 @@ service Catalogs {
     option (option.access) = ACTION_CREATE;
     option (google.api.http) = {
       post: "/cases/catalogs",
-      body: "*"
+      body: "input"
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {

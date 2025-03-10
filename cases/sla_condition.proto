@@ -40,7 +40,6 @@ message InputSLACondition {
   repeated general.Lookup priorities = 3;
   int64 reaction_time = 4;
   int64 resolution_time = 5;
-  int64 sla_id = 6;
 }
 
 // SLAConditionList message contains a list of SLACondition items with pagination
@@ -52,18 +51,9 @@ message SLAConditionList {
 
 // CreateSLAConditionRequest message for creating a new SLACondition
 message CreateSLAConditionRequest {
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      required: ["name", "priorities", "reaction_time", "resolution_time", "sla_id"]
-    }
-  };
-
-  string name = 2;
-  // List of priority IDs for creation [FROM Priority Dictionary]
-  repeated general.Lookup priorities = 3;
-  int64 reaction_time = 4;
-  int64 resolution_time = 5;
-  int64 sla_id = 6;
+    InputSLACondition input = 1;
+    int64 sla_id = 2;
+    repeated string fields = 3;
 }
 
 // UpdateSLAConditionRequest message for updating an existing SLACondition
@@ -77,10 +67,11 @@ message UpdateSLAConditionRequest {
   int64 id = 1;
   int64 sla_id = 2;
   InputSLACondition input = 3;
+  repeated string fields = 4;
 
   // ---- JSON PATCH fields mask ----
   // List of JPath fields specified in body(input).
-  repeated string x_json_mask = 4
+  repeated string x_json_mask = 5
   [(google.api.field_visibility) = {
     restriction: "PREVIEW" // "INTERNAL"
   },
@@ -161,7 +152,7 @@ service SLAConditions {
   rpc CreateSLACondition(CreateSLAConditionRequest) returns (SLACondition) {
     option (google.api.http) = {
       post: "/slas/{sla_id}/sla_condition"
-      body: "*"
+      body: "input"
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {

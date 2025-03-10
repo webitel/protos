@@ -42,8 +42,9 @@ message CreateCloseReasonGroupRequest {
     }
   };
 
-  string name = 1;
-  string description = 3;
+  InputCloseReasonGroup input = 1;
+  // Fields to be retrieved as a result.
+  repeated string fields = 2;
 }
 
 message InputCloseReasonGroup {
@@ -60,11 +61,13 @@ message UpdateCloseReasonGroupRequest {
   };
 
   int64 id = 1;
-  InputCloseReasonGroup input = 2;
+  // Fields to be retrieved as a result.
+  repeated string fields = 2;
+  InputCloseReasonGroup input = 3;
 
   // ---- JSON PATCH fields mask ----
   // List of JPath fields specified in body(input).
-  repeated string x_json_mask = 3
+  repeated string x_json_mask = 4
   [(google.api.field_visibility) = {
     restriction: "PREVIEW" // "INTERNAL"
   },
@@ -125,7 +128,7 @@ service CloseReasonGroups {
   rpc CreateCloseReasonGroup(CreateCloseReasonGroupRequest) returns (CloseReasonGroup) {
     option (google.api.http) = {
       post: "/cases/close_reason_groups"
-      body: "*"
+      body: "input"
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {

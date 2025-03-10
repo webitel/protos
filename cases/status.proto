@@ -42,8 +42,9 @@ message CreateStatusRequest {
     }
   };
 
-  string name = 1;
-  string description = 3;
+  InputStatus input = 1;
+  // Fields to be retrieved as a result.
+  repeated string fields = 2;
 }
 
 message InputStatus{
@@ -60,11 +61,13 @@ message UpdateStatusRequest {
   };
 
   int64 id = 1;
-  InputStatus input = 2;
+  // Fields to be retrieved as a result.
+  repeated string fields = 2;
+  InputStatus input = 3;
 
   // ---- JSON PATCH fields mask ----
   // List of JPath fields specified in body(input).
-  repeated string x_json_mask = 3
+  repeated string x_json_mask = 4
   [(google.api.field_visibility) = {
     restriction: "PREVIEW" // "INTERNAL"
   },
@@ -135,7 +138,7 @@ service Statuses {
   rpc CreateStatus(CreateStatusRequest) returns (Status) {
     option (google.api.http) = {
       post: "/cases/statuses"
-      body: "*"
+      body: "input"
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
