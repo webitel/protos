@@ -65,12 +65,8 @@ message CreateSourceRequest {
     }
   };
 
-  // The name of the source.
-  string name = 1;
-  // The description of the source.
-  string description = 3;
-  // The source type of the source.
-  SourceType type = 4;
+  InputSource input = 1;
+  repeated string fields = 2;
 }
 
 message InputSource {
@@ -92,10 +88,11 @@ message UpdateSourceRequest {
 
   int64 id = 1;
   InputSource input = 2;
+  repeated string fields = 3;
 
   // ---- JSON PATCH fields mask ----
   // List of JPath fields specified in body(input).
-  repeated string x_json_mask = 3
+  repeated string x_json_mask = 4
   [(google.api.field_visibility) = {
     restriction: "PREVIEW" // "INTERNAL"
   },
@@ -171,7 +168,7 @@ service Sources {
   rpc CreateSource(CreateSourceRequest) returns (Source) {
     option (google.api.http) = {
       post: "/cases/sources"
-      body: "*"
+      body: "input"
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
