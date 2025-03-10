@@ -68,6 +68,19 @@ service AuditFormService {
       get: "/call_center/audit/rate/{id}"
     };
   }
+
+  rpc UpdateAuditRate(UpdateAuditRateRequest) returns (AuditRate) {
+    option (google.api.http) = {
+      put: "/call_center/audit/rate/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteAuditRate(DeleteAuditRateRequest) returns (AuditRate) {
+    option (google.api.http) = {
+      delete: "/call_center/audit/rate/{id}"
+    };
+  }
 }
 
 enum AuditQuestionType {
@@ -97,17 +110,39 @@ message ListAuditRate {
 
 message CreateAuditFormRateRequest {
   Lookup form = 1;
-  repeated QuestionAnswer answers = 2;
+  repeated CreateQuestionAnswerRequest answers = 2;
   string comment = 3;
   string call_id = 4;
+}
+
+message UpdateAuditRateRequest {
+  int64 id = 1;
+  repeated UpdateQuestionAnswerRequest answers = 2;
+  string comment = 3;
 }
 
 message ReadAuditRateRequest {
   int64 id = 1;
 }
 
+message DeleteAuditRateRequest {
+  int64 id = 1;
+}
+
 message QuestionAnswer {
   google.protobuf.FloatValue score = 4;
+  int64 updated_at = 5;
+  Lookup updated_by = 6;
+  string comment = 7;
+}
+
+message CreateQuestionAnswerRequest {
+  google.protobuf.FloatValue score = 1;
+}
+
+message UpdateQuestionAnswerRequest {
+  google.protobuf.FloatValue score = 1;
+  string comment = 2;
 }
 
 message AuditRate {
