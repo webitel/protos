@@ -20,6 +20,10 @@ import "protoc-gen-openapiv2/options/annotations.proto"; // OpenAPI annotation s
 import "protoc-gen-openapiv2/options/openapiv2.proto";   // OpenAPI v2 options.
 import "proto/webitel/option.proto";     // Custom Webitel option annotations.
 
+// region: [custom] fields ..
+import "google/protobuf/struct.proto";
+// endregion: [custom] fields ..
+
 // Service definition for managing cases.
 service Cases {
   option (option.objclass) = "cases";  // Custom object class option for "cases".
@@ -111,6 +115,9 @@ message InputCreateCase {
 
   repeated InputCaseLink links = 15;    // List of links attached to the case.
   repeated CreateCaseRelatedCaseInput related = 16; // List of related cases.
+
+  // Custom data extension fields ..
+  google.protobuf.Struct custom = 100;
 }
 
 // Structure for close information when a case is closed.
@@ -195,6 +202,9 @@ message Case {
 
   general.Lookup sla = 33;              // SLA associated with the case.
   repeated int64 role_ids = 34;        // System field
+
+  // Custom data extension fields ..
+  google.protobuf.Struct custom = 100;
 }
 
 // Message representing close information for a case.
@@ -243,4 +253,7 @@ message InputCase {
   CloseInfo close = 15; // create: not required; update: required only when case status goes to the final state
   RateInfo rate = 16; // only for API, not UI
   StatusCondition status_condition = 17;
+
+  // Custom data extension fields ..
+  google.protobuf.Struct custom = 100;
 }
