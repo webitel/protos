@@ -1,16 +1,8 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "Webitel API",
-    "version": "24.04.0",
-    "contact": {
-      "name": "Webitel",
-      "url": "https://webitel.com",
-      "email": "support@webitel.com"
-    },
-    "license": {
-      "name": "MIT"
-    }
+    "title": "service.proto",
+    "version": "version not set"
   },
   "tags": [
     {
@@ -64,11 +56,6 @@
     {
       "name": "Statuses"
     }
-  ],
-  "host": "dev.webitel.com",
-  "basePath": "/api",
-  "schemes": [
-    "https"
   ],
   "consumes": [
     "application/json"
@@ -3645,10 +3632,6 @@
                   "$ref": "#/definitions/generalLookup",
                   "title": "create: not required, default initial value from status lookup or ui;"
                 },
-                "close_reason": {
-                  "$ref": "#/definitions/generalLookup",
-                  "title": "create: not required;"
-                },
                 "priority": {
                   "$ref": "#/definitions/generalLookup",
                   "title": "create: not required, default first value from priority lookup"
@@ -3661,13 +3644,20 @@
                   "$ref": "#/definitions/generalLookup",
                   "title": "on this field base many other readonly fields on return"
                 },
-                "close": {
-                  "$ref": "#/definitions/casesCloseInfo",
+                "close_reason": {
+                  "$ref": "#/definitions/generalLookup",
+                  "title": "create: not required;"
+                },
+                "close_result": {
+                  "type": "string",
                   "title": "create: not required; update: required only when case status goes to the final state"
                 },
-                "rate": {
-                  "$ref": "#/definitions/casesRateInfo",
-                  "title": "only for API, not UI"
+                "rating": {
+                  "type": "string",
+                  "format": "int64"
+                },
+                "rating_comment": {
+                  "type": "string"
                 },
                 "status_condition": {
                   "$ref": "#/definitions/casesStatusCondition"
@@ -3771,10 +3761,6 @@
                   "$ref": "#/definitions/generalLookup",
                   "title": "create: not required, default initial value from status lookup or ui;"
                 },
-                "close_reason": {
-                  "$ref": "#/definitions/generalLookup",
-                  "title": "create: not required;"
-                },
                 "priority": {
                   "$ref": "#/definitions/generalLookup",
                   "title": "create: not required, default first value from priority lookup"
@@ -3787,13 +3773,20 @@
                   "$ref": "#/definitions/generalLookup",
                   "title": "on this field base many other readonly fields on return"
                 },
-                "close": {
-                  "$ref": "#/definitions/casesCloseInfo",
+                "close_reason": {
+                  "$ref": "#/definitions/generalLookup",
+                  "title": "create: not required;"
+                },
+                "close_result": {
+                  "type": "string",
                   "title": "create: not required; update: required only when case status goes to the final state"
                 },
-                "rate": {
-                  "$ref": "#/definitions/casesRateInfo",
-                  "title": "only for API, not UI"
+                "rating": {
+                  "type": "string",
+                  "format": "int64"
+                },
+                "rating_comment": {
+                  "type": "string"
                 },
                 "status_condition": {
                   "$ref": "#/definitions/casesStatusCondition"
@@ -5498,17 +5491,37 @@
           "$ref": "#/definitions/casesStatusCondition",
           "description": "Status condition from status lookup."
         },
-        "close": {
-          "$ref": "#/definitions/casesCloseInfo",
-          "description": "Close information (if applicable)."
+        "close_reason": {
+          "$ref": "#/definitions/generalLookup",
+          "title": "Close details"
         },
-        "rate": {
-          "$ref": "#/definitions/casesRateInfo",
-          "description": "Rating information."
+        "close_result": {
+          "type": "string"
         },
-        "timing": {
-          "$ref": "#/definitions/casesTimingInfo",
-          "description": "SLA timing details."
+        "rating": {
+          "type": "string",
+          "format": "int64",
+          "title": "Rating details"
+        },
+        "rating_comment": {
+          "type": "string"
+        },
+        "resolved_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "Timing details"
+        },
+        "reacted_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "difference_in_reaction": {
+          "type": "string",
+          "format": "int64"
+        },
+        "difference_in_resolve": {
+          "type": "string",
+          "format": "int64"
         },
         "sla_condition": {
           "$ref": "#/definitions/generalLookup",
@@ -5953,20 +5966,6 @@
         }
       }
     },
-    "casesCloseInfo": {
-      "type": "object",
-      "properties": {
-        "close_result": {
-          "type": "string",
-          "description": "Result or reason for closing the case."
-        },
-        "close_reason": {
-          "$ref": "#/definitions/generalLookup",
-          "description": "Lookup for the close reason."
-        }
-      },
-      "description": "Message representing close information for a case."
-    },
     "casesCloseReason": {
       "type": "object",
       "properties": {
@@ -6085,20 +6084,6 @@
         }
       },
       "title": "CloseReasonList message contains a list of CloseReason items with pagination"
-    },
-    "casesCreateCaseCloseInput": {
-      "type": "object",
-      "properties": {
-        "close_result": {
-          "type": "string",
-          "description": "Comment or reason for closing the case."
-        },
-        "close_reason": {
-          "$ref": "#/definitions/generalLookup",
-          "description": "Close reason ID from lookup."
-        }
-      },
-      "description": "Structure for close information when a case is closed."
     },
     "casesCreateCaseRelatedCaseInput": {
       "type": "object",
@@ -6374,10 +6359,6 @@
           "$ref": "#/definitions/generalLookup",
           "title": "create: not required, default initial value from status lookup or ui;"
         },
-        "close_reason": {
-          "$ref": "#/definitions/generalLookup",
-          "title": "create: not required;"
-        },
         "priority": {
           "$ref": "#/definitions/generalLookup",
           "title": "create: not required, default first value from priority lookup"
@@ -6390,13 +6371,20 @@
           "$ref": "#/definitions/generalLookup",
           "title": "on this field base many other readonly fields on return"
         },
-        "close": {
-          "$ref": "#/definitions/casesCloseInfo",
+        "close_reason": {
+          "$ref": "#/definitions/generalLookup",
+          "title": "create: not required;"
+        },
+        "close_result": {
+          "type": "string",
           "title": "create: not required; update: required only when case status goes to the final state"
         },
-        "rate": {
-          "$ref": "#/definitions/casesRateInfo",
-          "title": "only for API, not UI"
+        "rating": {
+          "type": "string",
+          "format": "int64"
+        },
+        "rating_comment": {
+          "type": "string"
         },
         "status_condition": {
           "$ref": "#/definitions/casesStatusCondition"
@@ -6582,13 +6570,25 @@
           "$ref": "#/definitions/generalLookup",
           "description": "Service ID (affects many other readonly fields)."
         },
-        "close": {
-          "$ref": "#/definitions/casesCreateCaseCloseInput",
+        "close_reason": {
+          "$ref": "#/definitions/generalLookup",
           "description": "Optional close information."
         },
-        "rate": {
-          "$ref": "#/definitions/casesRateInfo",
+        "close_result": {
+          "type": "string",
+          "description": "Optional close information."
+        },
+        "rating": {
+          "type": "string",
+          "format": "int64",
           "description": "API-only rating information."
+        },
+        "rating_comment": {
+          "type": "string",
+          "description": "API-only rating information."
+        },
+        "status_condition": {
+          "$ref": "#/definitions/generalLookup"
         },
         "links": {
           "type": "array",
@@ -6605,9 +6605,6 @@
             "$ref": "#/definitions/casesCreateCaseRelatedCaseInput"
           },
           "description": "List of related cases."
-        },
-        "status_condition": {
-          "$ref": "#/definitions/generalLookup"
         },
         "custom": {
           "type": "object",
@@ -7051,21 +7048,6 @@
         }
       },
       "title": "PriorityList message contains a list of Priority items with pagination"
-    },
-    "casesRateInfo": {
-      "type": "object",
-      "properties": {
-        "rating": {
-          "type": "string",
-          "format": "int64",
-          "description": "Rating value."
-        },
-        "rating_comment": {
-          "type": "string",
-          "description": "Optional comment for the rating."
-        }
-      },
-      "description": "Message representing rating information."
     },
     "casesRelatedCase": {
       "type": "object",
@@ -7629,32 +7611,6 @@
       },
       "title": "StatusList message contains a list of Status items with pagination"
     },
-    "casesTimingInfo": {
-      "type": "object",
-      "properties": {
-        "resolved_at": {
-          "type": "string",
-          "format": "int64",
-          "description": "Actual resolution timestamp (in milliseconds)."
-        },
-        "reacted_at": {
-          "type": "string",
-          "format": "int64",
-          "description": "Actual reaction timestamp (in milliseconds)."
-        },
-        "difference_in_reaction": {
-          "type": "string",
-          "format": "int64",
-          "description": "Difference between actual and planned reaction time."
-        },
-        "difference_in_resolve": {
-          "type": "string",
-          "format": "int64",
-          "description": "Difference between actual and planned resolution time."
-        }
-      },
-      "description": "Message representing SLA timing information."
-    },
     "casesTranscriptLookup": {
       "type": "object",
       "properties": {
@@ -7781,17 +7737,5 @@
       },
       "title": "Status message represents a status entity with metadata"
     }
-  },
-  "securityDefinitions": {
-    "AccessToken": {
-      "type": "apiKey",
-      "name": "X-Webitel-Access",
-      "in": "header"
-    }
-  },
-  "security": [
-    {
-      "AccessToken": []
-    }
-  ]
+  }
 }
