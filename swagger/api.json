@@ -14259,13 +14259,13 @@
                   "title": "create: not required, default from service or set by UI;",
                   "$ref": "#/definitions/generalLookup"
                 },
-                "close": {
-                  "title": "create: not required; update: required only when case status goes to the final state",
-                  "$ref": "#/definitions/casesCloseInfo"
-                },
                 "close_reason": {
                   "title": "create: not required;",
                   "$ref": "#/definitions/generalLookup"
+                },
+                "close_result": {
+                  "type": "string",
+                  "title": "create: not required; update: required only when case status goes to the final state"
                 },
                 "contact_info": {
                   "type": "string",
@@ -14291,9 +14291,12 @@
                   "title": "create: not required, default first value from priority lookup",
                   "$ref": "#/definitions/generalLookup"
                 },
-                "rate": {
-                  "title": "only for API, not UI",
-                  "$ref": "#/definitions/casesRateInfo"
+                "rating": {
+                  "type": "string",
+                  "format": "int64"
+                },
+                "rating_comment": {
+                  "type": "string"
                 },
                 "reporter": {
                   "title": "create: required (if empty recognize as anonymous contact);",
@@ -14383,13 +14386,13 @@
                   "title": "create: not required, default from service or set by UI;",
                   "$ref": "#/definitions/generalLookup"
                 },
-                "close": {
-                  "title": "create: not required; update: required only when case status goes to the final state",
-                  "$ref": "#/definitions/casesCloseInfo"
-                },
                 "close_reason": {
                   "title": "create: not required;",
                   "$ref": "#/definitions/generalLookup"
+                },
+                "close_result": {
+                  "type": "string",
+                  "title": "create: not required; update: required only when case status goes to the final state"
                 },
                 "contact_info": {
                   "type": "string",
@@ -14415,9 +14418,12 @@
                   "title": "create: not required, default first value from priority lookup",
                   "$ref": "#/definitions/generalLookup"
                 },
-                "rate": {
-                  "title": "only for API, not UI",
-                  "$ref": "#/definitions/casesRateInfo"
+                "rating": {
+                  "type": "string",
+                  "format": "int64"
+                },
+                "rating_comment": {
+                  "type": "string"
                 },
                 "reporter": {
                   "title": "create: required (if empty recognize as anonymous contact);",
@@ -38888,13 +38894,16 @@
           "description": "Author or reporter of the case.",
           "$ref": "#/definitions/generalLookup"
         },
-        "close": {
-          "description": "Close information (if applicable).",
-          "$ref": "#/definitions/casesCloseInfo"
+        "close_reason": {
+          "title": "Close details",
+          "$ref": "#/definitions/generalLookup"
         },
         "close_reason_group": {
           "description": "Close reason group, immutable once set.",
           "$ref": "#/definitions/generalLookup"
+        },
+        "close_result": {
+          "type": "string"
         },
         "comments": {
           "description": "List of comments on the case.",
@@ -38920,6 +38929,14 @@
         "description": {
           "description": "Detailed description of the case.",
           "type": "string"
+        },
+        "difference_in_reaction": {
+          "type": "string",
+          "format": "int64"
+        },
+        "difference_in_resolve": {
+          "type": "string",
+          "format": "int64"
         },
         "etag": {
           "description": "Unique etag identifier.",
@@ -38964,9 +38981,17 @@
           "description": "Priority level of the case.",
           "$ref": "#/definitions/casesPriority"
         },
-        "rate": {
-          "description": "Rating information.",
-          "$ref": "#/definitions/casesRateInfo"
+        "rating": {
+          "type": "string",
+          "format": "int64",
+          "title": "Rating details"
+        },
+        "rating_comment": {
+          "type": "string"
+        },
+        "reacted_at": {
+          "type": "string",
+          "format": "int64"
         },
         "related": {
           "description": "List of related cases.",
@@ -38975,6 +39000,11 @@
         "reporter": {
           "description": "Reporter of the issue (null if anonymous).",
           "$ref": "#/definitions/generalLookup"
+        },
+        "resolved_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "Timing details"
         },
         "role_ids": {
           "type": "array",
@@ -39011,10 +39041,6 @@
         "subject": {
           "description": "Subject of the case.",
           "type": "string"
-        },
-        "timing": {
-          "description": "SLA timing details.",
-          "$ref": "#/definitions/casesTimingInfo"
         },
         "updated_at": {
           "description": "Last update timestamp (in milliseconds since Unix epoch).",
@@ -39432,20 +39458,6 @@
         }
       }
     },
-    "casesCloseInfo": {
-      "description": "Message representing close information for a case.",
-      "type": "object",
-      "properties": {
-        "close_reason": {
-          "description": "Lookup for the close reason.",
-          "$ref": "#/definitions/generalLookup"
-        },
-        "close_result": {
-          "description": "Result or reason for closing the case.",
-          "type": "string"
-        }
-      }
-    },
     "casesCloseReason": {
       "type": "object",
       "title": "CloseReason message represents a close reason entity with metadata",
@@ -39562,20 +39574,6 @@
         "page": {
           "type": "integer",
           "format": "int32"
-        }
-      }
-    },
-    "casesCreateCaseCloseInput": {
-      "description": "Structure for close information when a case is closed.",
-      "type": "object",
-      "properties": {
-        "close_reason": {
-          "description": "Close reason ID from lookup.",
-          "$ref": "#/definitions/generalLookup"
-        },
-        "close_result": {
-          "description": "Comment or reason for closing the case.",
-          "type": "string"
         }
       }
     },
@@ -39822,13 +39820,13 @@
           "title": "create: not required, default from service or set by UI;",
           "$ref": "#/definitions/generalLookup"
         },
-        "close": {
-          "title": "create: not required; update: required only when case status goes to the final state",
-          "$ref": "#/definitions/casesCloseInfo"
-        },
         "close_reason": {
           "title": "create: not required;",
           "$ref": "#/definitions/generalLookup"
+        },
+        "close_result": {
+          "type": "string",
+          "title": "create: not required; update: required only when case status goes to the final state"
         },
         "contact_info": {
           "type": "string",
@@ -39857,9 +39855,12 @@
           "title": "create: not required, default first value from priority lookup",
           "$ref": "#/definitions/generalLookup"
         },
-        "rate": {
-          "title": "only for API, not UI",
-          "$ref": "#/definitions/casesRateInfo"
+        "rating": {
+          "type": "string",
+          "format": "int64"
+        },
+        "rating_comment": {
+          "type": "string"
         },
         "reporter": {
           "title": "create: required (if empty recognize as anonymous contact);",
@@ -40018,13 +40019,17 @@
           "description": "Optional assignee ID.",
           "$ref": "#/definitions/generalLookup"
         },
-        "close": {
+        "close_reason": {
           "description": "Optional close information.",
-          "$ref": "#/definitions/casesCreateCaseCloseInput"
+          "$ref": "#/definitions/generalLookup"
         },
         "close_reason_group": {
           "description": "Optional close reason.",
           "$ref": "#/definitions/generalLookup"
+        },
+        "close_result": {
+          "description": "Optional close information.",
+          "type": "string"
         },
         "contact_info": {
           "description": "Optional contact information.",
@@ -40058,9 +40063,14 @@
           "description": "Optional priority level.",
           "$ref": "#/definitions/generalLookup"
         },
-        "rate": {
+        "rating": {
           "description": "API-only rating information.",
-          "$ref": "#/definitions/casesRateInfo"
+          "type": "string",
+          "format": "int64"
+        },
+        "rating_comment": {
+          "description": "API-only rating information.",
+          "type": "string"
         },
         "related": {
           "description": "List of related cases.",
@@ -40528,21 +40538,6 @@
         "page": {
           "type": "integer",
           "format": "int32"
-        }
-      }
-    },
-    "casesRateInfo": {
-      "description": "Message representing rating information.",
-      "type": "object",
-      "properties": {
-        "rating": {
-          "description": "Rating value.",
-          "type": "string",
-          "format": "int64"
-        },
-        "rating_comment": {
-          "description": "Optional comment for the rating.",
-          "type": "string"
         }
       }
     },
@@ -41105,32 +41100,6 @@
         "page": {
           "type": "integer",
           "format": "int32"
-        }
-      }
-    },
-    "casesTimingInfo": {
-      "description": "Message representing SLA timing information.",
-      "type": "object",
-      "properties": {
-        "difference_in_reaction": {
-          "description": "Difference between actual and planned reaction time.",
-          "type": "string",
-          "format": "int64"
-        },
-        "difference_in_resolve": {
-          "description": "Difference between actual and planned resolution time.",
-          "type": "string",
-          "format": "int64"
-        },
-        "reacted_at": {
-          "description": "Actual reaction timestamp (in milliseconds).",
-          "type": "string",
-          "format": "int64"
-        },
-        "resolved_at": {
-          "description": "Actual resolution timestamp (in milliseconds).",
-          "type": "string",
-          "format": "int64"
         }
       }
     },
