@@ -110,12 +110,14 @@ message InputCreateCase {
   general.Lookup priority = 10;                  // Optional priority level.
   general.Lookup source = 11;                    // Source of the case.
   general.Lookup service = 12;                   // Service ID (affects many other readonly fields).
-  CreateCaseCloseInput close = 13;      // Optional close information.
-  RateInfo rate = 14;                   // API-only rating information.
-
-  repeated InputCaseLink links = 15;    // List of links attached to the case.
-  repeated CreateCaseRelatedCaseInput related = 16; // List of related cases.
+  general.Lookup close_reason = 13;   // Optional close information.
+  string close_result = 14; // Optional close information.
+  int64 rating = 15;  // API-only rating information.
+  string rating_comment = 16; // API-only rating information.
   general.Lookup status_condition = 17;
+
+  repeated InputCaseLink links = 18;    // List of links attached to the case.
+  repeated CreateCaseRelatedCaseInput related = 19; // List of related cases.
 
   // Custom data extension fields ..
   google.protobuf.Struct custom = 100;
@@ -189,20 +191,29 @@ message Case {
   SourceTypeLookup source = 22;           // Source of the case.
   StatusCondition status_condition = 23; // Status condition from status lookup.
 
-  CloseInfo close = 24;                 // Close information (if applicable).
-  RateInfo rate = 25;                   // Rating information.
-  TimingInfo timing = 26;               // SLA timing details.
+  // Close details
+  general.Lookup close_reason = 25;
+  string close_result = 26;
+  // Rating details
+  int64 rating = 27;
+  string rating_comment = 28;
+  // Timing details
+  int64 resolved_at =29;
+  int64 reacted_at = 30;
+  int64 difference_in_reaction = 31;
+  int64 difference_in_resolve = 32;
 
-  general.Lookup sla_condition = 27; // List of SLA conditions.
-  general.Lookup service = 28;          // Service associated with the case.
 
-  CaseCommentList comments = 29;        // List of comments on the case.
-  RelatedCaseList related = 30;         // List of related cases.
-  CaseLinkList links = 31;              // List of attached links.
-  CaseFileList files = 32;              // List of attached files.
+  general.Lookup sla_condition = 33; // List of SLA conditions.
+  general.Lookup service = 34;          // Service associated with the case.
 
-  general.Lookup sla = 33;              // SLA associated with the case.
-  repeated int64 role_ids = 34;        // System field
+  CaseCommentList comments = 35;        // List of comments on the case.
+  RelatedCaseList related = 36;         // List of related cases.
+  CaseLinkList links = 37;              // List of attached links.
+  CaseFileList files = 38;              // List of attached files.
+
+  general.Lookup sla = 39;              // SLA associated with the case.
+  repeated int64 role_ids = 40;        // System field
 
   // Custom data extension fields ..
   google.protobuf.Struct custom = 100;
@@ -239,20 +250,21 @@ message TimingInfo {
 
 message InputCase {
   string etag = 1;
-  string subject = 3; // create: required;
-  string description = 4; // create: not required;
-  string contact_info = 5; // create: not required;
-  general.Lookup assignee = 6; // create: not required, default from service or set by UI;
-  general.Lookup reporter = 7; // create: required (if empty recognize as anonymous contact);
-  general.Lookup impacted = 8; // create: required, default is reporter or ui (if empty recognize as anonymous);
-  general.Lookup group = 9; // create: not required, default from service or set by UI;
-  general.Lookup status = 10; // create: not required, default initial value from status lookup or ui;
-  general.Lookup close_reason = 11; // create: not required;
-  general.Lookup priority = 12; // create: not required, default first value from priority lookup
-  general.Lookup source = 13; // source of the case
-  general.Lookup service = 14; // on this field base many other readonly fields on return
-  CloseInfo close = 15; // create: not required; update: required only when case status goes to the final state
-  RateInfo rate = 16; // only for API, not UI
+  string subject = 2; // create: required;
+  string description = 3; // create: not required;
+  string contact_info = 4; // create: not required;
+  general.Lookup assignee = 5; // create: not required, default from service or set by UI;
+  general.Lookup reporter = 6; // create: required (if empty recognize as anonymous contact);
+  general.Lookup impacted = 7; // create: required, default is reporter or ui (if empty recognize as anonymous);
+  general.Lookup group = 8; // create: not required, default from service or set by UI;
+  general.Lookup status = 9; // create: not required, default initial value from status lookup or ui;
+  general.Lookup priority = 10; // create: not required, default first value from priority lookup
+  general.Lookup source = 11; // source of the case
+  general.Lookup service = 12; // on this field base many other readonly fields on return
+  general.Lookup close_reason = 13; // create: not required;
+  string close_result = 14; // create: not required; update: required only when case status goes to the final state
+  int64 rating = 15;
+  string rating_comment = 16;
   StatusCondition status_condition = 17;
 
   // Custom data extension fields ..
