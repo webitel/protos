@@ -21,6 +21,14 @@ service AgentWorkingScheduleService {
     };
   }
 
+  rpc CreateAgentsWorkingScheduleGeneratedShifts(CreateAgentsWorkingScheduleGeneratedShiftsRequest) returns (CreateAgentsWorkingScheduleGeneratedShiftsResponse) {
+    option (option.access) = ACTION_CREATE;
+    option (google.api.http) = {
+      post: "/wfm/agents/working_schedules/{working_schedule_id}/generate"
+      body: "*"
+    };
+  }
+
   rpc SearchAgentsWorkingSchedule(SearchAgentsWorkingScheduleRequest) returns (SearchAgentsWorkingScheduleResponse) {
     option (option.access) = ACTION_READ;
     option (google.api.http) = {get: "/wfm/agents/working_schedules/{working_schedule_id}"};
@@ -52,6 +60,14 @@ message CreateAgentsWorkingScheduleShiftsRequest {
 }
 
 message CreateAgentsWorkingScheduleShiftsResponse {
+  repeated AgentWorkingSchedule items = 1;
+}
+
+message CreateAgentsWorkingScheduleGeneratedShiftsRequest {
+  int64 working_schedule_id = 1;
+}
+
+message CreateAgentsWorkingScheduleGeneratedShiftsResponse {
   repeated AgentWorkingSchedule items = 1;
 }
 
