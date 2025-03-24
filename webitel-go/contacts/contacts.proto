@@ -2,8 +2,10 @@ syntax = "proto3";
 package webitel.contacts;
 option go_package = "webitel.go/api/contacts;contacts";
 
-import "contacts/fields.proto";
-import "contacts/contact.proto";
+import "webitel-go/contacts/fields.proto";
+import "webitel-go/contacts/contact.proto";
+
+import "google/protobuf/wrappers.proto";
 
 import "google/api/visibility.proto";
 import "google/api/annotations.proto";
@@ -279,6 +281,29 @@ message SearchContactsRequest {
   // webitel.contacts.Manager manager = 19;
   // webitel.contacts.Comment comment = 20;
   // webitel.contacts.Label label = 21;
+
+  // Excludes contacts that belong to the specified group ID.
+  // - Filters out contacts associated with the given `group_id`.
+  int64 not_id_group = 30;
+
+  // Filters contacts by the specified group(s).
+  // - Includes only contacts that belong to one or more of the given group Group(s).
+  repeated int64 group = 31;
+
+  // Filters contacts by the specified owner(s).
+  // - Includes only contacts whose owner matches one or more of the given Owner(s).
+  // - The owner ID corresponds to `contact_id` in the `directory.wbt_user` table.
+  repeated int64 owner = 32;
+
+  // Filters contacts by the specified label(s).
+  // - Includes only contacts that have one or more of the given Label(s).
+  repeated string label = 33;
+
+  // Filters contacts based on whether they are user-associated.
+  // - `true`  → Includes only user-associated contacts.
+  // - `false` → Includes only contacts that are NOT user-associated.
+  // - A contact is considered user-associated if it exists in `directory.wbt_user`.
+  google.protobuf.BoolValue user = 34;
 
 }
 

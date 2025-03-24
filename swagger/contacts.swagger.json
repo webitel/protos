@@ -108,11 +108,11 @@
             "in": "query",
             "required": false,
             "type": "array",
+            "uniqueItems": true,
             "items": {
               "type": "string",
               "default": "id",
-              "pattern": "^[+|-|!]?\\w+$",
-              "uniqueItems": true
+              "pattern": "^[+|-|!]?\\w+$"
             },
             "collectionFormat": "multi"
           },
@@ -122,10 +122,10 @@
             "in": "query",
             "required": false,
             "type": "array",
+            "uniqueItems": true,
             "items": {
               "type": "string",
-              "default": "*",
-              "uniqueItems": true
+              "default": "*"
             },
             "collectionFormat": "multi"
           },
@@ -165,20 +165,54 @@
             "default": "READ"
           },
           {
-            "name": "group_id",
-            "description": "Filter by group ID.",
+            "name": "not_id_group",
+            "description": "Excludes contacts that belong to the specified group ID.\n- Filters out contacts associated with the given `group_id`.",
             "in": "query",
             "required": false,
             "type": "string",
             "format": "int64"
           },
           {
-            "name": "not_id_group",
-            "description": "Filter contacts that are not attached to the provided group.",
+            "name": "group",
+            "description": "Filters contacts by the specified group(s).\n- Includes only contacts that belong to one or more of the given group Group(s).",
             "in": "query",
             "required": false,
-            "type": "string",
-            "format": "int64"
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "owner",
+            "description": "Filters contacts by the specified owner(s).\n- Includes only contacts whose owner matches one or more of the given Owner(s).\n- The owner ID corresponds to `contact_id` in the `directory.wbt_user` table.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "label",
+            "description": "Filters contacts by the specified label(s).\n- Includes only contacts that have one or more of the given Label(s).",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "user",
+            "description": "Filters contacts based on whether they are user-associated.\n- `true`  → Includes only user-associated contacts.\n- `false` → Includes only contacts that are NOT user-associated.\n- A contact is considered user-associated if it exists in `directory.wbt_user`.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -1232,10 +1266,10 @@
             "in": "query",
             "required": true,
             "type": "array",
+            "uniqueItems": true,
             "items": {
               "type": "string",
-              "pattern": "^.+$",
-              "uniqueItems": true
+              "pattern": "^.+$"
             },
             "collectionFormat": "multi"
           }
@@ -1348,10 +1382,10 @@
               ],
               "items": {
                 "type": "object",
-                "$ref": "#/definitions/webitel.contacts.InputEmailAddress",
-                "uniqueItems": true
+                "$ref": "#/definitions/webitel.contacts.InputEmailAddress"
               },
-              "minItems": 1
+              "minItems": 1,
+              "uniqueItems": true
             }
           },
           {
@@ -1739,9 +1773,9 @@
             "in": "query",
             "required": true,
             "type": "array",
+            "uniqueItems": true,
             "items": {
-              "type": "string",
-              "uniqueItems": true
+              "type": "string"
             },
             "collectionFormat": "multi"
           }
@@ -1826,10 +1860,10 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "$ref": "#/definitions/webitel.contacts.InputContactGroup",
-                "uniqueItems": true
+                "$ref": "#/definitions/webitel.contacts.InputContactGroup"
               },
-              "minItems": 1
+              "minItems": 1,
+              "uniqueItems": true
             }
           },
           {
@@ -2282,10 +2316,10 @@
             "in": "query",
             "required": true,
             "type": "array",
+            "uniqueItems": true,
             "items": {
               "type": "string",
-              "pattern": "^(\\w+)(,\\w+)*$",
-              "uniqueItems": true
+              "pattern": "^(\\w+)(,\\w+)*$"
             },
             "collectionFormat": "multi"
           }
@@ -2322,10 +2356,10 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "$ref": "#/definitions/webitel.contacts.InputLabel",
-                "uniqueItems": true
+                "$ref": "#/definitions/webitel.contacts.InputLabel"
               },
-              "minItems": 1
+              "minItems": 1,
+              "uniqueItems": true
             }
           },
           {
@@ -2372,9 +2406,9 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "$ref": "#/definitions/webitel.contacts.InputLabel",
-                "uniqueItems": true
-              }
+                "$ref": "#/definitions/webitel.contacts.InputLabel"
+              },
+              "uniqueItems": true
             }
           },
           {
@@ -2515,9 +2549,9 @@
             "in": "query",
             "required": true,
             "type": "array",
+            "uniqueItems": true,
             "items": {
-              "type": "string",
-              "uniqueItems": true
+              "type": "string"
             },
             "collectionFormat": "multi"
           }
@@ -2617,10 +2651,10 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "$ref": "#/definitions/webitel.contacts.InputManager",
-                "uniqueItems": true
+                "$ref": "#/definitions/webitel.contacts.InputManager"
               },
-              "minItems": 1
+              "minItems": 1,
+              "uniqueItems": true
             }
           },
           {
@@ -3017,9 +3051,9 @@
             "in": "query",
             "required": true,
             "type": "array",
+            "uniqueItems": true,
             "items": {
-              "type": "string",
-              "uniqueItems": true
+              "type": "string"
             },
             "collectionFormat": "multi"
           }
@@ -3131,10 +3165,10 @@
               ],
               "items": {
                 "type": "object",
-                "$ref": "#/definitions/webitel.contacts.InputPhoneNumber",
-                "uniqueItems": true
+                "$ref": "#/definitions/webitel.contacts.InputPhoneNumber"
               },
-              "minItems": 1
+              "minItems": 1,
+              "uniqueItems": true
             }
           },
           {
@@ -3634,9 +3668,9 @@
             "in": "query",
             "required": true,
             "type": "array",
+            "uniqueItems": true,
             "items": {
-              "type": "string",
-              "uniqueItems": true
+              "type": "string"
             },
             "collectionFormat": "multi"
           }
@@ -3721,10 +3755,10 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "$ref": "#/definitions/webitel.contacts.InputTimezone",
-                "uniqueItems": true
+                "$ref": "#/definitions/webitel.contacts.InputTimezone"
               },
-              "minItems": 1
+              "minItems": 1,
+              "uniqueItems": true
             }
           },
           {
@@ -4072,10 +4106,10 @@
             "in": "query",
             "required": true,
             "type": "array",
+            "uniqueItems": true,
             "items": {
               "type": "string",
-              "pattern": "^.+$",
-              "uniqueItems": true
+              "pattern": "^.+$"
             },
             "collectionFormat": "multi"
           }
@@ -4112,10 +4146,10 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "$ref": "#/definitions/webitel.contacts.InputVariable",
-                "uniqueItems": true
+                "$ref": "#/definitions/webitel.contacts.InputVariable"
               },
-              "minItems": 1
+              "minItems": 1,
+              "uniqueItems": true
             }
           },
           {
@@ -4162,10 +4196,10 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "$ref": "#/definitions/webitel.contacts.InputVariable",
-                "uniqueItems": true
+                "$ref": "#/definitions/webitel.contacts.InputVariable"
               },
-              "minItems": 1
+              "minItems": 1,
+              "uniqueItems": true
             }
           },
           {
@@ -4590,6 +4624,10 @@
                     "$ref": "#/definitions/webitel.contacts.InputContactGroup"
                   },
                   "description": "The Contact's associated group(s)."
+                },
+                "custom": {
+                  "type": "object",
+                  "description": "Custom extension data fields."
                 }
               },
               "title": "NEW Contact source changes"
@@ -5134,6 +5172,10 @@
         "variables": {
           "$ref": "#/definitions/webitel.contacts.VariableList",
           "description": "Arbitrary client data that is populated by clients.\nDuplicate keys and values are allowed."
+        },
+        "custom": {
+          "type": "object",
+          "description": "Custom extension data fields."
         }
       },
       "description": "The Contact principal source.\nOUTPUT purpose only."
@@ -5982,6 +6024,10 @@
             "$ref": "#/definitions/webitel.contacts.InputContactGroup"
           },
           "description": "The Contact's associated group(s)."
+        },
+        "custom": {
+          "type": "object",
+          "description": "Custom extension data fields."
         }
       },
       "description": "The Contact principal input."
