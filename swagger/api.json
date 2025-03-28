@@ -11621,6 +11621,10 @@
                 "text": {
                   "description": "Content of the comment.",
                   "type": "string"
+                },
+                "userID": {
+                  "description": "Optional creator / updater ID. Use this to explicitly set the case creator / updater instead of deriving it from the auth token.",
+                  "$ref": "#/definitions/generalLookup"
                 }
               },
               "example": {
@@ -11680,6 +11684,10 @@
                 "text": {
                   "description": "Content of the comment.",
                   "type": "string"
+                },
+                "userID": {
+                  "description": "Optional creator / updater ID. Use this to explicitly set the case creator / updater instead of deriving it from the auth token.",
+                  "$ref": "#/definitions/generalLookup"
                 }
               },
               "example": {
@@ -11999,38 +12007,6 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/casesPriority"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        }
-      }
-    },
-    "/cases/related/{etag}": {
-      "delete": {
-        "tags": [
-          "RelatedCases"
-        ],
-        "summary": "Delete a specific related case",
-        "operationId": "DeleteRelatedCase",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "Identifier of the related case to delete.",
-            "name": "etag",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/casesRelatedCase"
             }
           },
           "default": {
@@ -13719,6 +13695,17 @@
             "type": "string",
             "name": "input.name",
             "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "input.userID.id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "input.userID.name",
+            "in": "query"
           }
         ],
         "responses": {
@@ -13848,6 +13835,10 @@
                 },
                 "url": {
                   "type": "string"
+                },
+                "userID": {
+                  "description": "Optional creator / updater ID. Use this to explicitly set the case creator / updater instead of deriving it from the auth token.",
+                  "$ref": "#/definitions/generalLookup"
                 }
               }
             }
@@ -13908,6 +13899,10 @@
                 },
                 "url": {
                   "type": "string"
+                },
+                "userID": {
+                  "description": "Optional creator / updater ID. Use this to explicitly set the case creator / updater instead of deriving it from the auth token.",
+                  "$ref": "#/definitions/generalLookup"
                 }
               }
             }
@@ -14316,6 +14311,10 @@
                 "subject": {
                   "type": "string",
                   "title": "create: required;"
+                },
+                "userID": {
+                  "description": "Optional creator / updater ID. Use this to explicitly set the case creator / updater instead of deriving it from the auth token.",
+                  "$ref": "#/definitions/generalLookup"
                 }
               }
             }
@@ -14443,6 +14442,10 @@
                 "subject": {
                   "type": "string",
                   "title": "create: required;"
+                },
+                "userID": {
+                  "description": "Optional creator / updater ID. Use this to explicitly set the case creator / updater instead of deriving it from the auth token.",
+                  "$ref": "#/definitions/generalLookup"
                 }
               }
             }
@@ -14532,6 +14535,10 @@
                 "relation_type": {
                   "description": "Relation type.",
                   "$ref": "#/definitions/casesRelationType"
+                },
+                "userID": {
+                  "description": "Optional creator / updater ID. Use this to explicitly set the case creator / updater instead of deriving it from the auth token.",
+                  "$ref": "#/definitions/generalLookup"
                 }
               }
             }
@@ -14609,6 +14616,10 @@
                 "relation_type": {
                   "description": "Relation type.",
                   "$ref": "#/definitions/casesRelationType"
+                },
+                "userID": {
+                  "description": "Optional creator / updater ID. Use this to explicitly set the case creator / updater instead of deriving it from the auth token.",
+                  "$ref": "#/definitions/generalLookup"
                 }
               }
             }
@@ -14798,6 +14809,43 @@
             "description": "Fields to return in the response.",
             "name": "fields",
             "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/casesRelatedCase"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "RelatedCases"
+        ],
+        "summary": "Delete a specific related case",
+        "operationId": "DeleteRelatedCase",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Etag or ID of the primary case",
+            "name": "primary_case_etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Identifier of the related case to delete.",
+            "name": "etag",
+            "in": "path",
+            "required": true
           }
         ],
         "responses": {
@@ -27566,6 +27614,70 @@
         }
       }
     },
+    "/search": {
+      "get": {
+        "tags": [
+          "FTSService"
+        ],
+        "operationId": "Search",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "object_name",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ftsSearchResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        }
+      }
+    },
     "/settings": {
       "get": {
         "tags": [
@@ -39575,6 +39687,10 @@
         "relation_type": {
           "description": "Relation type between the cases.",
           "$ref": "#/definitions/casesRelationType"
+        },
+        "userID": {
+          "description": "Optional creator / updater ID. Use this to explicitly set the case creator / updater instead of deriving it from the auth token.",
+          "$ref": "#/definitions/generalLookup"
         }
       }
     },
@@ -39853,6 +39969,10 @@
         "subject": {
           "type": "string",
           "title": "create: required;"
+        },
+        "userID": {
+          "description": "Optional creator / updater ID. Use this to explicitly set the case creator / updater instead of deriving it from the auth token.",
+          "$ref": "#/definitions/generalLookup"
         }
       }
     },
@@ -39867,6 +39987,10 @@
         "text": {
           "description": "Content of the comment.",
           "type": "string"
+        },
+        "userID": {
+          "description": "Optional creator / updater ID. Use this to explicitly set the case creator / updater instead of deriving it from the auth token.",
+          "$ref": "#/definitions/generalLookup"
         }
       },
       "example": {
@@ -39898,6 +40022,10 @@
         },
         "url": {
           "type": "string"
+        },
+        "userID": {
+          "description": "Optional creator / updater ID. Use this to explicitly set the case creator / updater instead of deriving it from the auth token.",
+          "$ref": "#/definitions/generalLookup"
         }
       }
     },
@@ -40071,6 +40199,10 @@
         "subject": {
           "description": "Required subject of the case.",
           "type": "string"
+        },
+        "userID": {
+          "description": "Optional creator / updater ID. Use this to explicitly set the case creator / updater instead of deriving it from the auth token.",
+          "$ref": "#/definitions/generalLookup"
         }
       }
     },
@@ -40161,6 +40293,10 @@
         "relation_type": {
           "description": "Relation type.",
           "$ref": "#/definitions/casesRelationType"
+        },
+        "userID": {
+          "description": "Optional creator / updater ID. Use this to explicitly set the case creator / updater instead of deriving it from the auth token.",
+          "$ref": "#/definitions/generalLookup"
         }
       }
     },
@@ -50220,6 +50356,35 @@
         }
       }
     },
+    "ftsSearchData": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "object_name": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    },
+    "ftsSearchResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ftsSearchData"
+          }
+        },
+        "next": {
+          "type": "boolean"
+        }
+      }
+    },
     "generalExtendedLookup": {
       "type": "object",
       "properties": {
@@ -50617,6 +50782,25 @@
       "enum": [
         "NULL_VALUE"
       ]
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        },
+        "message": {
+          "type": "string"
+        }
+      }
     },
     "runtimeError": {
       "type": "object",
