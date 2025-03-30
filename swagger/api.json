@@ -33328,10 +33328,12 @@
         "tags": [
           "AgentAbsenceService"
         ],
+        "summary": "Searches absences by filters.",
         "operationId": "AgentAbsenceService_SearchAgentsAbsences",
         "parameters": [
           {
             "type": "string",
+            "description": "Searches by agent name.",
             "name": "q",
             "in": "query"
           },
@@ -33364,43 +33366,10 @@
           {
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "int64"
+              "type": "string"
             },
             "collectionFormat": "multi",
-            "name": "supervisor_id",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "int64"
-            },
-            "collectionFormat": "multi",
-            "name": "team_id",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "int64"
-            },
-            "collectionFormat": "multi",
-            "name": "skill_id",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "format": "int64",
-            "name": "absent_at_from",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "format": "int64",
-            "name": "absent_at_to",
+            "name": "filters",
             "in": "query"
           }
         ],
@@ -33417,14 +33386,15 @@
         "tags": [
           "AgentAbsenceService"
         ],
-        "operationId": "AgentAbsenceService_CreateAgentsAbsencesBulk",
+        "summary": "Creates absences for multiple specified agents.",
+        "operationId": "AgentAbsenceService_CreateAgentsAbsences",
         "parameters": [
           {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/wfmCreateAgentsAbsencesBulkRequest"
+              "$ref": "#/definitions/wfmCreateAgentsAbsencesRequest"
             }
           }
         ],
@@ -33432,7 +33402,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/wfmCreateAgentsAbsencesBulkResponse"
+              "$ref": "#/definitions/wfmCreateAgentsAbsencesResponse"
             }
           }
         }
@@ -33565,7 +33535,106 @@
         "tags": [
           "AgentAbsenceService"
         ],
-        "operationId": "AgentAbsenceService_ReadAgentAbsences",
+        "summary": "Searches agent absences by filters.",
+        "operationId": "AgentAbsenceService_SearchAgentAbsence",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "agent_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "filters",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/wfmSearchAgentAbsenceResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "AgentAbsenceService"
+        ],
+        "summary": "Creates one-day-absence for one agent.",
+        "operationId": "AgentAbsenceService_CreateAgentAbsence",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "agent_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "item": {
+                  "$ref": "#/definitions/wfmAbsence"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/wfmCreateAgentAbsenceResponse"
+            }
+          }
+        }
+      }
+    },
+    "/wfm/agents/{agent_id}/absences/{id}": {
+      "get": {
+        "tags": [
+          "AgentAbsenceService"
+        ],
+        "summary": "Reads one absence per agent by its id.",
+        "operationId": "AgentAbsenceService_ReadAgentAbsence",
         "parameters": [
           {
             "type": "string",
@@ -33577,31 +33646,25 @@
           {
             "type": "string",
             "format": "int64",
-            "name": "absent_at_from",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "format": "int64",
-            "name": "absent_at_to",
-            "in": "query"
+            "name": "id",
+            "in": "path",
+            "required": true
           }
         ],
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/wfmReadAgentAbsencesResponse"
+              "$ref": "#/definitions/wfmReadAgentAbsenceResponse"
             }
           }
         }
-      }
-    },
-    "/wfm/agents/{agent_id}/absences/{id}": {
+      },
       "delete": {
         "tags": [
           "AgentAbsenceService"
         ],
+        "summary": "Deletes agent concrete absence by its id.",
         "operationId": "AgentAbsenceService_DeleteAgentAbsence",
         "parameters": [
           {
@@ -33624,6 +33687,79 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/wfmDeleteAgentAbsenceResponse"
+            }
+          }
+        }
+      }
+    },
+    "/wfm/agents/{agent_id}/absences/{item.id}": {
+      "put": {
+        "tags": [
+          "AgentAbsenceService"
+        ],
+        "summary": "Updates agent concrete absence by its id.",
+        "operationId": "AgentAbsenceService_UpdateAgentAbsence",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "agent_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "item.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "item": {
+                  "type": "object",
+                  "properties": {
+                    "absent_at": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "created_by": {
+                      "$ref": "#/definitions/wfmLookupEntity"
+                    },
+                    "domain_id": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "type_id": {
+                      "$ref": "#/definitions/wfmAbsenceType"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "updated_by": {
+                      "$ref": "#/definitions/wfmLookupEntity"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/wfmUpdateAgentAbsenceResponse"
             }
           }
         }
@@ -33685,142 +33821,6 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/wfmUpdateAgentWorkingConditionsResponse"
-            }
-          }
-        }
-      }
-    },
-    "/wfm/agents/{item.agent.id}/absences": {
-      "post": {
-        "tags": [
-          "AgentAbsenceService"
-        ],
-        "operationId": "AgentAbsenceService_CreateAgentAbsence",
-        "parameters": [
-          {
-            "type": "string",
-            "format": "int64",
-            "name": "item.agent.id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "item": {
-                  "type": "object",
-                  "properties": {
-                    "absence": {
-                      "$ref": "#/definitions/wfmAbsence"
-                    },
-                    "agent": {
-                      "type": "object",
-                      "properties": {
-                        "name": {
-                          "type": "string"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/wfmCreateAgentAbsenceResponse"
-            }
-          }
-        }
-      }
-    },
-    "/wfm/agents/{item.agent.id}/absences/{item.absence.id}": {
-      "put": {
-        "tags": [
-          "AgentAbsenceService"
-        ],
-        "operationId": "AgentAbsenceService_UpdateAgentAbsence",
-        "parameters": [
-          {
-            "type": "string",
-            "format": "int64",
-            "name": "item.agent.id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "format": "int64",
-            "name": "item.absence.id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "item": {
-                  "type": "object",
-                  "properties": {
-                    "absence": {
-                      "type": "object",
-                      "properties": {
-                        "absent_at": {
-                          "type": "string",
-                          "format": "int64"
-                        },
-                        "created_at": {
-                          "type": "string",
-                          "format": "int64"
-                        },
-                        "created_by": {
-                          "$ref": "#/definitions/wfmLookupEntity"
-                        },
-                        "domain_id": {
-                          "type": "string",
-                          "format": "int64"
-                        },
-                        "type_id": {
-                          "$ref": "#/definitions/wfmAgentAbsenceType"
-                        },
-                        "updated_at": {
-                          "type": "string",
-                          "format": "int64"
-                        },
-                        "updated_by": {
-                          "$ref": "#/definitions/wfmLookupEntity"
-                        }
-                      }
-                    },
-                    "agent": {
-                      "type": "object",
-                      "properties": {
-                        "name": {
-                          "type": "string"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/wfmUpdateAgentAbsenceResponse"
             }
           }
         }
@@ -35267,19 +35267,19 @@
         }
       }
     },
-    "CreateAgentsAbsencesBulkRequestabsentType": {
+    "CreateAgentsAbsencesRequestabsentType": {
       "type": "object",
       "properties": {
-        "absent_at_from": {
+        "date_from": {
           "type": "string",
           "format": "int64"
         },
-        "absent_at_to": {
+        "date_to": {
           "type": "string",
           "format": "int64"
         },
         "type_id": {
-          "$ref": "#/definitions/wfmAgentAbsenceType"
+          "$ref": "#/definitions/wfmAbsenceType"
         }
       }
     },
@@ -56890,7 +56890,7 @@
           "format": "int64"
         },
         "type_id": {
-          "$ref": "#/definitions/wfmAgentAbsenceType"
+          "$ref": "#/definitions/wfmAbsenceType"
         },
         "updated_at": {
           "type": "string",
@@ -56901,25 +56901,14 @@
         }
       }
     },
-    "wfmAgentAbsence": {
-      "type": "object",
-      "properties": {
-        "absence": {
-          "$ref": "#/definitions/wfmAbsence"
-        },
-        "agent": {
-          "$ref": "#/definitions/wfmLookupEntity"
-        }
-      }
-    },
-    "wfmAgentAbsenceType": {
+    "wfmAbsenceType": {
       "type": "string",
-      "default": "AGENT_ABSENCE_TYPE_UNSPECIFIED",
+      "default": "ABSENCE_TYPE_UNSPECIFIED",
       "enum": [
-        "AGENT_ABSENCE_TYPE_UNSPECIFIED",
-        "AGENT_ABSENCE_TYPE_DAYOFF",
-        "AGENT_ABSENCE_TYPE_VACATION",
-        "AGENT_ABSENCE_TYPE_SICKDAY"
+        "ABSENCE_TYPE_UNSPECIFIED",
+        "ABSENCE_TYPE_DAYOFF",
+        "ABSENCE_TYPE_VACATION",
+        "ABSENCE_TYPE_SICKDAY"
       ]
     },
     "wfmAgentAbsences": {
@@ -56941,7 +56930,7 @@
       "type": "object",
       "properties": {
         "absence": {
-          "$ref": "#/definitions/wfmAgentAbsenceType"
+          "$ref": "#/definitions/wfmAbsenceType"
         },
         "date": {
           "type": "string",
@@ -57087,11 +57076,11 @@
       "type": "object",
       "properties": {
         "item": {
-          "$ref": "#/definitions/wfmAgentAbsence"
+          "$ref": "#/definitions/wfmAbsence"
         }
       }
     },
-    "wfmCreateAgentsAbsencesBulkRequest": {
+    "wfmCreateAgentsAbsencesRequest": {
       "type": "object",
       "properties": {
         "agent_ids": {
@@ -57105,12 +57094,12 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/CreateAgentsAbsencesBulkRequestabsentType"
+            "$ref": "#/definitions/CreateAgentsAbsencesRequestabsentType"
           }
         }
       }
     },
-    "wfmCreateAgentsAbsencesBulkResponse": {
+    "wfmCreateAgentsAbsencesResponse": {
       "type": "object",
       "properties": {
         "items": {
@@ -57424,11 +57413,11 @@
         }
       }
     },
-    "wfmReadAgentAbsencesResponse": {
+    "wfmReadAgentAbsenceResponse": {
       "type": "object",
       "properties": {
         "item": {
-          "$ref": "#/definitions/wfmAgentAbsences"
+          "$ref": "#/definitions/wfmAbsence"
         }
       }
     },
@@ -57488,6 +57477,18 @@
       "properties": {
         "item": {
           "$ref": "#/definitions/wfmWorkingSchedule"
+        }
+      }
+    },
+    "wfmSearchAgentAbsenceResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmAbsence"
+          }
         }
       }
     },
@@ -57661,7 +57662,7 @@
       "type": "object",
       "properties": {
         "item": {
-          "$ref": "#/definitions/wfmAgentAbsence"
+          "$ref": "#/definitions/wfmAbsence"
         }
       }
     },
