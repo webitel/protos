@@ -11,33 +11,45 @@ option go_package = "github.com/webitel/protos/wfm;wfm";
 
 service AgentAbsenceService {
   option (option.objclass) = "agent_absences";
+
+  // Creates one-day-absence for one agent.
   rpc CreateAgentAbsence(CreateAgentAbsenceRequest) returns (CreateAgentAbsenceResponse) {
     option (option.access) = ACTION_CREATE;
     option (google.api.http) = {
-      post: "/wfm/agents/{item.agent.id}/absences"
+      post: "/wfm/agents/{agent_id}/absences"
       body: "*"
     };
   }
 
+  // Reads one absence per agent by its id.
+  rpc ReadAgentAbsence(ReadAgentAbsenceRequest) returns (ReadAgentAbsenceResponse) {
+    option (option.access) = ACTION_READ;
+    option (google.api.http) = {get: "/wfm/agents/{agent_id}/absences/{id}"};
+  }
+
+  // Searches agent absences by filters.
+  rpc SearchAgentAbsence(SearchAgentAbsenceRequest) returns (SearchAgentAbsenceResponse) {
+    option (option.access) = ACTION_READ;
+    option (google.api.http) = {get: "/wfm/agents/{agent_id}/absences"};
+  }
+
+  // Updates agent concrete absence by its id.
   rpc UpdateAgentAbsence(UpdateAgentAbsenceRequest) returns (UpdateAgentAbsenceResponse) {
     option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
-      put: "/wfm/agents/{item.agent.id}/absences/{item.absence.id}"
+      put: "/wfm/agents/{agent_id}/absences/{item.id}"
       body: "*"
     };
   }
 
+  // Deletes agent concrete absence by its id.
   rpc DeleteAgentAbsence(DeleteAgentAbsenceRequest) returns (DeleteAgentAbsenceResponse) {
     option (option.access) = ACTION_DELETE;
     option (google.api.http) = {delete: "/wfm/agents/{agent_id}/absences/{id}"};
   }
 
-  rpc ReadAgentAbsences(ReadAgentAbsencesRequest) returns (ReadAgentAbsencesResponse) {
-    option (option.access) = ACTION_READ;
-    option (google.api.http) = {get: "/wfm/agents/{agent_id}/absences"};
-  }
-
-  rpc CreateAgentsAbsencesBulk(CreateAgentsAbsencesBulkRequest) returns (CreateAgentsAbsencesBulkResponse) {
+  // Creates absences for multiple specified agents.
+  rpc CreateAgentsAbsences(CreateAgentsAbsencesRequest) returns (CreateAgentsAbsencesResponse) {
     option (option.access) = ACTION_CREATE;
     option (google.api.http) = {
       post: "/wfm/agents/absences"
@@ -45,6 +57,7 @@ service AgentAbsenceService {
     };
   }
 
+  // Searches absences by filters.
   rpc SearchAgentsAbsences(SearchAgentsAbsencesRequest) returns (SearchAgentsAbsencesResponse) {
     option (option.access) = ACTION_READ;
     option (google.api.http) = {get: "/wfm/agents/absences"};
@@ -52,19 +65,43 @@ service AgentAbsenceService {
 }
 
 message CreateAgentAbsenceRequest {
-  AgentAbsence item = 1 [(buf.validate.field).required = true];
+  int64 agent_id = 1;
+  Absence item = 2 [(buf.validate.field).required = true];
 }
 
 message CreateAgentAbsenceResponse {
-  AgentAbsence item = 1;
+  Absence item = 1;
+}
+
+message ReadAgentAbsenceRequest {
+  int64 id = 1;
+  int64 agent_id = 2;
+}
+
+message ReadAgentAbsenceResponse {
+  Absence item = 1;
+}
+
+message SearchAgentAbsenceRequest {
+  int64 agent_id = 1;
+  optional int32 page = 2;
+  optional int32 size = 3;
+  optional string sort = 4;
+  repeated string fields = 5;
+  repeated string filters = 6;
+}
+
+message SearchAgentAbsenceResponse {
+  repeated Absence items = 1;
 }
 
 message UpdateAgentAbsenceRequest {
-  AgentAbsence item = 1;
+  int64 agent_id = 1;
+  Absence item = 2;
 }
 
 message UpdateAgentAbsenceResponse {
-  AgentAbsence item = 1;
+  Absence item = 1;
 }
 
 message DeleteAgentAbsenceRequest {
@@ -76,36 +113,16 @@ message DeleteAgentAbsenceResponse {
   int64 id = 1;
 }
 
-message ReadAgentAbsencesRequest {
-  int64 agent_id = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).int64.gt = 0
-  ];
-
-  int64 absent_at_from = 2;
-  int64 absent_at_to = 3;
-
-  option (buf.validate.message).cel = {
-    id: "absent_at.filter",
-    message: "absent_at_to should be greater than absent_at_from",
-    expression: "this.absent_at_to >= this.absent_at_from"
-  };
-}
-
-message ReadAgentAbsencesResponse {
-  AgentAbsences item = 1;
-}
-
-message CreateAgentsAbsencesBulkRequest {
+message CreateAgentsAbsencesRequest {
   message absentType {
-    AgentAbsenceType type_id = 1 [(buf.validate.field).enum = {defined_only: true, in: [1, 2, 3]}];
-    int64 absent_at_from = 2 [(buf.validate.field).int64.gt = 0];
-    int64 absent_at_to = 3 [(buf.validate.field).int64.gt = 0];
+    AbsenceType type_id = 1 [(buf.validate.field).enum = {defined_only: true, in: [1, 2, 3]}];
+    int64 date_from = 2 [(buf.validate.field).int64.gt = 0];
+    int64 date_to = 3 [(buf.validate.field).int64.gt = 0];
 
     option (buf.validate.message).cel = {
       id: "absent_at.filter",
-      message: "absent_at_to should be greater than absent_at_from",
-      expression: "this.absent_at_to >= this.absent_at_from"
+      message: "date_to should be greater than date_from",
+      expression: "this.date_to >= this.date_from"
     };
   }
 
@@ -113,32 +130,17 @@ message CreateAgentsAbsencesBulkRequest {
   repeated int64 agent_ids = 2 [(buf.validate.field).repeated.min_items = 1];
 }
 
-message CreateAgentsAbsencesBulkResponse {
+message CreateAgentsAbsencesResponse {
   repeated AgentAbsences items = 1;
 }
 
 message SearchAgentsAbsencesRequest {
-  optional string q = 1;
-
+  optional string q = 1; // Searches by agent name.
   optional int32 page = 2;
   optional int32 size = 3;
-
   optional string sort = 4;
-
   repeated string fields = 5;
-
-  repeated int64 supervisor_id = 6;
-  repeated int64 team_id = 7;
-  repeated int64 skill_id = 8;
-
-  int64 absent_at_from = 9;
-  int64 absent_at_to = 10;
-
-  option (buf.validate.message).cel = {
-    id: "absent_at.filter",
-    message: "absent_at_to should be greater than absent_at_from",
-    expression: "this.absent_at_to >= this.absent_at_from"
-  };
+  repeated string filters = 6;
 }
 
 message SearchAgentsAbsencesResponse {
@@ -146,21 +148,16 @@ message SearchAgentsAbsencesResponse {
   bool next = 2;
 }
 
-enum AgentAbsenceType {
-  AGENT_ABSENCE_TYPE_UNSPECIFIED = 0;
-  AGENT_ABSENCE_TYPE_DAYOFF = 1;
-  AGENT_ABSENCE_TYPE_VACATION = 2;
-  AGENT_ABSENCE_TYPE_SICKDAY = 3;
-}
-
-message AgentAbsence {
-  LookupEntity agent = 1;
-  Absence absence = 2;
-}
-
 message AgentAbsences {
   LookupEntity agent = 1;
   repeated Absence absences = 2;
+}
+
+enum AbsenceType {
+  ABSENCE_TYPE_UNSPECIFIED = 0;
+  ABSENCE_TYPE_DAYOFF = 1;
+  ABSENCE_TYPE_VACATION = 2;
+  ABSENCE_TYPE_SICKDAY = 3;
 }
 
 message Absence {
@@ -171,6 +168,6 @@ message Absence {
   int64 updated_at = 5;
   LookupEntity updated_by = 6;
 
-  AgentAbsenceType type_id = 7 [(buf.validate.field).enum = {defined_only: true, in: [1, 2, 3]}];
+  AbsenceType type_id = 7 [(buf.validate.field).enum = {defined_only: true, in: [1, 2, 3]}];
   int64 absent_at = 8 [(buf.validate.field).int64.gt = 0];
 }
