@@ -4579,6 +4579,16 @@
             "format": "int64",
             "name": "duration.to",
             "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "name": "offered_agent_id",
+            "in": "query"
           }
         ],
         "responses": {
@@ -4742,6 +4752,16 @@
             "format": "int64",
             "name": "duration.to",
             "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "name": "offered_agent_id",
+            "in": "query"
           }
         ],
         "responses": {
@@ -4788,6 +4808,39 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/engineAttemptRenewalResultResponse"
+            }
+          },
+          "default": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/engineApiError"
+            }
+          }
+        }
+      }
+    },
+    "/call_center/queues/members": {
+      "delete": {
+        "tags": [
+          "MemberService"
+        ],
+        "summary": "DeleteAllMembers",
+        "operationId": "DeleteAllMembers",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engineDeleteAllMembersRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineListMember"
             }
           },
           "default": {
@@ -27733,7 +27786,8 @@
                 "password_validation_text",
                 "autolink_call_to_contact",
                 "period_to_playback_records",
-                "is_fulltext_search_enabled"
+                "is_fulltext_search_enabled",
+                "wbt_hide_contact"
               ],
               "type": "string"
             },
@@ -40788,9 +40842,17 @@
           "title": "Reaction time - required",
           "$ref": "#/definitions/casesTimings"
         },
+        "reaction_time_millis": {
+          "type": "string",
+          "format": "int64"
+        },
         "resolution_time": {
           "title": "Resolution time - required",
           "$ref": "#/definitions/casesTimings"
+        },
+        "resolution_time_millis": {
+          "type": "string",
+          "format": "int64"
         },
         "updated_at": {
           "type": "string",
@@ -42704,6 +42766,12 @@
         "member_call_id": {
           "type": "string"
         },
+        "offered_agents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/engineLookup"
+          }
+        },
         "offering_at": {
           "type": "string",
           "format": "int64"
@@ -44486,6 +44554,88 @@
         },
         "webrtc": {
           "$ref": "#/definitions/DefaultDeviceConfigResponseWebRTCDeviceConfig"
+        }
+      }
+    },
+    "engineDeleteAllMembersRequest": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "attempts": {
+          "$ref": "#/definitions/engineFilterBetween"
+        },
+        "bucket_id": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "created_at": {
+          "$ref": "#/definitions/engineFilterBetween"
+        },
+        "destination": {
+          "type": "string"
+        },
+        "id": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
+        "name": {
+          "type": "string"
+        },
+        "numbers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "offering_at": {
+          "$ref": "#/definitions/engineFilterBetween"
+        },
+        "priority": {
+          "$ref": "#/definitions/engineFilterBetween"
+        },
+        "q": {
+          "type": "string"
+        },
+        "queue_id": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "sort": {
+          "type": "string"
+        },
+        "stop_cause": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "variables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "without_members": {
+          "type": "boolean"
         }
       }
     },
@@ -48854,7 +49004,8 @@
         "password_validation_text",
         "autolink_call_to_contact",
         "period_to_playback_records",
-        "is_fulltext_search_enabled"
+        "is_fulltext_search_enabled",
+        "wbt_hide_contact"
       ]
     },
     "engineTag": {
