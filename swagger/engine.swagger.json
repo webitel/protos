@@ -4576,6 +4576,17 @@
             "required": false,
             "type": "string",
             "format": "int64"
+          },
+          {
+            "name": "offered_agent_id",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -4758,6 +4769,17 @@
             "required": false,
             "type": "string",
             "format": "int64"
+          },
+          {
+            "name": "offered_agent_id",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -4796,6 +4818,39 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/engineAttemptRenewalResultRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MemberService"
+        ]
+      }
+    },
+    "/call_center/queues/members": {
+      "delete": {
+        "summary": "DeleteMembers",
+        "operationId": "DeleteAllMembers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engineListMember"
+            }
+          },
+          "default": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/engineApiError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engineDeleteAllMembersRequest"
             }
           }
         ],
@@ -15811,6 +15866,12 @@
         "attempts": {
           "type": "integer",
           "format": "int32"
+        },
+        "offered_agents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/engineLookup"
+          }
         }
       }
     },
@@ -17567,6 +17628,88 @@
         },
         "webrtc": {
           "$ref": "#/definitions/DefaultDeviceConfigResponseWebRTCDeviceConfig"
+        }
+      }
+    },
+    "engineDeleteAllMembersRequest": {
+      "type": "object",
+      "properties": {
+        "q": {
+          "type": "string"
+        },
+        "id": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
+        "queue_id": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
+        "bucket_id": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "destination": {
+          "type": "string"
+        },
+        "created_at": {
+          "$ref": "#/definitions/engineFilterBetween"
+        },
+        "offering_at": {
+          "$ref": "#/definitions/engineFilterBetween"
+        },
+        "stop_cause": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "priority": {
+          "$ref": "#/definitions/engineFilterBetween"
+        },
+        "name": {
+          "type": "string"
+        },
+        "attempts": {
+          "$ref": "#/definitions/engineFilterBetween"
+        },
+        "agent_id": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "numbers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "variables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "sort": {
+          "type": "string"
+        },
+        "without_members": {
+          "type": "boolean"
         }
       }
     },

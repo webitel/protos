@@ -80,6 +80,13 @@ service MemberService {
             body: "*"
         };
     }
+    // DeleteMembers
+    rpc DeleteAllMembers(DeleteAllMembersRequest) returns (ListMember) {
+        option (google.api.http) = {
+            delete: "/call_center/queues/members"
+            body: "*"
+        };
+    }
 
     // ResetMembers
     rpc ResetMembers(ResetMembersRequest) returns (ResetMembersResponse) {
@@ -261,6 +268,7 @@ message AttemptHistory {
     string result = 24;
     string amd_result = 25;
     int32 attempts = 26;
+    repeated Lookup offered_agents = 27;
 }
 
 message Attempt {
@@ -312,6 +320,7 @@ message SearchAttemptsRequest {
     FilterBetween leaving_at = 13;
     FilterBetween offering_at = 14;
     FilterBetween duration = 15;
+    repeated int64 offered_agent_id = 16;
 }
 
 message SearchMembersRequest {
@@ -377,6 +386,30 @@ message DeleteMembersRequest {
     int32 size = 16;
     string sort = 17;
     bool without_members = 18;
+}
+
+message DeleteAllMembersRequest {
+    string q = 1;
+
+    repeated int64 id = 2;
+    repeated int64 queue_id = 3;
+    repeated int32 bucket_id = 4;
+    string destination = 5;
+
+    FilterBetween created_at = 6;
+    FilterBetween offering_at = 7;
+    repeated string stop_cause = 8;
+    FilterBetween priority = 9;
+    string name = 10;
+    FilterBetween attempts = 11;
+
+    repeated int32 agent_id = 12;
+    repeated string numbers = 13;
+    map<string,string> variables = 14;
+
+    int32 size = 15;
+    string sort = 16;
+    bool without_members = 17;
 }
 
 message ResetMembersRequest {
