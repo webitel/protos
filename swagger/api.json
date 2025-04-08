@@ -27787,7 +27787,8 @@
                 "autolink_call_to_contact",
                 "period_to_playback_records",
                 "is_fulltext_search_enabled",
-                "wbt_hide_contact"
+                "wbt_hide_contact",
+                "show_full_contact"
               ],
               "type": "string"
             },
@@ -40360,12 +40361,14 @@
           "title": "Name of the SLA"
         },
         "reaction_time": {
-          "title": "Reaction time",
-          "$ref": "#/definitions/casesTimings"
+          "type": "string",
+          "format": "int64",
+          "title": "Reaction time"
         },
         "resolution_time": {
-          "title": "Resolution time",
-          "$ref": "#/definitions/casesTimings"
+          "type": "string",
+          "format": "int64",
+          "title": "Resolution time"
         },
         "valid_from": {
           "type": "string",
@@ -40839,20 +40842,14 @@
           "title": "Name of the SLA - required"
         },
         "reaction_time": {
-          "title": "Reaction time - required",
-          "$ref": "#/definitions/casesTimings"
-        },
-        "reaction_time_millis": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "title": "Reaction time - required"
         },
         "resolution_time": {
-          "title": "Resolution time - required",
-          "$ref": "#/definitions/casesTimings"
-        },
-        "resolution_time_millis": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "title": "Resolution time - required"
         },
         "updated_at": {
           "type": "string",
@@ -41252,23 +41249,6 @@
         "page": {
           "type": "integer",
           "format": "int32"
-        }
-      }
-    },
-    "casesTimings": {
-      "type": "object",
-      "properties": {
-        "dd": {
-          "type": "string",
-          "format": "int64"
-        },
-        "hh": {
-          "type": "string",
-          "format": "int64"
-        },
-        "mm": {
-          "type": "string",
-          "format": "int64"
         }
       }
     },
@@ -44493,11 +44473,17 @@
         "enabled": {
           "type": "boolean"
         },
+        "event": {
+          "$ref": "#/definitions/engineTriggerEventType"
+        },
         "expression": {
           "type": "string"
         },
         "name": {
           "type": "string"
+        },
+        "object": {
+          "$ref": "#/definitions/engineTriggerObjectType"
         },
         "schema": {
           "$ref": "#/definitions/engineLookup"
@@ -47762,6 +47748,9 @@
         "enabled": {
           "type": "boolean"
         },
+        "event": {
+          "$ref": "#/definitions/engineTriggerEventType"
+        },
         "expression": {
           "type": "string"
         },
@@ -47777,6 +47766,9 @@
         },
         "name": {
           "type": "string"
+        },
+        "object": {
+          "$ref": "#/definitions/engineTriggerObjectType"
         },
         "schema": {
           "$ref": "#/definitions/engineLookup"
@@ -49005,7 +48997,8 @@
         "autolink_call_to_contact",
         "period_to_playback_records",
         "is_fulltext_search_enabled",
-        "wbt_hide_contact"
+        "wbt_hide_contact",
+        "show_full_contact"
       ]
     },
     "engineTag": {
@@ -49139,6 +49132,9 @@
         "enabled": {
           "type": "boolean"
         },
+        "event": {
+          "$ref": "#/definitions/engineTriggerEventType"
+        },
         "expression": {
           "type": "string"
         },
@@ -49148,6 +49144,9 @@
         },
         "name": {
           "type": "string"
+        },
+        "object": {
+          "$ref": "#/definitions/engineTriggerObjectType"
         },
         "schema": {
           "$ref": "#/definitions/engineLookup"
@@ -49169,6 +49168,17 @@
           }
         }
       }
+    },
+    "engineTriggerEventType": {
+      "type": "string",
+      "default": "empty_trigger_event",
+      "enum": [
+        "empty_trigger_event",
+        "create",
+        "update",
+        "delete",
+        "resolution_time"
+      ]
     },
     "engineTriggerJob": {
       "type": "object",
@@ -49216,13 +49226,21 @@
         "error"
       ]
     },
+    "engineTriggerObjectType": {
+      "type": "string",
+      "default": "empty_trigger_object",
+      "enum": [
+        "empty_trigger_object",
+        "case"
+      ]
+    },
     "engineTriggerType": {
       "type": "string",
       "default": "default_trigger_type",
       "enum": [
         "default_trigger_type",
         "cron",
-        "case"
+        "event"
       ]
     },
     "engineUpdateAgentPauseCauseRequest": {
@@ -50365,6 +50383,9 @@
         "enabled": {
           "type": "boolean"
         },
+        "event": {
+          "$ref": "#/definitions/engineTriggerEventType"
+        },
         "expression": {
           "type": "string"
         },
@@ -50374,6 +50395,9 @@
         },
         "name": {
           "type": "string"
+        },
+        "object": {
+          "$ref": "#/definitions/engineTriggerObjectType"
         },
         "schema": {
           "$ref": "#/definitions/engineLookup"
@@ -54489,6 +54513,10 @@
             "$ref": "#/definitions/webitel.contacts.DynamicCondition"
           }
         },
+        "contactsSize": {
+          "type": "string",
+          "format": "int64"
+        },
         "created_at": {
           "description": "Timestamp(milli) of the group's creation.",
           "type": "string",
@@ -54518,6 +54546,7 @@
           "type": "string"
         },
         "type": {
+          "title": "type ( Dynamic / Static )",
           "$ref": "#/definitions/webitel.contacts.GroupType"
         },
         "updated_at": {
