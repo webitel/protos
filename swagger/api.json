@@ -27718,6 +27718,70 @@
         }
       }
     },
+    "/search": {
+      "get": {
+        "tags": [
+          "FTSService"
+        ],
+        "operationId": "Search",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "object_name",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ftsSearchResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        }
+      }
+    },
     "/settings": {
       "get": {
         "tags": [
@@ -27775,7 +27839,14 @@
                 "period_to_playback_records",
                 "is_fulltext_search_enabled",
                 "wbt_hide_contact",
-                "show_full_contact"
+                "show_full_contact",
+                "call_end_sound_notification",
+                "call_end_push_notification",
+                "chat_end_sound_notification",
+                "chat_end_push_notification",
+                "task_end_sound_notification",
+                "task_end_push_notification",
+                "push_notification_timeout"
               ],
               "type": "string"
             },
@@ -41204,6 +41275,10 @@
           "type": "integer",
           "format": "int32"
         },
+        "call_dialer_queue": {
+          "type": "integer",
+          "format": "int32"
+        },
         "call_handled": {
           "type": "integer",
           "format": "int32"
@@ -41212,7 +41287,19 @@
           "type": "integer",
           "format": "int32"
         },
+        "call_inbound_queue": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "call_manual": {
+          "type": "integer",
+          "format": "int32"
+        },
         "call_missed": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "call_queue_missed": {
           "type": "integer",
           "format": "int32"
         },
@@ -41486,6 +41573,10 @@
         },
         "enabled": {
           "type": "boolean"
+        },
+        "max_member_limit": {
+          "type": "integer",
+          "format": "int32"
         },
         "priority": {
           "type": "integer",
@@ -42354,6 +42445,10 @@
           "type": "integer",
           "format": "int32"
         },
+        "call_dialer_queue": {
+          "type": "integer",
+          "format": "int32"
+        },
         "call_handled": {
           "type": "integer",
           "format": "int32"
@@ -42362,7 +42457,19 @@
           "type": "integer",
           "format": "int32"
         },
+        "call_inbound_queue": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "call_manual": {
+          "type": "integer",
+          "format": "int32"
+        },
         "call_missed": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "call_queue_missed": {
           "type": "integer",
           "format": "int32"
         },
@@ -43021,7 +43128,8 @@
       "enum": [
         "question_default",
         "question_score",
-        "question_option"
+        "question_option",
+        "question_yes"
       ]
     },
     "engine.AuditRate": {
@@ -43043,6 +43151,10 @@
         },
         "created_by": {
           "$ref": "#/definitions/engine.Lookup"
+        },
+        "critical_count": {
+          "type": "string",
+          "format": "int64"
         },
         "form": {
           "$ref": "#/definitions/engine.Lookup"
@@ -43068,6 +43180,10 @@
         "score_required": {
           "type": "number",
           "format": "float"
+        },
+        "select_yes_count": {
+          "type": "string",
+          "format": "int64"
         },
         "updated_at": {
           "type": "string",
@@ -47609,6 +47725,12 @@
     "engine.Question": {
       "type": "object",
       "properties": {
+        "critical_violation": {
+          "type": "boolean"
+        },
+        "description": {
+          "type": "string"
+        },
         "max": {
           "type": "integer",
           "format": "int32"
@@ -49535,7 +49657,14 @@
         "period_to_playback_records",
         "is_fulltext_search_enabled",
         "wbt_hide_contact",
-        "show_full_contact"
+        "show_full_contact",
+        "call_end_sound_notification",
+        "call_end_push_notification",
+        "chat_end_sound_notification",
+        "chat_end_push_notification",
+        "task_end_sound_notification",
+        "task_end_push_notification",
+        "push_notification_timeout"
       ]
     },
     "engine.SystemSettingService.PatchSystemSettingBody": {
@@ -49866,7 +49995,7 @@
         "empty_trigger_event",
         "create",
         "update",
-        "delete",
+        "remove",
         "resolution_time"
       ]
     },
@@ -50198,6 +50327,35 @@
         },
         "name": {
           "type": "string"
+        }
+      }
+    },
+    "ftsSearchData": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "object_name": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    },
+    "ftsSearchResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ftsSearchData"
+          }
+        },
+        "next": {
+          "type": "boolean"
         }
       }
     },
@@ -50593,6 +50751,25 @@
       "enum": [
         "NULL_VALUE"
       ]
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        },
+        "message": {
+          "type": "string"
+        }
+      }
     },
     "runtimeError": {
       "type": "object",
