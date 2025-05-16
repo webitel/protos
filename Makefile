@@ -11,6 +11,9 @@ engine_swagger:
       --swagger_out=simple_operation_ids=true,disable_default_errors=true,version=false,json_names_for_fields=false,allow_delete_body=true,include_package_in_tags=false,allow_repeated_fields_in_body=false,fqn_for_swagger_name=false,merge_file_name=engine,allow_merge=true:./swagger \
       ./engine/*.proto
 
+engine_swagger_v3:
+	cd ./engine && buf generate
+
 .PHONY: engine_proto
 
 engine_proto:
