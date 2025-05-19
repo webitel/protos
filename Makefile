@@ -14,6 +14,9 @@ engine_swagger:
 engine_swagger_v3:
 	cd ./engine && buf generate
 
+cases_swagger_v3:
+	cd ./cases && buf generate
+
 .PHONY: engine_proto
 
 engine_proto:
