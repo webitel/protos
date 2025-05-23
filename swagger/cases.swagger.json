@@ -2085,17 +2085,30 @@
         "parameters": [
           {
             "name": "input",
+            "description": "Main input payload for the source being created",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/casesInputSource"
+              "format": "object",
+              "$ref": "#/definitions/casesInputSource",
+              "example": {
+                "name": "Inbound",
+                "description": "For inbound communication",
+                "type": "CALL"
+              },
+              "description": "The input data for the source",
+              "required": [
+                "input"
+              ]
             }
           },
           {
             "name": "fields",
+            "description": "Optional list of specific fields to return after creation\n\nSpecific fields to include in response",
             "in": "query",
             "required": false,
             "type": "array",
+            "uniqueItems": true,
             "items": {
               "type": "string"
             },
@@ -5622,6 +5635,11 @@
           },
           "title": "System field"
         },
+        "dc": {
+          "type": "string",
+          "format": "int64",
+          "title": "System field"
+        },
         "custom": {
           "type": "object",
           "description": "Custom data extension fields .."
@@ -6887,20 +6905,59 @@
     },
     "casesInputSource": {
       "type": "object",
+      "example": {
+        "name": "Inbound",
+        "description": "Inbound customer calls",
+        "type": "CALL"
+      },
+      "default": "{\"name\": \"Default Source\", \"type\": \"CALL\"}",
       "properties": {
         "name": {
           "type": "string",
-          "description": "The name of the source."
+          "format": "string",
+          "example": "Inbound Calls",
+          "default": "\"New Source\"",
+          "description": "The name of the source",
+          "title": "Display name for the source",
+          "maxLength": 100,
+          "minLength": 2,
+          "pattern": "^[a-zA-Z0-9_\\- ]+$"
         },
         "description": {
           "type": "string",
-          "description": "The description of the source."
+          "format": "string",
+          "example": "Handles incoming calls from customers",
+          "default": "\"No description provided\"",
+          "description": "A short description of the source",
+          "title": "Optional short description for context",
+          "maxLength": 500
         },
         "type": {
+          "format": "string",
           "$ref": "#/definitions/casesSourceType",
-          "description": "The source type of the source."
+          "example": "CALL",
+          "enum": [
+            "CALL",
+            "EMAIL",
+            "CHAT"
+          ],
+          "default": "\"CALL\"",
+          "description": "The type of the source",
+          "title": "Type of the source; restrictable to a fixed set of allowed values"
         }
-      }
+      },
+      "description": "The data structure representing a source",
+      "title": "Input Source",
+      "externalDocs": {
+        "description": "Supported source types documentation",
+        "url": "https://api.example.com/docs/source-types"
+      },
+      "maxProperties": 5,
+      "minProperties": 2,
+      "required": [
+        "name",
+        "type"
+      ]
     },
     "casesInputStatus": {
       "type": "object",

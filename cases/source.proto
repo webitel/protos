@@ -57,26 +57,136 @@ message SourceList {
   repeated Source items = 3;
 }
 
-// Request message for creating a new source.
+
+// Request message for creating a new Source entity with full JSONSchema OpenAPI options
 message CreateSourceRequest {
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["name", "type"]
+      // Required properties for the root schema object
+      required: ["input"]
+
+      // High-level title and description for schema documentation
+      title: "Create Source Request"
+      description: "Request for creating a new source with all available OpenAPI options"
+
+      // Example default JSON value (escaped string)
+      default: "{\"input\": {\"name\": \"New Source\", \"type\": \"CALL\"}}"
+
+      // Marks the object as modifiable
+      read_only: false
+
+      // Verbose usage example for docs generation
+      example: "{\"input\": {\"name\": \"Inbound Calls\", \"description\": \"Handles incoming calls\", \"type\": \"CALL\"}, \"fields\": [\"name\", \"type\"]}"
+
+      // Restrict how many properties can exist in the object
+      max_properties: 3
+      min_properties: 1
+
+      // Regex pattern that the top-level object must match (basic catch-all here)
+      pattern: ".*"
+    }
+    // External documentation reference for this schema
+    external_docs: {
+      url: "https://schema.webitel.com/source-config";
+      description: "Data source configuration schema documentation";
     }
   };
 
-  InputSource input = 1;
-  repeated string fields = 2;
+  // Main input payload for the source being created
+  InputSource input = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      // Human-friendly field description
+      description: "The input data for the source"
+
+      // Field must be included in the request
+      required: ["input"]
+
+      // JSON-style string example of the field's structure
+      example: "{\"name\": \"Inbound\", \"description\": \"For inbound communication\", \"type\": \"CALL\"}"
+
+      // Marked as an object format for documentation clarity
+      format: "object"
+
+      read_only: false
+    }
+  ];
+
+  // Optional list of specific fields to return after creation
+  repeated string fields = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Specific fields to include in response"
+      example: "[\"name\", \"type\"]"
+
+      // Validation constraints on array size and uniqueness
+      min_items: 1
+      max_items: 50
+      unique_items: true
+
+      read_only: false
+    }
+  ];
 }
 
+// Input structure representing a new Source entity
 message InputSource {
-  // The name of the source.
-  string name = 1;
-  // The description of the source.
-  string description = 2;
-  // The source type of the source.
-  SourceType type = 3;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      // Metadata for the nested schema object
+      title: "Input Source"
+      description: "The data structure representing a source"
+      required: ["name", "type"]
+      default: "{\"name\": \"Default Source\", \"type\": \"CALL\"}"
+      read_only: false
+      example: "{\"name\": \"Inbound\", \"description\": \"Inbound customer calls\", \"type\": \"CALL\"}"
+      max_properties: 5
+      min_properties: 2
+    }
+    external_docs: {
+      url: "https://api.example.com/docs/source-types";
+      description: "Supported source types documentation";
+    }
+  };
+
+  // Display name for the source
+  string name = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "The name of the source"
+      min_length: 2
+      max_length: 100
+      pattern: "^[a-zA-Z0-9_\\- ]+$" // Alphanumeric + underscores, dashes, spaces
+      example: "\"Inbound Calls\""
+      default: "\"New Source\""
+      read_only: false
+      format: "string"
+    }
+  ];
+
+  // Optional short description for context
+  string description = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "A short description of the source"
+      example: "\"Handles incoming calls from customers\""
+      default: "\"No description provided\""
+      min_length: 0
+      max_length: 500
+      read_only: false
+      format: "string"
+    }
+  ];
+
+  // Type of the source; restrictable to a fixed set of allowed values
+  SourceType type = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "The type of the source"
+      example: "\"CALL\""
+      default: "\"CALL\""
+      read_only: false
+      format: "string"
+      enum: ["CALL", "EMAIL", "CHAT"] // Enum values for OpenAPI schema
+    }
+  ];
 }
+
 
 // Request message for updating an existing source.
 message UpdateSourceRequest {
