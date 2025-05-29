@@ -49,7 +49,7 @@ fs:
 storage_swagger:
 	protoc -I/usr/local/include -I./storage -I./engine -I./annotations \
       -I. \
-      --swagger_out=version=false,json_names_for_fields=false,allow_delete_body=true,include_package_in_tags=false,allow_repeated_fields_in_body=false,fqn_for_swagger_name=false,merge_file_name=storage,allow_merge=true:./swagger \
+      --swagger_out=version=false,json_names_for_fields=false,allow_delete_body=true,include_package_in_tags=false,allow_repeated_fields_in_body=false,fqn_for_swagger_name=true,merge_file_name=storage,allow_merge=true:./swagger \
       ./storage/*.proto
 
 .PHONY: storage_proto
