@@ -27,25 +27,107 @@ enum SourceType {
   MANUAL = 6;
 }
 
-// Represents a source entity in the contact system.
+// Represents a source entity in the contact management system.
 message Source {
-  // Unique identifier of the source
-  int64 id = 1;
-  // Name of the source
-  string name = 2;
-  // Description of the source
-  string description = 4;
-  // Source type of the source
-  SourceType type = 5;
-  // CreatedAt timestamp of the source
-  int64 created_at = 20;
-  // UpdatedAt timestamp of the source
-  int64 updated_at = 21;
-  // CreatedBy user of the source
-  general.Lookup created_by = 22;
-  // UpdatedBy user of the source
-  general.Lookup updated_by = 23;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      title: "Source Entity"
+      description: "Represents a data source in the contact management system."
+      required: [
+        "id",
+        "name",
+        "type",
+        "created_at",
+        "updated_at",
+        "created_by",
+        "updated_by"
+      ]
+    };
+  };
+
+  // Unique identifier of the source.
+  int64 id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Unique identifier for the source, generated automatically."
+      format: "int64"
+      read_only: true
+    }
+  ];
+
+  // Human-readable name of the source.
+  string name = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "A unique, descriptive name for the source."
+      example: "\"CRM System\""
+      min_length: 3
+      max_length: 100
+      pattern: "^[a-zA-Z0-9_\\-\\s]+$"
+    }
+  ];
+
+  // Optional detailed description of the source.
+  string description = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "An optional longer explanation of the source's purpose."
+      example: "\"Primary CRM system used for customer relationship tracking.\""
+      min_length: 0
+      max_length: 500
+    }
+  ];
+
+  // Source type, representing the category of the data origin.
+  SourceType type = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "The type of data source represented by this entry."
+      enum: [
+        "TYPE_UNSPECIFIED",
+        "CALL",
+        "CHAT",
+        "SOCIAL_MEDIA",
+        "EMAIL",
+        "API",
+        "MANUAL"
+      ]
+      example: "\"CALL\""
+      default: "TYPE_UNSPECIFIED"
+    }
+  ];
+
+  // Timestamp of when the source record was created.
+  int64 created_at = 20 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Unix timestamp representing when the source was created."
+      format: "int64"
+      read_only: true
+    }
+  ];
+
+  // Timestamp of when the source record was last updated.
+  int64 updated_at = 21 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Unix timestamp representing the most recent update."
+      format: "int64"
+      read_only: true
+    }
+  ];
+
+  // User who created the source record.
+  general.Lookup created_by = 22 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Reference to the user who originally created this source."
+      read_only: true
+    }
+  ];
+
+  // User who last updated the source record.
+  general.Lookup updated_by = 23 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Reference to the user who most recently modified this source."
+      read_only: true
+    }
+  ];
 }
+
 
 // A list of sources.
 message SourceList {
