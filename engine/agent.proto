@@ -7,6 +7,7 @@ option go_package = "github.com/webitel/protos/engine";
 import "const.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/wrappers.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 /*
 add sip & web field
@@ -141,7 +142,7 @@ service AgentService {
             get: "/call_center/users"
         };
     }
-    
+
 }
 
 message UserStatus {
@@ -202,11 +203,6 @@ message AgentTodayStatisticsResponse {
     int32 processing = 20;
     int32 task_accepts = 21;
     int32 queue_talk_sec = 22;
-
-    int32 call_queue_missed = 23;
-    int32 call_inbound_queue = 24;
-    int32 call_dialer_queue = 25;
-    int32 call_manual = 26;
 }
 
 message SearchAgentStatusStatisticItemRequest {
@@ -464,7 +460,6 @@ message AgentInQueue {
     int32 waiting_members = 7;
     int32 active_members = 8;
     AgentsInQueue agents = 9;
-    int32 max_member_limit = 10;
 }
 
 message ListAgentInQueue {
@@ -617,7 +612,15 @@ message Agent {
     string status = 3;
     string description = 4;
     int64 last_status_change = 5;
-    int32 progressive_count = 6;
+    int32 progressive_count = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        default: "1"
+        title: "progressive_count title"
+        description: "progressive_count desc"
+        read_only: false
+        example: "100"
+        maximum: 100
+        minimum: 1
+    }];
     string name = 7;
     repeated AgentChannel channel = 8;
     int64 status_duration = 9;
