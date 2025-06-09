@@ -132,7 +132,7 @@ message DeleteGroupRequest {
 // Request message for adding contacts to a group.
 message AddContactsToGroupRequest {
   // The unique ID of the group.
-  int64 group_id = 1;
+  repeated int64 group_ids = 1;
 
   // List of contact IDs to add to the group.
   repeated int64 contact_ids = 2;
@@ -248,13 +248,14 @@ service Groups {
   }
 
   // Add contacts to a group.
-  rpc AddContactsToGroup(AddContactsToGroupRequest) returns (contacts.ContactList) {
+  rpc AddContactsToGroups(AddContactsToGroupRequest) returns (contacts.ContactList) {
     option (google.api.http) = {
-      post: "/contacts/groups/{group_id}/contact"
+      post: "/contacts/groups/contacts:attach"
+      body: "*"
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Add contacts to a group"
+      summary: "Attach contacts to multiple groups"
     };
   }
 
