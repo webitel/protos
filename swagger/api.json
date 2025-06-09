@@ -16381,6 +16381,34 @@
         }
       }
     },
+    "/contacts/groups/contacts:attach": {
+      "post": {
+        "tags": [
+          "Groups"
+        ],
+        "summary": "Attach contacts to multiple groups",
+        "operationId": "Groups_AddContactsToGroups",
+        "parameters": [
+          {
+            "description": "Request message for adding contacts to a group.",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.AddContactsToGroupRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.contacts.ContactList"
+            }
+          }
+        }
+      }
+    },
     "/contacts/groups/dynamic": {
       "get": {
         "tags": [
@@ -16595,42 +16623,6 @@
       }
     },
     "/contacts/groups/{group_id}/contact": {
-      "post": {
-        "tags": [
-          "Groups"
-        ],
-        "summary": "Add contacts to a group",
-        "operationId": "Groups_AddContactsToGroup",
-        "parameters": [
-          {
-            "type": "string",
-            "format": "int64",
-            "description": "The unique ID of the group.",
-            "name": "group_id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "int64"
-            },
-            "collectionFormat": "multi",
-            "description": "List of contact IDs to add to the group.",
-            "name": "contact_ids",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.contacts.ContactList"
-            }
-          }
-        }
-      },
       "delete": {
         "tags": [
           "Groups"
@@ -53386,6 +53378,28 @@
         "WRITE",
         "DELETE"
       ]
+    },
+    "webitel.contacts.AddContactsToGroupRequest": {
+      "description": "Request message for adding contacts to a group.",
+      "type": "object",
+      "properties": {
+        "contact_ids": {
+          "description": "List of contact IDs to add to the group.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
+        "group_ids": {
+          "description": "The unique ID of the group.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        }
+      }
     },
     "webitel.contacts.Attachment": {
       "type": "object",
