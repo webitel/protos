@@ -89,7 +89,7 @@ bool is_active = 25 [
 
 ---
 
-### 7. Query Parameter Comments
+### 6. Query Parameter Comments
 
 **Purpose:**
 To document non-standard or non-obvious query parameters used in `GET` endpoints — especially ones like `q`, `sort`, `filter`, etc.
