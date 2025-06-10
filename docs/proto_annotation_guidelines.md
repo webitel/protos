@@ -12,6 +12,8 @@ string name = 2 [
 ```
 **Why:** Reduces support requests and clarifies field purpose in Swagger documentation.
 
+---
+
 #### 2. Enum Values
 **Purpose:** Define all possible values  
 **Implementation:**
@@ -28,6 +30,8 @@ enum SourceType {
 ```
 **Why:** Critical for frontend validation and documentation - automatically appears in generated clients.
 
+---
+
 #### 3. Enum Comments
 **Purpose:** Clarify non-obvious enum values  
 **Implementation:**
@@ -41,6 +45,7 @@ enum SourceType {
 ```
 **Why:** Provides context in IDE tooltips and reduces misinterpretation.
 
+---
 
 #### 4. Required Fields
 **Purpose:** Mark mandatory fields  
@@ -53,6 +58,8 @@ string name = 2 [
 ];
 ```
 **Why:** Generates automatic validation and prevents API misuse.
+
+---
 
 #### 5. Field Validation Rules
 **Purpose:** Define data constraints  
@@ -79,8 +86,6 @@ bool is_active = 25 [
   }
 ];
 ```
-
-Here is your full section translated into English:
 
 ---
 
