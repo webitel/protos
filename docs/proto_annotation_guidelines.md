@@ -1,6 +1,6 @@
 ### Essential Proto Annotations for Backend Team
 
-#### 1. Field Descriptions
+### 1. Field Descriptions
 **Purpose:** Provide clear context for API consumers  
 **Implementation:**
 ```protobuf
@@ -14,7 +14,7 @@ string name = 2 [
 
 ---
 
-#### 2. Enum Values
+### 2. Enum Values
 **Purpose:** Define all possible values  
 **Implementation:**
 ```protobuf
@@ -32,7 +32,7 @@ enum SourceType {
 
 ---
 
-#### 3. Enum Comments
+### 3. Enum Comments
 **Purpose:** Clarify non-obvious enum values  
 **Implementation:**
 ```protobuf
@@ -47,7 +47,7 @@ enum SourceType {
 
 ---
 
-#### 4. Required Fields
+### 4. Required Fields
 **Purpose:** Mark mandatory fields  
 **Implementation:**
 ```protobuf
@@ -61,7 +61,7 @@ string name = 2 [
 
 ---
 
-#### 5. Field Validation Rules
+### 5. Field Validation Rules
 **Purpose:** Define data constraints  
 **Implementation:**
 ```protobuf
@@ -76,7 +76,9 @@ string name = 2 [
 ```
 **Why:** Enables automatic client-side validation and documents data constraints.
 
-#### 6. Default Values
+---
+
+### 6. Default Values
 **Purpose:** Specify omitted field behavior  
 **Implementation:**
 ```protobuf
@@ -89,7 +91,7 @@ bool is_active = 25 [
 
 ---
 
-### 6. Query Parameter Comments
+### 7. Query Parameter Comments
 
 **Purpose:**
 To document non-standard or non-obvious query parameters used in `GET` endpoints — especially ones like `q`, `sort`, `filter`, etc.
