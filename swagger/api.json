@@ -12800,19 +12800,32 @@
         "operationId": "CreateSource",
         "parameters": [
           {
+            "description": "Main input payload for the source being created",
             "name": "input",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/webitel.cases.InputSource"
+              "description": "The input data for the source",
+              "format": "object",
+              "required": [
+                "input"
+              ],
+              "$ref": "#/definitions/webitel.cases.InputSource",
+              "example": {
+                "description": "For inbound communication",
+                "name": "Inbound",
+                "type": "CALL"
+              }
             }
           },
           {
+            "uniqueItems": true,
             "type": "array",
             "items": {
               "type": "string"
             },
             "collectionFormat": "multi",
+            "description": "Optional list of specific fields to return after creation\n\nSpecific fields to include in response",
             "name": "fields",
             "in": "query"
           }
@@ -51391,20 +51404,59 @@
       }
     },
     "webitel.cases.InputSource": {
+      "description": "The data structure representing a source",
       "type": "object",
+      "title": "Input Source",
+      "default": "{ \"name\": \"Default Source\", \"type\": \"CALL\" }",
+      "maxProperties": 5,
+      "minProperties": 2,
+      "required": [
+        "name",
+        "type"
+      ],
       "properties": {
         "description": {
-          "description": "The description of the source.",
-          "type": "string"
+          "description": "A short description of the source",
+          "type": "string",
+          "format": "string",
+          "title": "Optional short description for context",
+          "default": "No description provided",
+          "maxLength": 500,
+          "example": "Handles incoming calls from customers"
         },
         "name": {
-          "description": "The name of the source.",
-          "type": "string"
+          "description": "The name of the source",
+          "type": "string",
+          "format": "string",
+          "title": "Display name for the source",
+          "default": "New Source",
+          "maxLength": 100,
+          "minLength": 2,
+          "pattern": "^[a-zA-Z0-9_\\- ]+$",
+          "example": "Inbound Calls"
         },
         "type": {
-          "description": "The source type of the source.",
-          "$ref": "#/definitions/webitel.cases.SourceType"
+          "description": "The type of the source",
+          "format": "string",
+          "title": "Type of the source; restrictable to a fixed set of allowed values",
+          "default": "\"CALL\"",
+          "enum": [
+            "CALL",
+            "EMAIL",
+            "CHAT"
+          ],
+          "$ref": "#/definitions/webitel.cases.SourceType",
+          "example": "CALL"
         }
+      },
+      "externalDocs": {
+        "description": "Supported source types documentation",
+        "url": "https://api.example.com/docs/source-types"
+      },
+      "example": {
+        "description": "Inbound customer calls",
+        "name": "Inbound",
+        "type": "CALL"
       }
     },
     "webitel.cases.InputStatus": {
@@ -52010,43 +52062,75 @@
       }
     },
     "webitel.cases.Source": {
-      "description": "Represents a source entity in the contact system.",
+      "description": "Represents a data source in the contact management system.",
       "type": "object",
+      "title": "Source Entity",
+      "required": [
+        "id",
+        "name",
+        "type",
+        "created_at",
+        "updated_at",
+        "created_by",
+        "updated_by"
+      ],
       "properties": {
         "created_at": {
+          "description": "Unix timestamp representing when the source was created.",
           "type": "string",
           "format": "int64",
-          "title": "CreatedAt timestamp of the source"
+          "readOnly": true
         },
         "created_by": {
-          "title": "CreatedBy user of the source",
-          "$ref": "#/definitions/general.Lookup"
+          "description": "Reference to the user who originally created this source.",
+          "$ref": "#/definitions/general.Lookup",
+          "readOnly": true
         },
         "description": {
+          "description": "An optional longer explanation of the source's purpose.",
           "type": "string",
-          "title": "Description of the source"
+          "maxLength": 500,
+          "example": "Primary CRM system used for customer relationship tracking."
         },
         "id": {
+          "description": "Unique identifier for the source, generated automatically.",
           "type": "string",
           "format": "int64",
-          "title": "Unique identifier of the source"
+          "readOnly": true
         },
         "name": {
+          "description": "A unique, descriptive name for the source.",
           "type": "string",
-          "title": "Name of the source"
+          "maxLength": 100,
+          "minLength": 3,
+          "pattern": "^[a-zA-Z0-9_\\-\\s]+$",
+          "example": "CRM System"
         },
         "type": {
-          "title": "Source type of the source",
-          "$ref": "#/definitions/webitel.cases.SourceType"
+          "description": "The type of data source represented by this entry.",
+          "default": "TYPE_UNSPECIFIED",
+          "enum": [
+            "TYPE_UNSPECIFIED",
+            "CALL",
+            "CHAT",
+            "SOCIAL_MEDIA",
+            "EMAIL",
+            "API",
+            "MANUAL"
+          ],
+          "$ref": "#/definitions/webitel.cases.SourceType",
+          "example": "CALL"
         },
         "updated_at": {
+          "description": "Unix timestamp representing the most recent update.",
           "type": "string",
           "format": "int64",
-          "title": "UpdatedAt timestamp of the source"
+          "readOnly": true
         },
         "updated_by": {
-          "title": "UpdatedBy user of the source",
-          "$ref": "#/definitions/general.Lookup"
+          "description": "Reference to the user who most recently modified this source.",
+          "$ref": "#/definitions/general.Lookup",
+          "readOnly": true
         }
       }
     },
