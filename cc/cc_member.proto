@@ -14,7 +14,7 @@ service MemberService {
     rpc CallJoinToQueue(CallJoinToQueueRequest) returns (stream QueueEvent) {}
     rpc ChatJoinToQueue(ChatJoinToQueueRequest) returns (stream QueueEvent) {}
     rpc CallJoinToAgent(CallJoinToAgentRequest) returns (stream QueueEvent) {}
-    rpc OutboundCall(OutboundCallReqeust) returns (stream QueueEvent) {}
+    rpc OutboundCall(OutboundCallRequest) returns (OutboundCallResponse) {}
     rpc TaskJoinToAgent(TaskJoinToAgentRequest) returns (stream QueueEvent) {}
 
     rpc CancelAttempt(CancelAttemptRequest) returns (CancelAttemptResponse) {}
@@ -166,31 +166,27 @@ message TaskJoinToAgentRequest {
     int64 domain_id = 100;
 }
 
-message OutboundCallReqeust {
+message OutboundCallRequest {
     message Processing {
         bool enabled = 1;
         uint32 renewal_sec = 2;
         uint32 sec = 3;
         QueueFormSchema form = 4;
+        bool without_answer = 5;
     }
+    int64 user_id= 1;
+    int64 domain_id= 2;
+    string call_id = 3;
+    int32 timeout = 4;
+    map<string,string> variables = 5;
+    Processing processing = 6;
+    string queue_name = 7;
+    bool cancel_distribute = 8;
+}
 
-    message Gateway {
-        int32 id = 1;
-        string name = 2;
-    }
-
-    message Endpoint {
-        string dial_string = 1;
-        Gateway gateway = 2;
-        map<string,string> parameters = 3;
-    }
-
-    string call_id = 1;
-    int32 timeout = 2;
-    map<string,string> variables = 3;
-    Processing processing = 4;
-    string queue_name = 5;
-    bool cancel_distribute = 6;
+message OutboundCallResponse {
+    int64 attempt_id = 1;
+    int32 agent_id = 2;
 }
 
 message CallJoinToAgentRequest {
