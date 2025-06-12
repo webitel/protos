@@ -1,16 +1,8 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "Webitel API",
-    "version": "24.04.0",
-    "contact": {
-      "name": "Webitel",
-      "url": "https://webitel.com",
-      "email": "support@webitel.com"
-    },
-    "license": {
-      "name": "MIT"
-    }
+    "title": "service.proto",
+    "version": "version not set"
   },
   "tags": [
     {
@@ -64,11 +56,6 @@
     {
       "name": "Statuses"
     }
-  ],
-  "host": "dev.webitel.com",
-  "basePath": "/api",
-  "schemes": [
-    "https"
   ],
   "consumes": [
     "application/json"
@@ -2085,17 +2072,30 @@
         "parameters": [
           {
             "name": "input",
+            "description": "Main input payload for the source being created",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/webitel.cases.InputSource"
+              "format": "object",
+              "$ref": "#/definitions/webitel.cases.InputSource",
+              "example": {
+                "name": "Inbound",
+                "description": "For inbound communication",
+                "type": "CALL"
+              },
+              "description": "The input data for the source",
+              "required": [
+                "input"
+              ]
             }
           },
           {
             "name": "fields",
+            "description": "Optional list of specific fields to return after creation\n\nSpecific fields to include in response",
             "in": "query",
             "required": false,
             "type": "array",
+            "uniqueItems": true,
             "items": {
               "type": "string"
             },
@@ -6955,20 +6955,59 @@
     },
     "webitel.cases.InputSource": {
       "type": "object",
+      "example": {
+        "name": "Inbound",
+        "description": "Inbound customer calls",
+        "type": "CALL"
+      },
+      "default": "{ \"name\": \"Default Source\", \"type\": \"CALL\" }",
       "properties": {
         "name": {
           "type": "string",
-          "description": "The name of the source."
+          "format": "string",
+          "example": "Inbound Calls",
+          "default": "New Source",
+          "description": "The name of the source",
+          "title": "Display name for the source",
+          "maxLength": 100,
+          "minLength": 2,
+          "pattern": "^[a-zA-Z0-9_\\- ]+$"
         },
         "description": {
           "type": "string",
-          "description": "The description of the source."
+          "format": "string",
+          "example": "Handles incoming calls from customers",
+          "default": "No description provided",
+          "description": "A short description of the source",
+          "title": "Optional short description for context",
+          "maxLength": 500
         },
         "type": {
+          "format": "string",
           "$ref": "#/definitions/webitel.cases.SourceType",
-          "description": "The source type of the source."
+          "example": "CALL",
+          "enum": [
+            "CALL",
+            "EMAIL",
+            "CHAT"
+          ],
+          "default": "\"CALL\"",
+          "description": "The type of the source",
+          "title": "Type of the source; restrictable to a fixed set of allowed values"
         }
-      }
+      },
+      "description": "The data structure representing a source",
+      "title": "Input Source",
+      "externalDocs": {
+        "description": "Supported source types documentation",
+        "url": "https://api.example.com/docs/source-types"
+      },
+      "maxProperties": 5,
+      "minProperties": 2,
+      "required": [
+        "name",
+        "type"
+      ]
     },
     "webitel.cases.InputStatus": {
       "type": "object",
@@ -7578,40 +7617,72 @@
         "id": {
           "type": "string",
           "format": "int64",
-          "title": "Unique identifier of the source"
+          "description": "Unique identifier for the source, generated automatically.",
+          "readOnly": true
         },
         "name": {
           "type": "string",
-          "title": "Name of the source"
+          "example": "CRM System",
+          "description": "A unique, descriptive name for the source.",
+          "maxLength": 100,
+          "minLength": 3,
+          "pattern": "^[a-zA-Z0-9_\\-\\s]+$"
         },
         "description": {
           "type": "string",
-          "title": "Description of the source"
+          "example": "Primary CRM system used for customer relationship tracking.",
+          "description": "An optional longer explanation of the source's purpose.",
+          "maxLength": 500
         },
         "type": {
           "$ref": "#/definitions/webitel.cases.SourceType",
-          "title": "Source type of the source"
+          "example": "CALL",
+          "enum": [
+            "TYPE_UNSPECIFIED",
+            "CALL",
+            "CHAT",
+            "SOCIAL_MEDIA",
+            "EMAIL",
+            "API",
+            "MANUAL"
+          ],
+          "default": "TYPE_UNSPECIFIED",
+          "description": "The type of data source represented by this entry."
         },
         "created_at": {
           "type": "string",
           "format": "int64",
-          "title": "CreatedAt timestamp of the source"
+          "description": "Unix timestamp representing when the source was created.",
+          "readOnly": true
         },
         "updated_at": {
           "type": "string",
           "format": "int64",
-          "title": "UpdatedAt timestamp of the source"
+          "description": "Unix timestamp representing the most recent update.",
+          "readOnly": true
         },
         "created_by": {
           "$ref": "#/definitions/general.Lookup",
-          "title": "CreatedBy user of the source"
+          "description": "Reference to the user who originally created this source.",
+          "readOnly": true
         },
         "updated_by": {
           "$ref": "#/definitions/general.Lookup",
-          "title": "UpdatedBy user of the source"
+          "description": "Reference to the user who most recently modified this source.",
+          "readOnly": true
         }
       },
-      "description": "Represents a source entity in the contact system."
+      "description": "Represents a data source in the contact management system.",
+      "title": "Source Entity",
+      "required": [
+        "id",
+        "name",
+        "type",
+        "created_at",
+        "updated_at",
+        "created_by",
+        "updated_by"
+      ]
     },
     "webitel.cases.SourceList": {
       "type": "object",
@@ -7818,17 +7889,5 @@
       },
       "description": "Response message after unlinking a communication from a case."
     }
-  },
-  "securityDefinitions": {
-    "AccessToken": {
-      "type": "apiKey",
-      "name": "X-Webitel-Access",
-      "in": "header"
-    }
-  },
-  "security": [
-    {
-      "AccessToken": []
-    }
-  ]
+  }
 }
