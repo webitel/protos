@@ -1,17 +1,9 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "import.proto",
+    "title": "config_service.proto",
     "version": "version not set"
   },
-  "tags": [
-    {
-      "name": "ConfigService"
-    },
-    {
-      "name": "LoggerService"
-    }
-  ],
   "consumes": [
     "application/json"
   ],
@@ -21,7 +13,7 @@
   "paths": {
     "/logger/available_objects": {
       "get": {
-        "operationId": "ReadSystemObjects",
+        "operationId": "ConfigService_ReadSystemObjects",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -32,7 +24,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/rpcStatus"
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -51,7 +43,7 @@
     },
     "/logger/config": {
       "get": {
-        "operationId": "SearchConfig",
+        "operationId": "ConfigService_SearchConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -62,7 +54,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/rpcStatus"
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -105,7 +97,7 @@
           },
           {
             "name": "object",
-            "description": "NOT USED",
+            "description": "NOT USED.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -127,7 +119,8 @@
                 "contacts",
                 "cc_list_number",
                 "case_comments",
-                "record_file"
+                "record_file",
+                "related_cases"
               ]
             },
             "collectionFormat": "multi"
@@ -138,7 +131,7 @@
         ]
       },
       "post": {
-        "operationId": "CreateConfig",
+        "operationId": "ConfigService_CreateConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -149,7 +142,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/rpcStatus"
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -170,7 +163,7 @@
     },
     "/logger/config/{config_id}": {
       "get": {
-        "operationId": "ReadConfig",
+        "operationId": "ConfigService_ReadConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -181,14 +174,13 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/rpcStatus"
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
         "parameters": [
           {
             "name": "config_id",
-            "description": "int32 domainId = 8;",
             "in": "path",
             "required": true,
             "type": "integer",
@@ -200,7 +192,7 @@
         ]
       },
       "delete": {
-        "operationId": "DeleteConfig",
+        "operationId": "ConfigService_DeleteConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -211,7 +203,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/rpcStatus"
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -229,7 +221,7 @@
         ]
       },
       "put": {
-        "operationId": "UpdateConfig",
+        "operationId": "ConfigService_UpdateConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -240,7 +232,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/rpcStatus"
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -257,7 +249,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/ConfigServiceUpdateConfigBody"
+              "$ref": "#/definitions/loggerUpdateConfigRequest"
             }
           }
         ],
@@ -266,7 +258,7 @@
         ]
       },
       "patch": {
-        "operationId": "PatchConfig",
+        "operationId": "ConfigService_PatchConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -277,7 +269,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/rpcStatus"
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -294,7 +286,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/ConfigServicePatchConfigBody"
+              "$ref": "#/definitions/loggerPatchConfigRequest"
             }
           }
         ],
@@ -305,7 +297,7 @@
     },
     "/logger/config/{config_id}/logs": {
       "get": {
-        "operationId": "SearchLogByConfigId",
+        "operationId": "LoggerService_SearchLogByConfigId",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -316,7 +308,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/rpcStatus"
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -420,7 +412,7 @@
     },
     "/logger/user/{user_id}/logs": {
       "get": {
-        "operationId": "SearchLogByUserId",
+        "operationId": "LoggerService_SearchLogByUserId",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -431,7 +423,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/rpcStatus"
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -482,7 +474,7 @@
           },
           {
             "name": "object_id",
-            "description": "SPECIFIC filter",
+            "description": "SPECIFIC filter.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -494,7 +486,7 @@
           },
           {
             "name": "action",
-            "description": "GENERAL filters",
+            "description": "GENERAL filters.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -538,7 +530,7 @@
     },
     "/logger/{object}/record/{record_id}/logs": {
       "get": {
-        "operationId": "SearchLogByRecordId",
+        "operationId": "LoggerService_SearchLogByRecordId",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -549,7 +541,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/rpcStatus"
+              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -576,7 +568,8 @@
               "contacts",
               "cc_list_number",
               "case_comments",
-              "record_file"
+              "record_file",
+              "related_cases"
             ]
           },
           {
@@ -625,7 +618,7 @@
           },
           {
             "name": "action",
-            "description": "GENERAL filters",
+            "description": "GENERAL filters.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -680,56 +673,6 @@
     }
   },
   "definitions": {
-    "ConfigServicePatchConfigBody": {
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "type": "boolean"
-        },
-        "days_to_store": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "period": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "storage": {
-          "$ref": "#/definitions/loggerLookup"
-        },
-        "description": {
-          "type": "string"
-        },
-        "fields": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "ConfigServiceUpdateConfigBody": {
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "type": "boolean"
-        },
-        "days_to_store": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "period": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "storage": {
-          "$ref": "#/definitions/loggerLookup"
-        },
-        "description": {
-          "type": "string"
-        }
-      }
-    },
     "loggerAction": {
       "type": "string",
       "enum": [
@@ -759,7 +702,8 @@
         "contacts",
         "cc_list_number",
         "case_comments",
-        "record_file"
+        "record_file",
+        "related_cases"
       ],
       "default": "cc_queue"
     },
@@ -820,7 +764,6 @@
         "items": {
           "type": "array",
           "items": {
-            "type": "object",
             "$ref": "#/definitions/loggerConfig"
           }
         }
@@ -902,7 +845,6 @@
         "items": {
           "type": "array",
           "items": {
-            "type": "object",
             "$ref": "#/definitions/loggerLog"
           }
         }
@@ -917,6 +859,38 @@
         },
         "name": {
           "type": "string"
+        }
+      }
+    },
+    "loggerPatchConfigRequest": {
+      "type": "object",
+      "properties": {
+        "config_id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "days_to_store": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "period": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "storage": {
+          "$ref": "#/definitions/loggerLookup"
+        },
+        "description": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -937,24 +911,55 @@
         "items": {
           "type": "array",
           "items": {
-            "type": "object",
             "$ref": "#/definitions/loggerLookup"
           }
+        }
+      }
+    },
+    "loggerUpdateConfigRequest": {
+      "type": "object",
+      "properties": {
+        "config_id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "days_to_store": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "period": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "storage": {
+          "$ref": "#/definitions/loggerLookup"
+        },
+        "description": {
+          "type": "string"
         }
       }
     },
     "protobufAny": {
       "type": "object",
       "properties": {
-        "@type": {
+        "type_url": {
           "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
         }
-      },
-      "additionalProperties": {}
+      }
     },
-    "rpcStatus": {
+    "runtimeError": {
       "type": "object",
       "properties": {
+        "error": {
+          "type": "string"
+        },
         "code": {
           "type": "integer",
           "format": "int32"
@@ -965,7 +970,6 @@
         "details": {
           "type": "array",
           "items": {
-            "type": "object",
             "$ref": "#/definitions/protobufAny"
           }
         }
