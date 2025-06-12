@@ -22,13 +22,6 @@ service LoggerService {
       get: "/logger/{object}/record/{record_id}/logs"
     };
   }
-   rpc DeleteConfigLogs(DeleteConfigLogsRequest) returns (DeleteConfigLogsResponse) {
-    option (google.api.http) = {
-      delete: "/logger/config/{config_id}/logs"
-      body: "*"
-    };
-  }
-
 }
 
 enum Action {
@@ -132,7 +125,12 @@ message Log {
   string user_ip = 5;
   string new_state = 6;
   int32 config_id = 7;
-  Lookup record = 8;
+  Record record = 8;
   Lookup object = 9;
+}
+
+message Record {
+  string id = 1;
+  string name = 2;
 }
 
