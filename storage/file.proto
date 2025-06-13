@@ -27,6 +27,30 @@ service FileService {
             get: "/storage/file"
         };
     }
+
+    rpc UploadP2PVideo (UploadP2PVideoRequest) returns (UploadP2PVideoResponse) {
+        option (google.api.http) = {
+            post: "/storage/p2p/upload/video"
+        };
+    }
+}
+
+message ICEServers {
+    repeated string urls = 1;
+    string username = 2;
+    int32 credentialType = 3;
+    bytes credential = 4;
+}
+
+message UploadP2PVideoRequest {
+    string sdp_offer = 1;
+    string name = 2;
+    string uuid = 3;
+    repeated ICEServers ice_servers = 4;
+}
+
+message UploadP2PVideoResponse {
+    string sdp_answer = 1;
 }
 
 message BulkGenerateFileLinkRequest {
@@ -90,6 +114,8 @@ enum UploadFileChannel {
     MediaChannel = 5;
     KnowledgebaseChannel = 6;
     CasesChannel = 7;
+    ScreenshotChannel = 8;
+    ScreenSharingChannel = 9;
 }
 
 message Thumbnail {
