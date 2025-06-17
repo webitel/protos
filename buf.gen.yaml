@@ -1,0 +1,32 @@
+version: v2
+
+managed:
+  enabled: true
+  override:
+    - file_option: go_package_prefix
+      value: github.com/webitel/protos/gen
+
+  disable:
+    - module: buf.build/googleapis/googleapis
+    - module: buf.build/grpc-ecosystem/grpc-gateway
+    - module: buf.build/bufbuild/protovalidate
+    - module: buf.build/webitel/protoc-gen-go-webitel
+
+plugins:
+  # Generate OpenAPI documentation for api
+  - remote: buf.build/grpc-ecosystem/openapiv2:v2.26.3
+    out: .
+    opt:
+      - disable_default_errors=true
+      - version=false
+      - json_names_for_fields=false
+      - allow_delete_body=true
+      - include_package_in_tags=false
+      - allow_repeated_fields_in_body=false
+      - fqn_for_openapi_name=false
+      - merge_file_name=webitel-api
+      - allow_merge=true
+      - simple_operation_ids=true
+
+inputs:
+  - directory: .

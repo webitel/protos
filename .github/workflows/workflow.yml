@@ -1,0 +1,169 @@
+name: Workflow
+
+on:
+  push:
+    branches: [ main, "v[0-9]+.[0-9]+" ]
+    paths:
+      - "buf.yaml"
+      - "buf.lock"
+      - "**.proto"
+      - "**/buf.md"
+      - "**/README.md"
+      - "**/LICENSE"
+      - ".github/workflows/workflow.yml"
+
+permissions: { contents: read }
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  version:
+    name: Version
+    uses: webitel/reusable-workflows/.github/workflows/_version.yml@main
+    with:
+      development-branch: ${{ github.event.repository.default_branch }}
+      triggered-branch: ${{ github.ref_name }}
+      build-number: ${{ github.run_number }}
+
+  push:
+    name: Push to BSR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Push modules
+        uses: bufbuild/buf-action@v1
+        with:
+          token: ${{ secrets.BUF_TOKEN }}
+          push: true
+
+  swagger:
+    name: Generate Swagger
+    needs: [ version ]
+    runs-on: ubuntu-latest
+    permissions: { contents: write }
+    services:
+      swagger-editor:
+        image: swaggerapi/swagger-editor
+        ports: [ 80:8080 ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Buf
+        uses: bufbuild/buf-action@v1
+        with:
+          token: ${{ secrets.BUF_TOKEN }}
+          setup_only: true
+
+      - name: Update version in proto file
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = 'general/openapiv2.proto';
+            const newVersion = '${{ needs.version.outputs.version }}${{ github.event.repository.default_branch == github.ref_name  && '-dev' }}';
+            
+            let content = fs.readFileSync(path, 'utf8');
+            core.info('Original content preview:');
+            core.info(content.substring(content.indexOf('info: {'), content.indexOf('info: {') + 200) + '...');
+            
+            const versionRegex = /(info:\s*{[^}]*version:\s*")[^"]*(")/s;
+            const updatedContent = content.replace(versionRegex, `$1${newVersion}$2`);
+            if (content === updatedContent) {
+              core.setFailed('Version was not updated - regex did not match');
+              return;
+            }
+            
+            fs.writeFileSync(path, updatedContent);
+            
+            const finalContent = fs.readFileSync(path, 'utf8');
+            const versionMatch = finalContent.match(/info:\s*{[^}]*version:\s*"([^"]*)"/s);
+            
+            if (!versionMatch) {
+              core.setFailed('Could not find version in updated file');
+              return;
+            }
+            
+            const actualVersion = versionMatch[1];
+            core.info(`Expected version: ${newVersion}`);
+            core.info(`Actual version: ${actualVersion}`);
+            if (actualVersion !== newVersion) {
+              core.setFailed(`Version mismatch! Expected: ${newVersion}, Found: ${actualVersion}`);
+              return;
+            }
+            
+            core.notice('✅ Version updated successfully!');
+            const infoMatch = finalContent.match(/info:\s*{[^}]*}/s);
+            if (infoMatch) {
+              core.startGroup('Updated info block');
+              core.info(infoMatch[0]);
+              core.endGroup();
+            }
+
+      - name: Generate Swagger specification
+        run: buf generate
+
+      - name: Validate Swagger specification
+        uses: swaggerexpert/swagger-editor-validate@v1.5.1
+        with:
+          swagger-editor-url: http://localhost/
+          definition-file: webitel-api.swagger.json
+          default-timeout: 20000
+
+      - name: Commit and push version update
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          if git diff --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          
+          git add general/openapiv2.proto
+          git add webitel-api.swagger.json
+          git commit -m "chore: update API version to ${{ needs.version.outputs.version }}${{ github.ref_name == github.event.repository.default_branch && '-dev' }} [skip ci]"
+          git push
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: swagger
+          compression-level: 9
+          path: webitel-api.swagger.json
+
+  publish:
+    name: Publish release
+    needs: [ version, push, swagger ]
+    runs-on: ubuntu-latest
+    if: github.event.repository.default_branch != github.ref_name
+    permissions: { contents: write }
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history so we can list branches
+
+      - name: Download generated file
+        uses: actions/download-artifact@v4
+        with:
+          name: swagger
+
+      - name: Check latest release branch
+        id: check
+        uses: webitel/reusable-workflows/actions/check-latest-action@main
+        with:
+          triggered-branch: ${{ github.ref_name }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.version.outputs.version }}-${{ needs.version.outputs.version-build }}
+          target_commitish: ${{ github.sha }}
+          make_latest: ${{ needs.check.outputs.latest }}
+          generate_release_notes: true
+          draft: false
+          files: webitel-api.swagger.json
