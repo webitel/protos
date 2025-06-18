@@ -57,13 +57,13 @@ service Cases {
   }
 
   // RPC method for updating an existing case.
-  rpc UpdateCase(UpdateCaseRequest) returns (Case) {
+  rpc UpdateCase(UpdateCaseRequest) returns (UpdateCaseResponse) {
     option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
-      put: "/cases/{input.etag}"        // Maps this RPC to an HTTP PUT endpoint.
-      body: "input"                     // Specifies that the request body contains the "input" field.
+      put: "/cases/{input.etag}"         // Maps this RPC to an HTTP PUT endpoint.
+      body: "input"                      // Specifies that the request body contains the "input" field.
       additional_bindings {              // Additional binding for PATCH requests.
-          patch: "/cases/{input.etag}"  // Maps this RPC to an HTTP PATCH endpoint.
+          patch: "/cases/{input.etag}"   // Maps this RPC to an HTTP PATCH endpoint.
           body: "input"
       }
     };
@@ -77,6 +77,19 @@ service Cases {
     };
   }
 }
+
+message FieldChange {
+  string field = 1;                    // Name of the changed field, e.g., "status", "priority"
+  google.protobuf.Value old_value = 2; // Old value (before the update)
+  google.protobuf.Value new_value = 3; // New value (after the update)
+}
+
+message UpdateCaseResponse {
+  Case case = 1;                        // Updated case object
+  repeated FieldChange changes = 2;     // List of changed fields with old and new values
+}
+
+
 
 // Request message for searching cases with optional filters, pagination, and sorting.
 message SearchCasesRequest {
