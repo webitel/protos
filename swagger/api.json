@@ -14459,7 +14459,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/webitel.cases.Case"
+              "$ref": "#/definitions/webitel.cases.UpdateCaseResponse"
             }
           },
           "default": {
@@ -14590,7 +14590,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/webitel.cases.Case"
+              "$ref": "#/definitions/webitel.cases.UpdateCaseResponse"
             }
           },
           "default": {
@@ -50922,6 +50922,21 @@
         }
       }
     },
+    "webitel.cases.FieldChange": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string",
+          "title": "Name of the changed field, e.g., \"status\", \"priority\""
+        },
+        "new_value": {
+          "title": "New value (after the update)"
+        },
+        "old_value": {
+          "title": "Old value (before the update)"
+        }
+      }
+    },
     "webitel.cases.File": {
       "description": "Metadata for a file associated with a case.",
       "type": "object",
@@ -52448,6 +52463,23 @@
           "description": "Affected rows.",
           "type": "string",
           "format": "int64"
+        }
+      }
+    },
+    "webitel.cases.UpdateCaseResponse": {
+      "type": "object",
+      "properties": {
+        "case": {
+          "title": "Updated case object",
+          "$ref": "#/definitions/webitel.cases.Case"
+        },
+        "changes": {
+          "type": "array",
+          "title": "List of changed fields with old and new values",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.cases.FieldChange"
+          }
         }
       }
     },
