@@ -682,7 +682,9 @@
                 "LogChannel",
                 "MediaChannel",
                 "KnowledgebaseChannel",
-                "CasesChannel"
+                "CasesChannel",
+                "ScreenshotChannel",
+                "ScreenSharingChannel"
               ]
             },
             "collectionFormat": "multi"
@@ -1443,6 +1445,38 @@
         ],
         "tags": [
           "MediaFileService"
+        ]
+      }
+    },
+    "/storage/p2p/upload/video": {
+      "post": {
+        "operationId": "FileService_UploadP2PVideo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storage.UploadP2PVideoResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/storage.UploadP2PVideoRequest"
+            }
+          }
+        ],
+        "tags": [
+          "FileService"
         ]
       }
     },
@@ -2216,6 +2250,28 @@
         "size": {
           "type": "string",
           "format": "int64"
+        }
+      }
+    },
+    "storage.ICEServers": {
+      "type": "object",
+      "properties": {
+        "urls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "username": {
+          "type": "string"
+        },
+        "credentialType": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "credential": {
+          "type": "string",
+          "format": "byte"
         }
       }
     },
@@ -3031,7 +3087,9 @@
         "LogChannel",
         "MediaChannel",
         "KnowledgebaseChannel",
-        "CasesChannel"
+        "CasesChannel",
+        "ScreenshotChannel",
+        "ScreenSharingChannel"
       ],
       "default": "UnknownChannel"
     },
@@ -3121,6 +3179,34 @@
           "$ref": "#/definitions/storage.Thumbnail"
         },
         "server": {
+          "type": "string"
+        }
+      }
+    },
+    "storage.UploadP2PVideoRequest": {
+      "type": "object",
+      "properties": {
+        "sdp_offer": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "ice_servers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/storage.ICEServers"
+          }
+        }
+      }
+    },
+    "storage.UploadP2PVideoResponse": {
+      "type": "object",
+      "properties": {
+        "sdp_answer": {
           "type": "string"
         }
       }
