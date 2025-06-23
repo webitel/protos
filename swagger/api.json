@@ -10994,6 +10994,12 @@
             "description": "List of fields to include in the response.",
             "name": "fields",
             "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Indicates whether to disable the trigger after the application execution.\nDefault is false (trigger **will** be executed).\nSet to true to explicitly prevent the trigger from running (e.g., when called from another trigger or internal flow).\nто\n[WTEL-7055]",
+            "name": "disableTrigger",
+            "in": "query"
           }
         ],
         "responses": {
@@ -12806,16 +12812,10 @@
             "required": true,
             "schema": {
               "description": "The input data for the source",
-              "format": "object",
               "required": [
                 "input"
               ],
-              "$ref": "#/definitions/webitel.cases.InputSource",
-              "example": {
-                "description": "For inbound communication",
-                "name": "Inbound",
-                "type": "CALL"
-              }
+              "$ref": "#/definitions/webitel.cases.InputSource"
             }
           },
           {
@@ -14453,6 +14453,12 @@
             "description": "List of fields to include in the response.",
             "name": "fields",
             "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Indicates whether to disable the trigger after the application execution.\nDefault is false (trigger **will** be executed).\nSet to true to explicitly prevent the trigger from running (e.g., when called from another trigger or internal flow).\n\n[WTEL-7055]",
+            "name": "disableTrigger",
+            "in": "query"
           }
         ],
         "responses": {
@@ -14583,6 +14589,12 @@
             "collectionFormat": "multi",
             "description": "List of fields to include in the response.",
             "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Indicates whether to disable the trigger after the application execution.\nDefault is false (trigger **will** be executed).\nSet to true to explicitly prevent the trigger from running (e.g., when called from another trigger or internal flow).\n\n[WTEL-7055]",
+            "name": "disableTrigger",
             "in": "query"
           }
         ],
@@ -51620,7 +51632,7 @@
     "webitel.cases.InputSource": {
       "description": "The data structure representing a source",
       "type": "object",
-      "title": "Input Source",
+      "title": "Input structure representing a new Source entity",
       "default": "{ \"name\": \"Default Source\", \"type\": \"CALL\" }",
       "maxProperties": 5,
       "minProperties": 2,
@@ -51632,45 +51644,24 @@
         "description": {
           "description": "A short description of the source",
           "type": "string",
-          "format": "string",
           "title": "Optional short description for context",
           "default": "No description provided",
-          "maxLength": 500,
-          "example": "Handles incoming calls from customers"
+          "maxLength": 500
         },
         "name": {
           "description": "The name of the source",
           "type": "string",
-          "format": "string",
           "title": "Display name for the source",
           "default": "New Source",
           "maxLength": 100,
-          "minLength": 2,
-          "pattern": "^[a-zA-Z0-9_\\- ]+$",
-          "example": "Inbound Calls"
+          "minLength": 2
         },
         "type": {
           "description": "The type of the source",
-          "format": "string",
           "title": "Type of the source; restrictable to a fixed set of allowed values",
           "default": "\"CALL\"",
-          "enum": [
-            "CALL",
-            "EMAIL",
-            "CHAT"
-          ],
-          "$ref": "#/definitions/webitel.cases.SourceType",
-          "example": "CALL"
+          "$ref": "#/definitions/webitel.cases.SourceType"
         }
-      },
-      "externalDocs": {
-        "description": "Supported source types documentation",
-        "url": "https://api.example.com/docs/source-types"
-      },
-      "example": {
-        "description": "Inbound customer calls",
-        "name": "Inbound",
-        "type": "CALL"
       }
     },
     "webitel.cases.InputStatus": {
@@ -52278,7 +52269,6 @@
     "webitel.cases.Source": {
       "description": "Represents a data source in the contact management system.",
       "type": "object",
-      "title": "Source Entity",
       "required": [
         "id",
         "name",
@@ -52292,59 +52282,41 @@
         "created_at": {
           "description": "Unix timestamp representing when the source was created.",
           "type": "string",
-          "format": "int64",
-          "readOnly": true
+          "format": "int64"
         },
         "created_by": {
           "description": "Reference to the user who originally created this source.",
-          "$ref": "#/definitions/general.Lookup",
-          "readOnly": true
+          "$ref": "#/definitions/general.Lookup"
         },
         "description": {
           "description": "An optional longer explanation of the source's purpose.",
           "type": "string",
-          "maxLength": 500,
-          "example": "Primary CRM system used for customer relationship tracking."
+          "maxLength": 500
         },
         "id": {
           "description": "Unique identifier for the source, generated automatically.",
           "type": "string",
-          "format": "int64",
-          "readOnly": true
+          "format": "int64"
         },
         "name": {
           "description": "A unique, descriptive name for the source.",
           "type": "string",
           "maxLength": 100,
-          "minLength": 3,
-          "pattern": "^[a-zA-Z0-9_\\-\\s]+$",
-          "example": "CRM System"
+          "minLength": 3
         },
         "type": {
           "description": "The type of data source represented by this entry.",
           "default": "TYPE_UNSPECIFIED",
-          "enum": [
-            "TYPE_UNSPECIFIED",
-            "CALL",
-            "CHAT",
-            "SOCIAL_MEDIA",
-            "EMAIL",
-            "API",
-            "MANUAL"
-          ],
-          "$ref": "#/definitions/webitel.cases.SourceType",
-          "example": "CALL"
+          "$ref": "#/definitions/webitel.cases.SourceType"
         },
         "updated_at": {
           "description": "Unix timestamp representing the most recent update.",
           "type": "string",
-          "format": "int64",
-          "readOnly": true
+          "format": "int64"
         },
         "updated_by": {
           "description": "Reference to the user who most recently modified this source.",
-          "$ref": "#/definitions/general.Lookup",
-          "readOnly": true
+          "$ref": "#/definitions/general.Lookup"
         }
       }
     },
