@@ -91,17 +91,28 @@ message UpdateCaseResponse {
 
 
 
-// Request message for searching cases with optional filters, pagination, and sorting.
 message SearchCasesRequest {
   int32 page = 1;                       // Page number for pagination.
   int32 size = 2;                       // Number of results per page.
-  string q = 3;                         // Query string for searching cases.
+  string q = 3;                         // General query string.
   repeated string ids = 4;              // List of specific case IDs to retrieve.
   string sort = 5;                      // Sorting criteria (e.g., field:asc).
   repeated string fields = 6;           // List of fields to include in the response.
-  repeated string filters = 7;      // Key-value pairs for additional filtering.
+  repeated string filters = 7;          // Key-value pairs for additional filtering.
   string contact_id = 8;                // Contact ID for filtering cases.
+
+  CaseQueryTarget query_target = 9;         // Specify which fields to apply 'q' to.
 }
+
+// Define which fields are enabled for query matching.
+message CaseQueryTarget {
+  bool full = 1;           // Search everywhere (no restrictions)
+  bool subject = 2;        // Search in case subject.
+  bool name = 3;           // Search in case name or number.
+  bool contact_info = 4;   // Search in contact's email, phone, etc.
+  bool id = 5;             // Search in case id
+}
+
 
 // Request message for locating a specific case by its etag identifier.
 message LocateCaseRequest {
