@@ -18,6 +18,39 @@ service UserHelperService {
             get: "/user/widget/activity/today"
         };
     }
+    rpc OpenedWebSockets (OpenedWebSocketsRequest) returns (ListOpenedWebSocket) {
+        option (google.api.http) = {
+            get: "/users/{user_id}/websockets"
+        };
+    }
+
+}
+
+message OpenedWebSocketsRequest {
+    int32 page = 1;
+    int32 size = 2;
+    string q = 3;
+
+    string sort = 5;
+    repeated string fields = 6;
+
+    repeated int64 user_id = 7;
+}
+
+message OpenedWebSocket {
+    string id = 1;
+    int64 created_at = 2;
+    int64 updated_at = 3;
+    string user_agent = 4;
+    string ip = 5;
+    string client = 6;
+    int64 duration = 7;
+    int64 pong = 8;
+}
+
+message ListOpenedWebSocket {
+    bool next = 1;
+    repeated OpenedWebSocket items = 2;
 }
 
 message ActivityWorkspaceWidgetRequest {
