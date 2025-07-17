@@ -47,6 +47,7 @@ deps:
 
 # A set of rules for style, syntax, and best practices.
 # More options are available on: https://buf.build/docs/configuration/v2/buf-yaml/#lint
+# Style guide: https://buf.build/docs/best-practices/style-guide/
 lint:
   service_suffix: Service
   enum_zero_value_suffix: _UNSPECIFIED
@@ -56,26 +57,101 @@ lint:
 
   # Common rules: https://buf.build/docs/lint/rules
   use:
-    # - MINIMAL - consider to be fundamental rules for modern Protobuf development, enable it later
-    - ENUM_PASCAL_CASE
-    - ENUM_VALUE_UPPER_SNAKE_CASE
-    - FIELD_LOWER_SNAKE_CASE
-    - MESSAGE_PASCAL_CASE
-    - ONEOF_LOWER_SNAKE_CASE
-    - PACKAGE_LOWER_SNAKE_CASE
-    - RPC_PASCAL_CASE
-    - SERVICE_PASCAL_CASE
-    - PACKAGE_SAME_GO_PACKAGE
+    # Consider to be fundamental rules for modern Protobuf development, enable it later.
+    # See: https://buf.build/docs/lint/rules/#minimal
+    # - MINIMAL
+
+    # Checks non-empty comments.
+    # - COMMENT_ENUM
+    # - COMMENT_ENUM_VALUE
+    # - COMMENT_FIELD
+    # - COMMENT_MESSAGE
+    # - COMMENT_ONEOF
+    # - COMMENT_RPC
+    # - COMMENT_SERVICE
+
+    # This rule enforces that the first enum value is the zero value,
+    # which is a proto3 requirement on build.
+    # Example:
+    #     enum Scheme {
+    #         SCHEME_UNSPECIFIED = 0;
+    #         SCHEME_FTP = 1;
+    #     }
     - ENUM_FIRST_VALUE_ZERO
+
+    # Outlaws aliased enums like this:
+    #     enum Foo {
+    #         option allow_alias = true;
+    #         FOO_UNSPECIFIED = 0;
+    #         FOO_ONE = 1;
+    #         FOO_TWO = 1; // *** DON'T DO THIS ***
+    #     }
     - ENUM_NO_ALLOW_ALIAS
-    - IMPORT_NO_PUBLIC
+    - ENUM_PASCAL_CASE
+
+    # Requires that all enum value names are prefixed with the enum name.
     - ENUM_VALUE_PREFIX
+
+    # Checks that enum values are UPPER_SNAKE_CASE.
+    - ENUM_VALUE_UPPER_SNAKE_CASE
+
+    # Requires that all enum values have a zero value with a defined suffix.
+    # By default, it verifies that the zero value of all enums ends in _UNSPECIFIED
     - ENUM_ZERO_VALUE_SUFFIX
+
+    # Checks that field names are lower_snake_case.
+    - FIELD_LOWER_SNAKE_CASE
+
+    # All .proto files must be named as lower_snake_case.proto.
     - FILE_LOWER_SNAKE_CASE
-    - RPC_REQUEST_RESPONSE_UNIQUE
+
+    # Checks that all the imports declared across Protobuf files are actually used.
+    - IMPORT_USED
+
+    # Checks that messages are PascalCase.
+    - MESSAGE_PASCAL_CASE
+
+    # Checks that oneof names are lower_snake_case.
+    - ONEOF_LOWER_SNAKE_CASE
+
+    # Checks that all files have a package declaration.
+    - PACKAGE_DEFINED
+
+    # Checks that packages are lower_snake_case.
+    - PACKAGE_LOWER_SNAKE_CASE
+
+    # Detects package import cycles.
+    - PACKAGE_NO_IMPORT_CYCLE
+
+    # Checks that all files with a given package are in the same directory.
+    - PACKAGE_SAME_DIRECTORY
+
+    # Requires that all protovalidate constraints specified are valid.
+    - PROTOVALIDATE
+
+    # Checks that RPCs are PascalCase.
+    - RPC_PASCAL_CASE
+
+    # Enforce the message name of RPC request/responses,
+    # and that all request/responses are unique.
+    # All request and response messages are unique across your Protobuf schema.
+    # All request and response messages are named after the RPC,
+    # either by naming them:
+    #   - MethodNameRequest;
+    #   - MethodNameResponse or ServiceNameMethodNameRequest;
+    #   - ServiceNameMethodNameResponse.
     - RPC_REQUEST_STANDARD_NAME
     - RPC_RESPONSE_STANDARD_NAME
+    - RPC_REQUEST_RESPONSE_UNIQUE
+
+    # Checks that services are PascalCase.
+    - SERVICE_PASCAL_CASE
+
+    # Enforces that all services are suffixed with Service.
     - SERVICE_SUFFIX
+
+    # Checks that all files have a syntax specified.
+    - SYNTAX_SPECIFIED
 
   ignore:
     - google/api/annotations.proto
@@ -86,6 +162,3 @@ lint:
 breaking:
   use:
     - FILE
-
-
-
