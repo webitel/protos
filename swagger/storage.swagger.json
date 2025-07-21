@@ -1448,7 +1448,7 @@
         ]
       }
     },
-    "/storage/p2p/upload/video": {
+    "/storage/p2p/video": {
       "post": {
         "operationId": "FileService_UploadP2PVideo",
         "responses": {
@@ -1472,6 +1472,80 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/storage.UploadP2PVideoRequest"
+            }
+          }
+        ],
+        "tags": [
+          "FileService"
+        ]
+      }
+    },
+    "/storage/p2p/video/{id}": {
+      "delete": {
+        "operationId": "FileService_StopP2PVideo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storage.StopP2PVideoResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/storage.StopP2PVideoRequest"
+            }
+          }
+        ],
+        "tags": [
+          "FileService"
+        ]
+      },
+      "put": {
+        "operationId": "FileService_RenegotiateP2PVideo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storage.RenegotiateP2PVideoResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/storage.RenegotiateP2PVideoRequest"
             }
           }
         ],
@@ -2683,6 +2757,25 @@
         }
       }
     },
+    "storage.RenegotiateP2PVideoRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "sdp_offer": {
+          "type": "string"
+        }
+      }
+    },
+    "storage.RenegotiateP2PVideoResponse": {
+      "type": "object",
+      "properties": {
+        "sdp_answer": {
+          "type": "string"
+        }
+      }
+    },
     "storage.SafeUploadFileRequest.Metadata": {
       "type": "object",
       "properties": {
@@ -2855,6 +2948,17 @@
           "type": "string"
         }
       }
+    },
+    "storage.StopP2PVideoRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "storage.StopP2PVideoResponse": {
+      "type": "object"
     },
     "storage.StreamFile": {
       "type": "object",
@@ -3207,6 +3311,9 @@
       "type": "object",
       "properties": {
         "sdp_answer": {
+          "type": "string"
+        },
+        "id": {
           "type": "string"
         }
       }
