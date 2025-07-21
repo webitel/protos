@@ -30,7 +30,21 @@ service FileService {
 
     rpc UploadP2PVideo (UploadP2PVideoRequest) returns (UploadP2PVideoResponse) {
         option (google.api.http) = {
-            post: "/storage/p2p/upload/video"
+            post: "/storage/p2p/video"
+            body: "*"
+        };
+    }
+
+    rpc StopP2PVideo (StopP2PVideoRequest) returns (StopP2PVideoResponse) {
+        option (google.api.http) = {
+            delete: "/storage/p2p/video/{id}"
+            body: "*"
+        };
+    }
+
+    rpc RenegotiateP2PVideo (RenegotiateP2PVideoRequest) returns (RenegotiateP2PVideoResponse) {
+        option (google.api.http) = {
+            put: "/storage/p2p/video/{id}"
             body: "*"
         };
     }
@@ -51,6 +65,23 @@ message UploadP2PVideoRequest {
 }
 
 message UploadP2PVideoResponse {
+    string sdp_answer = 1;
+    string id = 2;
+}
+
+message StopP2PVideoRequest {
+    string id = 1;
+}
+
+message StopP2PVideoResponse {
+}
+
+message RenegotiateP2PVideoRequest {
+    string id = 1;
+    string sdp_offer = 2;
+}
+
+message RenegotiateP2PVideoResponse {
     string sdp_answer = 1;
 }
 
