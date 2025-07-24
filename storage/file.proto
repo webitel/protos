@@ -48,6 +48,27 @@ service FileService {
             body: "*"
         };
     }
+
+    rpc SearchScreenRecordings (SearchScreenRecordingsRequest) returns (ListFile) {
+        option (google.api.http) = {
+            get: "/storage/users/{user_id}/screenrecordings"
+        };
+    }
+}
+
+message SearchScreenRecordingsRequest {
+    int64 user_id = 1;
+    int32 page = 2;
+    int32 size = 3;
+    string q = 4;
+
+    string sort = 5;
+    repeated string fields = 6;
+
+    repeated int64 id = 7;
+    engine.FilterBetween uploaded_at = 8;
+    repeated string reference_id = 9;
+    engine.FilterBetween retention_until = 10;
 }
 
 message ICEServers {
