@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+option go_package = "github.com/webitel/protos/webrtc_recorder";
+
+package webrtc_recorder;
+
+import "google/api/annotations.proto";
+
+service WebRTCService {
+  rpc UploadP2PVideo (UploadP2PVideoRequest) returns (UploadP2PVideoResponse) {
+    option (google.api.http) = {
+      post: "/webrtc/video"
+      body: "*"
+    };
+  }
+
+  rpc StopP2PVideo (StopP2PVideoRequest) returns (StopP2PVideoResponse) {
+    option (google.api.http) = {
+      delete: "/webrtc/video/{id}"
+      body: "*"
+    };
+  }
+
+  rpc RenegotiateP2PVideo (RenegotiateP2PVideoRequest) returns (RenegotiateP2PVideoResponse) {
+    option (google.api.http) = {
+      put: "/webrtc/video/{id}"
+      body: "*"
+    };
+  }
+}
+
+
+message ICEServers {
+  repeated string urls = 1;
+  string username = 2;
+  int32 credentialType = 3;
+  bytes credential = 4;
+}
+
+message UploadP2PVideoRequest {
+  string sdp_offer = 1;
+  string name = 2;
+  string uuid = 3;
+  repeated ICEServers ice_servers = 4;
+}
+
+message UploadP2PVideoResponse {
+  string sdp_answer = 1;
+  string id = 2;
+}
+
+message StopP2PVideoRequest {
+  string id = 1;
+}
+
+message StopP2PVideoResponse {
+}
+
+message RenegotiateP2PVideoRequest {
+  string id = 1;
+  string sdp_offer = 2;
+}
+
+message RenegotiateP2PVideoResponse {
+  string sdp_answer = 1;
+}
