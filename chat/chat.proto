@@ -21,8 +21,6 @@ service ChatService {
   rpc InviteToConversation(InviteToConversationRequest) returns (InviteToConversationResponse) {}
   // DeclineInvitation declines chat invitation FROM user
   rpc DeclineInvitation(DeclineInvitationRequest) returns (DeclineInvitationResponse) {}
-  // SaveMessage persists a message to the conversation with optional metadata or bindings
-  rpc SaveMessage(SaveMessageRequest) returns (SaveMessageResponse) {}
   // DeleteMessage by unique `id` or `variables` as external binding(s)
   rpc DeleteMessage(DeleteMessageRequest) returns (HistoryMessage) {} // (DeleteMessageResponse) {}
   // CheckSession returns internal chat channel for external chat user
@@ -35,8 +33,9 @@ service ChatService {
   rpc GetConversationByID(GetConversationByIDRequest) returns (GetConversationByIDResponse) {}
   rpc GetHistoryMessages(GetHistoryMessagesRequest) returns (GetHistoryMessagesResponse) {}
 
-  // [WTEL-4695] crutch
-  rpc SaveAgentJoinMessage(SaveAgentJoinMessageRequest) returns (SaveAgentJoinMessageResponse) {}
+  // [WTEL-4695], [WTEL6931] - tasks
+  // SendServiceMessage sends a service level message
+  rpc SendServiceMessage(SendServiceMessageRequest) returns (SendServiceMessageResponse) {}
 
   // API /v1
   rpc SetVariables(SetVariablesRequest) returns (ChatVariablesResponse) {}
@@ -62,8 +61,8 @@ message Conversation {
   int64 domain_id = 6;
   repeated Member members = 7;
   repeated HistoryMessage messages = 8;
-  //  string self_channel_id = 9;
-  //  int32 unread_messages = 10;
+//  string self_channel_id = 9;
+//  int32 unread_messages = 10;
 }
 
 message GetChannelByPeerRequest {
@@ -122,13 +121,12 @@ message UpdateChannelRequest {
 message UpdateChannelResponse {}
 
 
-message SaveAgentJoinMessageRequest {
-  Message message = 1;
-  // receiver channel id
-  string receiver = 2;
+message SendServiceMessageRequest {
+  Message message = 1; // message to send
+  string chat_id = 2; // either conversation id or channel id
 }
 
-message SaveAgentJoinMessageResponse {
+message SendServiceMessageResponse {
 }
 
 message HistoryMessage {
@@ -165,6 +163,7 @@ message CheckSessionRequest {
   string external_id = 1;
   int64 profile_id = 2;
   string username = 3;
+  string type = 4;
 }
 
 message CheckSessionResponse {
@@ -193,8 +192,8 @@ message SendMessageRequest {
 }
 
 message SendMessageResponse {
-  // Message sent !
-  Message message = 1;
+    // Message sent !
+    Message message = 1;
 }
 
 message StartConversationRequest {
@@ -228,6 +227,7 @@ enum CloseConversationCause {
   flow_end = 1;
   client_leave = 2;
   flow_err = 3;
+  broadcast_end = 4;
 }
 
 message CloseConversationResponse {
@@ -266,17 +266,17 @@ message LeaveConversationResponse {
 
 message InviteToConversationRequest {
 
-  User user = 1;                    // invite: .user.*
-  string conversation_id = 2;       // TO: chat
-  string inviter_channel_id = 3;    // FROM: chat
-  int64 timeout_sec = 4;            // invite: timeout
-  int64 domain_id = 5;              // invite: .user.domain
-  int64 auth_user_id = 6;           // FROM: user.id
-  //  bool from_flow = 7;
-  string title = 7;                 // invite: chat title
-  string app_id = 8;                // ???
+    User user = 1;                    // invite: .user.*
+    string conversation_id = 2;       // TO: chat
+    string inviter_channel_id = 3;    // FROM: chat
+    int64 timeout_sec = 4;            // invite: timeout
+    int64 domain_id = 5;              // invite: .user.domain
+    int64 auth_user_id = 6;           // FROM: user.id
+    //  bool from_flow = 7;
+    string title = 7;                 // invite: chat title
+    string app_id = 8;                // ???
 
-  map<string,string> variables = 9; // invite: chat metadata
+    map<string,string> variables = 9; // invite: chat metadata
 }
 
 message InviteToConversationResponse {
@@ -291,16 +291,6 @@ message DeclineInvitationRequest {
 }
 
 message DeclineInvitationResponse {
-}
-
-message SaveMessageRequest {
-  Message message = 1;
-  string channel_id = 2; 
-  string conversation_id = 3;
-}
-
-message SaveMessageResponse {
-  int64 id = 1;
 }
 
 message DeleteMessageRequest {
@@ -402,37 +392,37 @@ message GetHistoryMessagesResponse {
 
 
 message SetVariablesRequest {
-  // Required. Chat channel unique IDentifier
-  // to which .variables must be attached.
-  // Accept `channel_id` or `conversation_id`.
-  string channel_id = 1;
-  // Required. Variables to be merged.
-  // NOTE: Empty value(s) implies unset(remove) key action
-  map<string,string> variables = 2;
+    // Required. Chat channel unique IDentifier
+    // to which .variables must be attached.
+    // Accept `channel_id` or `conversation_id`.
+    string channel_id = 1;
+    // Required. Variables to be merged.
+    // NOTE: Empty value(s) implies unset(remove) key action
+    map<string,string> variables = 2;
 }
 
 message ChatVariablesResponse {
-  // Unique Chat Channel IDentifier.
-  string channel_id = 1;
-  // Result Chat Channel's Variables SET.
-  map<string,string> variables = 2;
+    // Unique Chat Channel IDentifier.
+    string channel_id = 1;
+    // Result Chat Channel's Variables SET.
+    map<string,string> variables = 2;
 }
 
 message ChatTransferRequest {
-  // ConversationID of chat@flow channel
-  // currently controlling the session
-  string conversation_id = 1;
-  // Optional. [FROM] Joined channel (member)
-  // originator of the transfer operation
-  // Implies the conversation_id if omitted
-  string channel_id = 2;
+    // ConversationID of chat@flow channel
+    // currently controlling the session
+    string conversation_id = 1;
+    // Optional. [FROM] Joined channel (member)
+    // originator of the transfer operation
+    // Implies the conversation_id if omitted
+    string channel_id = 2;
 
-  // Required. [TO] Flow schema unique ID,
-  // to which a conversation must be transfered
-  int64 schema_id = 3;
-  int64 user_id = 5;
-  // Optional. Origination Variables to be chained (merged)
-  map<string,string> variables = 4;
+    // Required. [TO] Flow schema unique ID,
+    // to which a conversation must be transfered
+    int64 schema_id = 3;
+    int64 user_id = 5;
+    // Optional. Origination Variables to be chained (merged)
+    map<string,string> variables = 4;
 }
 
 message ChatTransferResponse {
