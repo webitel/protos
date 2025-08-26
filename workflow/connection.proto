@@ -4,6 +4,7 @@ syntax = "proto3";
 package workflow;
 
 option go_package = "github.com/webitel/protos/workflow";
+import "google/protobuf/struct.proto";
 
 service FlowService {
     rpc DistributeAttempt(DistributeAttemptRequest) returns (DistributeAttemptResponse) {}
@@ -11,6 +12,37 @@ service FlowService {
 
     rpc StartFlow(StartFlowRequest) returns (StartFlowResponse) {}
     rpc StartSyncFlow(StartSyncFlowRequest) returns (StartSyncFlowResponse) {}
+    rpc BotExecute(BotExecuteRequest) returns (BotExecuteResponse) {}
+}
+
+message BotExecuteRequest {
+    message Function {
+        string name = 2;
+        google.protobuf.Struct args = 3;
+    }
+
+    message Timeout {
+        string event = 1;
+    }
+    string dialog_id = 1;
+
+    oneof data {
+        Function function = 2;
+        Timeout timeout = 3;
+    }
+}
+
+message BotExecuteResponse {
+    message TTS {
+        string model = 1;
+        string text = 2;
+        bool stop_talk = 3;
+    }
+    bool will_continue = 1;
+    google.protobuf.Struct response = 2;
+    string scheduling = 3;
+    bool exit = 4;
+    TTS tts = 5;
 }
 
 message FlowScope {
