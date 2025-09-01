@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package engine;
+
+option go_package = "github.com/webitel/protos/engine";
+
+import "google/api/annotations.proto";
+
+service FeedbackService {
+  rpc Generate (GenerateFeedbackRequest) returns (GenerateFeedbackResponse) {}
+
+  rpc Get(GetFeedbackRequest) returns (Feedback) {
+    option (google.api.http) = {
+      get: "/feedback"
+    };
+  }
+
+  rpc Create(CreateFeedbackRequest) returns (Feedback) {
+    option (google.api.http) = {
+      post: "/feedback"
+    };
+  }
+}
+
+message GetFeedbackRequest {
+  string key = 1;
+}
+
+message Feedback {
+  int64 created_at = 1;
+  float rating = 2;
+  string description = 3;
+  map<string,string> payload = 4;
+}
+
+message CreateFeedbackRequest {
+  string key = 1;
+  map<string,string> payload = 2;
+  float rating = 3;
+  string description = 4;
+}
+
+message GenerateFeedbackRequest {
+  int64 domain_id = 1;
+  string source_id = 2;
+  string source = 3;
+  map<string,string> payload = 4;
+}
+
+message GenerateFeedbackResponse {
+  string key = 1;
+}
