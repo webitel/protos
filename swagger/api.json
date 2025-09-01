@@ -22630,6 +22630,79 @@
         }
       }
     },
+    "/feedback": {
+      "get": {
+        "tags": [
+          "FeedbackService"
+        ],
+        "operationId": "GetFeedback",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "key",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.Feedback"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "FeedbackService"
+        ],
+        "operationId": "CreateFeedback",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "key",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
+            "name": "payload[string]",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "format": "float",
+            "name": "rating",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "description",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.Feedback"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/hook": {
       "get": {
         "tags": [
@@ -43119,6 +43192,28 @@
         }
       }
     },
+    "engine.Feedback": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "description": {
+          "type": "string"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "rating": {
+          "type": "number",
+          "format": "float"
+        }
+      }
+    },
     "engine.FilterBetween": {
       "type": "object",
       "properties": {
@@ -43161,6 +43256,14 @@
             "type": "object",
             "$ref": "#/definitions/engine.ForAgentPauseCause"
           }
+        }
+      }
+    },
+    "engine.GenerateFeedbackResponse": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
         }
       }
     },
@@ -58586,6 +58689,9 @@
     },
     {
       "name": "EmailProfileService"
+    },
+    {
+      "name": "FeedbackService"
     },
     {
       "name": "ListService"
