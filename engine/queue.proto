@@ -7,6 +7,7 @@ option go_package = "github.com/webitel/protos/engine";
 import "const.proto";
 import "google/protobuf/struct.proto";
 import "google/api/annotations.proto";
+import "google/protobuf/wrappers.proto";
 
 
 service QueueService {
@@ -23,6 +24,20 @@ service QueueService {
             get: "/call_center/queues"
         };
     }
+
+    rpc SetQueuesGlobalState(SetQueuesGlobalStateRequest) returns (SetQueuesGlobalStateResponse) {
+        option (google.api.http) = {
+            patch: "/call_center/queues/state"
+            body: "*"
+        };
+    }
+
+    rpc GetQueuesGlobalState(GetQueuesGlobalStateRequest) returns (GetQueuesGlobalStateResponse) {
+        option (google.api.http) = {
+            get: "/call_center/queues/state"
+        };
+    }
+    
     // Queue item
     rpc ReadQueue(ReadQueueRequest) returns (Queue) {
         option (google.api.http) = {
@@ -333,4 +348,20 @@ message SearchQueueTagsRequest {
 
     string sort = 4;
     repeated string fields = 5;
+}
+
+message GetQueuesGlobalStateRequest {
+
+}
+
+message GetQueuesGlobalStateResponse {
+    google.protobuf.BoolValue is_all_enabled = 1;    
+}
+
+message SetQueuesGlobalStateRequest {
+    bool enabled = 1;
+}
+
+message SetQueuesGlobalStateResponse {
+    int32 affected_rows_count = 1;
 }
