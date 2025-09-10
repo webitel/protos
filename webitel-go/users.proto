@@ -56,7 +56,12 @@ service Users {
             }
         };
     }
-    // rpc UpdatePassword(UpdatePasswordRequest) returns (UpdatePasswordResponse) {}
+    rpc UpdatePassword(UpdatePasswordRequest) returns (UpdatePasswordResponse) {
+        option (google.api.http) = {
+            patch: "/users/password"  // For expired password using username
+            body: "*"
+        };
+    }
 
     rpc LogoutUser(LogoutUserRequest) returns (LogoutUserResponse) {
         option (google.api.http) = {
@@ -122,6 +127,10 @@ message User {
     // The "chat_name" field is used to store the name displayed externally on the platform.
     // For example, "chat_name" is shown when an agent connects to chats with clients.
     string chat_name = 26;
+
+    // When set to true, the user will be required to change their password on next login.
+    bool force_password_change = 27;
+
 }
 
 message CreateUserRequest {
@@ -205,6 +214,8 @@ message UpdatePasswordRequest {
     string old_password = 2;     // OLD
     string user_password = 3;    // NEW
     string confirm_password = 4; // CONFIRM
+    string username = 5;         // Username (when password expired)
+    string domain = 6;          // Domain name required for user lookup when password expired
 }
 
 message UpdatePasswordResponse {

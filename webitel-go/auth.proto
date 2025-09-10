@@ -130,6 +130,20 @@ message SessionLoginRequest {
 
 message LoginResponse {
     AccessToken authorization = 1;
+    repeated UserWarning warnings = 2; // Warning messages that may need localization
+}
+
+message UserWarning {
+    string id = 1;        // Unique identifier for the warning (e.g., "app.password.expires_soon")
+    string detail = 2;
+    oneof warning_data {
+        PasswordExpiryWarning password_expiry = 3;
+    }
+}
+
+message PasswordExpiryWarning {
+    int64 days_remaining = 1;  // Days until password expires
+    int64 expires_at = 2;      // Unix timestamp when password expires
 }
 
 // // Design: this -or- extend CreateUserRequest
