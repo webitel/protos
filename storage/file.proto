@@ -30,9 +30,21 @@ service FileService {
 
     rpc SearchScreenRecordings (SearchScreenRecordingsRequest) returns (ListFile) {
         option (google.api.http) = {
-            get: "/storage/users/{user_id}/screenrecordings"
+            get: "/storage/users/{user_id}/{channel}"
         };
     }
+
+    rpc DeleteScreenRecordings (DeleteScreenRecordingsRequest) returns (DeleteFilesResponse) {
+        option (google.api.http) = {
+            delete: "/storage/users/{user_id}/{id}"
+            body: "*"
+        };
+    }
+}
+
+message DeleteScreenRecordingsRequest {
+    int64 user_id = 1;
+    repeated int64 id = 2;
 }
 
 message SearchScreenRecordingsRequest {
@@ -48,6 +60,7 @@ message SearchScreenRecordingsRequest {
     engine.FilterBetween uploaded_at = 8;
     repeated string reference_id = 9;
     engine.FilterBetween retention_until = 10;
+    UploadFileChannel channel = 11;
 }
 
 message ICEServers {
