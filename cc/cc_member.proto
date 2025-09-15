@@ -147,12 +147,20 @@ message QueueFormSchema {
     int32 id = 1;
 }
 
+message ProcessingProlongation {
+    bool enabled = 1;
+    uint32 repeats_number = 2;
+    uint32 prolongation_time_sec = 3;
+    bool is_timeout_retry = 4;
+}
+
 message TaskJoinToAgentRequest {
     message Processing {
         bool enabled = 1;
         uint32 renewal_sec = 2;
         uint32 sec = 3;
         QueueFormSchema form = 4;
+        ProcessingProlongation processing_prolongation = 5;
     }
 
     int32 agent_id = 1;
@@ -173,6 +181,7 @@ message OutboundCallRequest {
         uint32 sec = 3;
         QueueFormSchema form = 4;
         bool without_answer = 5;
+        ProcessingProlongation processing_prolongation = 6;
     }
     int64 user_id= 1;
     int64 domain_id= 2;
@@ -201,6 +210,7 @@ message CallJoinToAgentRequest {
         uint32 renewal_sec = 2;
         uint32 sec = 3;
         QueueFormSchema form = 4;
+        ProcessingProlongation processing_prolongation = 5;
     }
 
     string member_call_id = 1;
