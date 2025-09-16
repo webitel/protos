@@ -1,0 +1,55 @@
+syntax = "proto3";
+package webitel.proto.data;
+
+option go_package = "github.com/webitel/proto/data;pbdata";
+
+import "google/protobuf/struct.proto";
+
+enum Operator {
+  Equal = 0;          // ==
+  Present = 1;        // =*
+  LessOrEqual = 2;    // <=
+  GreaterOrEqual = 3; // >=
+}
+
+message FieldValueAssertion {
+  // Field name.
+  string field = 1;
+  // Assrtion value.
+  google.protobuf.Value value = 2;
+}
+
+message SubstringFilter {
+  // Field.id name.
+  string field = 1;
+  // Substrings: (initial)(any+)?(final)?
+  string value = 2;
+}
+
+message Filterset {
+  repeated Filter cond = 1;
+}
+
+message Filter {
+
+  oneof type {
+    // AND conditions.
+    Filterset and = 1;
+    // OR conditions.
+    Filterset or  = 2;
+    // NOT condition.
+    Filter not = 3;
+    // Equality match condition.
+    // Substrings: {
+    //   "field": "name",
+    //   "value": "*fi?ter* *test"
+    // }
+    FieldValueAssertion equal = 5;
+    // Field value present ? NOTNULL ?
+    string present = 6; // field.id
+    // Operator '<='.
+    FieldValueAssertion lessOrEqual = 7;
+    // Operator '>='.
+    FieldValueAssertion greaterOrEqual = 8;
+  }
+}

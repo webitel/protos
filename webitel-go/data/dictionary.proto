@@ -1,0 +1,262 @@
+syntax = "proto3";
+package webitel.proto.data;
+
+option go_package = "github.com/webitel/proto/data;pbdata";
+
+import "data/struct.proto";
+import "data/types.proto";
+// import "webitel/proto/data/value.proto";
+import "data/dataset.proto";
+// import "webitel/proto/data/extension.proto";
+
+import "google/protobuf/struct.proto";
+
+import "google/api/visibility.proto";
+import "google/api/annotations.proto";
+// import "google/protobuf/wrappers.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+// Dictionary Type is represented by the Struct message.
+// message Dictionary = Struct;
+
+// Dictionaries service.
+service Dictionaries {
+  
+  // types
+  
+  // Lookup dictionaries data types.
+  rpc SearchType(SearchTypeRequest) returns (StructList) {
+  // rpc SearchType(SearchDictionaryRequest) returns (StructList) { // (DictionaryList) {
+    option (google.api.http) = {
+      get: "/types/dictionaries"
+    };
+  }
+
+  // Locate the dictionary type.
+  rpc LocateType(LocateDictionaryRequest) returns  (Struct) { // (Dictionary) {
+    option (google.api.http) = {
+      get: "/types/dictionaries/{repo}"
+    };
+  }
+
+  // Create custom dictionary.
+  rpc CreateType(CreateDictionaryRequest) returns  (Struct) { // (Dictionary) {
+    option (google.api.http) = {
+      post: "/types/dictionaries/{repo}"
+      response_body: "*"
+      body: "input"
+    };
+  }
+
+  // Update custom dictionary.
+  rpc UpdateType(UpdateDictionaryRequest) returns  (Struct) { // (Dictionary) {
+    option (google.api.http) = {
+      // PUT save given full & final [input] state !
+      // NOTE: Preserve all [input.fields] changes & it's position !
+      put: "/types/dictionaries/{repo}"
+      body:  "input"
+      response_body: "*"
+      // additional_bindings {
+      //   // PATCH acts like a partial update
+      //   // FIXME: how to deal with input.fields here ?
+      //   // DESIGN: input.fields array merge with the source.fields,
+      //   //         so here you can ONLY [add] or [edit] but NOT [remove]
+      //   //         some fields and no way to specify field position !
+      //   // NOTE: use PUT instead as a full update !
+      //   patch: "/types/dictionaries/{repo}"
+      //   response_body: "*"
+      //   body: "input"
+      // }
+    };
+  }
+
+  // Delete custom dictionaries.
+  rpc DeleteType(DeleteDictionaryRequest) returns  (StructList) { // (DictionaryList) {
+    option (google.api.http) = {
+      delete: "/types/dictionaries" // [/:repo]
+      response_body: "*"
+    };
+  }
+
+  // dataset
+
+  // Lookup a dictionary dataset.
+  rpc SearchData(SearchDatasetRequest) returns (Dataset) {
+    option (google.api.http) = {
+      get: "/dictionaries/{repo}"
+      // get: "/{repo=dictionaries}"
+    };
+  }
+  // Locate a dictionary record.
+  rpc LocateData(LocateDatasetRequest) returns (google.protobuf.Struct) { // (Record) {
+    option (google.api.http) = {
+      get: "/dictionaries/{repo}/{id}"
+    };
+  }
+  // Create a dictionary record.
+  rpc CreateData(CreateDatasetRequest) returns (google.protobuf.Struct) { // (Record) {
+    option (google.api.http) = {
+      post: "/dictionaries/{repo}"
+      response_body: "*"
+      body: "record"
+    };
+  }
+  // Update a dictionary record.
+  rpc UpdateData(UpdateDatasetRequest) returns (google.protobuf.Struct) { // (Record) {
+    option (google.api.http) = {
+      // patch: "/dictionaries/{row.type}/{row.id}"
+      patch: "/dictionaries/{repo}/{id}"
+      // patch: "/{type=dictionaries/*}/{id}" // INVALID =((
+      response_body: "*"
+      body: "record"
+      additional_bindings {
+        // put: "/dictionaries/{row.type}/{row.id}"
+        put: "/dictionaries/{repo}/{id}"
+        response_body: "*"
+        body:  "record"
+      }
+    };
+  }
+  // Delete a dictionary records.
+  rpc DeleteData(DeleteDatasetRequest) returns (Dataset) {
+    option (google.api.http) = {
+      delete: "/dictionaries/{repo}"
+      // response_body: "*"
+      additional_bindings {
+        delete: "/dictionaries/{repo}/{id}"
+        // response_body: "*"
+        // body:  "record"
+      }
+    };
+  }
+  // Import dataset from CSV file.
+  rpc ImportCSV(ImportCSVRequest) returns (Dataset) {
+    option (google.api.http) = {
+      post: "/dictionaries/{repo}/csv"
+      response_body: "*"
+      body: "*"
+    };
+  }
+}
+
+// ----------------------------------- //
+//             Dictionary              //
+// ----------------------------------- //
+
+message LocateDictionaryRequest {
+  // `types.repo`
+  string repo = 1;
+}
+
+message InputDictionary {
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"repo\":\"countries\",\"name\":\"Countries\",\"about\":\"Dataset of countries we are working with ..\",\"fields\":[{\"id\":\"code\",\"name\":\"Code\",\"hint\":\"+3(80)\",\"kind\":\"int32\",\"int32\":{\"min\":\"10\",\"max\":\"9999\"},\"required\":true},{\"id\":\"name\",\"name\":\"Country\",\"hint\":\"Country name\",\"kind\":\"string\",\"string\":{\"max\":64},\"required\":true},{\"id\":\"capital\",\"name\":\"Capital city\",\"kind\":\"lookup\",\"lookup\":{\"id\":\"name\",\"name\":\"name\",\"type\":\"dictionaries/cities\"}},{\"id\":\"created_at\",\"name\":\"Creation Date\",\"kind\":\"datetime\",\"datetime\":{\"part\":\"full\",\"time\":\"s\"},\"default\":\"$(timestamp)\",\"readonly\":true},{\"id\":\"created_by\",\"name\":\"Author\",\"kind\":\"lookup\",\"lookup\":{\"id\":\"id\",\"name\":\"name\",\"type\":\"users\"},\"default\":\"$(user)\",\"readonly\":true},{\"id\":\"updated_at\",\"name\":\"Last Modified\",\"kind\":\"datetime\",\"datetime\":{\"part\":\"full\",\"time\":\"s\"},\"always\":\"$(timestamp)\",\"readonly\":true},{\"id\":\"updated_by\",\"name\":\"Editor\",\"kind\":\"lookup\",\"lookup\":{\"type\":\"users\"},\"always\":\"$(user)\",\"readonly\":true}],\"primary\":\"code\",\"display\":\"name\",\"indexes\":{\"code\":{\"unique\":true},\"capital_city\":{\"unique\":true,\"fields\":[\"capital\"]}}}"
+  };
+
+  // string id = 1; // The [type] name (singular form), e.g.: `country`.
+  string repo = 2; // Repository (dataset) name (plural form), e.g.: `countries`.
+  string name = 3; // A User-friendly [type.id] name ; lang: specific.
+
+  reserved 4; // Struct.path
+
+  string about = 5; // Short description
+
+  reserved 6 to 10; // future extensions
+
+  // Fields definitions
+  repeated Field fields = 11;
+
+  // constraints
+
+  // Required. Primary [fields.id] key.
+  // Used as [lookup].id setting for this [struct] type.
+  string primary = 12;
+  // Required. Display [fields.id] key.
+  // Used as [lookup].name setting for this [struct] type.
+  string display = 13;
+
+  // INDEX fields.
+  map<string, Index> indexes = 14;
+
+  // Administer access control ? Enable RbAC ?
+  bool administered = 24;
+}
+
+message CreateDictionaryRequest {
+  // NEW [`types.repo`] repository name, e.g.: `countries`.
+  string repo = 1;
+
+  // [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  //   default: "country"
+  // }];
+  
+  // NEW dictionary [type] definition.
+  InputDictionary input = 2;
+}
+
+message UpdateDictionaryRequest {
+
+  // ------- PATCH Options ------- //
+
+  // JSON PATCH fields mask.
+  // List of JPath fields specified in body(input).
+  repeated string x_json_mask = 1
+  [(google.api.field_visibility) = {
+    restriction: "PREVIEW" // "INTERNAL"
+  },
+  (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    read_only: true
+    pattern: "^$"
+  }];
+
+  // ------- Result Options ------- //
+
+  // Fields to return into result.
+  repeated string fields = 2;
+
+  // ------- Update Options ------- //
+
+  // [**repo**] name of the dataset type, e.g.: `countries`.
+  string repo = 3;
+  // The dictionary [**type**] changes.
+  InputDictionary input = 4;
+}
+
+message DeleteDictionaryRequest {
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: [
+        "repo"
+      ]
+    }
+  };
+
+  // Fields to retrive into result dataset.
+  repeated string fields = 1;
+  // `types.repo`
+  repeated string repo = 2;
+  // // `record.pk`
+  // repeated string id = 3;
+}
+
+message ImportCSVRequest {
+  // `types.repo`
+  string repo = 1;
+  // CSV data
+  bytes data = 2;
+
+  // map < field, column > index
+  map<string, uint32> fields = 5;
+  uint32 line_begin = 6;
+  uint32 line_end = 7;
+
+  enum action {
+    continue = 0;
+    break = 1;
+  }
+  action on_data_error = 10;
+  action on_empty_line = 11;
+}
+

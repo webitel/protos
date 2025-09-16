@@ -1,0 +1,206 @@
+syntax = "proto3";
+package webitel.proto.data;
+
+option go_package = "github.com/webitel/proto/data;pbdata";
+
+import "data/value.proto";
+import "data/type/primitive.proto"; // webitel.proto.data.type.[*]
+// import "webitel/proto/data/extension.proto"; // webitel.proto.data.type.[*]
+
+import "google/protobuf/struct.proto";         // google.protobuf.[Value]
+// import "google/protobuf/wrappers.proto";
+
+// import "protoc-gen-openapiv2/options/annotations.proto";
+
+
+// Type of the Structure.
+message Struct {
+  // int64 dc = 0;
+
+  string id = 1; // Deprecated. Use `repo` instead. The [type] name (singular form), e.g.: `country`.
+  string repo = 2; // Repository (dataset) name (plural form), e.g.: `countries`.
+  string name = 3; // A User-friendly [id] name ; lang: specific.
+  string path = 4; // Readonly. Relative path to access the dataset APIs, e.g.: `dictionaries/countries`.
+
+  string about = 5; // Optional. Short description.
+
+  reserved 6 to 10;
+
+  // Fields of the struct type.
+  repeated Field fields = 11;
+
+  // type constraints
+
+  // TODO: Accept: int [fields.position]; string [fields.id];
+  
+  // Required. Primary [fields.id] key.
+  // Used as [lookup].id setting for this [struct] type.
+  string primary = 12;
+  // Required. Display [fields.id] key.
+  // Used as [lookup].name setting for this [struct] type.
+  string display = 13;
+  // INDEX fields.
+  map<string, Index> indexes = 14;
+  // Extension extension = 15;
+
+  reserved 15 to 20;
+  
+  // Readonly. Is [ system / custom ] type ?
+  // NOTE: Custom [types.repo] are always prefixed with `/dictionaries`
+  bool readonly = 21;
+  // Readonly. System- type(s) support only !
+  bool extendable = 22;
+  // // Extension fields type.
+  // Extension extension = 23;
+
+  // Administer access control ? Enable RbAC ?
+  bool administered = 24;
+  // Readonly. RbAC objclass identity.
+  string objclass = 25;
+
+  // FIXME: -or- define Dictionary model with fields below !?
+  // NOTE: non-custom (system) types has no such fields ...
+
+  int64 created_at = 31;
+  LookupValue created_by = 32;
+  int64 updated_at = 33;
+  LookupValue updated_by = 34;
+}
+
+// Field of the struct.
+message Field {
+
+  // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+  //   example: "{\"id\":\"name\",\"name\":\"Title\",\"kind\":\"string\",\"string\":{\"max\":64},\"required\":true}"
+  // };
+
+  // Field [code] name.
+  string id = 1; // code
+  // Title of the field. Lang specific.
+  string name = 2; // title
+  // Short description. Default: {name}.
+  string hint = 3;
+
+  // future options
+  reserved 4 to 10;
+
+  // Required. The field type.
+  webitel.proto.data.type.Kind kind = 11;
+  // Required. Field type settings.
+  oneof type {
+    webitel.proto.data.type.Bool     bool     = 12;
+    webitel.proto.data.type.Int      int32    = 13;
+    webitel.proto.data.type.Int      int64    = 14;
+    webitel.proto.data.type.Int      int      = 15;
+    webitel.proto.data.type.Uint     uint32   = 16;
+    webitel.proto.data.type.Uint     uint64   = 17;
+    webitel.proto.data.type.Uint     uint     = 18;
+    webitel.proto.data.type.Float    float32  = 19;
+    webitel.proto.data.type.Float    float64  = 20;
+    webitel.proto.data.type.Float    float    = 21;
+    webitel.proto.data.type.Binary   binary   = 22;
+    webitel.proto.data.type.Lookup   lookup   = 23;
+    webitel.proto.data.type.Text     string   = 24;
+    webitel.proto.data.type.Text     richtext = 25;
+    webitel.proto.data.type.Datetime datetime = 26;
+    webitel.proto.data.type.Duration duration = 27;
+  }
+  // .. future types
+  reserved 28 to 50;
+
+  // Generated field value.
+  oneof value {
+    // [ ON INSERT ONLY ]
+    //
+    // The `default` expression will be used in `INSERT` operation
+    // that does not specify a value for the field.
+    //
+    // If there is no default for a field, then the default is null.
+    google.protobuf.Value default = 51;
+    // [ ON INSERT OR UPDATE ]
+    // 
+    // Always signifies that the field value will be computed on any write (INSERT OR UPDATE) operations.
+    // The field cannot be written to, and when read the result of the last generated expression will be returned.
+    //
+    // The generation expression can refer to other columns in the table, but not other generated columns. Any functions and operators used must be immutable. References to other tables are not allowed.
+    google.protobuf.Value always = 52;
+  }
+  
+  // // Optional. Autoincrement.
+  // string serial = 51; // FIXME: e.g. "+1", "CS_+1" (template)
+
+  // message Generation {
+  //   oneof expression {
+  //     // [ ON INSERT ONLY ]
+  //     //
+  //     // The `default` expression will be used in any `INSERT` operation
+  //     // that does not specify a value for the column.
+  //     //
+  //     // If there is no default for a field, then the default is null.
+  //     google.protobuf.Value default = 52;
+  //     // [ ON INSERT OR UPDATE ]
+  //     // 
+  //     // Always signifies that the field value will be computed on any write (INSERT OR UPDATE) operations.
+  //     // The field cannot be written to, and when read the result of the last generated expression will be returned.
+  //     //
+  //     // The generation expression can refer to other columns in the table, but not other generated columns. Any functions and operators used must be immutable. References to other tables are not allowed.
+  //     google.protobuf.Value always = 53;
+  //   }
+  // }
+
+  // // Optional. Default field value. (on:create only)
+  // // In an INSERT command, if `readonly` is selected, a user-specified value is only accepted if the
+  // // In an UPDATE command, if `readonly` is selected, any update of the field to any value other than DEFAULT will be rejected.
+  // google.protobuf.Value default = 52; // Value default = 52;
+
+
+  // .. future options
+  reserved 53 to 60;
+
+  // The field options.
+
+  // Optional. Disable any write (INSERT OR UPDATE) operations.
+  // READONLY signifies that the field value will be always computed on any write (INSERT OR UPDATE) operations.
+  // If selected, the `default` value MUST be specified.
+  bool readonly = 61; // FIXME: Is base field ? [ id, created_, updated_ ]
+  // Optional. Do NOT allow NULL values !
+  bool required = 62;
+  // Optional. Disable data read operation. (selection)
+  bool disabled = 63;
+  // Is hidden (system) field ?
+  // Do NOT display on the `view` card ?
+  bool hidden = 64;
+}
+
+// INDEX [struct.fields].
+message Index {
+  // Indicates whether set of [fields] MUST be UNIQUE within [type].
+  bool unique = 1;
+  // A set of [struct.fields.id] to INDEX within [type] dataset.
+  repeated string fields = 2;
+  // A set of [struct.fields.id] to INCLUDE beside the [fields] index.
+  repeated string include = 3;
+}
+
+// // Record [type] values. Tuple.
+// message Record {
+
+//   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+//     example: "{\"id\":\"7b1e64af98\",\"name\":\"Example\",\"count\":23,\"example\":true,\"latency\":0.698,\"reference\":{\"id\":482,\"name\":\"Ukraine\",\"type\":\"/dictionaries/countries\"}}"
+//   };
+
+//   // Readonly. Type of the fields
+//   Struct type = 1;
+//   // Set of the record values.
+//   map<string, Value> values = 2; // fields = 2;
+// }
+
+// // Record fields value.
+// message InputRecord {
+
+//   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+//     example: "{\"id\":7816498,\"name\":\"Example\",\"count\":23,\"example\":true,\"latency\":0.698,\"reference\":{\"id\":482,\"name\":\"Ukraine\"}}"
+//   };
+
+//   map<string, Value> values = 2; // fields = 2;
+// }

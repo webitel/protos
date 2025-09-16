@@ -1,0 +1,284 @@
+syntax = "proto3";
+package webitel.proto.data;
+
+option go_package = "github.com/webitel/proto/data;pbdata";
+
+import "data/struct.proto";
+// import "webitel/proto/data/value.proto";
+import "google/protobuf/struct.proto";
+
+import "google/api/visibility.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+// Dataset records page view.
+message Dataset {
+  // Type of the dataset record.
+  Struct type = 4;
+  // List of the dataset page records.
+  repeated google.protobuf.Struct data = 1;
+  // Current page number.
+  int32 page = 2;
+  // Next page available?
+  bool next = 3;
+}
+
+// Records service
+service Records {
+
+  // Search dataset records
+  rpc Search(SearchDatasetRequest) returns (Dataset) {
+    option (google.api.http) = {
+      get: "/v2/dataset/{type}"
+    };
+  }
+  // Locate dataset record
+  rpc Locate(LocateDatasetRequest) returns (google.protobuf.Struct) { // (Record) {
+    option (google.api.http) = {
+      get: "/v2/dataset/{type}/{id}"
+    };
+  }
+  // Create dataset record
+  rpc Create(CreateDatasetRequest) returns (google.protobuf.Struct) { // (Record) {
+    option (google.api.http) = {
+      post: "/v2/dataset/{type}"
+      response_body: "*"
+      body: "input"
+    };
+  }
+  // Update dataset record
+  rpc Update(UpdateDatasetRequest) returns (google.protobuf.Struct) { // (Record) {
+    option (google.api.http) = {
+      patch: "/v2/dataset/{row.type}/{row.id}"
+      response_body: "*"
+      body: "input"
+      additional_bindings {
+        put: "/v2/dataset/{row.type}/{row.id}"
+        response_body: "*"
+        body:  "input"
+      }
+    };
+  }
+  // Delete dataset records
+  rpc Delete(DeleteDatasetRequest) returns (Dataset) {
+    option (google.api.http) = {
+      delete: "/v2/dataset/{type}"
+      response_body: "*"
+    };
+  }
+}
+
+// ----------------------------------- //
+//              Dataset                //
+// ----------------------------------- //
+
+message InputId {
+  string id = 1;
+  string type = 3;
+}
+
+message SearchDatasetRequest {
+
+  // Number of result records (per page).
+  // Default: 16.
+  int32 size = 1;
+
+  // Page number of result set of records.
+  // Default: 1.
+  int32 page = 2;
+
+  // Sort result dataset of records by fields.
+  // ```
+  // sort ::= *( ORDER name )
+  //
+  // ORDER  = ASC / DESC
+  // DESC   = "-" / "!"
+  // ASC    = [ "+" ]   ; Default
+  // ```
+  //
+  // Fields available
+  //
+  // - `id`(seq)
+  // - `domain`{name}
+  // - `created_at`
+  // - `created_by`{name}
+  // - `updated_at`
+  // - `updated_by`{name}
+  //
+  // Use ?fields=`field.sort()` option to sort Edge fields.
+  repeated string sort = 3
+  [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: ARRAY,
+      // title: "sort",
+      pattern: "^[+|-|!]?\\w+$",
+      // description: "Fields [Q]uery to build result record",
+      // format: "name[.func(args)][{fields}],..",
+      default: "*",
+      example: "\"!updated_at,tag\"",
+      unique_items: true,
+      // array: "id",
+      // array: "names",
+      // array: "labels",
+      // array: "emails",
+    }
+  ];
+
+  // Fields [Q]uery to build result dataset record.
+  // ```
+  // fields ::= field [ *( "," field ) ]
+  // field  ::= name [ *( func ) ] [ inner ]
+  // inner  ::= "{" fields "}"
+  // funcs  ::= *( func )
+  // func   ::= "." name "(" [ args ] ")"
+  // name   ::= ALPHA / DIGIT / USCORE
+  //
+  // ALPHA    = %x41-5A / %x61-7A  ; "A"-"Z" / "a"-"z"
+  // DIGIT    = %x30-39            ; "0"-"9"
+  // USCORE   = %x5F ; underscore  ; "_"
+  // ```
+  repeated string fields = 4
+  [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      // type: ARRAY,
+      // title: "fields",
+      // pattern: "(\\w+(\\.\\w+\\(([^\\)]*)\\))*(\\{\\1\\})*(,\\1)*)+",
+      // description: "Fields [Q]uery to build result record",
+      // format: "name[.func(args)][{fields}],..",
+      default: "*",
+      example: "\"*,labels.size(3).sort(!updated_at){updated_at,label}\"",
+      unique_items: true,
+      // array: "id",
+      // array: "names",
+      // array: "labels",
+      // array: "emails",
+    }
+  ];
+
+  // ----- Search Options ---------------------------
+
+  // Search term:
+  // `?` - matches any character
+  // `*` - matches 0 or more characters
+  // e.g.: name,emails{type},labels etc...
+  string q = 5;
+
+  // [`types.repo`]
+  string repo = 6;
+  // [`record.id`]
+  repeated string id = 7;
+
+  // Filter string in CEL format.
+  string filters = 8;
+}
+
+message LocateDatasetRequest {
+
+  // Fields [Q]uery to build result dataset record.
+  // ```
+  // fields ::= field [ *( "," field ) ]
+  // field  ::= name [ *( func ) ] [ inner ]
+  // inner  ::= "{" fields "}"
+  // funcs  ::= *( func )
+  // func   ::= "." name "(" [ args ] ")"
+  // name   ::= ALPHA / DIGIT / USCORE
+  //
+  // ALPHA    = %x41-5A / %x61-7A  ; "A"-"Z" / "a"-"z"
+  // DIGIT    = %x30-39            ; "0"-"9"
+  // USCORE   = %x5F ; underscore  ; "_"
+  // ```
+  repeated string fields = 4
+  [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      // type: ARRAY,
+      // title: "fields",
+      // pattern: "(\\w+(\\.\\w+\\(([^\\)]*)\\))*(\\{\\1\\})*(,\\1)*)+",
+      // description: "Fields [Q]uery to build result record",
+      // format: "name[.func(args)][{fields}],..",
+      default: "*",
+      example: "\"*,labels.size(3).sort(!updated_at){updated_at,label}\"",
+      unique_items: true,
+      // array: "id",
+      // array: "names",
+      // array: "labels",
+      // array: "emails",
+    }
+  ];
+
+  // ----- Search Options ---------------------------
+
+  // [`types.repo`]
+  string repo = 5;
+  // [`record.id`]
+  string id = 6;
+}
+
+message CreateDatasetRequest {
+
+
+  // [`types.repo`]
+  string repo = 1;
+  reserved 2; // record.id
+
+  // Record data.
+  google.protobuf.Struct record = 3
+  [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    example: "{\"code\":38,\"name\":\"Україна\",\"capital\":{\"id\":44,\"name\":\"Київ\"}}"
+  }];
+
+}
+
+message UpdateDatasetRequest {
+
+  // ------- PATCH Options ------- //
+
+  // JSON PATCH fields mask.
+  // List of JPath fields specified in body(input).
+  repeated string x_json_mask = 1
+  [(google.api.field_visibility) = {
+    restriction: "PREVIEW" // "INTERNAL"
+  },
+  (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    read_only: true
+    pattern: "^$"
+  }];
+
+  // ------- Result Options ------- //
+
+  // Source Fields to return into result.
+  repeated string fields = 2;
+
+  // ------- Update Options ------- //
+
+
+  // Lookup row = 1;
+  // InputId row = 1;
+
+  // [`types.repo`] data source
+  string repo = 5;
+  // [`record.id`] for update
+  string id = 6;
+  // Record data fields changes.
+  google.protobuf.Struct record = 7;
+  
+  // InputRecord input = 3;
+}
+
+message DeleteDatasetRequest {
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: [
+        "repo", "id"
+      ]
+    }
+  };
+
+  // Fields to be retrieved into result dataset.
+  repeated string fields = 1;
+
+  // [`types.repo`]
+  string repo = 5;
+  // [`record.id`]
+  repeated string id = 6;
+}
