@@ -1,0 +1,175 @@
+syntax = "proto3";
+package webitel.proto.data.type;
+
+option go_package = "github.com/webitel/proto/data/type;pbtype";
+
+import "google/protobuf/wrappers.proto";
+
+// Kind of primitive data types.
+enum Kind {
+  // option allow_alias = true;
+  none     = 0;
+  list     = 1; // [array]
+  bool     = 2;
+  int      = 3; // int32
+  int32    = 4;
+  int64    = 5;
+  uint     = 6; // uint32
+  uint32   = 7;
+  uint64   = 8;
+  float    = 9; // float32
+  float32  = 10;
+  float64  = 11;
+  binary   = 12;
+  lookup   = 13;
+  string   = 14;
+  richtext = 15;
+  datetime = 16; // date &| time
+  duration = 17;
+}
+
+message Bool {
+  // no constraints
+}
+
+message Int {
+  google.protobuf.Int64Value min = 1;
+  google.protobuf.Int64Value max = 2;
+  
+  // DESIGN. Custom error(s) on spec. constraint violation.
+  // map < constraint, template > to produce [status.message].
+  // {
+  //   "min": "country code {value} MUST contain at least 2 digits"
+  //   "max": "country code {value} MAY contain at most 4 digits"
+  // }
+  map<string, string> violation = 5;
+}
+
+message Uint {
+  google.protobuf.UInt64Value min = 1;
+  google.protobuf.UInt64Value max = 2;
+  map<string, string> violation = 5;
+}
+
+message Float {
+  uint32 frac = 3; // fractional part precision
+  google.protobuf.DoubleValue min = 1;
+  google.protobuf.DoubleValue max = 2;
+  map<string, string> violation = 5;
+}
+
+message Text {
+  uint32 max_bytes = 1;
+  uint32 max_chars = 2;
+  bool   multiline = 3;
+  
+  map<string, string> violation = 5;
+  // // accept format
+  // string accept_regex = 7;
+  // // equality strategy
+  // bool ignore_case = 8;
+}
+
+message Binary {
+  uint32 max_bytes = 1;
+  map<string, string> violation = 5;
+}
+
+// Lookup ( REFERENCE ) type descriptor.
+// Simplified [webitel.custom.Struct] options.
+message Lookup {
+
+  // [Readonly]. Dataset title.
+  string name = 1;
+  
+  // [Required]. Reference dataset relative path
+  // e.g.: "contacts", "dictionaries/cities".
+  // (lookup).{`type`} value relation.
+  string path = 2;
+
+  // [Readonly]. Primary dataset field.
+  // (lookup).{`id`} value relation.
+  string primary = 3;
+  // [Readonly]. Display dataset field.
+  // (lookup).{`name`} value relation.
+  string display = 4;
+
+  // Optional. Query dataset filters ...
+  // map < filter, template >
+  map<string, string> query = 11;
+  // [ "not_found", "too_much_records" ]
+  map<string, string> violation = 12;
+}
+
+// Datetime type settings.
+message Datetime {
+  // enum Part {
+  //   full = 0; // date & time
+  //   date = 1; // date only ; YYYY-MM-DD
+  //   time = 2; // time only ; HH:mm:ss[.pres]
+  // }
+  // Part part = 1; // part of: [ date &| time ]
+  // enum Stamp {
+  //   s  =  0; // seconds
+  //   ms =  1; // [milli]seconds ; E+3
+  //   mc =  2; // [micro]seconds ; E+6
+  //   ns =  3; // [nano]seconds  ; E+9
+  //   m  = -1; // minutes
+  //   h  = -2; // hours
+  // }
+  // Stamp time = 2; // time precision
+  // string zone = 3; // ??? [ Europe/Kyiv | +03:00 ]
+
+  // Timezone associated.
+  // Default: `UTC`.
+  string zone = 1;
+
+  // Epoch timestamp.
+  // If zero - UNIX epoch (1970-01-01 00:00:00) will be used.
+  double epoch = 2;
+
+  // Display format.
+  // See [layouts](https://pkg.go.dev/time#pkg-constants) for details.
+  // Default: `Mon, 02 Jan 2006 15:04:05 -0700`; [time.RFC1123Z]
+  string format = 3;
+}
+
+// Duration 
+message Duration {
+  google.protobuf.Int64Value min = 1;
+  google.protobuf.Int64Value max = 2;
+  map<string, string> violation = 5;
+  // Display format.
+  // TODO: `hh:mm:ss.ms`
+  string format = 6;
+}
+
+// Type descriptpr.
+message Type {
+
+  // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+  //   example: "{\"kind\":\"uint\",\"uint\":{\"min\":10,\"max\":9999,\"violation\":{\"min\":\"country code $(.value) MUST contain at least 2 digits\"}}}"
+  // };
+
+  // Scalar type.
+  Kind kind = 1;
+  // Type constraints.
+  oneof type {
+    Bool     bool     = 12;
+    Int      int32    = 13;
+    Int      int64    = 14;
+    Int      int      = 15;
+    Uint     uint32   = 16;
+    Uint     uint64   = 17;
+    Uint     uint     = 18;
+    Float    float32  = 19;
+    Float    float64  = 20;
+    Float    float    = 21;
+    Binary   binary   = 26;
+    Lookup   lookup   = 27;
+    Text     string   = 22;
+    Text     richtext = 23;
+    Datetime datetime = 24;
+    Duration duration = 25;
+  }
+}

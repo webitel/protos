@@ -1,0 +1,169 @@
+syntax = "proto3";
+package webitel.proto.data;
+
+option go_package = "github.com/webitel/proto/data;pbdata";
+
+import "data/struct.proto";
+// import "webitel/proto/data/dataset.proto";
+// import "webitel/proto/data/extension.proto";
+
+// import "google/protobuf/struct.proto";
+
+// import "google/api/visibility.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/wrappers.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+// Dataset of structured types.
+message StructList {
+  // List of `Struct` types.
+  repeated Struct data = 1;
+  // Page number of results.
+  int32 page = 2;
+  // Next page available ?
+  bool next = 3;
+}
+
+// Types service registry.
+service Types {
+  
+  // types
+  
+  // Lookup data types registry.
+  rpc Search(SearchTypeRequest) returns (StructList) {
+    option (google.api.http) = {
+      get: "/types"
+    };
+  }
+
+  // Structured data type details.
+  rpc Locate(LocateTypeRequest) returns (Struct) {
+    option (google.api.http) = {
+      get: "/types/{path}"
+    };
+  }
+
+}
+
+// ----------------------------------- //
+//             Dictionary              //
+// ----------------------------------- //
+
+message SearchTypeRequest {
+
+  // ----- Search Options ---------------------------
+
+  // Search term:
+  // `?` - matches any character
+  // `*` - matches 0 or more characters
+  // e.g.: name,emails{type},labels etc...
+  string q = 5;
+  // `types.id`
+  string id = 6;
+  // `types.name`
+  string name = 7;
+  // `types.repo`
+  string repo = 8;
+  // `types.path`
+  string path = 9;
+
+  // [NOT] [ system / custom ] types only
+  google.protobuf.BoolValue readonly = 21;
+  // [NOT] Extend[able] types only.
+  google.protobuf.BoolValue extendable = 22;
+  // [NOT] include extensions/* types.
+  google.protobuf.BoolValue extensions = 25;
+  // [NOT] Extend[ed] types only.
+  google.protobuf.BoolValue extended = 23;
+  // [NOT] Administer access control only
+  google.protobuf.BoolValue administered = 24;
+
+  // ----- Result Options ---------------------------
+
+  // Number of result records (per page).
+  // Default: 16.
+  int32 size = 1;
+
+  // Page number of result set of records.
+  // Default: 1.
+  int32 page = 2;
+
+  // Sort result dataset of records by fields.
+  // ```
+  // sort ::= *( ORDER name )
+  //
+  // ORDER  = ASC / DESC
+  // DESC   = "-" / "!"
+  // ASC    = [ "+" ]   ; Default
+  // ```
+  //
+  // Fields available
+  //
+  // - `id`(seq)
+  // - `domain`{name}
+  // - `created_at`
+  // - `created_by`{name}
+  // - `updated_at`
+  // - `updated_by`{name}
+  //
+  // Use ?fields=`field.sort()` option to sort Edge fields.
+  repeated string sort = 3
+  [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: ARRAY,
+      // title: "sort",
+      pattern: "^[+|-|!]?\\w+$",
+      // description: "Fields [Q]uery to build result record",
+      // format: "name[.func(args)][{fields}],..",
+      default: "*",
+      example: "\"!updated_at,tag\"",
+      unique_items: true,
+      // array: "id",
+      // array: "names",
+      // array: "labels",
+      // array: "emails",
+    }
+  ];
+
+  // Fields [Q]uery to build result dataset record.
+  // ```
+  // fields ::= field [ *( "," field ) ]
+  // field  ::= name [ *( func ) ] [ inner ]
+  // inner  ::= "{" fields "}"
+  // funcs  ::= *( func )
+  // func   ::= "." name "(" [ args ] ")"
+  // name   ::= ALPHA / DIGIT / USCORE
+  //
+  // ALPHA    = %x41-5A / %x61-7A  ; "A"-"Z" / "a"-"z"
+  // DIGIT    = %x30-39            ; "0"-"9"
+  // USCORE   = %x5F ; underscore  ; "_"
+  // ```
+  repeated string fields = 4
+  [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      // type: ARRAY,
+      // title: "fields",
+      // pattern: "(\\w+(\\.\\w+\\(([^\\)]*)\\))*(\\{\\1\\})*(,\\1)*)+",
+      // description: "Fields [Q]uery to build result record",
+      // format: "name[.func(args)][{fields}],..",
+      default: "*",
+      example: "\"*,labels.size(3).sort(!updated_at){updated_at,label}\"",
+      unique_items: true,
+      // array: "id",
+      // array: "names",
+      // array: "labels",
+      // array: "emails",
+    }
+  ];
+}
+
+message LocateTypeRequest {
+
+  // `types.path`
+  string path = 1
+  [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      format: "path",
+    }
+  ];
+}

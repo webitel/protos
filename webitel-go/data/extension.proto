@@ -1,0 +1,285 @@
+syntax = "proto3";
+package webitel.proto.data;
+
+option go_package = "github.com/webitel/proto/data;pbdata";
+
+import "data/types.proto";
+// import "webitel/proto/data/value.proto";
+import "data/struct.proto";
+
+// import "webitel/proto/data/dataset.proto";
+// import "google/protobuf/struct.proto";
+
+// import "google/api/visibility.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+// // Extension represents a set of an extra fields
+// // for some [extendable] Dictionary type.
+// message Extension = Struct; // .. with simplified configuration
+
+// Extensions service.
+service Extensions {
+
+  // types
+
+  // Search for type extensions.
+  rpc SearchType(SearchExtensionRequest) returns (StructList) { // (ExtensionList) {
+    option (google.api.http) = {
+      get: "/types/extensions"
+    };
+  }
+
+  // Type extension details.
+  rpc LocateType(LocateExtensionRequest) returns  (Struct) { // returns (Extension) {
+    option (google.api.http) = {
+      get: "/types/extensions/{repo}"
+    };
+  }
+
+  // Create type extension.
+  rpc CreateType(CreateExtensionRequest) returns  (Struct) { // returns (Extension) {
+    option (google.api.http) = {
+      post: "/types/extensions/{repo}"
+      response_body: "*"
+      body: "input"
+    };
+  }
+
+  // Update type extension.
+  rpc UpdateType(UpdateExtensionRequest) returns  (Struct) { // returns (Extension) {
+    option (google.api.http) = {
+      put: "/types/extensions/{repo}"
+      response_body: "*"
+      body: "input"
+      // additional_bindings {
+      //   patch: "/types/extensions/{repo}"
+      //   response_body: "*"
+      //   body: "input"
+      // }
+    };
+  }
+
+  // Delete extension for types.
+  rpc DeleteType(DeleteExtensionRequest) returns  (StructList) { // returns (ExtensionList) {
+    option (google.api.http) = {
+      delete: "/types/extensions/{repo}"
+      response_body: "*"
+      additional_bindings {
+        delete: "/types/extensions"
+        response_body: "*"
+      }
+    };
+  }
+
+
+  // dataset
+
+  // // // Search dataset records
+  // // rpc Search(SearchDatasetRequest) returns (Dataset) {
+  // //   option (google.api.http) = {
+  // //     get: "/dictionaries/{type}"
+  // //   };
+  // // }
+
+  // // Record extension data.
+  // rpc Locate(LocateDatasetRequest) returns (google.protobuf.Struct) { // (Record) {
+  //   option (google.api.http) = {
+  //     get: "/extensions/{repo}/{id}"
+  //   };
+  // }
+  // // // Create dataset record
+  // // rpc Create(CreateDatasetRequest) returns (Record) {
+  // //   option (google.api.http) = {
+  // //     post: "/extensions/{type}"
+  // //     response_body: "*"
+  // //     body: "record"
+  // //   };
+  // // }
+
+  // // Update extension data.
+  // rpc Update(UpdateDatasetRequest) returns (google.protobuf.Struct) { // (Record) {
+  //   option (google.api.http) = {
+  //     // patch: "/extensions/{row.type}/{row.id}"
+  //     patch: "/extensions/{repo}/{id}"
+  //     response_body: "*"
+  //     body: "record"
+  //     additional_bindings {
+  //       // put: "/extensions/{row.type}/{row.id}"
+  //       put: "/extensions/{repo}/{id}"
+  //       response_body: "*"
+  //       body:  "record"
+  //     }
+  //   };
+  // }
+
+  // // Delete records extension data.
+  // rpc Delete(DeleteDatasetRequest) returns (Dataset) {
+  //   option (google.api.http) = {
+  //     delete: "/extensions/{repo}"
+  //     response_body: "*"
+  //   };
+  // }
+}
+
+// ----------------------------------- //
+//             Extensions              //
+// ----------------------------------- //
+
+message SearchExtensionRequest {
+
+  // Number of result records (per page).
+  // Default: 16.
+  int32 size = 1;
+
+  // Page number of result set of records.
+  // Default: 1.
+  int32 page = 2;
+
+  // Sort result dataset of records by fields.
+  // ```
+  // sort ::= *( ORDER name )
+  //
+  // ORDER  = ASC / DESC
+  // DESC   = "-" / "!"
+  // ASC    = [ "+" ]   ; Default
+  // ```
+  //
+  // Fields available
+  //
+  // - `id`(seq)
+  // - `domain`{name}
+  // - `created_at`
+  // - `created_by`{name}
+  // - `updated_at`
+  // - `updated_by`{name}
+  //
+  // Use ?fields=`field.sort()` option to sort Edge fields.
+  repeated string sort = 3
+  [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: ARRAY,
+      // title: "sort",
+      pattern: "^[+|-|!]?\\w+$",
+      // description: "Fields [Q]uery to build result record",
+      // format: "name[.func(args)][{fields}],..",
+      default: "*",
+      example: "\"!updated_at,tag\"",
+      unique_items: true,
+      // array: "id",
+      // array: "names",
+      // array: "labels",
+      // array: "emails",
+    }
+  ];
+
+  // Fields [Q]uery to build result dataset record.
+  // ```
+  // fields ::= field [ *( "," field ) ]
+  // field  ::= name [ *( func ) ] [ inner ]
+  // inner  ::= "{" fields "}"
+  // funcs  ::= *( func )
+  // func   ::= "." name "(" [ args ] ")"
+  // name   ::= ALPHA / DIGIT / USCORE
+  //
+  // ALPHA    = %x41-5A / %x61-7A  ; "A"-"Z" / "a"-"z"
+  // DIGIT    = %x30-39            ; "0"-"9"
+  // USCORE   = %x5F ; underscore  ; "_"
+  // ```
+  repeated string fields = 4
+  [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      // type: ARRAY,
+      // title: "fields",
+      // pattern: "(\\w+(\\.\\w+\\(([^\\)]*)\\))*(\\{\\1\\})*(,\\1)*)+",
+      // description: "Fields [Q]uery to build result record",
+      // format: "name[.func(args)][{fields}],..",
+      default: "*",
+      example: "\"*,labels.size(3).sort(!updated_at){updated_at,label}\"",
+      unique_items: true,
+      // array: "id",
+      // array: "names",
+      // array: "labels",
+      // array: "emails",
+    }
+  ];
+
+  // ----- Search Options ---------------------------
+
+  // Search term:
+  // `?` - matches any character
+  // `*` - matches 0 or more characters
+  // e.g.: name,emails{type},labels etc...
+  string q = 5;
+  
+  // extension.type.id
+  repeated string id = 6;
+
+}
+
+message LocateExtensionRequest {
+  // `type.repo`
+  string repo = 1; // id
+}
+
+message InputExtension {
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"fields\":[{\"id\":\"country\",\"name\":\"Country\",\"kind\":\"lookup\",\"lookup\":{\"id\":\"code\",\"name\":\"name\",\"type\":\"/dictionaries/countries\"},\"required\":true},{\"id\":\"city\",\"name\":\"City\",\"kind\":\"lookup\",\"lookup\":{\"id\":\"id\",\"name\":\"name\",\"type\":\"/dictionaries/cities?code={country.code}\"}}],\"indexes\":{\"country\":{},\"city\":{}}}"
+  };
+
+  // Fields definitions
+  repeated Field fields = 5;
+
+  // constraints
+
+  // // PRIMARY [fields.id] KEY.
+  // // Default: "id"
+  // string primary = 10;
+
+  // INDEX Fields
+  map<string, Index> indices = 11;
+}
+
+message CreateExtensionRequest {
+
+  // int64 dc = 0;
+
+  // // SUPER type
+  // InputId type = 1;
+
+  // SUPER `types.repo` to extend, e.g.: `contacts`.
+  // Lookup: GET /types?extendable=true
+  string repo = 1;
+
+  // Extension type fields.
+  InputExtension input = 2;
+}
+
+message UpdateExtensionRequest {
+  // // SUPER type
+  // InputId type = 1;
+
+  // `type.repo`
+  string repo = 1;
+  InputExtension input = 2;
+}
+
+message DeleteExtensionRequest {
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: [
+        "type"
+      ]
+    }
+  };
+
+  repeated string fields = 1;
+  // `type.repo`
+  repeated string repo = 2;
+}
+
+// ----------------------------------- //
+//               Dataset               //
+// ----------------------------------- //

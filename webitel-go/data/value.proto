@@ -1,0 +1,54 @@
+syntax = "proto3";
+package webitel.proto.data;
+
+option go_package = "github.com/webitel/proto/data;pbdata";
+
+// import "webitel/proto/data/value.proto";
+
+import "google/protobuf/struct.proto";
+import "google/protobuf/wrappers.proto";
+
+message LookupValue {
+  // Required. Unique Identifier.
+  string id = 1;
+  // Readonly. Display name.
+  string name = 2;
+  // Optional. Reference type.
+  string type = 3;
+}
+
+// `ListValue` is a wrapper around a repeated field of values.
+//
+// The JSON representation for `ListValue` is JSON array.
+message ListValue {
+  // Repeated field of dynamically typed values.
+  repeated Value values = 1;
+}
+
+// `Value` represents a dynamically typed value which can be either
+// null, a number, a string, a boolean, a recursive struct value, or a
+// list of values. A producer of value is expected to set one of these
+// variants. Absence of any variant indicates an error.
+//
+// The JSON representation for `Value` is JSON value.
+message Value {
+  // The kind of value.
+  oneof kind {
+    // Represents a null value.
+    google.protobuf.NullValue   null = 1;
+    // Represents a boolean value.
+    google.protobuf.BoolValue   bool = 2;
+    // Represents a signed integer value.
+    google.protobuf.Int32Value  int32    = 3;
+    google.protobuf.Int64Value  int64    = 4;
+    google.protobuf.UInt32Value uint32   = 5;
+    google.protobuf.UInt64Value uint64   = 6;
+    google.protobuf.FloatValue  float32  = 7;
+    google.protobuf.DoubleValue float64  = 8;
+    google.protobuf.DoubleValue datetime = 9;
+    google.protobuf.StringValue string   = 10;
+    google.protobuf.BytesValue  binary   = 11;
+    LookupValue                 lookup   = 12;
+    ListValue                   list     = 13;
+  }
+}
