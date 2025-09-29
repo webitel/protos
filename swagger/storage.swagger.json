@@ -34,6 +34,192 @@
     "application/json"
   ],
   "paths": {
+    "/storage/agent/{agent_id}": {
+      "get": {
+        "operationId": "SearchScreenRecordingsByAgent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storage.ListFile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "uploaded_at.from",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "uploaded_at.to",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "reference_id",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "retention_until.from",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "retention_until.to",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "channel",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UnknownChannel",
+              "ChatChannel",
+              "MailChannel",
+              "CallChannel",
+              "LogChannel",
+              "MediaChannel",
+              "KnowledgebaseChannel",
+              "CasesChannel",
+              "ScreenshotChannel",
+              "ScreenSharingChannel"
+            ],
+            "default": "UnknownChannel"
+          }
+        ],
+        "tags": [
+          "FileService"
+        ]
+      }
+    },
+    "/storage/agent/{agent_id}/{id}": {
+      "delete": {
+        "operationId": "DeleteScreenRecordingsByAgent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storage.DeleteFilesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "csv",
+            "minItems": 1
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/storage.FileService.DeleteScreenRecordingsByAgentBody"
+            }
+          }
+        ],
+        "tags": [
+          "FileService"
+        ]
+      }
+    },
     "/storage/backend_profiles": {
       "get": {
         "summary": "List of BackendProfile",
@@ -2537,6 +2723,9 @@
       }
     },
     "storage.FileService.DeleteScreenRecordingsBody": {
+      "type": "object"
+    },
+    "storage.FileService.DeleteScreenRecordingsByAgentBody": {
       "type": "object"
     },
     "storage.FileTranscriptSafeResponse": {
