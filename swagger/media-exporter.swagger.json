@@ -1,0 +1,339 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "pdf.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "PdfService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/export/pdf/{agent_id}": {
+      "post": {
+        "summary": "Generate a new PDF export asynchronously.\nReturns metadata about the created export task.",
+        "operationId": "GeneratePdfExport",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.pdf.PdfExportMetadata"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "agent_id",
+            "description": "Agent ID for which the export is generated.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.pdf.PdfService.GeneratePdfExportBody"
+            }
+          }
+        ],
+        "tags": [
+          "PdfService"
+        ]
+      }
+    },
+    "/export/pdf/{agent_id}/history": {
+      "get": {
+        "summary": "Get paginated history of PDF exports for a given agent.",
+        "operationId": "GetPdfExportHistory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.pdf.PdfHistoryResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "agent_id",
+            "description": "Agent ID.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "description": "Page number (starting from 1).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "description": "Page size (number of records per page).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "PdfService"
+        ]
+      }
+    },
+    "/export/pdf/{file_id}": {
+      "get": {
+        "summary": "Download a previously generated PDF by export ID.",
+        "operationId": "DownloadPdfExport",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "$ref": "#/definitions/webitel.pdf.PdfExportChunk"
+                },
+                "error": {
+                  "$ref": "#/definitions/google.rpc.Status"
+                }
+              },
+              "title": "Stream result of webitel.pdf.PdfExportChunk"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "file_id",
+            "description": "Unique export identifier.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "domain_id",
+            "description": "Domain ID for authorization.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "PdfService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "google.protobuf.Any": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "google.rpc.Status": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
+        }
+      }
+    },
+    "webitel.pdf.PdfExportChunk": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "string",
+          "format": "byte",
+          "description": "Raw PDF file bytes (chunked)."
+        }
+      },
+      "description": "Chunked response with PDF binary data."
+    },
+    "webitel.pdf.PdfExportMetadata": {
+      "type": "object",
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "description": "Unique identifier of the task."
+        },
+        "file_name": {
+          "type": "string",
+          "description": "File name of the export."
+        },
+        "mime_type": {
+          "type": "string",
+          "description": "MIME type, e.g., \"application/pdf\"."
+        },
+        "status": {
+          "type": "string",
+          "description": "Task status: pending | processing | done | failed."
+        },
+        "size": {
+          "type": "string",
+          "format": "int64",
+          "description": "File size in bytes (0 if not ready)."
+        }
+      },
+      "description": "Metadata about a PDF export task."
+    },
+    "webitel.pdf.PdfExportStatus": {
+      "type": "string",
+      "enum": [
+        "PDF_EXPORT_STATUS_UNSPECIFIED",
+        "PDF_EXPORT_STATUS_PENDING",
+        "PDF_EXPORT_STATUS_PROCESSING",
+        "PDF_EXPORT_STATUS_DONE",
+        "PDF_EXPORT_STATUS_FAILED"
+      ],
+      "default": "PDF_EXPORT_STATUS_UNSPECIFIED",
+      "description": "Status of the PDF export process.\n\n - PDF_EXPORT_STATUS_UNSPECIFIED: Default value.\n - PDF_EXPORT_STATUS_PENDING: Task is waiting to start.\n - PDF_EXPORT_STATUS_PROCESSING: Task is in progress.\n - PDF_EXPORT_STATUS_DONE: Task is completed successfully.\n - PDF_EXPORT_STATUS_FAILED: Task failed."
+    },
+    "webitel.pdf.PdfHistoryRecord": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "description": "Export ID."
+        },
+        "name": {
+          "type": "string",
+          "description": "Export name."
+        },
+        "file_id": {
+          "type": "string",
+          "format": "int64",
+          "description": "Related file ID."
+        },
+        "mime_type": {
+          "type": "string",
+          "description": "MIME type of the export."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Creation timestamp (Unix millis)."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Update timestamp (Unix millis)."
+        },
+        "created_by": {
+          "type": "string",
+          "format": "int64",
+          "description": "User ID who created the export."
+        },
+        "updated_by": {
+          "type": "string",
+          "format": "int64",
+          "description": "User ID who last updated the export."
+        },
+        "status": {
+          "$ref": "#/definitions/webitel.pdf.PdfExportStatus",
+          "description": "Current export status."
+        }
+      },
+      "description": "Represents a single PDF export record."
+    },
+    "webitel.pdf.PdfHistoryResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Current page number."
+        },
+        "next": {
+          "type": "boolean",
+          "description": "True if there is a next page."
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.pdf.PdfHistoryRecord"
+          },
+          "description": "List of export history records."
+        }
+      },
+      "description": "Response containing a page of export history."
+    },
+    "webitel.pdf.PdfService.GeneratePdfExportBody": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "type": "string",
+          "description": "Channel type (e.g., \"screenshot\")."
+        },
+        "from": {
+          "type": "string",
+          "format": "int64",
+          "description": "Start timestamp (Unix millis)."
+        },
+        "to": {
+          "type": "string",
+          "format": "int64",
+          "description": "End timestamp (Unix millis)."
+        },
+        "file_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          },
+          "description": "Optional list of specific file IDs to include."
+        }
+      },
+      "description": "Request for generating a PDF export."
+    }
+  }
+}

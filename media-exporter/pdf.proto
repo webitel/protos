@@ -1,0 +1,194 @@
+syntax = "proto3";
+
+package webitel.pdf;
+
+option go_package = "github.com/webitel/pdf/api/pdf;pdf";
+
+import "google/api/annotations.proto";
+
+// PdfService provides methods to generate, download,
+// and manage PDF exports from media files.
+service PdfService {
+
+  // Generate a new PDF export asynchronously.
+  // Returns metadata about the created export task.
+  rpc GeneratePdfExport (PdfGenerateRequest) returns (PdfExportMetadata) {
+    option (google.api.http) = {
+      post: "/export/pdf/{agent_id}"
+      body: "*"
+    };
+  }
+
+  // Download a previously generated PDF by export ID.
+  rpc DownloadPdfExport (PdfDownloadRequest) returns (stream PdfExportChunk) {
+    option (google.api.http) = {
+      get: "/export/pdf/{file_id}"
+    };
+  }
+
+  // Get paginated history of PDF exports for a given agent.
+  rpc GetPdfExportHistory (PdfHistoryRequest) returns (PdfHistoryResponse) {
+    option (google.api.http) = {
+      get: "/export/pdf/{agent_id}/history"
+    };
+  }
+}
+
+// Request for generating a PDF export.
+message PdfGenerateRequest {
+  int64 agent_id = 1;   // Agent ID for which the export is generated.
+  string channel = 2;   // Channel type (e.g., "screenshot").
+  int64 from = 3;       // Start timestamp (Unix millis).
+  int64 to = 4;         // End timestamp (Unix millis).
+
+  repeated int64 file_ids = 5; // Optional list of specific file IDs to include.
+}
+
+// Request for downloading a previously generated PDF export.
+message PdfDownloadRequest {
+  int64 file_id = 1;  // Unique export identifier.
+  int64 domain_id = 2;  // Domain ID for authorization.
+}
+
+// Metadata about a PDF export task.
+message PdfExportMetadata {
+  string task_id = 1;    // Unique identifier of the task.
+  string file_name = 2;  // File name of the export.
+  string mime_type = 3;  // MIME type, e.g., "application/pdf".
+  string status = 4;     // Task status: pending | processing | done | failed.
+  int64 size = 5;        // File size in bytes (0 if not ready).
+}
+
+// Chunked response with PDF binary data.
+message PdfExportChunk {
+  bytes data = 1; // Raw PDF file bytes (chunked).
+}
+
+// Request for retrieving paginated history of exports.
+message PdfHistoryRequest {
+  int64 agent_id = 1; // Agent ID.
+  int32 page = 2;     // Page number (starting from 1).
+  int32 size = 3;     // Page size (number of records per page).
+}
+
+// Response containing a page of export history.
+message PdfHistoryResponse {
+  int32 page = 1;                    // Current page number.
+  bool next = 2;                 // True if there is a next page.
+  repeated PdfHistoryRecord data = 3; // List of export history records.
+}
+
+// Represents a single PDF export record.
+message PdfHistoryRecord {
+  int64 id = 1;                 // Export ID.
+  string name = 2;              // Export name.
+  int64 file_id = 3;            // Related file ID.
+  string mime_type = 4;         // MIME type of the export.
+  int64 created_at = 5;         // Creation timestamp (Unix millis).
+  int64 updated_at = 6;         // Update timestamp (Unix millis).
+  int64 created_by = 7;         // User ID who created the export.
+  int64 updated_by = 8;         // User ID who last updated the export.
+  PdfExportStatus status = 9;   // Current export status.
+}
+
+// Status of the PDF export process.
+enum PdfExportStatus {
+  PDF_EXPORT_STATUS_UNSPECIFIED = 0; // Default value.
+  PDF_EXPORT_STATUS_PENDING = 1;     // Task is waiting to start.
+  PDF_EXPORT_STATUS_PROCESSING = 2;  // Task is in progress.
+  PDF_EXPORT_STATUS_DONE = 3;        // Task is completed successfully.
+  PDF_EXPORT_STATUS_FAILED = 4;      // Task failed.
+}
+
+
+//syntax = "proto3";
+//
+//package webitel.pdf;
+//
+//option go_package = "github.com/webitel/pdf/api/pdf;pdf";
+//
+//import "google/api/annotations.proto";
+//
+//// Service for generating exports from media files
+//service PdfService {
+//
+//  // Generate PDF asynchronously, returns metadata
+//  rpc GeneratePDF (ExportRequest) returns (ExportMetadata) {
+//    option (google.api.http) = {
+//      post: "/export/pdf/{agent_id}/pdf"
+//      body: "*"
+//    };
+//  }
+//
+//  // Download previously generated PDF
+//  rpc DownloadPDF (DownloadRequest) returns (stream ExportResponse) {
+//    option (google.api.http) = {
+//      get: "/export/pdf/{id}/pdf"
+//    };
+//  }
+//
+//  rpc GetPpfHistory (GetHistoryRequest) returns (PdfHistoryResponse) {
+//    option (google.api.http) = {
+//      get: "/export/pdf/{agent_id}/ppf_history"
+//    };
+//  }
+//}
+//
+//message GetHistoryRequest{
+//  int64 agent_id = 1;
+//  int32 page = 2;
+//  int32 size = 3;
+//}
+//
+//message PdfHistoryResponse{
+//  int32 page = 1;
+//  bool next = 2;
+//  repeated PdfHistoryRecord data = 3;
+//}
+//
+//enum PdfGenerateStatus{
+//  PENDING = 0;
+//  PROCESSING = 1;
+//  DONE = 2;
+//  FAILED = 3;
+//}
+//
+//message PdfHistoryRecord{
+//  int64 id = 1;
+//  string name = 2;
+//  int64 fileID = 3;
+//  string mime = 4;
+//  int64 uploadedAt = 5;
+//  int64 updatedAt = 6;
+//  int64 uploadedBy = 7;
+//  int64 updatedBy = 8;
+//  PdfGenerateStatus status = 9;
+//}
+//
+//// Request to generate export
+//message ExportRequest {
+//  int64 agent_id = 1; // Agent ID
+//  string channel  = 2;
+//  int64 from      = 3;
+//  int64 to        = 4;
+//}
+//
+//// Request to download export
+//message DownloadRequest {
+//  int64 id = 1;       // Task identifier from GeneratePDF
+//  int64 domainID = 2; // Domain ID for authorization
+//}
+//
+//// Metadata about export
+//message ExportMetadata {
+//  string task_id  = 1;
+//  string file_name = 2;
+//  string mime_type = 3;  // e.g., "application/pdf"
+//  string status    = 4;  // pending | processing | done | failed
+//  int64 size       = 5;  // optional, 0 if not ready
+//}
+//
+//// Response with PDF chunk
+//message ExportResponse {
+//  bytes chunk = 1;
+//}
