@@ -33046,6 +33046,38 @@
         }
       }
     },
+    "/storage/file/restore": {
+      "patch": {
+        "tags": [
+          "FileService"
+        ],
+        "operationId": "RestoreFiles",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/storage.RestoreFilesRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storage.RestoreFilesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/storage/file_policies": {
       "get": {
         "tags": [
@@ -34569,7 +34601,7 @@
           "Dictionaries"
         ],
         "summary": "Lookup dictionaries data types.",
-        "operationId": "SearchTypeMixin3",
+        "operationId": "SearchType",
         "parameters": [
           {
             "type": "string",
@@ -34692,7 +34724,7 @@
           "Dictionaries"
         ],
         "summary": "Delete custom dictionaries.",
-        "operationId": "DeleteTypeMixin3",
+        "operationId": "DeleteType",
         "parameters": [
           {
             "type": "array",
@@ -34862,7 +34894,7 @@
           "Extensions"
         ],
         "summary": "Search for type extensions.",
-        "operationId": "SearchType",
+        "operationId": "SearchTypeMixin3",
         "parameters": [
           {
             "type": "integer",
@@ -35096,7 +35128,7 @@
           "Extensions"
         ],
         "summary": "Delete extension for types.",
-        "operationId": "DeleteType",
+        "operationId": "DeleteTypeMixin3",
         "parameters": [
           {
             "minItems": 1,
@@ -56804,6 +56836,20 @@
         }
       }
     },
+    "storage.FileMalwareScan": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "found": {
+          "type": "boolean"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
     "storage.FilePoliciesService.FilePolicyApplyBody": {
       "type": "object"
     },
@@ -57360,6 +57406,21 @@
         }
       }
     },
+    "storage.RestoreFilesRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        }
+      }
+    },
+    "storage.RestoreFilesResponse": {
+      "type": "object"
+    },
     "storage.SafeUploadFileRequest.Metadata": {
       "type": "object",
       "properties": {
@@ -57420,6 +57481,9 @@
         },
         "file_url": {
           "type": "string"
+        },
+        "malware": {
+          "$ref": "#/definitions/storage.FileMalwareScan"
         },
         "mime_type": {
           "type": "string"
@@ -57677,6 +57741,9 @@
         "file_url": {
           "type": "string"
         },
+        "malware": {
+          "$ref": "#/definitions/storage.FileMalwareScan"
+        },
         "server": {
           "type": "string"
         },
@@ -57701,6 +57768,9 @@
         "id": {
           "type": "string",
           "format": "int64"
+        },
+        "malware": {
+          "$ref": "#/definitions/storage.FileMalwareScan"
         },
         "mime": {
           "type": "string"
