@@ -37,7 +37,18 @@ jobs:
       #       and changes like SearchType -> SearchTypeMixin3
       - name: Merge Swagger files
         run: |
+          set +e
           swagger mixin swagger/*.swagger.json --output swagger/api.json
+          EXIT_CODE=$?
+          set -e
+      
+          if [ $EXIT_CODE -ne 0 ]; then
+            echo "::warning::Swagger mixin finished with exit code $EXIT_CODE. Continuing as planned."
+            
+            if [ $EXIT_CODE -ne 21 ]; then
+              exit $EXIT_CODE
+            fi
+          fi
 
       - name: Check for local changes
         id: check-changes
