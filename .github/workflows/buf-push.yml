@@ -1,0 +1,49 @@
+name: Buf
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "**.proto"
+      - "**/buf.yaml"
+      - "**/buf.lock"
+      - "**/buf.md"
+      - "**/README.md"
+      - "**/LICENSE"
+      - ".github/workflows/buf-push.yml"
+
+permissions: { contents: read }
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  push:
+    name: Push to BSR
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        inputs:
+          - cases
+          - cc
+          - chat
+          - engine
+          - fs
+          - general
+          - logger
+          - media-exporter
+          - storage
+          - webitel-go
+          - workflow
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Push modules
+        uses: bufbuild/buf-action@v1
+        with:
+          version: "1.57.2"
+          token: ${{ secrets.BUF_TOKEN }}
+          paths: ${{ matrix.inputs }}
+          push: true

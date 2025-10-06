@@ -1,32 +1,71 @@
+name: Swagger
+
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
     paths:
-      - swagger/**
+      - "swagger/*.swagger.json"
+      - ".github/workflows/swagger-mix.yml"
+
+permissions: { contents: read }
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  swagger-mix:
+  merge:
+    name: Merge files
     runs-on: ubuntu-latest
-    name: Merge a swagger files 
+    permissions: { contents: write }
     steps:
-        - name: Set up Go
-          uses: actions/setup-go@v4
-          with:
-            go-version: 1.24
-        - name: Checkout the code
-          uses: actions/checkout@v4
-        - name: Run generator
-          run:
-            go run github.com/msample/swagger-mixin@latest swagger/engine.swagger.json swagger/storage.swagger.json swagger/messages.swagger.json swagger/logger.swagger.json swagger/webitel-go.swagger.json swagger/wfm.swagger.json swagger/knowledgebase.swagger.json swagger/cases.swagger.json swagger/fts.swagger.json swagger/media-exporter.swagger.json > swagger/api.json
-        - name: Git add changes
-          if: always()
-          run:
-            git add swagger/api.json
-        - name: Push changes
-          if: always()
-          run: |
-              git config --global user.name 'webitel-bot'
-              git config --global user.email 'webitel-bot@users.noreply.github.com'
-              git commit -am "Automated swagger-mix generation"
-              git push
+
+      # TODO: use the hosted tool cache: @actions/tool-cache
+      - name: Download go-swagger
+        env:
+          SWAGGER_VERSION: "0.32.3"
+          OS_ARCH: "linux_amd64"
+
+        run: |
+          dir=$(mktemp -d)
+          curl -sL "https://github.com/go-swagger/go-swagger/releases/download/v${SWAGGER_VERSION}/swagger-${OS_ARCH}" -o $dir/swagger
+          sudo install $dir/swagger /usr/local/bin
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # TODO: enable `fqn_for_swagger_name` in generating swagger files to skip duplicated definitions
+      #       and changes like SearchType -> SearchTypeMixin3
+      - name: Merge Swagger files
+        run: |
+          swagger mixin swagger/*.swagger.json --output swagger/api.json
+
+      - name: Check for local changes
+        id: check-changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "::set-output name=found::true"
+            echo "Uncommitted changes found: "
+            git status --porcelain
+          fi
+
+      - name: Create Github APP token
+        uses: webitel/reusable-workflows/actions/create-github-app-token@create-github-app-token-v1.0.1
+        if: steps.check-changes.outputs.found == 'true'
+        id: app-token
+        with:
+          app-id: ${{ vars.DELIVERY_BOT_APP_ID }}
+          private-key: ${{ secrets.DELIVERY_BOT_APP_PEM }}
+
+      - name: Configure git user
+        if: steps.check-changes.outputs.found == 'true'
+        run: |
+          git config --global user.name '${{ steps.app-token.outputs.user-name }}'
+          git config --global user.email '${{ steps.app-token.outputs.user-email }}'
+          git config --local --add --bool push.autoSetupRemote true
+
+      - name: Commit changes
+        if: steps.check-changes.outputs.found == 'true'
+        run: |
+          git add swagger/api.json
+          git commit -m "chore: merge swagger files"
+          git push
