@@ -11736,7 +11736,7 @@
           "CaseComments"
         ],
         "summary": "Delete a specific comment by its etag",
-        "operationId": "DeleteCommentMixin6",
+        "operationId": "DeleteComment",
         "parameters": [
           {
             "type": "string",
@@ -11778,7 +11778,7 @@
           "CaseComments"
         ],
         "summary": "Update a specific comment by its etag",
-        "operationId": "UpdateCommentMixin6",
+        "operationId": "UpdateComment",
         "parameters": [
           {
             "type": "string",
@@ -13463,7 +13463,7 @@
           "CaseComments"
         ],
         "summary": "Publish comment into a specific case",
-        "operationId": "PublishCommentMixin6",
+        "operationId": "PublishComment",
         "parameters": [
           {
             "type": "string",
@@ -14229,7 +14229,7 @@
         "tags": [
           "CaseTimeline"
         ],
-        "operationId": "GetTimelineMixin6",
+        "operationId": "GetTimeline",
         "parameters": [
           {
             "type": "string",
@@ -14325,7 +14325,7 @@
         "tags": [
           "CaseTimeline"
         ],
-        "operationId": "GetTimelineCounterMixin6",
+        "operationId": "GetTimelineCounter",
         "parameters": [
           {
             "type": "string",
@@ -17612,7 +17612,7 @@
           "Comments"
         ],
         "summary": "Publish comment for a Contact.",
-        "operationId": "PublishComment",
+        "operationId": "PublishCommentMixin6",
         "parameters": [
           {
             "type": "string",
@@ -17663,7 +17663,7 @@
           "Comments"
         ],
         "summary": "Update (edit) specific Comment text owned",
-        "operationId": "UpdateComment",
+        "operationId": "UpdateCommentMixin6",
         "parameters": [
           {
             "type": "string",
@@ -17740,7 +17740,7 @@
           "Comments"
         ],
         "summary": "Delete Comment(s) for Contact ...",
-        "operationId": "DeleteComment",
+        "operationId": "DeleteCommentMixin6",
         "parameters": [
           {
             "type": "string",
@@ -21125,7 +21125,7 @@
         "tags": [
           "Timeline"
         ],
-        "operationId": "GetTimeline",
+        "operationId": "GetTimelineMixin6",
         "parameters": [
           {
             "type": "string",
@@ -21221,7 +21221,7 @@
         "tags": [
           "Timeline"
         ],
-        "operationId": "GetTimelineCounter",
+        "operationId": "GetTimelineCounterMixin6",
         "parameters": [
           {
             "type": "string",
@@ -24501,6 +24501,143 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/engine.TestEmailProfileResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/export/pdf/{agent_id}": {
+      "post": {
+        "tags": [
+          "PdfService"
+        ],
+        "summary": "Generate a new PDF export asynchronously.\nReturns metadata about the created export task.",
+        "operationId": "GeneratePdfExport",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Agent ID for which the export is generated.",
+            "name": "agent_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.pdf.PdfService.GeneratePdfExportBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.pdf.PdfExportMetadata"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/export/pdf/{agent_id}/history": {
+      "get": {
+        "tags": [
+          "PdfService"
+        ],
+        "summary": "Get paginated history of PDF exports for a given agent.",
+        "operationId": "GetPdfExportHistory",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Agent ID.",
+            "name": "agent_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page number (starting from 1).",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page size (number of records per page).",
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.pdf.PdfHistoryResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/export/pdf/{file_id}": {
+      "get": {
+        "tags": [
+          "PdfService"
+        ],
+        "summary": "Download a previously generated PDF by export ID.",
+        "operationId": "DownloadPdfExport",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Unique export identifier.",
+            "name": "file_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Domain ID for authorization.",
+            "name": "domain_id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "title": "Stream result of webitel.pdf.PdfExportChunk",
+              "properties": {
+                "error": {
+                  "$ref": "#/definitions/google.rpc.Status"
+                },
+                "result": {
+                  "$ref": "#/definitions/webitel.pdf.PdfExportChunk"
+                }
+              }
             }
           },
           "default": {
@@ -29937,7 +30074,7 @@
         "tags": [
           "FTSService"
         ],
-        "operationId": "SearchMixin7",
+        "operationId": "Search",
         "parameters": [
           {
             "type": "integer",
@@ -32909,6 +33046,70 @@
         }
       }
     },
+    "/storage/file/quarantine": {
+      "delete": {
+        "tags": [
+          "FileService"
+        ],
+        "operationId": "DeleteQuarantineFiles",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/storage.DeleteQuarantineFilesRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storage.DeleteFilesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/storage/file/restore": {
+      "patch": {
+        "tags": [
+          "FileService"
+        ],
+        "operationId": "RestoreFiles",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/storage.RestoreFilesRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storage.RestoreFilesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/storage/file_policies": {
       "get": {
         "tags": [
@@ -34308,7 +34509,7 @@
           "Types"
         ],
         "summary": "Lookup data types registry.",
-        "operationId": "SearchMixin3",
+        "operationId": "SearchMixin6",
         "parameters": [
           {
             "type": "string",
@@ -34432,7 +34633,7 @@
           "Dictionaries"
         ],
         "summary": "Lookup dictionaries data types.",
-        "operationId": "SearchTypeMixin3",
+        "operationId": "SearchType",
         "parameters": [
           {
             "type": "string",
@@ -34555,7 +34756,7 @@
           "Dictionaries"
         ],
         "summary": "Delete custom dictionaries.",
-        "operationId": "DeleteTypeMixin3",
+        "operationId": "DeleteType",
         "parameters": [
           {
             "type": "array",
@@ -34725,7 +34926,7 @@
           "Extensions"
         ],
         "summary": "Search for type extensions.",
-        "operationId": "SearchType",
+        "operationId": "SearchTypeMixin6",
         "parameters": [
           {
             "type": "integer",
@@ -34849,7 +35050,7 @@
           "Extensions"
         ],
         "summary": "Type extension details.",
-        "operationId": "LocateTypeMixin3",
+        "operationId": "LocateTypeMixin6",
         "parameters": [
           {
             "type": "string",
@@ -34880,7 +35081,7 @@
           "Extensions"
         ],
         "summary": "Update type extension.",
-        "operationId": "UpdateTypeMixin3",
+        "operationId": "UpdateTypeMixin6",
         "parameters": [
           {
             "type": "string",
@@ -34919,7 +35120,7 @@
           "Extensions"
         ],
         "summary": "Create type extension.",
-        "operationId": "CreateTypeMixin3",
+        "operationId": "CreateTypeMixin6",
         "parameters": [
           {
             "type": "string",
@@ -34959,7 +35160,7 @@
           "Extensions"
         ],
         "summary": "Delete extension for types.",
-        "operationId": "DeleteType",
+        "operationId": "DeleteTypeMixin6",
         "parameters": [
           {
             "minItems": 1,
@@ -35005,7 +35206,7 @@
           "Types"
         ],
         "summary": "Structured data type details.",
-        "operationId": "LocateMixin3",
+        "operationId": "Locate",
         "parameters": [
           {
             "type": "string",
@@ -36663,7 +36864,7 @@
           "Records"
         ],
         "summary": "Search dataset records",
-        "operationId": "Search",
+        "operationId": "SearchMixin6",
         "parameters": [
           {
             "type": "string",
@@ -36848,7 +37049,7 @@
           "Records"
         ],
         "summary": "Locate dataset record",
-        "operationId": "Locate",
+        "operationId": "LocateMixin6",
         "parameters": [
           {
             "type": "string",
@@ -56027,14 +56228,11 @@
     "protobufAny": {
       "type": "object",
       "properties": {
-        "type_url": {
+        "@type": {
           "type": "string"
-        },
-        "value": {
-          "type": "string",
-          "format": "byte"
         }
-      }
+      },
+      "additionalProperties": {}
     },
     "protobufNullValue": {
       "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value.",
@@ -56125,16 +56323,13 @@
       }
     },
     "rpcStatus": {
-      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https://github.com/grpc). Each `Status` message contains\nthree pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the\n[API Design Guide](https://cloud.google.com/apis/design/errors).",
       "type": "object",
       "properties": {
         "code": {
-          "description": "The status code, which should be an enum value of\n[google.rpc.Code][google.rpc.Code].",
           "type": "integer",
           "format": "int32"
         },
         "details": {
-          "description": "A list of messages that carry the error details.  There is a common set of\nmessage types for APIs to use.",
           "type": "array",
           "items": {
             "type": "object",
@@ -56142,7 +56337,6 @@
           }
         },
         "message": {
-          "description": "A developer-facing error message, which should be in English. Any\nuser-facing error message should be localized and sent in the\n[google.rpc.Status.details][google.rpc.Status.details] field, or localized\nby the client.",
           "type": "string"
         }
       }
@@ -56618,6 +56812,18 @@
     "storage.DeleteFilesResponse": {
       "type": "object"
     },
+    "storage.DeleteQuarantineFilesRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        }
+      }
+    },
     "storage.File": {
       "type": "object",
       "properties": {
@@ -56663,6 +56869,20 @@
           "title": "deprecated use reference_id"
         },
         "view_name": {
+          "type": "string"
+        }
+      }
+    },
+    "storage.FileMalwareScan": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "found": {
+          "type": "boolean"
+        },
+        "status": {
           "type": "string"
         }
       }
@@ -57223,6 +57443,21 @@
         }
       }
     },
+    "storage.RestoreFilesRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        }
+      }
+    },
+    "storage.RestoreFilesResponse": {
+      "type": "object"
+    },
     "storage.SafeUploadFileRequest.Metadata": {
       "type": "object",
       "properties": {
@@ -57283,6 +57518,9 @@
         },
         "file_url": {
           "type": "string"
+        },
+        "malware": {
+          "$ref": "#/definitions/storage.FileMalwareScan"
         },
         "mime_type": {
           "type": "string"
@@ -57540,6 +57778,9 @@
         "file_url": {
           "type": "string"
         },
+        "malware": {
+          "$ref": "#/definitions/storage.FileMalwareScan"
+        },
         "server": {
           "type": "string"
         },
@@ -57564,6 +57805,9 @@
         "id": {
           "type": "string",
           "format": "int64"
+        },
+        "malware": {
+          "$ref": "#/definitions/storage.FileMalwareScan"
         },
         "mime": {
           "type": "string"
@@ -61272,446 +61516,152 @@
         }
       }
     },
-    "webitel.knowledgebase.Article": {
-      "type": "object",
-      "properties": {
-        "created_at": {
-          "description": "The user who created this Field.",
-          "type": "string",
-          "format": "int64"
-        },
-        "created_by": {
-          "description": "Timestamp(milli) of the Field creation.",
-          "$ref": "#/definitions/webitel.knowledgebase.Lookup"
-        },
-        "etag": {
-          "description": "Unique ID of the latest version of the update.\nThis ID changes after any update to the underlying value(s).",
-          "type": "string"
-        },
-        "has_children": {
-          "description": "Indicates that the article has children.",
-          "type": "boolean"
-        },
-        "id": {
-          "description": "The unique ID of the association. Never changes.",
-          "type": "string"
-        },
-        "parent_article": {
-          "description": "The parent article ID.",
-          "type": "string",
-          "format": "int64"
-        },
-        "pinned": {
-          "description": "Indicates that the article is pinned on the top of list.",
-          "type": "boolean"
-        },
-        "space_id": {
-          "description": "Space ID associated with.",
-          "type": "string",
-          "format": "int64"
-        },
-        "state": {
-          "description": "Indicates the state of the article.",
-          "type": "boolean"
-        },
-        "tags": {
-          "description": "Tags associated with the article.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "text": {
-          "description": "The text content of the article.",
-          "type": "string"
-        },
-        "title": {
-          "description": "The title of the article.",
-          "type": "string"
-        },
-        "updated_at": {
-          "description": "Timestamp(milli) of the last Field update.\nTake part in Etag generation.",
-          "type": "string",
-          "format": "int64"
-        },
-        "updated_by": {
-          "description": "The user who performed last Update.",
-          "$ref": "#/definitions/webitel.knowledgebase.Lookup"
-        },
-        "ver": {
-          "description": "READONLY. Operational attributes\nVersion of the latest update. Numeric sequence.",
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "webitel.knowledgebase.ArticleList": {
-      "description": "Article dataset.\nNOTE: Edge represents connection between two nodes.\nSo this spaceArticles.data are always subordinate to some space.id.",
+    "webitel.pdf.PdfExportChunk": {
+      "description": "Chunked response with PDF binary data.",
       "type": "object",
       "properties": {
         "data": {
-          "description": "Article dataset page.",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.knowledgebase.Article"
-          }
-        },
-        "next": {
-          "type": "boolean",
-          "title": "Indicates that this is a partial result.\nMore data available upon query: ?size=${data.len}\u0026page=${page++}"
-        },
-        "page": {
-          "description": "The page number of the partial result.",
-          "type": "integer",
-          "format": "int32"
+          "description": "Raw PDF file bytes (chunked).",
+          "type": "string",
+          "format": "byte"
         }
       }
     },
-    "webitel.knowledgebase.ArticleVersion": {
+    "webitel.pdf.PdfExportMetadata": {
+      "description": "Metadata about a PDF export task.",
       "type": "object",
       "properties": {
-        "id": {
-          "description": "The unique ID of the association. Never changes.",
+        "file_name": {
+          "description": "File name of the export.",
           "type": "string"
         },
-        "parent_article": {
-          "description": "The parent article ID.",
-          "type": "string",
-          "format": "int64"
-        },
-        "space_id": {
-          "description": "Space ID associated with.",
-          "type": "string",
-          "format": "int64"
-        },
-        "tags": {
-          "description": "Tags associated with the article.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "text": {
-          "description": "The text content of the article.",
-          "type": "string"
-        },
-        "title": {
-          "description": "The title of the article.",
-          "type": "string"
-        },
-        "updated_at": {
-          "description": "Timestamp(milli) of the last Field update.",
-          "type": "string",
-          "format": "int64"
-        },
-        "updated_by": {
-          "description": "The user who loaded this attachment.",
-          "$ref": "#/definitions/webitel.knowledgebase.Lookup"
-        },
-        "ver": {
-          "description": "Version of the latest update. Numeric sequence.",
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "webitel.knowledgebase.ArticleVersionList": {
-      "type": "object",
-      "properties": {
-        "data": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.knowledgebase.ArticleVersion"
-          }
-        },
-        "next": {
-          "type": "boolean",
-          "title": "Indicates that this is a partial result.\nMore data available upon query: ?size=${data.len}\u0026page=${page++}"
-        },
-        "page": {
-          "description": "The page number of the partial result.",
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "webitel.knowledgebase.Attachment": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "description": "The unique ID of the association. Never changes.",
+        "mime_type": {
+          "description": "MIME type, e.g., \"application/pdf\".",
           "type": "string"
         },
         "size": {
-          "description": "The size of the attachment.",
-          "type": "integer",
-          "format": "int32"
-        },
-        "title": {
-          "description": "The title of the article.",
-          "type": "string"
-        },
-        "uploaded_by": {
-          "description": "The user who loaded this attachment.",
-          "$ref": "#/definitions/webitel.knowledgebase.Lookup"
-        }
-      }
-    },
-    "webitel.knowledgebase.AttachmentList": {
-      "type": "object",
-      "properties": {
-        "data": {
-          "description": "Attachment dataset page.",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.knowledgebase.Attachment"
-          }
-        },
-        "next": {
-          "type": "boolean",
-          "title": "Indicates that this is a partial result.\nMore data available upon query: ?size=${data.len}\u0026page=${page++}"
-        },
-        "page": {
-          "description": "The page number of the partial result.",
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "webitel.knowledgebase.Combined": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "title": "Id of the record (article or space)"
-        },
-        "name": {
-          "type": "string",
-          "title": "Display name of the record (article or space)"
-        },
-        "type": {
-          "type": "string",
-          "title": "Type of the record: article/space"
-        }
-      }
-    },
-    "webitel.knowledgebase.CombinedList": {
-      "type": "object",
-      "properties": {
-        "data": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.knowledgebase.Combined"
-          }
-        },
-        "next": {
-          "type": "boolean",
-          "title": "Indicates that this is a partial result.\nMore data available upon query: ?size=${data.len}\u0026page=${page++}"
-        },
-        "page": {
-          "description": "The page number of the partial result.",
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "webitel.knowledgebase.InputArticle": {
-      "description": "An input of the Space's Articles.",
-      "type": "object",
-      "required": [
-        "etag"
-      ],
-      "properties": {
-        "etag": {
-          "description": "Unique ID of the latest version of an existing resource.",
-          "type": "string"
-        },
-        "parent_article": {
-          "description": "The parent article ID.",
+          "description": "File size in bytes (0 if not ready).",
           "type": "string",
           "format": "int64"
         },
-        "pinned": {
-          "description": "Indicates that the article is pinned on the top of list.",
-          "type": "boolean"
-        },
-        "space_id": {
-          "description": "[VALUE]: --------------------------------------\nSpace ID associated with.",
-          "type": "string",
-          "format": "int64"
-        },
-        "state": {
-          "description": "Indicates if article is active and actual.",
-          "type": "boolean"
-        },
-        "tags": {
-          "description": "Tags associated with the article.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "text": {
-          "description": "The text content of the article.",
+        "status": {
+          "description": "Task status: pending | processing | done | failed.",
           "type": "string"
         },
-        "title": {
-          "description": "The title of the article.",
+        "task_id": {
+          "description": "Unique identifier of the task.",
           "type": "string"
         }
       }
     },
-    "webitel.knowledgebase.InputSpace": {
-      "description": "The Space principal input.",
-      "type": "object",
-      "properties": {
-        "etag": {
-          "description": "Unique ID of the latest version of an existing resorce.",
-          "type": "string"
-        },
-        "home_page": {
-          "description": "BIO. Short description about the space.\nOPTIONAL. Multi-lined text.",
-          "type": "string"
-        },
-        "name": {
-          "description": "Represents the name of the knowledge base space.",
-          "type": "string"
-        },
-        "state": {
-          "description": "The state of the space.",
-          "type": "boolean"
-        }
-      }
+    "webitel.pdf.PdfExportStatus": {
+      "description": "Status of the PDF export process.\n\n - PDF_EXPORT_STATUS_UNSPECIFIED: Default value.\n - PDF_EXPORT_STATUS_PENDING: Task is waiting to start.\n - PDF_EXPORT_STATUS_PROCESSING: Task is in progress.\n - PDF_EXPORT_STATUS_DONE: Task is completed successfully.\n - PDF_EXPORT_STATUS_FAILED: Task failed.",
+      "type": "string",
+      "default": "PDF_EXPORT_STATUS_UNSPECIFIED",
+      "enum": [
+        "PDF_EXPORT_STATUS_UNSPECIFIED",
+        "PDF_EXPORT_STATUS_PENDING",
+        "PDF_EXPORT_STATUS_PROCESSING",
+        "PDF_EXPORT_STATUS_DONE",
+        "PDF_EXPORT_STATUS_FAILED"
+      ]
     },
-    "webitel.knowledgebase.Lookup": {
-      "description": "Lookup reference information.\nSimplified search filter to uniquely identify related object.",
-      "type": "object",
-      "properties": {
-        "id": {
-          "description": "Reference Object unique ID.",
-          "type": "string"
-        },
-        "name": {
-          "description": "Reference Object display name.",
-          "type": "string"
-        },
-        "type": {
-          "description": "Reference Object well-known type.",
-          "type": "string"
-        }
-      }
-    },
-    "webitel.knowledgebase.Space": {
+    "webitel.pdf.PdfHistoryRecord": {
+      "description": "Represents a single PDF export record.",
       "type": "object",
       "properties": {
         "created_at": {
-          "description": "The timestamp when the space was created (in Unix time).",
+          "description": "Creation timestamp (Unix millis).",
           "type": "string",
           "format": "int64"
         },
         "created_by": {
-          "description": "The user who created the space.",
-          "$ref": "#/definitions/webitel.knowledgebase.Lookup"
+          "description": "User ID who created the export.",
+          "type": "string",
+          "format": "int64"
         },
-        "domain": {
-          "description": "READONLY. The space's metadata.",
-          "$ref": "#/definitions/webitel.knowledgebase.Lookup"
-        },
-        "etag": {
-          "description": "Unique ID of the latest version of the update.\nThis ID changes after any update to the underlying value(s).",
-          "type": "string"
-        },
-        "has_children": {
-          "description": "Indicates if the space has children.",
-          "type": "boolean"
-        },
-        "home_page": {
-          "description": "BIO. Short description about the space.",
-          "type": "string"
+        "file_id": {
+          "description": "Related file ID.",
+          "type": "string",
+          "format": "int64"
         },
         "id": {
-          "description": "The unique ID of the association. Never changes.",
-          "type": "string"
+          "description": "Export ID.",
+          "type": "string",
+          "format": "int64"
         },
-        "mode": {
-          "description": "[R]ecord[b]ased[A]ccess[C]ontrol mode granted.",
+        "mime_type": {
+          "description": "MIME type of the export.",
           "type": "string"
         },
         "name": {
-          "description": "The name of the space.",
+          "description": "Export name.",
           "type": "string"
         },
-        "state": {
-          "description": "The state of the space.",
-          "type": "boolean"
+        "status": {
+          "description": "Current export status.",
+          "$ref": "#/definitions/webitel.pdf.PdfExportStatus"
         },
         "updated_at": {
-          "description": "The timestamp when the space was last updated (in Unix time).",
+          "description": "Update timestamp (Unix millis).",
           "type": "string",
           "format": "int64"
         },
         "updated_by": {
-          "description": "The user who last updated the space.",
-          "$ref": "#/definitions/webitel.knowledgebase.Lookup"
-        },
-        "ver": {
-          "description": "READONLY. Operational attributes\nVersion of the latest update. Numeric sequence.",
-          "type": "integer",
-          "format": "int32"
+          "description": "User ID who last updated the export.",
+          "type": "string",
+          "format": "int64"
         }
       }
     },
-    "webitel.knowledgebase.SpaceList": {
+    "webitel.pdf.PdfHistoryResponse": {
+      "description": "Response containing a page of export history.",
       "type": "object",
       "properties": {
         "data": {
-          "description": "Space(s) dataset page.",
+          "description": "List of export history records.",
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/webitel.knowledgebase.Space"
+            "$ref": "#/definitions/webitel.pdf.PdfHistoryRecord"
           }
         },
         "next": {
-          "type": "boolean",
-          "title": "Indicates that this is a partial result.\nMore data available upon query: ?size=${data.len}\u0026page=${page++}"
-        },
-        "page": {
-          "description": "The page number of the partial result.",
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "webitel.knowledgebase.Tag": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "description": "The name of the tag.",
-          "type": "string"
-        }
-      }
-    },
-    "webitel.knowledgebase.TagsList": {
-      "type": "object",
-      "properties": {
-        "data": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.knowledgebase.Tag"
-          }
-        },
-        "next": {
+          "description": "True if there is a next page.",
           "type": "boolean"
         },
         "page": {
+          "description": "Current page number.",
           "type": "integer",
           "format": "int32"
+        }
+      }
+    },
+    "webitel.pdf.PdfService.GeneratePdfExportBody": {
+      "description": "Request for generating a PDF export.",
+      "type": "object",
+      "properties": {
+        "channel": {
+          "description": "Channel type (e.g., \"screenshot\").",
+          "type": "string"
+        },
+        "file_ids": {
+          "description": "Optional list of specific file IDs to include.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
+        "from": {
+          "description": "Start timestamp (Unix millis).",
+          "type": "string",
+          "format": "int64"
+        },
+        "to": {
+          "description": "End timestamp (Unix millis).",
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -63005,6 +62955,57 @@
   ],
   "tags": [
     {
+      "name": "Services"
+    },
+    {
+      "name": "CaseComments"
+    },
+    {
+      "name": "RelatedCases"
+    },
+    {
+      "name": "CaseFiles"
+    },
+    {
+      "name": "CaseLinks"
+    },
+    {
+      "name": "Priorities"
+    },
+    {
+      "name": "StatusConditions"
+    },
+    {
+      "name": "Sources"
+    },
+    {
+      "name": "SLAConditions"
+    },
+    {
+      "name": "Cases"
+    },
+    {
+      "name": "CaseCommunications"
+    },
+    {
+      "name": "CaseTimeline"
+    },
+    {
+      "name": "Catalogs"
+    },
+    {
+      "name": "CloseReasons"
+    },
+    {
+      "name": "CloseReasonGroups"
+    },
+    {
+      "name": "SLAs"
+    },
+    {
+      "name": "Statuses"
+    },
+    {
       "name": "RoutingChatPlanService"
     },
     {
@@ -63114,6 +63115,207 @@
     },
     {
       "name": "WebHookService"
+    },
+    {
+      "name": "FTSService"
+    },
+    {
+      "name": "PdfService"
+    },
+    {
+      "name": "MessagesService"
+    },
+    {
+      "name": "ContactLinkingService"
+    },
+    {
+      "name": "ContactsChatCatalog"
+    },
+    {
+      "name": "AgentChatService"
+    },
+    {
+      "name": "CasesChatCatalog"
+    },
+    {
+      "name": "BackendProfileService"
+    },
+    {
+      "name": "CognitiveProfileService"
+    },
+    {
+      "name": "FileService"
+    },
+    {
+      "name": "FilePoliciesService"
+    },
+    {
+      "name": "FileTranscriptService"
+    },
+    {
+      "name": "ImportTemplateService"
+    },
+    {
+      "name": "MediaFileService"
+    },
+    {
+      "name": "Presence"
+    },
+    {
+      "name": "Customers"
+    },
+    {
+      "name": "Permissions"
+    },
+    {
+      "name": "Users"
+    },
+    {
+      "name": "Roles"
+    },
+    {
+      "name": "AC"
+    },
+    {
+      "name": "AccessStore"
+    },
+    {
+      "name": "OAuth2"
+    },
+    {
+      "name": "SA"
+    },
+    {
+      "name": "Auth"
+    },
+    {
+      "name": "Devices"
+    },
+    {
+      "name": "CallManager"
+    },
+    {
+      "name": "CA"
+    },
+    {
+      "name": "Classes"
+    },
+    {
+      "name": "Comments"
+    },
+    {
+      "name": "Labels"
+    },
+    {
+      "name": "Emails"
+    },
+    {
+      "name": "Upload"
+    },
+    {
+      "name": "Photos"
+    },
+    {
+      "name": "Phones"
+    },
+    {
+      "name": "Managers"
+    },
+    {
+      "name": "Variables"
+    },
+    {
+      "name": "Languages"
+    },
+    {
+      "name": "Timezones"
+    },
+    {
+      "name": "IMClients"
+    },
+    {
+      "name": "ContactGroups"
+    },
+    {
+      "name": "Contacts"
+    },
+    {
+      "name": "DynamicConditions"
+    },
+    {
+      "name": "DynamicGroups"
+    },
+    {
+      "name": "Groups"
+    },
+    {
+      "name": "Timeline"
+    },
+    {
+      "name": "Records"
+    },
+    {
+      "name": "Types"
+    },
+    {
+      "name": "Dictionaries"
+    },
+    {
+      "name": "Extensions"
+    },
+    {
+      "name": "Domains"
+    },
+    {
+      "name": "Articles"
+    },
+    {
+      "name": "KnowledgebaseSearch"
+    },
+    {
+      "name": "Spaces"
+    },
+    {
+      "name": "Tags"
+    },
+    {
+      "name": "LDAP"
+    },
+    {
+      "name": "OAuth2Federation"
+    },
+    {
+      "name": "TwoFactorAuthentication"
+    },
+    {
+      "name": "UserAccessTokens"
+    },
+    {
+      "name": "UserSettings"
+    },
+    {
+      "name": "AgentAbsenceService"
+    },
+    {
+      "name": "AgentWorkingConditionsService"
+    },
+    {
+      "name": "AgentWorkingScheduleService"
+    },
+    {
+      "name": "ForecastCalculationService"
+    },
+    {
+      "name": "PauseTemplateService"
+    },
+    {
+      "name": "ShiftTemplateService"
+    },
+    {
+      "name": "WorkingConditionService"
+    },
+    {
+      "name": "WorkingScheduleService"
     }
   ]
 }

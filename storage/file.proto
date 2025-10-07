@@ -22,6 +22,21 @@ service FileService {
         };
     }
 
+    rpc RestoreFiles (RestoreFilesRequest) returns (RestoreFilesResponse) {
+        option (google.api.http) = {
+            patch: "/storage/file/restore"
+            body: "*"
+        };
+    }
+
+    rpc DeleteQuarantineFiles (DeleteQuarantineFilesRequest) returns (DeleteFilesResponse) {
+        option (google.api.http) = {
+            delete: "/storage/file/quarantine"
+            body: "*"
+        };
+    }
+
+
     rpc SearchFiles(SearchFilesRequest) returns (ListFile) {
         option (google.api.http) = {
             get: "/storage/file"
@@ -53,6 +68,18 @@ service FileService {
             body: "*"
         };
     }
+}
+
+message DeleteQuarantineFilesRequest {
+    repeated int64 id = 1;
+}
+
+message RestoreFilesRequest {
+    repeated int64 id = 1;
+}
+
+message RestoreFilesResponse {
+    
 }
 
 message DeleteScreenRecordingsRequest {
@@ -168,6 +195,12 @@ message Thumbnail {
     string scale = 3;
 }
 
+message FileMalwareScan {
+    bool found = 1;
+    string status = 2;
+    string description = 3;
+}
+
 message GenerateFileLinkRequest {
     int64 domain_id = 1;
     int64 file_id = 2;
@@ -246,6 +279,7 @@ message UploadFileUrlResponse {
     string sha256sum = 7;
     Thumbnail thumbnail = 8;
     string server = 9;
+    FileMalwareScan malware = 10;
 }
 
 message UploadFileRequest {
@@ -314,6 +348,7 @@ message SafeUploadFileResponse {
         string mime_type = 8;
         string uuid = 9;
         Thumbnail thumbnail = 10;
+        FileMalwareScan malware = 11;
     }
 
     message Part {
@@ -340,4 +375,5 @@ message UploadFileResponse {
     string server = 5;
     string sha256sum = 6;
     Thumbnail thumbnail = 7;
+    FileMalwareScan malware = 8;
 }

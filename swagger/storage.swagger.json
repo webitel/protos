@@ -949,6 +949,70 @@
         ]
       }
     },
+    "/storage/file/quarantine": {
+      "delete": {
+        "operationId": "DeleteQuarantineFiles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storage.DeleteFilesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/storage.DeleteQuarantineFilesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "FileService"
+        ]
+      }
+    },
+    "/storage/file/restore": {
+      "patch": {
+        "operationId": "RestoreFiles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storage.RestoreFilesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/storage.RestoreFilesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "FileService"
+        ]
+      }
+    },
     "/storage/file_policies": {
       "get": {
         "summary": "List of FilePolicy",
@@ -2495,6 +2559,18 @@
     "storage.DeleteFilesResponse": {
       "type": "object"
     },
+    "storage.DeleteQuarantineFilesRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        }
+      }
+    },
     "storage.File": {
       "type": "object",
       "properties": {
@@ -2541,6 +2617,20 @@
         "uuid": {
           "type": "string",
           "title": "deprecated use reference_id"
+        }
+      }
+    },
+    "storage.FileMalwareScan": {
+      "type": "object",
+      "properties": {
+        "found": {
+          "type": "boolean"
+        },
+        "status": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
         }
       }
     },
@@ -3100,6 +3190,21 @@
         }
       }
     },
+    "storage.RestoreFilesRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        }
+      }
+    },
+    "storage.RestoreFilesResponse": {
+      "type": "object"
+    },
     "storage.SafeUploadFileRequest.Metadata": {
       "type": "object",
       "properties": {
@@ -3182,6 +3287,9 @@
         },
         "thumbnail": {
           "$ref": "#/definitions/storage.Thumbnail"
+        },
+        "malware": {
+          "$ref": "#/definitions/storage.FileMalwareScan"
         }
       }
     },
@@ -3429,6 +3537,9 @@
         },
         "thumbnail": {
           "$ref": "#/definitions/storage.Thumbnail"
+        },
+        "malware": {
+          "$ref": "#/definitions/storage.FileMalwareScan"
         }
       }
     },
@@ -3460,6 +3571,9 @@
         },
         "server": {
           "type": "string"
+        },
+        "malware": {
+          "$ref": "#/definitions/storage.FileMalwareScan"
         }
       }
     },
