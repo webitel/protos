@@ -1,11 +1,12 @@
-version: v1
-managed:
-  enabled: true
+version: v2
 
 plugins:
-  - plugin: buf.build/grpc-ecosystem/openapiv2
+
+  # Generate OpenAPI documentation for api
+  - remote: buf.build/grpc-ecosystem/openapiv2:v2.16.0
     out: ../swagger
     opt:
+      - disable_default_errors=true
       - version=false
       - json_names_for_fields=false
       - allow_delete_body=true
@@ -14,4 +15,6 @@ plugins:
       - fqn_for_openapi_name=false
       - merge_file_name=logger
       - allow_merge=true
-      - simple_operation_ids=true
+
+inputs:
+  - directory: .

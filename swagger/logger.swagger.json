@@ -1,9 +1,17 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "config_service.proto",
+    "title": "import.proto",
     "version": "version not set"
   },
+  "tags": [
+    {
+      "name": "ConfigService"
+    },
+    {
+      "name": "LoggerService"
+    }
+  ],
   "consumes": [
     "application/json"
   ],
@@ -19,12 +27,6 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerSystemObjects"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -49,12 +51,6 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerConfigs"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -97,7 +93,7 @@
           },
           {
             "name": "object",
-            "description": "NOT USED.",
+            "description": "NOT USED",
             "in": "query",
             "required": false,
             "type": "array",
@@ -137,12 +133,6 @@
             "schema": {
               "$ref": "#/definitions/loggerConfig"
             }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
           }
         },
         "parameters": [
@@ -169,17 +159,12 @@
             "schema": {
               "$ref": "#/definitions/loggerConfig"
             }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
           }
         },
         "parameters": [
           {
             "name": "config_id",
+            "description": "int32 domainId = 8;",
             "in": "path",
             "required": true,
             "type": "integer",
@@ -197,12 +182,6 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerEmpty"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -227,12 +206,6 @@
             "schema": {
               "$ref": "#/definitions/loggerConfig"
             }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
           }
         },
         "parameters": [
@@ -248,7 +221,26 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/loggerUpdateConfigRequest"
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "days_to_store": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "period": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "storage": {
+                  "$ref": "#/definitions/loggerLookup"
+                },
+                "description": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -264,12 +256,6 @@
             "schema": {
               "$ref": "#/definitions/loggerConfig"
             }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
           }
         },
         "parameters": [
@@ -285,7 +271,32 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/loggerPatchConfigRequest"
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "days_to_store": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "period": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "storage": {
+                  "$ref": "#/definitions/loggerLookup"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "fields": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
             }
           }
         ],
@@ -302,12 +313,6 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerLogs"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -418,12 +423,6 @@
             "schema": {
               "$ref": "#/definitions/loggerLogs"
             }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
           }
         },
         "parameters": [
@@ -473,7 +472,7 @@
           },
           {
             "name": "object_id",
-            "description": "SPECIFIC filter.",
+            "description": "SPECIFIC filter",
             "in": "query",
             "required": false,
             "type": "array",
@@ -485,7 +484,7 @@
           },
           {
             "name": "action",
-            "description": "GENERAL filters.",
+            "description": "GENERAL filters",
             "in": "query",
             "required": false,
             "type": "array",
@@ -535,12 +534,6 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerLogs"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
             }
           }
         },
@@ -616,7 +609,7 @@
           },
           {
             "name": "action",
-            "description": "GENERAL filters.",
+            "description": "GENERAL filters",
             "in": "query",
             "required": false,
             "type": "array",
@@ -761,6 +754,7 @@
         "items": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/loggerConfig"
           }
         }
@@ -842,6 +836,7 @@
         "items": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/loggerLog"
           }
         }
@@ -856,38 +851,6 @@
         },
         "name": {
           "type": "string"
-        }
-      }
-    },
-    "loggerPatchConfigRequest": {
-      "type": "object",
-      "properties": {
-        "config_id": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "enabled": {
-          "type": "boolean"
-        },
-        "days_to_store": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "period": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "storage": {
-          "$ref": "#/definitions/loggerLookup"
-        },
-        "description": {
-          "type": "string"
-        },
-        "fields": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
         }
       }
     },
@@ -908,66 +871,8 @@
         "items": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/loggerLookup"
-          }
-        }
-      }
-    },
-    "loggerUpdateConfigRequest": {
-      "type": "object",
-      "properties": {
-        "config_id": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "enabled": {
-          "type": "boolean"
-        },
-        "days_to_store": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "period": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "storage": {
-          "$ref": "#/definitions/loggerLookup"
-        },
-        "description": {
-          "type": "string"
-        }
-      }
-    },
-    "protobufAny": {
-      "type": "object",
-      "properties": {
-        "type_url": {
-          "type": "string"
-        },
-        "value": {
-          "type": "string",
-          "format": "byte"
-        }
-      }
-    },
-    "runtimeError": {
-      "type": "object",
-      "properties": {
-        "error": {
-          "type": "string"
-        },
-        "code": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "message": {
-          "type": "string"
-        },
-        "details": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/protobufAny"
           }
         }
       }
