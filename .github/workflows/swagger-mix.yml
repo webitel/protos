@@ -33,8 +33,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # TODO: enable `fqn_for_swagger_name` in generating swagger files to skip duplicated definitions
-      #       and changes like SearchType -> SearchTypeMixin3
       - name: Merge Swagger files
         run: |
           set +e
@@ -44,17 +42,14 @@ jobs:
       
           if [ $EXIT_CODE -ne 0 ]; then
             echo "::warning::Swagger mixin finished with exit code $EXIT_CODE. Continuing as planned."
-            
-            if [ $EXIT_CODE -ne 21 ]; then
-              exit $EXIT_CODE
-            fi
           fi
 
       - name: Check for local changes
         id: check-changes
         run: |
           if [ -n "$(git status --porcelain)" ]; then
-            echo "::set-output name=found::true"
+            echo "found=true" >> $GITHUB_OUTPUT
+
             echo "Uncommitted changes found: "
             git status --porcelain
           fi
