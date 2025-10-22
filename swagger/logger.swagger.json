@@ -28,6 +28,12 @@
             "schema": {
               "$ref": "#/definitions/loggerSystemObjects"
             }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
           }
         },
         "parameters": [
@@ -51,6 +57,12 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerConfigs"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
             }
           }
         },
@@ -133,6 +145,12 @@
             "schema": {
               "$ref": "#/definitions/loggerConfig"
             }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
           }
         },
         "parameters": [
@@ -159,6 +177,12 @@
             "schema": {
               "$ref": "#/definitions/loggerConfig"
             }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
           }
         },
         "parameters": [
@@ -183,6 +207,12 @@
             "schema": {
               "$ref": "#/definitions/loggerEmpty"
             }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
           }
         },
         "parameters": [
@@ -206,6 +236,12 @@
             "schema": {
               "$ref": "#/definitions/loggerConfig"
             }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
           }
         },
         "parameters": [
@@ -221,26 +257,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "enabled": {
-                  "type": "boolean"
-                },
-                "days_to_store": {
-                  "type": "integer",
-                  "format": "int32"
-                },
-                "period": {
-                  "type": "integer",
-                  "format": "int32"
-                },
-                "storage": {
-                  "$ref": "#/definitions/loggerLookup"
-                },
-                "description": {
-                  "type": "string"
-                }
-              }
+              "$ref": "#/definitions/ConfigServiceUpdateConfigBody"
             }
           }
         ],
@@ -256,6 +273,12 @@
             "schema": {
               "$ref": "#/definitions/loggerConfig"
             }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
           }
         },
         "parameters": [
@@ -271,32 +294,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "enabled": {
-                  "type": "boolean"
-                },
-                "days_to_store": {
-                  "type": "integer",
-                  "format": "int32"
-                },
-                "period": {
-                  "type": "integer",
-                  "format": "int32"
-                },
-                "storage": {
-                  "$ref": "#/definitions/loggerLookup"
-                },
-                "description": {
-                  "type": "string"
-                },
-                "fields": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              }
+              "$ref": "#/definitions/ConfigServicePatchConfigBody"
             }
           }
         ],
@@ -313,6 +311,12 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerLogs"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
             }
           }
         },
@@ -422,6 +426,12 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerLogs"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
             }
           }
         },
@@ -534,6 +544,12 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerLogs"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
             }
           }
         },
@@ -664,6 +680,56 @@
     }
   },
   "definitions": {
+    "ConfigServicePatchConfigBody": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "days_to_store": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "period": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "storage": {
+          "$ref": "#/definitions/loggerLookup"
+        },
+        "description": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ConfigServiceUpdateConfigBody": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "days_to_store": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "period": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "storage": {
+          "$ref": "#/definitions/loggerLookup"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
     "loggerAction": {
       "type": "string",
       "enum": [
@@ -873,6 +939,34 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/loggerLookup"
+          }
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
           }
         }
       }
