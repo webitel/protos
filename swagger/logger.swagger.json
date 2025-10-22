@@ -21,7 +21,7 @@
   "paths": {
     "/logger/available_objects": {
       "get": {
-        "operationId": "ReadSystemObjects",
+        "operationId": "ConfigService_ReadSystemObjects",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -51,7 +51,7 @@
     },
     "/logger/config": {
       "get": {
-        "operationId": "SearchConfig",
+        "operationId": "ConfigService_SearchConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -138,7 +138,7 @@
         ]
       },
       "post": {
-        "operationId": "CreateConfig",
+        "operationId": "ConfigService_CreateConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -170,7 +170,7 @@
     },
     "/logger/config/{config_id}": {
       "get": {
-        "operationId": "ReadConfig",
+        "operationId": "ConfigService_ReadConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -200,7 +200,7 @@
         ]
       },
       "delete": {
-        "operationId": "DeleteConfig",
+        "operationId": "ConfigService_DeleteConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -229,7 +229,7 @@
         ]
       },
       "put": {
-        "operationId": "UpdateConfig",
+        "operationId": "ConfigService_UpdateConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -257,26 +257,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "enabled": {
-                  "type": "boolean"
-                },
-                "days_to_store": {
-                  "type": "integer",
-                  "format": "int32"
-                },
-                "period": {
-                  "type": "integer",
-                  "format": "int32"
-                },
-                "storage": {
-                  "$ref": "#/definitions/loggerLookup"
-                },
-                "description": {
-                  "type": "string"
-                }
-              }
+              "$ref": "#/definitions/ConfigServiceUpdateConfigBody"
             }
           }
         ],
@@ -285,7 +266,7 @@
         ]
       },
       "patch": {
-        "operationId": "PatchConfig",
+        "operationId": "ConfigService_PatchConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -313,32 +294,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "enabled": {
-                  "type": "boolean"
-                },
-                "days_to_store": {
-                  "type": "integer",
-                  "format": "int32"
-                },
-                "period": {
-                  "type": "integer",
-                  "format": "int32"
-                },
-                "storage": {
-                  "$ref": "#/definitions/loggerLookup"
-                },
-                "description": {
-                  "type": "string"
-                },
-                "fields": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              }
+              "$ref": "#/definitions/ConfigServicePatchConfigBody"
             }
           }
         ],
@@ -349,7 +305,7 @@
     },
     "/logger/config/{config_id}/logs": {
       "get": {
-        "operationId": "SearchLogByConfigId",
+        "operationId": "LoggerService_SearchLogByConfigId",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -464,7 +420,7 @@
     },
     "/logger/user/{user_id}/logs": {
       "get": {
-        "operationId": "SearchLogByUserId",
+        "operationId": "LoggerService_SearchLogByUserId",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -582,7 +538,7 @@
     },
     "/logger/{object}/record/{record_id}/logs": {
       "get": {
-        "operationId": "SearchLogByRecordId",
+        "operationId": "LoggerService_SearchLogByRecordId",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -724,6 +680,56 @@
     }
   },
   "definitions": {
+    "ConfigServicePatchConfigBody": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "days_to_store": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "period": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "storage": {
+          "$ref": "#/definitions/loggerLookup"
+        },
+        "description": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ConfigServiceUpdateConfigBody": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "days_to_store": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "period": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "storage": {
+          "$ref": "#/definitions/loggerLookup"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
     "loggerAction": {
       "type": "string",
       "enum": [
