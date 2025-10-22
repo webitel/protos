@@ -21,12 +21,18 @@
   "paths": {
     "/logger/available_objects": {
       "get": {
-        "operationId": "ReadSystemObjects",
+        "operationId": "ConfigService_ReadSystemObjects",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerSystemObjects"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
             }
           }
         },
@@ -45,12 +51,18 @@
     },
     "/logger/config": {
       "get": {
-        "operationId": "SearchConfig",
+        "operationId": "ConfigService_SearchConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerConfigs"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
             }
           }
         },
@@ -126,12 +138,18 @@
         ]
       },
       "post": {
-        "operationId": "CreateConfig",
+        "operationId": "ConfigService_CreateConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerConfig"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
             }
           }
         },
@@ -152,12 +170,18 @@
     },
     "/logger/config/{config_id}": {
       "get": {
-        "operationId": "ReadConfig",
+        "operationId": "ConfigService_ReadConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerConfig"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
             }
           }
         },
@@ -176,12 +200,18 @@
         ]
       },
       "delete": {
-        "operationId": "DeleteConfig",
+        "operationId": "ConfigService_DeleteConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerEmpty"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
             }
           }
         },
@@ -199,12 +229,18 @@
         ]
       },
       "put": {
-        "operationId": "UpdateConfig",
+        "operationId": "ConfigService_UpdateConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerConfig"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
             }
           }
         },
@@ -249,12 +285,18 @@
         ]
       },
       "patch": {
-        "operationId": "PatchConfig",
+        "operationId": "ConfigService_PatchConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerConfig"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
             }
           }
         },
@@ -307,12 +349,18 @@
     },
     "/logger/config/{config_id}/logs": {
       "get": {
-        "operationId": "SearchLogByConfigId",
+        "operationId": "LoggerService_SearchLogByConfigId",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerLogs"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
             }
           }
         },
@@ -416,12 +464,18 @@
     },
     "/logger/user/{user_id}/logs": {
       "get": {
-        "operationId": "SearchLogByUserId",
+        "operationId": "LoggerService_SearchLogByUserId",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerLogs"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
             }
           }
         },
@@ -528,12 +582,18 @@
     },
     "/logger/{object}/record/{record_id}/logs": {
       "get": {
-        "operationId": "SearchLogByRecordId",
+        "operationId": "LoggerService_SearchLogByRecordId",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/loggerLogs"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
             }
           }
         },
@@ -873,6 +933,34 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/loggerLookup"
+          }
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
           }
         }
       }
