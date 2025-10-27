@@ -253,6 +253,34 @@
         }
       }
     },
+    "/agent/chats/counter": {
+      "get": {
+        "tags": [
+          "AgentChatService"
+        ],
+        "operationId": "AgentChatService_GetAgentChatsCounter",
+        "parameters": [
+          {
+            "type": "boolean",
+            "name": "only_closed",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "name": "only_unprocessed",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.chat.GetAgentChatsCounterResponse"
+            }
+          }
+        }
+      }
+    },
     "/agent/chats/{chat_id}": {
       "patch": {
         "tags": [
@@ -14226,7 +14254,7 @@
           },
           {
             "type": "string",
-            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
+            "description": "Includes the history of ONLY those dialogs\nwhose member channel(s) contain\na specified set of variables.",
             "name": "group[string]",
             "in": "query"
           }
@@ -15105,10 +15133,10 @@
     "/chat/broadcast": {
       "post": {
         "tags": [
-          "MessagesService"
+          "Messages"
         ],
         "summary": "Broadcast message send message from via to peer recipients.",
-        "operationId": "BroadcastMessage",
+        "operationId": "MessagesService_BroadcastMessage",
         "parameters": [
           {
             "name": "body",
@@ -15125,12 +15153,6 @@
             "schema": {
               "$ref": "#/definitions/webitel.chat.BroadcastMessageResponse"
             }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/google.rpc.Status"
-            }
           }
         }
       }
@@ -15138,7 +15160,7 @@
     "/chat/customers": {
       "get": {
         "tags": [
-          "Catalog"
+          "Messages"
         ],
         "summary": "Query of external chat customers",
         "operationId": "Catalog_GetCustomers",
@@ -15231,7 +15253,7 @@
     "/chat/dialogs": {
       "get": {
         "tags": [
-          "Catalog"
+          "Messages"
         ],
         "summary": "Query of chat conversations",
         "operationId": "Catalog_GetDialogs",
@@ -15344,7 +15366,7 @@
           },
           {
             "type": "string",
-            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
+            "description": "Includes ONLY those chat dialogs\nwhose member channel(s) contain\na specified set of variables.\n\n10",
             "name": "group[string]",
             "in": "query"
           }
@@ -15362,7 +15384,7 @@
     "/chat/dialogs/{chat_id}/members": {
       "get": {
         "tags": [
-          "Catalog"
+          "Messages"
         ],
         "summary": "Query of chat participants",
         "operationId": "Catalog_GetMembers",
@@ -15500,7 +15522,7 @@
     "/chat/dialogs/{chat_id}/messages": {
       "get": {
         "tags": [
-          "Catalog"
+          "Messages"
         ],
         "summary": "Query of the chat history",
         "operationId": "Catalog_GetHistory",
@@ -15569,7 +15591,7 @@
           },
           {
             "type": "string",
-            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
+            "description": "Includes the history of ONLY those dialogs\nwhose member channel(s) contain\na specified set of variables.",
             "name": "group[string]",
             "in": "query"
           }
@@ -15683,7 +15705,7 @@
     "/chat/{peer.type}/{peer.id}/messages": {
       "get": {
         "tags": [
-          "Catalog"
+          "Messages"
         ],
         "summary": "Query of the chat history",
         "operationId": "Catalog_GetHistory2",
@@ -15753,7 +15775,7 @@
           },
           {
             "type": "string",
-            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
+            "description": "Includes the history of ONLY those dialogs\nwhose member channel(s) contain\na specified set of variables.",
             "name": "group[string][string]",
             "in": "query"
           }
@@ -17390,7 +17412,7 @@
           },
           {
             "type": "string",
-            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
+            "description": "Includes the history of ONLY those dialogs\nwhose member channel(s) contain\na specified set of variables.",
             "name": "group[string][string]",
             "in": "query"
           }
@@ -17471,7 +17493,7 @@
           },
           {
             "type": "string",
-            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
+            "description": "Includes the history of ONLY those dialogs\nwhose member channel(s) contain\na specified set of variables.",
             "name": "group[string]",
             "in": "query"
           }
@@ -61138,6 +61160,15 @@
         }
       }
     },
+    "webitel.chat.GetAgentChatsCounterResponse": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
     "webitel.chat.GetAgentChatsResponse": {
       "type": "object",
       "properties": {
@@ -61266,6 +61297,9 @@
         "id": {
           "type": "string"
         },
+        "source": {
+          "type": "string"
+        },
         "url": {
           "type": "string"
         }
@@ -61371,6 +61405,10 @@
         "keyboard": {
           "description": "Keyboard. Buttons. Quick Replies.",
           "$ref": "#/definitions/webitel.chat.ReplyMarkup"
+        },
+        "kind": {
+          "type": "string",
+          "title": "Kind of the message. Custom type classifier. Optional. Default: empty.\nMay be used by the client UI to extend set of general message.type(s): [ text | file ]"
         },
         "postback": {
           "description": "Postback. Reply Button Click[ed].",
@@ -61560,6 +61598,614 @@
         },
         "until": {
           "description": "Until epochtime (milli).\n**Match**: less or equal ..",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "webitel.chat.server.Account": {
+      "type": "object",
+      "title": "Account contact info to extend and replace legacy chat.Client message type",
+      "properties": {
+        "channel": {
+          "description": "e.g.: bot, user, phone, telegram, facebook, viber, skype ...",
+          "type": "string",
+          "title": "Channel communication type"
+        },
+        "contact": {
+          "description": "optional: channel specific contact string",
+          "type": "string",
+          "title": "Channel specific contact string"
+        },
+        "first_name": {
+          "type": "string",
+          "title": "optional"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "title": "Unique IDentifier"
+        },
+        "last_name": {
+          "type": "string",
+          "title": "optional"
+        },
+        "username": {
+          "type": "string",
+          "title": "required"
+        }
+      }
+    },
+    "webitel.chat.server.Button": {
+      "type": "object",
+      "properties": {
+        "caption": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.chat.server.Buttons": {
+      "type": "object",
+      "properties": {
+        "button": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.server.Button"
+          }
+        }
+      }
+    },
+    "webitel.chat.server.Channel": {
+      "type": "object",
+      "properties": {
+        "closed_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "connection": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "domain_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "id": {
+          "type": "string"
+        },
+        "internal": {
+          "type": "boolean"
+        },
+        "props": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "webitel.chat.server.ChatTransferResponse": {
+      "type": "object"
+    },
+    "webitel.chat.server.ChatVariablesResponse": {
+      "type": "object",
+      "properties": {
+        "channel_id": {
+          "description": "Unique Chat Channel IDentifier.",
+          "type": "string"
+        },
+        "variables": {
+          "description": "Result Chat Channel's Variables SET.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "webitel.chat.server.CheckSessionResponse": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "title": "Account for .this chat channel, end-user contact info",
+          "$ref": "#/definitions/webitel.chat.server.Account"
+        },
+        "channel_id": {
+          "type": "string"
+        },
+        "client_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "exists": {
+          "type": "boolean"
+        },
+        "properties": {
+          "description": "optional: extra context",
+          "type": "object",
+          "title": "Properties defined in .StartConversationRequest.message.variables",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "webitel.chat.server.CloseConversationCause": {
+      "type": "string",
+      "title": "- no_cause: optional (no cause)",
+      "default": "no_cause",
+      "enum": [
+        "no_cause",
+        "flow_end",
+        "client_leave",
+        "flow_err",
+        "broadcast_end"
+      ]
+    },
+    "webitel.chat.server.CloseConversationResponse": {
+      "type": "object"
+    },
+    "webitel.chat.server.Conversation": {
+      "type": "object",
+      "properties": {
+        "closed_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "domain_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "id": {
+          "type": "string"
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.server.Member"
+          }
+        },
+        "messages": {
+          "type": "array",
+          "title": "string self_channel_id = 9;\n  int32 unread_messages = 10;",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.server.HistoryMessage"
+          }
+        },
+        "title": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "webitel.chat.server.DeclineInvitationResponse": {
+      "type": "object"
+    },
+    "webitel.chat.server.File": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "mime": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "size": {
+          "type": "string",
+          "format": "int64"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.chat.server.Gateway": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.chat.server.GetConversationByIDResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.chat.server.Conversation"
+        }
+      }
+    },
+    "webitel.chat.server.GetConversationsResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.server.Conversation"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "title": "search: has {next} page ?"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "title": "select: offset {page}"
+        }
+      }
+    },
+    "webitel.chat.server.GetHistoryMessagesResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.server.HistoryMessage"
+          }
+        },
+        "next": {
+          "type": "boolean",
+          "title": "search: has {next} page ?"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "title": "select: offset {page}"
+        }
+      }
+    },
+    "webitel.chat.server.HistoryMessage": {
+      "type": "object",
+      "properties": {
+        "channel_id": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "file": {
+          "$ref": "#/definitions/webitel.chat.server.File"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "kind": {
+          "type": "string",
+          "title": "int64 conversation_id = 3;\n// int64 from_user_id = 2;\n// string from_user_type = 3;"
+        },
+        "text": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "webitel.chat.server.InviteToConversationResponse": {
+      "type": "object",
+      "properties": {
+        "invite_id": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.chat.server.JoinConversationResponse": {
+      "type": "object",
+      "properties": {
+        "channel_id": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.chat.server.LeaveConversationCause": {
+      "type": "string",
+      "title": "- default_cause: optional (no cause)",
+      "default": "default_cause",
+      "enum": [
+        "default_cause",
+        "agent_timeout",
+        "client_timeout",
+        "agent_leave",
+        "transfer",
+        "silence_timeout"
+      ]
+    },
+    "webitel.chat.server.LeaveConversationResponse": {
+      "type": "object"
+    },
+    "webitel.chat.server.Member": {
+      "type": "object",
+      "properties": {
+        "channel_id": {
+          "type": "string"
+        },
+        "external_id": {
+          "type": "string",
+          "title": "string firstname = 6;\nstring lastname = 7;"
+        },
+        "internal": {
+          "type": "boolean"
+        },
+        "type": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "user_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "username": {
+          "type": "string"
+        },
+        "via": {
+          "$ref": "#/definitions/webitel.chat.server.Gateway"
+        }
+      }
+    },
+    "webitel.chat.server.Message": {
+      "type": "object",
+      "properties": {
+        "buttons": {
+          "type": "array",
+          "title": "Reply Markup Buttons SET",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.server.Buttons"
+          }
+        },
+        "contact": {
+          "title": "End-User extra contact info",
+          "$ref": "#/definitions/webitel.chat.server.Account"
+        },
+        "created_at": {
+          "description": "Optional. Send message date (epochtime ms) Generates by the service.",
+          "type": "string",
+          "format": "int64"
+        },
+        "file": {
+          "title": "File to send. Pass an HTTP .URL as a string for Webitel to get a file from the Internet,\nor upload a new one using storage.FileService.UploadFile()",
+          "$ref": "#/definitions/webitel.chat.server.File"
+        },
+        "forward_from_chat_id": {
+          "type": "string",
+          "title": "Unique identifier for the chat where the original message was sent"
+        },
+        "forward_from_message_id": {
+          "type": "string",
+          "format": "int64",
+          "title": "Message identifier in the chat specified in from_chat_id"
+        },
+        "forward_from_variables": {
+          "type": "object",
+          "title": "External message sent-binding to be able to identify corresponding internal message",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "from": {
+          "title": "From sender user account",
+          "$ref": "#/definitions/webitel.chat.server.Account"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "title": "Unique message identifier inside this chat"
+        },
+        "inline": {
+          "type": "array",
+          "title": "Inline Keyboard Buttons SET",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.server.Buttons"
+          }
+        },
+        "kind": {
+          "type": "string",
+          "title": "Kind of the message. Custom type classifier. Optional. Default: empty.\nMay be used by the client UI to extend set of general message.type(s): [ text | file ]"
+        },
+        "left_chat_member": {
+          "title": "LeftChatMember description for {\"type\":\"left\"} notification",
+          "$ref": "#/definitions/webitel.chat.server.Account"
+        },
+        "new_chat_members": {
+          "type": "array",
+          "title": "NewChatMembers description for {\"type\":\"joined\"} notification",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.server.Account"
+          }
+        },
+        "no_input": {
+          "description": "An option used to block input to force the user\nto respond with one of the `Buttons`.\nInstructs client agents to disable input capabilities.\nCan only be used with a set of `Buttons`.",
+          "type": "boolean"
+        },
+        "postback": {
+          "description": "Postback. Reply Button Click[ed].",
+          "$ref": "#/definitions/webitel.chat.server.Postback"
+        },
+        "reply_to_message_id": {
+          "type": "string",
+          "format": "int64",
+          "title": "Optional. If the message is a reply,\nthis is the ID of the original message"
+        },
+        "reply_to_variables": {
+          "type": "object",
+          "title": "External message sent-binding to be able to identify corresponding internal message",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "text": {
+          "type": "string",
+          "title": "Text of the message to be sent, 1-4096"
+        },
+        "type": {
+          "description": "Type of this Message to notify e.g.: text, file, read, status etc.",
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "Optional. Edit message date (epochtime ms) Generates by the service.\nFor \"read\" messages, you can specify the date the last READ message was created_at"
+        },
+        "variables": {
+          "type": "object",
+          "title": "Optional. This Message extra properties",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "webitel.chat.server.Postback": {
+      "description": "Postback. Reply Button Click[ed].",
+      "type": "object",
+      "properties": {
+        "code": {
+          "description": "Button's callback data associated.",
+          "type": "string"
+        },
+        "mid": {
+          "description": "Message ID of the button.",
+          "type": "string",
+          "format": "int64"
+        },
+        "text": {
+          "description": "Button's caption. Text to display.",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.chat.server.SendMessageResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "title": "Message sent !",
+          "$ref": "#/definitions/webitel.chat.server.Message"
+        }
+      }
+    },
+    "webitel.chat.server.SendServiceMessageResponse": {
+      "type": "object"
+    },
+    "webitel.chat.server.SendUserActionResponse": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "type": "boolean",
+          "title": "Affected ?"
+        }
+      }
+    },
+    "webitel.chat.server.StartConversationResponse": {
+      "type": "object",
+      "properties": {
+        "channel_id": {
+          "type": "string"
+        },
+        "conversation_id": {
+          "type": "string"
+        },
+        "message": {
+          "title": "Sent \"start\" message !",
+          "$ref": "#/definitions/webitel.chat.server.Message"
+        }
+      }
+    },
+    "webitel.chat.server.UpdateChannelResponse": {
+      "type": "object"
+    },
+    "webitel.chat.server.User": {
+      "type": "object",
+      "properties": {
+        "connection": {
+          "type": "string"
+        },
+        "internal": {
+          "type": "boolean"
+        },
+        "type": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "webitel.chat.server.UserAction": {
+      "description": "User actions. Use this to provide users with detailed info\nabout their chat partner's actions: typing or sending attachments of all kinds.\n\n - Typing: User is typing.\n - Cancel: Invalidate all previous action updates.\nE.g. when user deletes entered text or aborts a video upload.",
+      "type": "string",
+      "default": "Typing",
+      "enum": [
+        "Typing",
+        "Cancel"
+      ]
+    },
+    "webitel.chat.server.WaitMessageResponse": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "title": "Error error = 3;",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.chat.server.Message"
+          }
+        },
+        "timeout_sec": {
           "type": "string",
           "format": "int64"
         }
@@ -63136,19 +63782,23 @@
       "name": "MediaFileService"
     },
     {
-      "name": "MessagesService"
+      "name": "ChatService"
     },
     {
-      "name": "ContactLinkingService"
-    },
-    {
-      "name": "ContactsChatCatalog"
+      "description": "**Messages** Service",
+      "name": "Messages"
     },
     {
       "name": "AgentChatService"
     },
     {
       "name": "CasesChatCatalog"
+    },
+    {
+      "name": "ContactLinkingService"
+    },
+    {
+      "name": "ContactsChatCatalog"
     },
     {
       "name": "ConfigService"
