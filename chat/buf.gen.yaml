@@ -1,22 +1,18 @@
 version: v2
 
-managed:
-  enabled: true
-  override:
-    - file_option: go_package_prefix
-      value: github.com/webitel/chat_manager/api/chat
-      module: buf.build/webitel/general
-
 
 plugins:
-  - remote: buf.build/protocolbuffers/go
-    out: ../../chat_manager/gen
-    opt: paths=source_relative
-    include_imports: true
-
-  - remote: buf.build/grpc/go
-    out: ../../chat_manager/gen
-    opt: paths=source_relative
+  - remote: buf.build/grpc-ecosystem/openapiv2
+    out: ../swagger
+    opt:
+      - openapi_naming_strategy=fqn
+      - json_names_for_fields=false
+      - disable_default_errors=true
+      - repeated_path_param_separator=csv
+      - allow_delete_body=true
+      - logtostderr=true
+      - allow_merge=true
+      - merge_file_name=messages
 
 inputs:
-  - directory: "."
+  - directory: .
