@@ -168,6 +168,7 @@ message File {
     int64 retention_until = 12;
 
     string uuid = 20; // deprecated use reference_id
+    CustomFileProperties properties = 21;
 }
 
 enum UploadStatusCode {
@@ -199,6 +200,13 @@ message FileMalwareScan {
     bool found = 1;
     string status = 2;
     string description = 3;
+}
+
+message CustomFileProperties {
+    int64 start_time = 1; // Початок запису (якщо це відео/аудіо)
+    int64 end_time = 2;   // Кінець запису
+    int64 width = 3;
+    int64 height = 4;
 }
 
 message GenerateFileLinkRequest {
@@ -268,6 +276,7 @@ message UploadFileUrlRequest {
     string mime = 5;
     UploadFileChannel channel = 6;
     bool generate_thumbnail = 7;
+    CustomFileProperties properties = 8;
 }
 
 message UploadFileUrlResponse {
@@ -295,6 +304,8 @@ message UploadFileRequest {
         bool generate_thumbnail = 8;
         int64 uploaded_by = 9;
         int64 created_at = 10;
+
+        CustomFileProperties properties = 11;
     }
 
     oneof data {
@@ -324,6 +335,7 @@ message SafeUploadFileRequest {
         bool progress = 7;
         UploadFileChannel channel = 8;
         bool generate_thumbnail = 9;
+        CustomFileProperties properties = 10;
     }
 
     oneof data {
