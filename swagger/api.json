@@ -11053,6 +11053,131 @@
         }
       }
     },
+    "/calls/{call_id}/files": {
+      "get": {
+        "tags": [
+          "FileService"
+        ],
+        "operationId": "SearchFilesByCall",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "call_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "name": "id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "uploaded_at.from",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "uploaded_at.to",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "reference_id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "retention_until.from",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "retention_until.to",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "enum": [
+                "UnknownChannel",
+                "ChatChannel",
+                "MailChannel",
+                "CallChannel",
+                "LogChannel",
+                "MediaChannel",
+                "KnowledgebaseChannel",
+                "CasesChannel",
+                "ScreenshotChannel",
+                "ScreenSharingChannel"
+              ],
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "channel",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storage.ListFile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/cases": {
       "get": {
         "tags": [
@@ -56946,6 +57071,29 @@
         }
       }
     },
+    "storage.CustomFileProperties": {
+      "type": "object",
+      "properties": {
+        "end_time": {
+          "type": "string",
+          "format": "int64",
+          "title": "Кінець запису"
+        },
+        "height": {
+          "type": "string",
+          "format": "int64"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "int64",
+          "title": "Початок запису (якщо це відео/аудіо)"
+        },
+        "width": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "storage.DeleteFileTranscriptRequest": {
       "type": "object",
       "properties": {
@@ -57018,6 +57166,9 @@
         },
         "name": {
           "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/storage.CustomFileProperties"
         },
         "reference_id": {
           "type": "string"
@@ -57668,6 +57819,9 @@
         "progress": {
           "type": "boolean"
         },
+        "properties": {
+          "$ref": "#/definitions/storage.CustomFileProperties"
+        },
         "stream_response": {
           "type": "boolean"
         },
@@ -57936,6 +58090,9 @@
         "profile_id": {
           "type": "string",
           "format": "int64"
+        },
+        "properties": {
+          "$ref": "#/definitions/storage.CustomFileProperties"
         },
         "stream_response": {
           "type": "boolean"
