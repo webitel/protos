@@ -68,6 +68,12 @@ service FileService {
             body: "*"
         };
     }
+
+    rpc SearchFilesByCall (SearchFilesByCallRequest) returns (ListFile) {
+        option (google.api.http) = {
+            get: "/calls/{call_id}/files"
+        };
+    }
 }
 
 message DeleteQuarantineFilesRequest {
@@ -388,4 +394,20 @@ message UploadFileResponse {
     string sha256sum = 6;
     Thumbnail thumbnail = 7;
     FileMalwareScan malware = 8;
+}
+
+message SearchFilesByCallRequest {
+    string call_id = 1;
+
+    int32 page = 2;
+    int32 size = 3;
+    string q = 4;
+    string sort = 5;
+    repeated string fields = 6;
+
+    repeated int64 id = 7;
+    engine.FilterBetween uploaded_at = 8;
+    repeated string reference_id = 9;
+    engine.FilterBetween retention_until = 10;
+    repeated UploadFileChannel channel = 11;
 }
