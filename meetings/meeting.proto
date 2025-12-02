@@ -1,14 +1,16 @@
 syntax = "proto3";
 
-package engine;
+package meetings;
 
-option go_package = "github.com/webitel/protos/engine";
+option go_package = "github.com/webitel/meetings/gen/go/api/meetings;meetings";
 
 import "google/api/annotations.proto";
+import "proto/webitel/option.proto";
 
 
 service MeetingService {
   rpc CreateMeeting(CreateMeetingRequest) returns (Meeting) {
+    option (option.access) = ACTION_CREATE;
     option (google.api.http) = {
       post: "/meetings"
       body: "*"
@@ -16,6 +18,7 @@ service MeetingService {
   }
 
   rpc GetMeeting(GetMeetingRequest) returns (Meeting) {
+    option (option.access) = ACTION_READ;
     option (google.api.http) = {
       get: "/meetings/{meeting_id}"
     };
