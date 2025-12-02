@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package meetings;
+
+option go_package = "github.com/webitel/meetings/gen/go/api/meetings;meetings";
+
+import "google/api/annotations.proto";
+import "proto/webitel/option.proto";
+
+
+service MeetingService {
+  rpc CreateMeeting(CreateMeetingRequest) returns (Meeting) {
+    option (option.access) = ACTION_CREATE;
+    option (google.api.http) = {
+      post: "/meetings"
+      body: "*"
+    };
+  }
+
+  rpc GetMeeting(GetMeetingRequest) returns (Meeting) {
+    option (option.access) = ACTION_READ;
+    option (google.api.http) = {
+      get: "/meetings/{meeting_id}"
+    };
+  }
+
+  rpc GetMeetingNA(GetMeetingRequest) returns (Meeting) {}
+}
+
+
+message CreateMeetingRequest {
+  string title = 1;
+  int32 ttl = 2;
+  map<string, string> metadata = 3;
+}
+
+message Meeting {
+  string id = 1;
+  string title = 2;
+  int32 ttl = 3;
+  int64 created_at = 4;
+  int64 expires_at = 6;
+  map<string, string> metadata = 5;
+}
+
+message GetMeetingRequest {
+  string meeting_id = 1;
+}
