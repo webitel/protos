@@ -1,0 +1,58 @@
+syntax = "proto3";
+package web_meeting_backend;
+option go_package = "github.com/webitel/protos/web_meeting_backend";
+
+service MeetingService {
+  rpc CreateMeeting(CreateMeetingRequest) returns (CreateMeetingResponse);
+  rpc GetMeeting(GetMeetingRequest) returns (Meeting);
+  rpc DeleteMeeting(DeleteMeetingRequest) returns (DeleteMeetingResponse);
+  rpc SatisfactionMeeting(SatisfactionMeetingRequest) returns (SatisfactionMeetingResponse);
+}
+
+message SatisfactionMeetingRequest {
+  string id = 1;
+  string satisfaction = 2;
+}
+
+message SatisfactionMeetingResponse {
+  
+}
+
+message Meeting {
+  string id = 1;
+  string title = 2;
+  int64 created_at = 3;
+  int64 expires_at = 4;
+  map<string, string> variables = 5;
+  string url = 6;
+}
+
+message CreateMeetingRequest {
+  string title = 1;
+  int64 expire_sec = 2;
+  string base_path = 3;
+  map<string,string> variables = 4;
+}
+
+message CreateMeetingResponse {
+  string id = 1;
+  string url = 2;
+}
+
+message GetMeetingRequest {
+  string id = 1;
+}
+
+message GetMeetingResponse {
+  int64 expire = 1;
+  string host = 2;
+  map<string,string> variables = 3;
+}
+
+message DeleteMeetingRequest {
+  string id = 1;
+}
+
+message DeleteMeetingResponse {
+
+}
