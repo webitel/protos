@@ -2,11 +2,18 @@ syntax = "proto3";
 package web_meeting_backend;
 option go_package = "github.com/webitel/protos/web_meeting_backend";
 
+import "google/api/annotations.proto";
+
 service MeetingService {
   rpc CreateMeeting(CreateMeetingRequest) returns (CreateMeetingResponse);
   rpc GetMeeting(GetMeetingRequest) returns (Meeting);
   rpc DeleteMeeting(DeleteMeetingRequest) returns (DeleteMeetingResponse);
-  rpc SatisfactionMeeting(SatisfactionMeetingRequest) returns (SatisfactionMeetingResponse);
+  rpc SatisfactionMeeting(SatisfactionMeetingRequest) returns (SatisfactionMeetingResponse) {
+    option (google.api.http) = {
+      post: "/meetings/{id}/satisfaction"
+      body: "*"
+    };
+  };
 }
 
 message SatisfactionMeetingRequest {
