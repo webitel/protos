@@ -16,6 +16,36 @@
     "application/json"
   ],
   "paths": {
+    "/meetings/{id}": {
+      "get": {
+        "operationId": "GetMeetingView",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/web_meeting_backend.MeetingView"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "MeetingService"
+        ]
+      }
+    },
     "/meetings/{id}/satisfaction": {
       "post": {
         "operationId": "SatisfactionMeeting",
@@ -123,6 +153,12 @@
         },
         "url": {
           "type": "string"
+        },
+        "satisfaction": {
+          "type": "string"
+        },
+        "allow_satisfaction": {
+          "type": "boolean"
         }
       }
     },
@@ -131,6 +167,28 @@
       "properties": {
         "satisfaction": {
           "type": "string"
+        }
+      }
+    },
+    "web_meeting_backend.MeetingView": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "satisfaction": {
+          "type": "string"
+        },
+        "allow_satisfaction": {
+          "type": "boolean"
         }
       }
     },
