@@ -6,6 +6,12 @@ import "google/api/annotations.proto";
 
 service MeetingService {
   rpc CreateMeeting(CreateMeetingRequest) returns (CreateMeetingResponse);
+  rpc GetMeetingView(GetMeetingRequest) returns (MeetingView) {
+    option (google.api.http) = {
+      get: "/meetings/{id}"
+    };
+  };
+
   rpc GetMeeting(GetMeetingRequest) returns (Meeting);
   rpc DeleteMeeting(DeleteMeetingRequest) returns (DeleteMeetingResponse);
   rpc SatisfactionMeeting(SatisfactionMeetingRequest) returns (SatisfactionMeetingResponse) {
@@ -32,6 +38,16 @@ message Meeting {
   int64 expires_at = 4;
   map<string, string> variables = 5;
   string url = 6;
+  string satisfaction = 7;
+  bool allow_satisfaction = 8;
+}
+
+message MeetingView {
+  string title = 1;
+  int64 created_at = 2;
+  int64 expires_at = 3;
+  string satisfaction = 4;
+  bool allow_satisfaction = 5;
 }
 
 message CreateMeetingRequest {
@@ -39,6 +55,7 @@ message CreateMeetingRequest {
   int64 expire_sec = 2;
   string base_path = 3;
   map<string,string> variables = 4;
+  int64 domain_id = 5;
 }
 
 message CreateMeetingResponse {
