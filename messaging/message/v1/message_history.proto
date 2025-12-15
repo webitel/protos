@@ -1,47 +1,68 @@
 syntax = "proto3";
 package webitel.messaging.message.v1;
+import "peer.proto";
 
-option go_package = "github.com/webitel/protos/messaging/message/v1;messagingpb";
+option go_package = "github.com/webitel/protos/messaging/message/v1;impb";
 
+// Enum representing available system message types.
 enum MessageType {
+    // Represents an unspecified or unknown message type.
     UNSPECIFIED = 0;
+    // Represents a text message.
     TEXT = 1;
-    FILE = 2;
+    // Represents a document message.
+    DOCUMENT = 2;
+    // Represents an image message.
     IMAGE = 3;
 }
 
-message Lookup {
-  int64 id = 1;
-  string name = 2;
-}
-
 message Document {
-  string id = 1 [json_name = "id"];
-  string url = 2 [json_name = "url"];
-  string file_name = 3 [json_name = "fileName"]; 
-  string caption = 4 [json_name = "caption"];
-  string mime_type = 5 [json_name = "mimeType"]; 
-  int64 size_bytes = 6 [json_name = "sizeBytes"];
+  string id = 1;
+  string url = 2;
+  string file_name = 3; 
+  string caption = 4;
+  string mime_type = 5; 
+  int64 size_bytes = 6;
   int64 created_at = 7;
-  int64 updated_at = 8;
-  Lookup created_by = 9;
-  Lookup updated_by = 10;
+  string created_by = 8;
+  int64 updated_at = 9;
+  string updated_by = 10;
 }
 
 message Image {
-  string id = 1 [json_name = "id"];
-  string url = 2 [json_name = "url"];
-  string file_name = 3 [json_name = "fileName"];
-  string caption = 4 [json_name = "caption"];
-  string mime_type = 5 [json_name = "mimeType"]; 
+  string id = 1;
+  string url = 2;
+  string file_name = 3;
+  string caption = 4;
+  string mime_type = 5;
 
   message Thumbnail {
-    string url = 1 [json_name = "url"];
+    string url = 1;
   }
-  repeated Thumbnail thumbnails = 6 [json_name = "thumbnails"];
+  repeated Thumbnail thumbnails = 6;
+  int64 created_at = 7;
+  string created_by = 8;
+  int64 updated_at = 9;
+  string updated_by = 10;
 }
 
-message GetThreadMessagesHistoryRequest {
+message Message {
+    string id = 1;
+    string thread_id = 2;
+    webitel.messaging.message.v1.Peer from = 3;
+    webitel.messaging.message.v1.Peer to = 4;
+
+    int64 created_at = 5;
+    int64 updated_at = 6;
+
+    oneof content {
+        string text = 7;
+        Document document = 8;
+        Image image = 9;
+    }
+}
+
+message SearchThreadMessagesHistoryRequest {
   string thread_id = 1;
   optional int64 cursor_timestamp = 2;
   optional string cursor_id = 3;
@@ -50,12 +71,14 @@ message GetThreadMessagesHistoryRequest {
   repeated string peer_ids = 5;
   repeated MessageType message_types = 6;
   optional string q = 7;
+  repeated string ids = 8;
 }
 
-message GetThreadMessagesHistoryResponse {
+message SearchThreadMessagesHistoryResponse {
     string thread_id = 1;
     optional int64 last_cursor_timestamp = 2;
     optional string last_cursor_id = 3;
     bool has_next = 4;
 
+    repeated Message messages = 5; 
 }

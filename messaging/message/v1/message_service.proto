@@ -4,7 +4,7 @@ package webitel.messaging.message.v1;
 import "message.proto";
 
 
-option go_package = "github.com/webitel/protos/messaging/message/v1;messagingpb";
+option go_package = "github.com/webitel/protos/messaging/message/v1;impb";
 
 import "google/api/annotations.proto";
 import "google/api/client.proto";
@@ -12,30 +12,34 @@ import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 
 
-service MessageService {
-  //TODO:
-  //1. SendText
+// The Message service entity provides methods for sending messages to a specified recipient [peer].
+service Message {
+  // Sends a text message to a specified recipient [peer].
   rpc SendText(SendTextRequest) returns (SendTextResponse) {
     option (google.api.http) = {
       post: "/v1/messages/text"
       body: "*"
     };
-    //option (google.api.method_signature) = "parent,Message";
   }
-  //2. SendFile
-  rpc SendFile(SendFileRequest) returns (SendFileResponse) {
+  
+  // Sends a document message to a specified recipient [peer].
+  // This method sends a document message to the recipient [peer] specified in the request.
+  // The document can be uploaded as a internal file via id or provided as a URL.
+  rpc SendDocument(SendDocumentRequest) returns (SendDocumentResponse) {
     option (google.api.http) = {
       post: "/v1/messages/file"
       body: "*"
     };
-    // option (google.api.method_signature) = "parent,File";
   }
-  //?3. SendImage
+
+  // Sends an image message to a specified recipient [peer].
   rpc SendImage(SendImageRequest) returns (SendImageResponse) {
     option (google.api.http) = {
       post: "/v1/messages/image"
       body: "*"
     };
   }
+
+  //TODO: add `SendAudio` rpc method support
 }
 

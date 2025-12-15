@@ -4,54 +4,64 @@ import "peer.proto";
 
 package webitel.messaging.message.v1;
 
-option go_package = "github.com/webitel/protos/messaging/message/v1;messagingpb";
+option go_package = "github.com/webitel/protos/messaging/message/v1;impb";
 
 // Represents a request to send a text message.
 message SendTextRequest {
-  Peer   from        = 1 [json_name = "from"];
-  Peer   to          = 2 [json_name = "to"];
-  bool   preview_url = 3 [json_name = "previewUrl"];
-  string body        = 4 [json_name = "body"];
+  Peer   from        = 1;
+  Peer   to          = 2;
+  string body        = 3;
 }
 
-message Message {
-    string id = 1;
-}
+// Represents a response to send a text message.
 message SendTextResponse {
-  //? use array of contacts for 'broadcast list'
-  Peer to = 1 [json_name = "to"];
-  Message = 2 [json_name = "message"];
+  Peer to = 1;
+  string id = 2;
 }
 
+// Represents `Document` message with necessary fields
+// to process it into frequently used `document`
+// entity in messaging systems.
 message Document {
-  string id = 1 [json_name = "id"];
-  string url = 2 [json_name = "url"];
-  string file_name =3 [json_name = "fileName"]; 
-  string caption = 4 [json_name = "caption"];
-  string mime_type = 5 [json_name = "mimeType"];
-  optional int64 size_bytes = 6 [json_name = "sizeBytes"];
+  string id = 1;
+  string url = 2;
+  string file_name = 3; 
+  string caption = 4;
+  string mime_type = 5;
+  optional int64 size_bytes = 6;
 }
 
-message SendFileRequest {
-  Peer   from        = 1 [json_name = "from"];
-  Peer   to          = 2 [json_name = "to"];
-  Document document = 3 [json_name = "document"];
+// Represents a request to send a message with document.
+message SendDocumentRequest {
+  Peer   from        = 1;
+  Peer   to          = 2;
+  Document document = 3;
 }
 
-message SendFileResponse {
-  Peer to = 1 [json_name = "to"];
-  Message message = 2 [json_name = "message"];
+// Represents a response to send message with document. 
+message SendDocumentResponse {
+  Peer to = 1;
+  string id = 2;
 }
 
+// Represents `Image` entity with 
+// necessary fields. 
+message Image {
+  string id = 1;
+  string link = 2;
+  string caption = 3;
+  string mime_type = 4;
+}
+
+// Represents a request to send an message with image.
 message SendImageRequest {
-  Peer   from        = 1 [json_name = "from"];
-  Peer   to          = 2 [json_name = "to"];
-  string id          = 3 [json_name = "id"];
-  string link        = 4 [json_name = "link"];
-  string caption     = 5 [json_name = "caption"];
+  Peer   from        = 1;
+  Peer   to          = 2;
+  Image image = 3;
 }
 
+// Represents a response to send message with image.
 message SendImageResponse {
-    Peer to = 1 [json_name = "to"];
-    Message message = 2 [json_name = "message"];
+    Peer to = 1;
+    string id = 2;
 }
