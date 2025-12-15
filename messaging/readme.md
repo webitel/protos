@@ -64,7 +64,7 @@ When you introduce a new microservice under `messaging/`:
 
    Inside the new directory, create a `buf.yaml` (and `buf.gen.yaml` if needed)
    based on an existing messaging service (for example, `messaging/chat`). Adjust
-   module name, roots, and generation targets.
+   module name, roots, and generation targets. Name buf repository as messaging-[your-service-name].
 
 3. **Define protobuf contracts**
 
@@ -89,6 +89,19 @@ When you introduce a new microservice under `messaging/`:
    ```
 
    Fix any lint issues before committing.
+
+## Usage
+
+These protobuf definitions are meant to be:
+
+- **Source of truth** for public contracts between messaging microservices and
+  other modules (cases, engine, storage, etc.).
+- **Input to code generation** for gRPC/HTTP clients and servers, OpenAPI specs,
+  and other derived artifacts.
+
+Downstream services should **not** modify generated code directly. Contract
+changes must be made in the corresponding `.proto` files and then regenerated
+through the standard tooling (Buf/Makefile).
 
 ## Usage
 

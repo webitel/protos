@@ -1,0 +1,137 @@
+syntax = "proto3";
+
+package webitel.messaging.contact.v1;
+
+import "google/protobuf/struct.proto";
+
+option go_package = "github.com/webitel/contact/proto/gen/webitel/messaging/v1;impb";
+
+
+service Contacts {
+  rpc SearchContact(SearchContactRequest) returns (ContactList);
+  rpc CreateContact(CreateContactRequest) returns (Contact);
+  rpc UpdateContact(UpdateContactRequest) returns (Contact);
+  rpc DeleteContact(DeleteContactRequest) returns (Contact);
+  rpc GetContact(GetContactRequest) returns (Contact);
+
+  rpc CanBeSender(CanBeSenderRequest) returns (CanBeSenderResponse);
+}
+
+message SearchContactRequest {
+  int32 page = 1;
+  int32 size = 2;
+  string q = 3;
+
+  string sort = 4;
+  repeated string fields = 5;
+
+
+  repeated string app_id = 6;
+  repeated string iss_id = 7;
+  repeated ContactType type = 8;
+}
+
+message CreateContactRequest {
+  // Issuer of the Contact
+  string iss_id = 1;
+
+  string app_id = 3;
+
+  // Type of the Contact
+  // e.g. bot, user, system, admin etc.
+  ContactType type = 4;
+
+  // Display name
+  string name = 5;
+  // Username unique inside issuer
+  string username = 6;
+  // Optional metadata
+  google.protobuf.Struct metadata = 7;
+}
+
+message UpdateContactRequest {
+  // Unique internal Contact ID
+  string id = 1;
+
+  // Display name
+  string name = 2;
+  // Username unique inside issuer
+  string username = 3;
+  // Optional metadata
+  google.protobuf.Struct metadata = 4;
+}
+
+
+message DeleteContactRequest {
+  string id = 1;
+}
+
+
+message GetContactRequest {
+  string id = 1;
+}
+
+message CanBeSenderRequest {
+  string from_id = 1;
+  string to_id = 2;
+}
+
+message CanBeSenderResponse {
+  bool can = 1;
+  UnableSendReason reason = 2;
+  string details = 3;
+}
+
+
+
+message ContactList {
+  int32 page = 1;
+  int32 size = 2;
+  repeated Contact contacts = 3;
+}
+
+
+
+message Contact {
+  // Unique internal Contact ID
+  string id = 1;
+  // Issuer of the Contact
+  // e.g. sms, email, whatsapp, telegram, etc.
+  string iss_id = 2;
+
+  string app_id = 4;
+
+  // Type of the Contact
+  // e.g. bot, user, system, admin etc.
+  ContactType type = 5;
+
+  // Display name
+  string name = 6;
+  // Username unique inside issuer
+  string username = 7;
+  // Optional metadata
+  google.protobuf.Struct metadata = 8;
+
+  // System information
+
+  int64 created_at = 9;
+
+  int64 updated_at = 10;
+}
+
+enum ContactType {
+  ContactTypeUnspecified = 0;
+  ContactTypeUser = 1;
+  ContactTypeBot = 2;
+  ContactTypeSystem = 3;
+  ContactTypeAdmin = 4;
+}
+
+
+enum UnableSendReason {
+  Undefined = 0;
+  SameContact = 1;
+  ContactNotFound = 2;
+}
+
+
