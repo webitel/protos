@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+import "peer.proto";
+
+package webitel.messaging.message.v1;
+
+option go_package = "github.com/webitel/protos/messaging/message/v1;messagingpb";
+
+// Represents a request to send a text message.
+message SendTextRequest {
+  Peer   from        = 1 [json_name = "from"];
+  Peer   to          = 2 [json_name = "to"];
+  bool   preview_url = 3 [json_name = "previewUrl"];
+  string body        = 4 [json_name = "body"];
+}
+
+message Message {
+    string id = 1;
+}
+message SendTextResponse {
+  //? use array of contacts for 'broadcast list'
+  Peer to = 1 [json_name = "to"];
+  Message = 2 [json_name = "message"];
+}
+
+message Document {
+  string id = 1 [json_name = "id"];
+  string url = 2 [json_name = "url"];
+  string file_name =3 [json_name = "fileName"]; 
+  string caption = 4 [json_name = "caption"];
+  string mime_type = 5 [json_name = "mimeType"];
+  optional int64 size_bytes = 6 [json_name = "sizeBytes"];
+}
+
+message SendFileRequest {
+  Peer   from        = 1 [json_name = "from"];
+  Peer   to          = 2 [json_name = "to"];
+  Document document = 3 [json_name = "document"];
+}
+
+message SendFileResponse {
+  Peer to = 1 [json_name = "to"];
+  Message message = 2 [json_name = "message"];
+}
+
+message SendImageRequest {
+  Peer   from        = 1 [json_name = "from"];
+  Peer   to          = 2 [json_name = "to"];
+  string id          = 3 [json_name = "id"];
+  string link        = 4 [json_name = "link"];
+  string caption     = 5 [json_name = "caption"];
+}
+
+message SendImageResponse {
+    Peer to = 1 [json_name = "to"];
+    Message message = 2 [json_name = "message"];
+}

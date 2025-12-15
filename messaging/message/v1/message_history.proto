@@ -1,0 +1,61 @@
+syntax = "proto3";
+package webitel.messaging.message.v1;
+
+option go_package = "github.com/webitel/protos/messaging/message/v1;messagingpb";
+
+enum MessageType {
+    UNSPECIFIED = 0;
+    TEXT = 1;
+    FILE = 2;
+    IMAGE = 3;
+}
+
+message Lookup {
+  int64 id = 1;
+  string name = 2;
+}
+
+message Document {
+  string id = 1 [json_name = "id"];
+  string url = 2 [json_name = "url"];
+  string file_name = 3 [json_name = "fileName"]; 
+  string caption = 4 [json_name = "caption"];
+  string mime_type = 5 [json_name = "mimeType"]; 
+  int64 size_bytes = 6 [json_name = "sizeBytes"];
+  int64 created_at = 7;
+  int64 updated_at = 8;
+  Lookup created_by = 9;
+  Lookup updated_by = 10;
+}
+
+message Image {
+  string id = 1 [json_name = "id"];
+  string url = 2 [json_name = "url"];
+  string file_name = 3 [json_name = "fileName"];
+  string caption = 4 [json_name = "caption"];
+  string mime_type = 5 [json_name = "mimeType"]; 
+
+  message Thumbnail {
+    string url = 1 [json_name = "url"];
+  }
+  repeated Thumbnail thumbnails = 6 [json_name = "thumbnails"];
+}
+
+message GetThreadMessagesHistoryRequest {
+  string thread_id = 1;
+  optional int64 cursor_timestamp = 2;
+  optional string cursor_id = 3;
+  int32 limit = 4;
+
+  repeated string peer_ids = 5;
+  repeated MessageType message_types = 6;
+  optional string q = 7;
+}
+
+message GetThreadMessagesHistoryResponse {
+    string thread_id = 1;
+    optional int64 last_cursor_timestamp = 2;
+    optional string last_cursor_id = 3;
+    bool has_next = 4;
+
+}
