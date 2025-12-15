@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package webitel.messaging.thread.v1;
+
+import "messaging/message/v1/peer.proto";
+import "messaging/message/v1/message.proto";
+import "messaging/thread/v1/thread.proto";
+
+option go_package = "github.com/webitel/contact/proto/gen/webitel/thread/v1;impb";
+
+// ==========================================================
+// Message Sending (Command-only Service)
+// ==========================================================
+//
+
+service MessageCommandService {
+  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
+}
+
+// ==========================================================
+// Requests / Responses
+// ==========================================================
+
+message SendMessageRequest {
+
+  // Sender of the message.
+  webitel.messaging.message.v1.Peer from = 1;
+
+  // Target peer (user, group, or channel).
+  webitel.messaging.message.v1.Peer to = 2;
+
+  // Message payload.
+  webitel.messaging.message.v1.Message message = 3;
+}
+
+message SendMessageResponse {
+
+  // Thread where the message was delivered.
+  Thread thread = 1;
+
+  // Persisted message.
+  webitel.messaging.message.v1.Message message = 2;
+}
