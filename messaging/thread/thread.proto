@@ -16,20 +16,11 @@ option go_package = "github.com/webitel/im/api/thread;thread";
 // - Publish canonical events to message broker
 
 service ThreadService {
-
-  // Main entry point for sending a message.
-  // Resolves an existing thread or creates a new one.
-  rpc PublishMessage(PublishMessageRequest) returns (PublishMessageResponse);
-
   // Explicit thread creation (optional for MVP UI flows).
   rpc CreateThread(CreateThreadRequest) returns (CreateThreadResponse);
 
   // Find an existing thread between two peers.
-  rpc FindThread(FindThreadRequest) returns (FindThreadResponse);
-
-  // Internal command used by MQ / broker consumers.
-  // Processes an already accepted message.
-  rpc HandleNewMessage(NewMessageEvent) returns (google.protobuf.Empty);
+  rpc SearchThread(SearchThreadRequest) returns (SearchThreadResponse);
 }
 
 // ==========================================================
@@ -136,22 +127,7 @@ message Message {
   MessageStatus status = 10;
 }
 
-// ==========================================================
-// Requests / Responses
-// ==========================================================
 
-// Idempotent request for sending a message.
-message PublishMessageRequest {
-
-  // Unique key for idempotent message submission.
-  string idempotency_key = 1;
-
-  Message message = 2;
-}
-
-message PublishMessageResponse {
-  Thread thread = 1;
-}
 
 // Explicit thread creation.
 message CreateThreadRequest {
@@ -164,23 +140,16 @@ message CreateThreadResponse {
 }
 
 // Thread lookup between two peers.
-message FindThreadRequest {
+message SearchThreadRequest {
   Peer from_peer = 1;
   Peer to_peer = 2;
 }
 
-message FindThreadResponse {
+message SearchThreadResponse {
   Thread thread = 1;
 }
 
-// ==========================================================
-// Internal Events (Broker-triggered)
-// ==========================================================
 
-// Emitted after message persistence and validation.
-message NewMessageEvent {
-  Message message = 1;
-}
 
 // ==========================================================
 // Activity Events (Published to Message Broker)
