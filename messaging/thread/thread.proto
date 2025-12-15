@@ -1,0 +1,198 @@
+syntax = "proto3";
+
+package thread.v1;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/webitel/im/api/thread;thread";
+
+// ==========================================================
+// Thread Service — Core Messaging Domain
+// ==========================================================
+//
+// Responsibility:
+// - Resolve or create threads
+// - Accept new messages (idempotent)
+// - Publish canonical events to message broker
+
+service ThreadService {
+
+  // Main entry point for sending a message.
+  // Resolves an existing thread or creates a new one.
+  rpc PublishMessage(PublishMessageRequest) returns (PublishMessageResponse);
+
+  // Explicit thread creation (optional for MVP UI flows).
+  rpc CreateThread(CreateThreadRequest) returns (CreateThreadResponse);
+
+  // Find an existing thread between two peers.
+  rpc FindThread(FindThreadRequest) returns (FindThreadResponse);
+
+  // Internal command used by MQ / broker consumers.
+  // Processes an already accepted message.
+  rpc HandleNewMessage(NewMessageEvent) returns (google.protobuf.Empty);
+}
+
+// ==========================================================
+// Core Domain Models
+// ==========================================================
+
+// Peer is a canonical identifier of a chat entity.
+// Mirrors Telegram's PeerUser / PeerChat / PeerChannel concept.
+message Peer {
+
+  enum Type {
+    PEER_TYPE_UNSPECIFIED = 0;
+    PEER_TYPE_USER = 1;
+    PEER_TYPE_GROUP = 2;
+    PEER_TYPE_CHANNEL = 3;
+  }
+
+  Type type = 1;
+
+  // Canonical identifier of the entity (contact_id, group_id, channel_id).
+  string id = 2;
+}
+
+// Thread represents a conversation unit.
+message Thread {
+
+  // Canonical thread identifier, assigned by server.
+  string id = 1;
+
+  ThreadType type = 2;
+
+  repeated Member members = 3;
+}
+
+// Thread type defines conversation semantics.
+enum ThreadType {
+  THREAD_TYPE_UNSPECIFIED = 0;
+  THREAD_TYPE_DIRECT = 1; // 1-to-1 chat
+  THREAD_TYPE_GROUP = 2;  // Group or channel chat
+}
+
+// Member represents participation of a contact in a thread.
+message Member {
+  string thread_id = 1;
+  string contact_id = 2;
+}
+
+// ==========================================================
+// Message Model
+// ==========================================================
+
+// Message delivery lifecycle status.
+enum MessageStatus {
+  MESSAGE_STATUS_UNSPECIFIED = 0;
+  MESSAGE_STATUS_SENT = 1;
+  MESSAGE_STATUS_DELIVERED = 2;
+  MESSAGE_STATUS_READ = 3;
+}
+
+// Media metadata abstraction.
+// Actual binary content is stored elsewhere.
+message MessageMedia {
+
+  enum MediaType {
+    MEDIA_TYPE_UNSPECIFIED = 0;
+    MEDIA_TYPE_PHOTO = 1;
+    MEDIA_TYPE_VIDEO = 2;
+    MEDIA_TYPE_FILE = 3;
+  }
+
+  MediaType type = 1;
+
+  // Reference to external media storage.
+  string file_id = 2;
+}
+
+// Canonical message entity.
+message Message {
+
+  // Server-generated unique identifier.
+  string id = 1;
+
+  // Unix timestamp (milliseconds).
+  int64 date = 2;
+
+  // Author of the message.
+  string from_contact_id = 3;
+
+  Peer from_peer = 4;
+
+  Peer to_peer = 5;
+
+  // Client-generated ID for idempotency and optimistic UI.
+  string client_message_id = 6;
+
+  // Message content.
+  string text = 7;
+
+  MessageMedia media = 8;
+
+  // Editing metadata
+  int64 edit_date = 9;
+
+  MessageStatus status = 10;
+}
+
+// ==========================================================
+// Requests / Responses
+// ==========================================================
+
+// Idempotent request for sending a message.
+message PublishMessageRequest {
+
+  // Unique key for idempotent message submission.
+  string idempotency_key = 1;
+
+  Message message = 2;
+}
+
+message PublishMessageResponse {
+  Thread thread = 1;
+}
+
+// Explicit thread creation.
+message CreateThreadRequest {
+  Peer from_peer = 1;
+  Peer to_peer = 2;
+}
+
+message CreateThreadResponse {
+  Thread thread = 1;
+}
+
+// Thread lookup between two peers.
+message FindThreadRequest {
+  Peer from_peer = 1;
+  Peer to_peer = 2;
+}
+
+message FindThreadResponse {
+  Thread thread = 1;
+}
+
+// ==========================================================
+// Internal Events (Broker-triggered)
+// ==========================================================
+
+// Emitted after message persistence and validation.
+message NewMessageEvent {
+  Message message = 1;
+}
+
+// ==========================================================
+// Activity Events (Published to Message Broker)
+// ==========================================================
+
+// Emitted when a new thread is created.
+message NewThreadEvent {
+  Thread thread = 1;
+}
+
+// Emitted for every new message in a thread.
+message MemberActivityEvent {
+  string thread_id = 1;
+  Message message = 2;
+}
