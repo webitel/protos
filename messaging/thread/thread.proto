@@ -23,26 +23,7 @@ service ThreadService {
   rpc SearchThread(SearchThreadRequest) returns (SearchThreadResponse);
 }
 
-// ==========================================================
-// Core Domain Models
-// ==========================================================
 
-// Peer is a canonical identifier of a chat entity.
-// Mirrors Telegram's PeerUser / PeerChat / PeerChannel concept.
-message Peer {
-
-  enum Type {
-    PEER_TYPE_UNSPECIFIED = 0;
-    PEER_TYPE_USER = 1;
-    PEER_TYPE_GROUP = 2;
-    PEER_TYPE_CHANNEL = 3;
-  }
-
-  Type type = 1;
-
-  // Canonical identifier of the entity (contact_id, group_id, channel_id).
-  string id = 2;
-}
 
 // Thread represents a conversation unit.
 message Thread {
@@ -68,66 +49,6 @@ message Member {
   string contact_id = 2;
 }
 
-// ==========================================================
-// Message Model
-// ==========================================================
-
-// Message delivery lifecycle status.
-enum MessageStatus {
-  MESSAGE_STATUS_UNSPECIFIED = 0;
-  MESSAGE_STATUS_SENT = 1;
-  MESSAGE_STATUS_DELIVERED = 2;
-  MESSAGE_STATUS_READ = 3;
-}
-
-// Media metadata abstraction.
-// Actual binary content is stored elsewhere.
-message MessageMedia {
-
-  enum MediaType {
-    MEDIA_TYPE_UNSPECIFIED = 0;
-    MEDIA_TYPE_PHOTO = 1;
-    MEDIA_TYPE_VIDEO = 2;
-    MEDIA_TYPE_FILE = 3;
-  }
-
-  MediaType type = 1;
-
-  // Reference to external media storage.
-  string file_id = 2;
-}
-
-// Canonical message entity.
-message Message {
-
-  // Server-generated unique identifier.
-  string id = 1;
-
-  // Unix timestamp (milliseconds).
-  int64 date = 2;
-
-  // Author of the message.
-  string from_contact_id = 3;
-
-  Peer from_peer = 4;
-
-  Peer to_peer = 5;
-
-  // Client-generated ID for idempotency and optimistic UI.
-  string client_message_id = 6;
-
-  // Message content.
-  string text = 7;
-
-  MessageMedia media = 8;
-
-  // Editing metadata
-  int64 edit_date = 9;
-
-  MessageStatus status = 10;
-}
-
-
 
 // Explicit thread creation.
 message CreateThreadRequest {
@@ -147,21 +68,4 @@ message SearchThreadRequest {
 
 message SearchThreadResponse {
   Thread thread = 1;
-}
-
-
-
-// ==========================================================
-// Activity Events (Published to Message Broker)
-// ==========================================================
-
-// Emitted when a new thread is created.
-message NewThreadEvent {
-  Thread thread = 1;
-}
-
-// Emitted for every new message in a thread.
-message MemberActivityEvent {
-  string thread_id = 1;
-  Message message = 2;
 }
