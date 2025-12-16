@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package webitel.messaging.admin.v1;
+
+option go_package = "github.com/webitel/messaging/proto/gen/webitel/messaging/admin/v1;adpb";
+
+
+// Application (Client) Authorization
+message ClientApp {
+
+  // OPTIONAL. [FROM] Allowed [U]ser-[A]gent(s)
+  repeated string ua = 1;
+  // OPTIONAL. [FROM] Allowed [WEB] Origin(s)
+  ClientNet net = 2;
+  // OPTIONAL. [FROM] Allowed [NET]work(s)
+  ClientWeb web = 3;
+
+  // REQUIRED. License [CUSTOMER_PORTAL] product.
+  // **NOTE**: Used to limit the number of concurrent [external] user dialogs.
+  LookupID product = 4;
+
+  // OPTIONAL. Limit the number of concurrent [external] user dialogs.
+  // Can be used to distribute the load of a joint product between individual apps.
+  // The maximum value is limited by the license `product` number.
+  // The default value corresponds to maximum.
+  int32 max_usage = 5;
+
+  // Idle session timeout (in: minutes)
+  // **NOTE**: The user will be forcibly logged out after minutes of inactivity.
+  // Default: 10. Minimum: 1. Maximum: 1440. 24h
+  int32 max_idle = 6;
+
+  // Maximum session lifetime period. (in: minutes)
+  // ( -0 ) NO limit. Awaits for user logout action ..
+  // ( +1 ) Forbids refreshing an access token after ( issued + max_age ). Login required after
+  int32 max_age = 7;
+
+}
+
+// LookupID Reference.
+message LookupID {
+  // Object IDentifier.
+  string id = 1;
+  // Type specific Object ID.
+  string type = 2;
+  // Display Object name.
+  string name = 3;
+}
+
+
+// Client [sub]network configuration
+message ClientNet {
+  // [FROM] IP address(es) subnet allowed
+  repeated string cidr = 1;
+}
+
+// Client Web configuration
+message ClientWeb {
+  // [FROM] Origin pattern(s) allowed
+  repeated string origin = 1;
+}

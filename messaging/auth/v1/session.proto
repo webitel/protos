@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package webitel.messaging.auth.v1;
+
+import "auth/v1/device.proto";
+import "google/protobuf/wrappers.proto";
+
+// End-User (Device) Session
+// https://core.telegram.org/constructor/authorization
+message Session {
+
+  // Business (Domain) Account ID
+  int64 dc = 1;
+  // Session (internal) identifier
+  string id = 2;
+  // Created date ; timestamp
+  int64 date = 3;
+  // Session (device) display name.
+  string name = 4;
+
+  int64  user_id   = 5; // [ME] optional ; empty - means logged out ;
+  string client_id = 6; // [VIA] app.id associated from authorization ;
+  string device_id = 7; // [FROM] device associated from authorization ;
+
+  // int64 max_age = 10; // not after ; timestamp
+  // int64 seen = 10; // last activity date ; timestamp
+}
+
+message GetSessionRequest {
+
+  // Filter (and) SET
+
+  int64 dc = 1; // business.(domain).id
+  int64 user_id = 2; // account.(user).id
+  string client_id = 3; // client.(app).id
+  string device_id = 4; // client.(device).id
+
+  google.protobuf.BoolValue push = 5; // registered for PUSH notifications ? ONLY !
+}
+
+message SessionList {
+  // List of Session(s).
+  repeated Session sessions = 1;
+  // List of Device(s), mentioned in sessions
+  repeated Device devices = 2;
+  // repeated Application apps = 3;
+  int32 page = 5;
+  bool next = 6;
+}
