@@ -8,137 +8,95 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 
 option go_package = "github.com/webitel/contact/proto/gen/webitel/delivery/v1;impb";
 
-/////////////////////////////////////////////////////////
-// SERVICE
-/////////////////////////////////////////////////////////
-
+//------------------------------------------------------------------------------
+// DELIVERY SERVICE
+//------------------------------------------------------------------------------
 service Delivery {
-  // Opens a uni-directional stream.
-  //
-  // Client sends a single StreamRequest and receives a continuous stream
-  // of ServerEvent messages.
-  //
-  // This stream is intended for real-time delivery of messaging events
-  // such as new messages, acknowledgements, errors and keep-alive signals.
+  // Stream opens a uni-directional (Server-to-Client) persistent connection.
+  // The client sends a StreamRequest to subscribe, and the server responds with
+  // a continuous stream of ServerEvents until the connection is closed.
   rpc Stream(StreamRequest) returns (stream ServerEvent);
 }
 
-/////////////////////////////////////////////////////////
-// CLIENT → SERVER
-/////////////////////////////////////////////////////////
+//------------------------------------------------------------------------------
+// CLIENT REQUESTS
+//------------------------------------------------------------------------------
 
-// StreamRequest defines parameters for opening a delivery event stream.
+// StreamRequest defines the subscription parameters for the event stream.
 message StreamRequest {
-
-  // ---------------------------------------------------------------------------
-  // Future settings (not implemented yet)
-  // ---------------------------------------------------------------------------
-
-  // Types of events the client wants to receive.
-  // If empty or omitted, the server may stream all supported event types.
-  //
-  // Example values:
-  //   - MESSAGE
-  //   - ACK
-  //   - ERROR
-  //   - PING
-  //
-  // This field allows clients to reduce unnecessary traffic.
-  //
-  // repeated EventType allowed_events = 1;
-
-  // Heartbeat / ping configuration.
-  // Controls how often the server sends PingEvent messages
-  // to keep the stream alive and detect broken connections.
-  //
-  // message PingSettings {
-  //   // Ping interval in seconds.
-  //   int32 interval_seconds = 1;
-  // }
-  //
-  // PingSettings ping = 2;
-
-  // Maximum number of in-flight events allowed.
-  // Server should not exceed this amount without client acknowledgement.
-  //  int32 max_in_flight = 3;
-
-//  // Resume stream from the last successfully processed event.
-//  string last_event_id = 4;
+  /*
+   * Reserved for future implementation:
+   * 1. repeated EventType allowed_events - Filter for specific event types (MESSAGE, ACK, etc.)
+   * 2. PingSettings ping                 - Custom heartbeat intervals.
+   * 3. int32 max_in_flight               - Flow control (backpressure) limit.
+   * 4. string last_event_id              - Support for stream resumption after reconnect.
+   */
 }
 
-/////////////////////////////////////////////////////////
-// SERVER → CLIENT
-/////////////////////////////////////////////////////////
+//------------------------------------------------------------------------------
+// SERVER EVENTS (TOP-LEVEL)
+//------------------------------------------------------------------------------
 
-// ServerEvent represents a single event sent from server to client
-// over the delivery stream.
+// ServerEvent is a container for all types of data sent over the delivery stream.
 message ServerEvent {
-
-  // Unique event identifier.
-  // Can be used by clients for logging, debugging or resume logic.
+  // Unique identifier for the event. Used for logging, tracing, and deduplication.
   string id = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "Unique identifier of the streamed event"
     }
   ];
 
-  // Event creation timestamp (server-side).
+  // Timestamp of event generation (Unix epoch in milliseconds).
   int64 created_at = 2;
 
+  // Relative importance of the event for client-side processing priority.
   EventPriority priority = 3;
 
-  //FIXME useful for debugging purposes
-  //  string trace_id = 4;
-
-  // Exactly one event payload is set.
+  // Payload contains the specific event data.
   oneof payload {
-
-    // Sent once when the stream is successfully established.
+    // Confirmation of successful stream establishment.
     ConnectedEvent connected_event = 4;
 
-    // Emitted when a new message is delivered to the client.
+    // A new incoming message from a chat/thread.
     NewMessageEvent message_event = 5;
 
-    // Acknowledgement for previously processed events or messages.
+    // Acknowledgement of a previously sent message or processed action.
     AckEvent ack_event = 6;
 
-    // Error that occurred during stream processing.
+    // Notification about a stream-level or business-logic error.
     ErrorEvent error_event = 7;
 
-    // Keep-alive or heartbeat event.
+    // Heartbeat signal to maintain connection and detect "half-open" sockets.
     PingEvent ping_event = 8;
   }
 }
 
-/////////////////////////////////////////////////////////
-// EVENTS
-/////////////////////////////////////////////////////////
+//------------------------------------------------------------------------------
+// EVENT PAYLOAD DETAILS
+//------------------------------------------------------------------------------
 
-// ConnectedEvent is sent immediately after the stream is opened.
+// ConnectedEvent is the first message sent by the server after the stream is opened.
 message ConnectedEvent {
-
-  // Indicates whether the stream has been successfully initialized.
+  // Status of the stream initialization.
   bool ok = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "Indicates successful stream initialization"
     }
   ];
 
-  // Server-assigned connection identifier.
+  // Unique session/connection ID assigned by the server for this stream.
   string connection_id = 2;
 
-  // Server version for debugging and compatibility checks.
-  //FIXME do we need it ?
+  // Current server version. Useful for feature detection and troubleshooting.
   string server_version = 3;
 }
 
-// NewMessageEvent represents an incoming message delivered to the client.
+// NewMessageEvent contains a message that needs to be delivered to the client.
 message NewMessageEvent {
-
-  //FIXME do we need some idempotency id / key or just use Message.id ?
+  // Unique delivery identifier (can be used for client-side idempotency).
   string id = 1;
 
-  // Delivered message payload.
+  // The actual message object with content, metadata, and sender info.
   webitel.messaging.thread.v1.Message message = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "Message delivered via the stream",
@@ -146,43 +104,35 @@ message NewMessageEvent {
   ];
 }
 
-// AckEvent represents server-side acknowledgement
-// of a client-related action or event.
+// AckEvent confirms the status of a specific event or message processing on the server.
 message AckEvent {
-
-  // Identifier of the related client event or message.
+  // Reference to the original event/message ID being acknowledged.
   string id = 1;
 
-  // Server-side processing status.
+  // Result of the operation (Success, Error, etc.).
   Status status = 2;
 
-  // Optional structured details for errors or metadata.
-  // Examples:
-  //   - validation errors
-  //   - retry-after info
-  //   - quota limits
-  //   - rate limiting metadata
+  // Additional context for the result (e.g., reason for rejection, quota details).
   repeated google.protobuf.Any details = 3;
 }
 
-// ErrorEvent represents an error emitted by the server.
+// ErrorEvent communicates issues that occur during the stream's lifetime.
 message ErrorEvent {
-
-  // Machine-readable error code.
+  // Machine-readable string constant (e.g., "INTERNAL_ERROR", "AUTH_EXPIRED").
   string code = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "Machine-readable error code"
     }
   ];
 
-  // Human-readable error description.
+  // Human-readable message explaining the error.
   string message = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "Human-readable error message"
     }
   ];
 
-  // Optional structured error details.
+  // Structured error metadata for programmatic handling.
   repeated google.protobuf.Any details = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "Additional structured error details"
@@ -190,10 +140,9 @@ message ErrorEvent {
   ];
 }
 
-// PingEvent is used as a keep-alive signal.
+// PingEvent is used to verify the connection is still active.
 message PingEvent {
-
-  // Optional payload echoed back to the client.
+  // Optional data that the server might include for RTT (Round Trip Time) calculation.
   string echo = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "Optional ping payload"
@@ -201,35 +150,39 @@ message PingEvent {
   ];
 }
 
-/////////////////////////////////////////////////////////
-// ENUMS
-/////////////////////////////////////////////////////////
+//------------------------------------------------------------------------------
+// ENUMERATIONS
+//------------------------------------------------------------------------------
 
-// Status represents server-side processing result
-// of a client-related operation or event.
+// Status defines the outcome of an operation or delivery process.
 enum Status {
-
-  // Default unspecified value.
+  // Unspecified or unknown state.
   STATUS_UNSPECIFIED = 0;
 
-  // Operation completed successfully.
+  // The operation was successful.
   SUCCESS = 1;
 
-  // Operation failed due to a temporary server-side issue.
-  // Client may retry or wait for reconnection.
+  // A transient error occurred; retrying might resolve the issue.
   TEMPORARY_ERROR = 2;
 
-  // Operation failed permanently.
-  // Retrying the same action will not succeed.
+  // A fatal error occurred; do not retry with the same parameters.
   PERMANENT_ERROR = 3;
 
-  // Operation was rejected due to business or validation rules.
+  // The request violated business logic or validation rules.
   REJECTED = 4;
 }
 
+// EventPriority defines how urgently the client should handle the incoming event.
 enum EventPriority {
+  // Unspecified priority.
   PRIORITY_UNSPECIFIED = 0;
-  HIGH = 1;    // message, error
-  NORMAL = 2;  // ack
-  LOW = 3;     // ping, telemetry
+
+  // Critical events (New messages, Errors).
+  HIGH = 1;
+
+  // Standard events (Acknowledgements).
+  NORMAL = 2;
+
+  // Background events (Pings, Statistics).
+  LOW = 3;
 }
