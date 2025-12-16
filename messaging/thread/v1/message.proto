@@ -1,10 +1,9 @@
 syntax = "proto3";
 
+package webitel.messaging.thread.v1;
 import "peer.proto";
 
-package webitel.messaging.message.v1;
-
-option go_package = "github.com/webitel/protos/messaging/message/v1;impb";
+option go_package = "github.com/webitel/protos/messaging/thread/v1;impb";
 
 // Represents a request to send a text message.
 message SendTextRequest {
@@ -26,16 +25,20 @@ message Document {
   string id = 1;
   string url = 2;
   string file_name = 3; 
-  string caption = 4;
-  string mime_type = 5;
-  optional int64 size_bytes = 6;
+  string mime_type = 4;
+  optional int64 size_bytes = 5;
+}
+
+message DocumentRequest {
+  repeated Document documents = 1;
+  string body = 2; 
 }
 
 // Represents a request to send a message with document.
 message SendDocumentRequest {
   Peer   from        = 1;
   Peer   to          = 2;
-  Document document = 3;
+  DocumentRequest document = 3;
 }
 
 // Represents a response to send message with document. 
@@ -49,15 +52,19 @@ message SendDocumentResponse {
 message Image {
   string id = 1;
   string link = 2;
-  string caption = 3;
-  string mime_type = 4;
+  string mime_type = 3;
+}
+
+message ImageRequest {
+  repeated Image images = 1;
+  string body = 2;
 }
 
 // Represents a request to send an message with image.
 message SendImageRequest {
   Peer   from        = 1;
   Peer   to          = 2;
-  Image image = 3;
+  ImageRequest image = 3;
 }
 
 // Represents a response to send message with image.
