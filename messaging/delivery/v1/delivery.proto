@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+package webitel.messaging.delivery.v1;
+
+import "google/protobuf/any.proto";
+import "messaging/message/v1/message.proto";
+
+option go_package = "github.com/webitel/contact/proto/gen/webitel/delivery/v1;impb";
+
+// SERVICE
+service Delivery {
+  // Bi-directional stream:
+  // client sends commands, server sends events
+  rpc Stream(stream ClientEvent) returns (stream ServerEvent);
+}
+
+
+// CLIENT → SERVER
+message ClientEvent {
+  string id = 1;
+
+  oneof payload {
+    SendTextEvent     send_text      = 3;
+    SendFileEvent     send_file      = 4;
+    SendAudioEvent    send_audio     = 5;
+    SendDocumentEvent send_document  = 6;
+    AckEvent          ack_message    = 7;
+    PingEvent         ping           = 8;
+    ReadMessageEvent  read_message   = 9;
+  }
+}
+
+message ReadMessageEvent{
+  Peer peer = 1;
+  string message_id = 2;
+}
+
+message SendTextEvent {
+  webitel.messaging.message.v1.Message message = 1;
+}
+
+message SendFileEvent {
+  webitel.messaging.message.v1.Message message = 1;
+}
+
+message SendAudioEvent {
+  webitel.messaging.message.v1.Message message = 1;
+}
+
+message SendDocumentEvent {
+  webitel.messaging.message.v1.Message message = 1;
+}
+
+
+message AckEvent {
+    string id  = 1;
+    Status ack = 2;
+}
+
+message PingEvent {
+  string echo = 1;
+}
+
+
+// SERVER → CLIENT
+message ServerEvent {
+  string id = 1;
+
+  oneof payload {
+    ConnectedEvent            connected_event        = 2;
+    NewTextMessageEvent       text_message_event     = 3;
+    NewAudioMessageEvent      audio_message_event    = 4;
+    NewFileMessageEvent       file_message_event     = 5;
+    NewDocumentMessageEvent   document_message_event = 6;
+    AckEvent                  ack_event              = 7;
+    ErrorEvent                error_event            = 8;
+    PingEvent                 ping_event             = 9;
+  }
+}
+
+// ---- Events (mocked) ----
+
+message ConnectedEvent {
+  bool ok = 1;
+}
+message NewMessageEvent {
+  webitel.messaging.message.v1.Message message = 1;
+}
+
+
+message ErrorEvent {
+  string code = 1;
+  string message = 2;
+  repeated google.protobuf.Any details = 3;
+}
+
+
+
+// ENUMS
+enum Status {
+  DELIVERY_STATUS_UNSPECIFIED = 0;
+  RECEIVED  = 1;
+  ERROR     = 2;
+}
