@@ -12,9 +12,8 @@ service Contacts {
   rpc CreateContact(CreateContactRequest) returns (Contact);
   rpc UpdateContact(UpdateContactRequest) returns (Contact);
   rpc DeleteContact(DeleteContactRequest) returns (Contact);
-  rpc GetContact(GetContactRequest) returns (Contact);
 
-  rpc CanBeSender(CanBeSenderRequest) returns (CanBeSenderResponse);
+  rpc CanSend(CanSendRequest) returns (CanSendResponse);
 }
 
 message SearchContactRequest {
@@ -28,7 +27,7 @@ message SearchContactRequest {
 
   repeated string app_id = 6;
   repeated string iss_id = 7;
-  repeated ContactType type = 8;
+  repeated string type = 8;
 }
 
 message CreateContactRequest {
@@ -38,8 +37,7 @@ message CreateContactRequest {
   string app_id = 3;
 
   // Type of the Contact
-  // e.g. bot, user, system, admin etc.
-  ContactType type = 4;
+  string type = 4;
 
   // Display name
   string name = 5;
@@ -71,12 +69,12 @@ message GetContactRequest {
   string id = 1;
 }
 
-message CanBeSenderRequest {
+message CanSendRequest {
   string from_id = 1;
   string to_id = 2;
 }
 
-message CanBeSenderResponse {
+message CanSendResponse {
   bool can = 1;
   UnableSendReason reason = 2;
   string details = 3;
@@ -103,7 +101,7 @@ message Contact {
 
   // Type of the Contact
   // e.g. bot, user, system, admin etc.
-  ContactType type = 5;
+  string type = 5;
 
   // Display name
   string name = 6;
@@ -119,19 +117,11 @@ message Contact {
   int64 updated_at = 10;
 }
 
-enum ContactType {
-  ContactTypeUnspecified = 0;
-  ContactTypeUser = 1;
-  ContactTypeBot = 2;
-  ContactTypeSystem = 3;
-  ContactTypeAdmin = 4;
-}
 
 
 enum UnableSendReason {
   Undefined = 0;
-  SameContact = 1;
-  ContactNotFound = 2;
+  ContactNotFound = 1;
 }
 
 
