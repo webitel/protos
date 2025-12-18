@@ -6,147 +6,133 @@ option go_package = "github.com/webitel/pdf/api/pdf;pdf";
 
 import "google/api/annotations.proto";
 
-enum PdfChannel{
-  CALL = 0;
-  SCREENRECORDING =1;
-}
 
-// PdfService provides methods to generate, download,
-// and manage PDF exports from media files.
+// PdfService provides methods to asynchronously generate, list,
+// and manage PDF exports from different media sources.
 service PdfService {
 
-  // Generate a new PDF export asynchronously.
-  // Returns metadata about the created export task.
-  rpc GenerateScreenrecordingPdfExport (ScreenrecordingPdfGenerateRequest) returns (PdfExportMetadata) {
+  // --- Screenrecording Exports ---
+
+  // Creates a new task to generate a PDF export for an agent's screen recordings.
+  // This operation is asynchronous and returns a task metadata.
+  rpc CreateScreenrecordingExport(CreateScreenrecordingRequest) returns (ExportTask) {
     option (google.api.http) = {
-      post: "/export/pdf/{agent_id}"
+      post: "/agents/{agent_id}/exports/pdf/screenrecordings"
       body: "*"
     };
   }
 
-  // Download a previously generated PDF by export ID.
-  rpc DownloadPdfExport (PdfDownloadRequest) returns (stream PdfExportChunk) {
+  // Lists the history of PDF exports for a specific agent.
+  rpc ListScreenrecordingExports(ListScreenrecordingHistoryRequest) returns (ListExportsResponse) {
     option (google.api.http) = {
-      get: "/export/pdf/{file_id}"
+      get: "/agents/{agent_id}/exports/pdf/screenrecordings"
     };
   }
 
-  // Get paginated history of PDF exports for a given agent.
-  rpc GetScreenrecordingPdfExportHistory (PdfScreenrecordingHistoryRequest) returns (PdfHistoryResponse) {
-    option (google.api.http) = {
-      get: "/export/pdf/{agent_id}/history"
-    };
-  }
+  // --- Call Exports ---
 
-  // Generate a new PDF export asynchronously by Call ID.
-  rpc GenerateCallPdfExport (PdfGenerateCallPdfRequest) returns (PdfExportMetadata) {
+  // Creates a new task to generate a PDF export for a specific call.
+  // Useful for documenting call transcripts or associated media.
+  rpc CreateCallExport(CreateCallExportRequest) returns (ExportTask) {
     option (google.api.http) = {
-      post: "/export/pdf/call/{call_id}"
+      post: "/calls/{call_id}/exports/pdf"
       body: "*"
     };
   }
 
-  // Get history of PDF exports for a specific Call.
-  rpc GetCallPdfHistory (PdfCallPdfHistoryRequest) returns (PdfHistoryResponse) {
+  // Lists the history of PDF exports for a specific call ID.
+  rpc ListCallExports(ListCallHistoryRequest) returns (ListExportsResponse) {
     option (google.api.http) = {
-      get: "/export/pdf/call/{call_id}/history"
+      get: "/calls/{call_id}/exports/pdf"
     };
   }
 
+  // --- General Operations ---
 
-  rpc DeletePdfExportRecord (DeletePdfExportRecordRequest) returns (DeletePdfExportRecordResponse){
+  // Deletes a specific export record from the history.
+  rpc DeleteExport(DeleteExportRequest) returns (DeleteExportResponse) {
     option (google.api.http) = {
-      delete: "/export/pdf/history/{id}"
+      delete: "/exports/pdf/history/{id}"
     };
   }
 }
 
-message PdfGenerateCallPdfRequest {
+// --- Message Definitions ---
+
+// Request for generating a screen recording PDF.
+message CreateScreenrecordingRequest {
+  int64 agent_id = 1;          // Unique identifier of the agent.
+  int64 from = 2;              // Start timestamp of the range (Unix millis).
+  int64 to = 3;                // End timestamp of the range (Unix millis).
+  repeated int64 file_ids = 4;   // Optional: specific file IDs to include in the PDF.
+}
+
+// Request for generating a call media PDF.
+message CreateCallExportRequest {
+  string call_id = 1;          // Unique identifier of the call.
+  int64 from = 3;              // Start timestamp of the range (Unix millis).
+  int64 to = 4;                // End timestamp of the range (Unix millis).
+  repeated int64 file_ids = 5;   // Optional: specific file IDs to include in the PDF.
+}
+
+// Request for retrieving paginated export history for an agent.
+message ListScreenrecordingHistoryRequest {
+  int64 agent_id = 1;
+  int32 page = 2;              // Page number (1-based).
+  int32 size = 3;              // Number of items per page.
+}
+
+// Request for retrieving paginated export history for a call.
+message ListCallHistoryRequest {
   string call_id = 1;
-  int64 from = 3;              // Start timestamp (Unix millis).
-  int64 to = 4;                // End timestamp (Unix millis).
-
-  repeated int64 file_ids = 5; // Optional list of specific file IDs to include.
+  int32 page = 2;              // Page number (1-based).
+  int32 size = 3;              // Number of items per page.
 }
 
-message PdfCallPdfHistoryRequest {
-  string call_id = 1;
-  int32 page = 2;
-  int32 size = 3;
+// Response containing a page of export history records.
+message ListExportsResponse {
+  int32 page = 1;              // Current page number.
+  bool next = 2;               // Indicates if there are more records available.
+  repeated ExportRecord items = 3; // List of export records.
 }
 
-message DeletePdfExportRecordRequest{
-  int64 id = 1;
+// Metadata about an export task immediately after creation.
+message ExportTask {
+  string task_id = 1;          // Unique ID to track the background task.
+  string file_name = 2;        // Target name of the PDF file.
+  string mime_type = 3;        // MIME type (usually application/pdf).
+  ExportStatus status = 4;     // Current lifecycle status of the task.
+  int64 size = 5;              // File size in bytes (0 if not yet generated).
 }
 
-message DeletePdfExportRecordResponse{
-  int64 id = 1;
+// Represents a persisted record of a PDF export.
+message ExportRecord {
+  int64 id = 1;                // Internal database record ID.
+  string name = 2;             // Display name of the export.
+  int64 file_id = 3;           // Reference to the file in the storage system.
+  string mime_type = 4;        // MIME type of the generated file.
+  int64 created_at = 5;        // Creation timestamp (Unix millis).
+  int64 updated_at = 6;        // Last update timestamp (Unix millis).
+  int64 created_by = 7;        // User ID who initiated the export.
+  int64 updated_by = 8;        // User ID who last modified the record.
+  ExportStatus status = 9;     // Final status of the export process.
 }
 
-// Request for generating a PDF export.
-message ScreenrecordingPdfGenerateRequest {
-  int64 agent_id = 1;   // Agent ID for which the export is generated.
-  PdfChannel channel = 2;   // Channel type (e.g., "screenshot").
-  int64 from = 3;       // Start timestamp (Unix millis).
-  int64 to = 4;         // End timestamp (Unix millis).
-
-  repeated int64 file_ids = 5; // Optional list of specific file IDs to include.
+// Request to delete a history record.
+message DeleteExportRequest {
+  int64 id = 1;                // ID of the record to remove.
 }
 
-// Request for downloading a previously generated PDF export.
-message PdfDownloadRequest {
-  int64 file_id = 1;  // Unique export identifier.
-  int64 domain_id = 2;  // Domain ID for authorization.
+// Response confirming the deletion of a record.
+message DeleteExportResponse {
+  int64 id = 1;                // ID of the deleted record.
 }
 
-// Metadata about a PDF export task.
-message PdfExportMetadata {
-  string task_id = 1;    // Unique identifier of the task.
-  string file_name = 2;  // File name of the export.
-  string mime_type = 3;  // MIME type, e.g., "application/pdf".
-  string status = 4;     // Task status: pending | processing | done | failed.
-  int64 size = 5;        // File size in bytes (0 if not ready).
+// Status of the PDF generation process.
+enum ExportStatus {
+  EXPORT_STATUS_UNSPECIFIED = 0;
+  PENDING = 1;                 // Task is queued and waiting for a worker.
+  PROCESSING = 2;              // PDF is currently being rendered.
+  DONE = 3;                    // Export finished successfully.
+  FAILED = 4;                  // Export failed during generation.
 }
-
-// Chunked response with PDF binary data.
-message PdfExportChunk {
-  bytes data = 1; // Raw PDF file bytes (chunked).
-}
-
-// Request for retrieving paginated history of exports.
-message PdfScreenrecordingHistoryRequest {
-  int64 agent_id = 1;     // Agent ID.
-  int32 page = 2;         // Page number (starting from 1).
-  int32 size = 3;         // Page size (number of records per page).
-}
-
-// Response containing a page of export history.
-message PdfHistoryResponse {
-  int32 page = 1;                    // Current page number.
-  bool next = 2;                 // True if there is a next page.
-  repeated PdfHistoryRecord data = 3; // List of export history records.
-}
-
-// Represents a single PDF export record.
-message PdfHistoryRecord {
-  int64 id = 1;                 // Export ID.
-  string name = 2;              // Export name.
-  int64 file_id = 3;            // Related file ID.
-  string mime_type = 4;         // MIME type of the export.
-  int64 created_at = 5;         // Creation timestamp (Unix millis).
-  int64 updated_at = 6;         // Update timestamp (Unix millis).
-  int64 created_by = 7;         // User ID who created the export.
-  int64 updated_by = 8;         // User ID who last updated the export.
-  PdfExportStatus status = 9;   // Current export status.
-}
-
-// Status of the PDF export process.
-enum PdfExportStatus {
-  PDF_EXPORT_STATUS_UNSPECIFIED = 0; // Default value.
-  PDF_EXPORT_STATUS_PENDING = 1;     // Task is waiting to start.
-  PDF_EXPORT_STATUS_PROCESSING = 2;  // Task is in progress.
-  PDF_EXPORT_STATUS_DONE = 3;        // Task is completed successfully.
-  PDF_EXPORT_STATUS_FAILED = 4;      // Task failed.
-}
-
-

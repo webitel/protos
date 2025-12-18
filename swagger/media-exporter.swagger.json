@@ -16,15 +16,15 @@
     "application/json"
   ],
   "paths": {
-    "/export/pdf/call/{call_id}": {
-      "post": {
-        "summary": "Generate a new PDF export asynchronously by Call ID.",
-        "operationId": "GenerateCallPdfExport",
+    "/agents/{agent_id}/exports/pdf/screenrecordings": {
+      "get": {
+        "summary": "Lists the history of PDF exports for a specific agent.",
+        "operationId": "ListScreenrecordingExports",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/webitel_media_exporter.PdfExportMetadata"
+              "$ref": "#/definitions/webitel_media_exporter.ListExportsResponse"
             }
           },
           "default": {
@@ -36,17 +36,65 @@
         },
         "parameters": [
           {
-            "name": "call_id",
+            "name": "agent_id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "description": "Page number (1-based).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "description": "Number of items per page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "PdfService"
+        ]
+      },
+      "post": {
+        "summary": "Creates a new task to generate a PDF export for an agent's screen recordings.\nThis operation is asynchronous and returns a task metadata.",
+        "operationId": "CreateScreenrecordingExport",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel_media_exporter.ExportTask"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "agent_id",
+            "description": "Unique identifier of the agent.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
           },
           {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/webitel_media_exporter.PdfService.GenerateCallPdfExportBody"
+              "$ref": "#/definitions/webitel_media_exporter.PdfService.CreateScreenrecordingExportBody"
             }
           }
         ],
@@ -55,15 +103,15 @@
         ]
       }
     },
-    "/export/pdf/call/{call_id}/history": {
+    "/calls/{call_id}/exports/pdf": {
       "get": {
-        "summary": "Get history of PDF exports for a specific Call.",
-        "operationId": "GetCallPdfHistory",
+        "summary": "Lists the history of PDF exports for a specific call ID.",
+        "operationId": "ListCallExports",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/webitel_media_exporter.PdfHistoryResponse"
+              "$ref": "#/definitions/webitel_media_exporter.ListExportsResponse"
             }
           },
           "default": {
@@ -82,6 +130,7 @@
           },
           {
             "name": "page",
+            "description": "Page number (1-based).",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -89,6 +138,7 @@
           },
           {
             "name": "size",
+            "description": "Number of items per page.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -98,16 +148,55 @@
         "tags": [
           "PdfService"
         ]
-      }
-    },
-    "/export/pdf/history/{id}": {
-      "delete": {
-        "operationId": "DeletePdfExportRecord",
+      },
+      "post": {
+        "summary": "Creates a new task to generate a PDF export for a specific call.\nUseful for documenting call transcripts or associated media.",
+        "operationId": "CreateCallExport",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/webitel_media_exporter.DeletePdfExportRecordResponse"
+              "$ref": "#/definitions/webitel_media_exporter.ExportTask"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "call_id",
+            "description": "Unique identifier of the call.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel_media_exporter.PdfService.CreateCallExportBody"
+            }
+          }
+        ],
+        "tags": [
+          "PdfService"
+        ]
+      }
+    },
+    "/exports/pdf/history/{id}": {
+      "delete": {
+        "summary": "Deletes a specific export record from the history.",
+        "operationId": "DeleteExport",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel_media_exporter.DeleteExportResponse"
             }
           },
           "default": {
@@ -120,148 +209,9 @@
         "parameters": [
           {
             "name": "id",
+            "description": "ID of the record to remove.",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
-          }
-        ],
-        "tags": [
-          "PdfService"
-        ]
-      }
-    },
-    "/export/pdf/{agent_id}": {
-      "post": {
-        "summary": "Generate a new PDF export asynchronously.\nReturns metadata about the created export task.",
-        "operationId": "GenerateScreenrecordingPdfExport",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel_media_exporter.PdfExportMetadata"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/google.rpc.Status"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "agent_id",
-            "description": "Agent ID for which the export is generated.",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "format": "int64"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/webitel_media_exporter.PdfService.GenerateScreenrecordingPdfExportBody"
-            }
-          }
-        ],
-        "tags": [
-          "PdfService"
-        ]
-      }
-    },
-    "/export/pdf/{agent_id}/history": {
-      "get": {
-        "summary": "Get paginated history of PDF exports for a given agent.",
-        "operationId": "GetScreenrecordingPdfExportHistory",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel_media_exporter.PdfHistoryResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/google.rpc.Status"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "agent_id",
-            "description": "Agent ID.",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "format": "int64"
-          },
-          {
-            "name": "page",
-            "description": "Page number (starting from 1).",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "size",
-            "description": "Page size (number of records per page).",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          }
-        ],
-        "tags": [
-          "PdfService"
-        ]
-      }
-    },
-    "/export/pdf/{file_id}": {
-      "get": {
-        "summary": "Download a previously generated PDF by export ID.",
-        "operationId": "DownloadPdfExport",
-        "responses": {
-          "200": {
-            "description": "A successful response.(streaming responses)",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "result": {
-                  "$ref": "#/definitions/webitel_media_exporter.PdfExportChunk"
-                },
-                "error": {
-                  "$ref": "#/definitions/google.rpc.Status"
-                }
-              },
-              "title": "Stream result of webitel_media_exporter.PdfExportChunk"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/google.rpc.Status"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "file_id",
-            "description": "Unique export identifier.",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "format": "int64"
-          },
-          {
-            "name": "domain_id",
-            "description": "Domain ID for authorization.",
-            "in": "query",
-            "required": false,
             "type": "string",
             "format": "int64"
           }
@@ -301,93 +251,37 @@
         }
       }
     },
-    "webitel_media_exporter.DeletePdfExportRecordResponse": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "int64"
-        }
-      }
-    },
-    "webitel_media_exporter.PdfChannel": {
-      "type": "string",
-      "enum": [
-        "CALL",
-        "SCREENRECORDING"
-      ],
-      "default": "CALL"
-    },
-    "webitel_media_exporter.PdfExportChunk": {
-      "type": "object",
-      "properties": {
-        "data": {
-          "type": "string",
-          "format": "byte",
-          "description": "Raw PDF file bytes (chunked)."
-        }
-      },
-      "description": "Chunked response with PDF binary data."
-    },
-    "webitel_media_exporter.PdfExportMetadata": {
-      "type": "object",
-      "properties": {
-        "task_id": {
-          "type": "string",
-          "description": "Unique identifier of the task."
-        },
-        "file_name": {
-          "type": "string",
-          "description": "File name of the export."
-        },
-        "mime_type": {
-          "type": "string",
-          "description": "MIME type, e.g., \"application/pdf\"."
-        },
-        "status": {
-          "type": "string",
-          "description": "Task status: pending | processing | done | failed."
-        },
-        "size": {
-          "type": "string",
-          "format": "int64",
-          "description": "File size in bytes (0 if not ready)."
-        }
-      },
-      "description": "Metadata about a PDF export task."
-    },
-    "webitel_media_exporter.PdfExportStatus": {
-      "type": "string",
-      "enum": [
-        "PDF_EXPORT_STATUS_UNSPECIFIED",
-        "PDF_EXPORT_STATUS_PENDING",
-        "PDF_EXPORT_STATUS_PROCESSING",
-        "PDF_EXPORT_STATUS_DONE",
-        "PDF_EXPORT_STATUS_FAILED"
-      ],
-      "default": "PDF_EXPORT_STATUS_UNSPECIFIED",
-      "description": "Status of the PDF export process.\n\n - PDF_EXPORT_STATUS_UNSPECIFIED: Default value.\n - PDF_EXPORT_STATUS_PENDING: Task is waiting to start.\n - PDF_EXPORT_STATUS_PROCESSING: Task is in progress.\n - PDF_EXPORT_STATUS_DONE: Task is completed successfully.\n - PDF_EXPORT_STATUS_FAILED: Task failed."
-    },
-    "webitel_media_exporter.PdfHistoryRecord": {
+    "webitel_media_exporter.DeleteExportResponse": {
       "type": "object",
       "properties": {
         "id": {
           "type": "string",
           "format": "int64",
-          "description": "Export ID."
+          "description": "ID of the deleted record."
+        }
+      },
+      "description": "Response confirming the deletion of a record."
+    },
+    "webitel_media_exporter.ExportRecord": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "description": "Internal database record ID."
         },
         "name": {
           "type": "string",
-          "description": "Export name."
+          "description": "Display name of the export."
         },
         "file_id": {
           "type": "string",
           "format": "int64",
-          "description": "Related file ID."
+          "description": "Reference to the file in the storage system."
         },
         "mime_type": {
           "type": "string",
-          "description": "MIME type of the export."
+          "description": "MIME type of the generated file."
         },
         "created_at": {
           "type": "string",
@@ -397,26 +291,65 @@
         "updated_at": {
           "type": "string",
           "format": "int64",
-          "description": "Update timestamp (Unix millis)."
+          "description": "Last update timestamp (Unix millis)."
         },
         "created_by": {
           "type": "string",
           "format": "int64",
-          "description": "User ID who created the export."
+          "description": "User ID who initiated the export."
         },
         "updated_by": {
           "type": "string",
           "format": "int64",
-          "description": "User ID who last updated the export."
+          "description": "User ID who last modified the record."
         },
         "status": {
-          "$ref": "#/definitions/webitel_media_exporter.PdfExportStatus",
-          "description": "Current export status."
+          "$ref": "#/definitions/webitel_media_exporter.ExportStatus",
+          "description": "Final status of the export process."
         }
       },
-      "description": "Represents a single PDF export record."
+      "description": "Represents a persisted record of a PDF export."
     },
-    "webitel_media_exporter.PdfHistoryResponse": {
+    "webitel_media_exporter.ExportStatus": {
+      "type": "string",
+      "enum": [
+        "EXPORT_STATUS_UNSPECIFIED",
+        "PENDING",
+        "PROCESSING",
+        "DONE",
+        "FAILED"
+      ],
+      "default": "EXPORT_STATUS_UNSPECIFIED",
+      "description": "Status of the PDF generation process.\n\n - PENDING: Task is queued and waiting for a worker.\n - PROCESSING: PDF is currently being rendered.\n - DONE: Export finished successfully.\n - FAILED: Export failed during generation."
+    },
+    "webitel_media_exporter.ExportTask": {
+      "type": "object",
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "description": "Unique ID to track the background task."
+        },
+        "file_name": {
+          "type": "string",
+          "description": "Target name of the PDF file."
+        },
+        "mime_type": {
+          "type": "string",
+          "description": "MIME type (usually application/pdf)."
+        },
+        "status": {
+          "$ref": "#/definitions/webitel_media_exporter.ExportStatus",
+          "description": "Current lifecycle status of the task."
+        },
+        "size": {
+          "type": "string",
+          "format": "int64",
+          "description": "File size in bytes (0 if not yet generated)."
+        }
+      },
+      "description": "Metadata about an export task immediately after creation."
+    },
+    "webitel_media_exporter.ListExportsResponse": {
       "type": "object",
       "properties": {
         "page": {
@@ -426,31 +359,31 @@
         },
         "next": {
           "type": "boolean",
-          "description": "True if there is a next page."
+          "description": "Indicates if there are more records available."
         },
-        "data": {
+        "items": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/webitel_media_exporter.PdfHistoryRecord"
+            "$ref": "#/definitions/webitel_media_exporter.ExportRecord"
           },
-          "description": "List of export history records."
+          "description": "List of export records."
         }
       },
-      "description": "Response containing a page of export history."
+      "description": "Response containing a page of export history records."
     },
-    "webitel_media_exporter.PdfService.GenerateCallPdfExportBody": {
+    "webitel_media_exporter.PdfService.CreateCallExportBody": {
       "type": "object",
       "properties": {
         "from": {
           "type": "string",
           "format": "int64",
-          "description": "Start timestamp (Unix millis)."
+          "description": "Start timestamp of the range (Unix millis)."
         },
         "to": {
           "type": "string",
           "format": "int64",
-          "description": "End timestamp (Unix millis)."
+          "description": "End timestamp of the range (Unix millis)."
         },
         "file_ids": {
           "type": "array",
@@ -458,26 +391,23 @@
             "type": "string",
             "format": "int64"
           },
-          "description": "Optional list of specific file IDs to include."
+          "description": "Optional: specific file IDs to include in the PDF."
         }
-      }
+      },
+      "description": "Request for generating a call media PDF."
     },
-    "webitel_media_exporter.PdfService.GenerateScreenrecordingPdfExportBody": {
+    "webitel_media_exporter.PdfService.CreateScreenrecordingExportBody": {
       "type": "object",
       "properties": {
-        "channel": {
-          "$ref": "#/definitions/webitel_media_exporter.PdfChannel",
-          "description": "Channel type (e.g., \"screenshot\")."
-        },
         "from": {
           "type": "string",
           "format": "int64",
-          "description": "Start timestamp (Unix millis)."
+          "description": "Start timestamp of the range (Unix millis)."
         },
         "to": {
           "type": "string",
           "format": "int64",
-          "description": "End timestamp (Unix millis)."
+          "description": "End timestamp of the range (Unix millis)."
         },
         "file_ids": {
           "type": "array",
@@ -485,10 +415,10 @@
             "type": "string",
             "format": "int64"
           },
-          "description": "Optional list of specific file IDs to include."
+          "description": "Optional: specific file IDs to include in the PDF."
         }
       },
-      "description": "Request for generating a PDF export."
+      "description": "Request for generating a screen recording PDF."
     }
   }
 }
