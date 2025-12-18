@@ -16,6 +16,90 @@
     "application/json"
   ],
   "paths": {
+    "/export/pdf/call/{call_id}": {
+      "post": {
+        "summary": "Generate a new PDF export asynchronously by Call ID.",
+        "operationId": "GenerateCallPdfExport",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel_media_exporter.PdfExportMetadata"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "call_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel_media_exporter.PdfService.GenerateCallPdfExportBody"
+            }
+          }
+        ],
+        "tags": [
+          "PdfService"
+        ]
+      }
+    },
+    "/export/pdf/call/{call_id}/history": {
+      "get": {
+        "summary": "Get history of PDF exports for a specific Call.",
+        "operationId": "GetCallPdfHistory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel_media_exporter.PdfHistoryResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "call_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "PdfService"
+        ]
+      }
+    },
     "/export/pdf/history/{id}": {
       "delete": {
         "operationId": "DeletePdfExportRecord",
@@ -50,7 +134,7 @@
     "/export/pdf/{agent_id}": {
       "post": {
         "summary": "Generate a new PDF export asynchronously.\nReturns metadata about the created export task.",
-        "operationId": "GeneratePdfExport",
+        "operationId": "GenerateScreenrecordingPdfExport",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -79,7 +163,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/webitel_media_exporter.PdfService.GeneratePdfExportBody"
+              "$ref": "#/definitions/webitel_media_exporter.PdfService.GenerateScreenrecordingPdfExportBody"
             }
           }
         ],
@@ -91,7 +175,7 @@
     "/export/pdf/{agent_id}/history": {
       "get": {
         "summary": "Get paginated history of PDF exports for a given agent.",
-        "operationId": "GetPdfExportHistory",
+        "operationId": "GetScreenrecordingPdfExportHistory",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -355,7 +439,30 @@
       },
       "description": "Response containing a page of export history."
     },
-    "webitel_media_exporter.PdfService.GeneratePdfExportBody": {
+    "webitel_media_exporter.PdfService.GenerateCallPdfExportBody": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "string",
+          "format": "int64",
+          "description": "Start timestamp (Unix millis)."
+        },
+        "to": {
+          "type": "string",
+          "format": "int64",
+          "description": "End timestamp (Unix millis)."
+        },
+        "file_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          },
+          "description": "Optional list of specific file IDs to include."
+        }
+      }
+    },
+    "webitel_media_exporter.PdfService.GenerateScreenrecordingPdfExportBody": {
       "type": "object",
       "properties": {
         "channel": {

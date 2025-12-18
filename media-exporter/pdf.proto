@@ -17,7 +17,7 @@ service PdfService {
 
   // Generate a new PDF export asynchronously.
   // Returns metadata about the created export task.
-  rpc GeneratePdfExport (PdfGenerateRequest) returns (PdfExportMetadata) {
+  rpc GenerateScreenrecordingPdfExport (ScreenrecordingPdfGenerateRequest) returns (PdfExportMetadata) {
     option (google.api.http) = {
       post: "/export/pdf/{agent_id}"
       body: "*"
@@ -32,17 +32,47 @@ service PdfService {
   }
 
   // Get paginated history of PDF exports for a given agent.
-  rpc GetPdfExportHistory (PdfHistoryRequest) returns (PdfHistoryResponse) {
+  rpc GetScreenrecordingPdfExportHistory (PdfScreenrecordingHistoryRequest) returns (PdfHistoryResponse) {
     option (google.api.http) = {
       get: "/export/pdf/{agent_id}/history"
     };
   }
+
+  // Generate a new PDF export asynchronously by Call ID.
+  rpc GenerateCallPdfExport (PdfGenerateCallPdfRequest) returns (PdfExportMetadata) {
+    option (google.api.http) = {
+      post: "/export/pdf/call/{call_id}"
+      body: "*"
+    };
+  }
+
+  // Get history of PDF exports for a specific Call.
+  rpc GetCallPdfHistory (PdfCallPdfHistoryRequest) returns (PdfHistoryResponse) {
+    option (google.api.http) = {
+      get: "/export/pdf/call/{call_id}/history"
+    };
+  }
+
 
   rpc DeletePdfExportRecord (DeletePdfExportRecordRequest) returns (DeletePdfExportRecordResponse){
     option (google.api.http) = {
       delete: "/export/pdf/history/{id}"
     };
   }
+}
+
+message PdfGenerateCallPdfRequest {
+  string call_id = 1;
+  int64 from = 3;              // Start timestamp (Unix millis).
+  int64 to = 4;                // End timestamp (Unix millis).
+
+  repeated int64 file_ids = 5; // Optional list of specific file IDs to include.
+}
+
+message PdfCallPdfHistoryRequest {
+  string call_id = 1;
+  int32 page = 2;
+  int32 size = 3;
 }
 
 message DeletePdfExportRecordRequest{
@@ -54,7 +84,7 @@ message DeletePdfExportRecordResponse{
 }
 
 // Request for generating a PDF export.
-message PdfGenerateRequest {
+message ScreenrecordingPdfGenerateRequest {
   int64 agent_id = 1;   // Agent ID for which the export is generated.
   PdfChannel channel = 2;   // Channel type (e.g., "screenshot").
   int64 from = 3;       // Start timestamp (Unix millis).
@@ -84,10 +114,10 @@ message PdfExportChunk {
 }
 
 // Request for retrieving paginated history of exports.
-message PdfHistoryRequest {
-  int64 agent_id = 1; // Agent ID.
-  int32 page = 2;     // Page number (starting from 1).
-  int32 size = 3;     // Page size (number of records per page).
+message PdfScreenrecordingHistoryRequest {
+  int64 agent_id = 1;     // Agent ID.
+  int32 page = 2;         // Page number (starting from 1).
+  int32 size = 3;         // Page size (number of records per page).
 }
 
 // Response containing a page of export history.
