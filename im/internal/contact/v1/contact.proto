@@ -4,7 +4,7 @@ package webitel.im.internal.contact.v1;
 
 import "google/protobuf/struct.proto";
 
-option go_package = "github.com/webitel/im-contact-service/gen/api/v1;impb";
+option go_package = "github.com/webitel/im-contact-service/gen/go/api/v1;impb";
 
 
 service Contacts {
@@ -45,7 +45,7 @@ message CreateContactRequest {
   // Username unique inside issuer
   string username = 6;
   // Optional metadata
-  google.protobuf.Struct metadata = 7;
+  map<string, string> metadata = 7;
 }
 
 message UpdateContactRequest {
@@ -57,7 +57,7 @@ message UpdateContactRequest {
   // Username unique inside issuer
   string username = 3;
   // Optional metadata
-  google.protobuf.Struct metadata = 4;
+  map<string, string> metadata = 4;
 }
 
 
@@ -77,8 +77,6 @@ message CanSendRequest {
 
 message CanSendResponse {
   bool can = 1;
-  UnableSendReason reason = 2;
-  string details = 3;
 }
 
 
@@ -86,7 +84,8 @@ message CanSendResponse {
 message ContactList {
   int32 page = 1;
   int32 size = 2;
-  repeated Contact contacts = 3;
+  bool next = 3;
+  repeated Contact contacts = 4;
 }
 
 
@@ -99,7 +98,7 @@ message Contact {
 
   string name = 6;
   string username = 7;
-  google.protobuf.Struct metadata = 8;
+  map<string, string> metadata = 8;
 
   int64 created_at = 9;
 
