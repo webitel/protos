@@ -57,7 +57,7 @@ When you introduce a new microservice under `messaging/`:
    Example (for a new `notifications` service):
 
    ```bash
-   mkdir -p messaging/notifications
+   mkdir -p im/notifications
    ```
 
 2. **Add Buf module configuration**
