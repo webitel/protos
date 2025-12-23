@@ -3,6 +3,7 @@ syntax = "proto3";
 package webitel.im.internal.contact.v1;
 
 import "google/protobuf/struct.proto";
+import "buf/validate/validate.proto";
 
 option go_package = "github.com/webitel/im-contact-service/gen/go/api/v1;impb";
 
@@ -33,46 +34,48 @@ message SearchContactRequest {
 
 message CreateContactRequest {
   // Issuer of the Contact
-  string iss_id = 1;
+  string iss_id = 1 [(buf.validate.field).required = true];
 
-  string app_id = 3;
+  string app_id = 3 [(buf.validate.field).required = true];
 
   // Type of the Contact
-  string type = 4;
+  string type = 4 [(buf.validate.field).required = true];
 
   // Display name
   string name = 5;
   // Username unique inside issuer
-  string username = 6;
+  string username = 6
+  [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).required = true
+  ];
   // Optional metadata
   map<string, string> metadata = 7;
 }
 
 message UpdateContactRequest {
   // Unique internal Contact ID
-  string id = 1;
+  string id = 1 [(buf.validate.field).string.uuid = true];
 
   // Display name
   string name = 2;
   // Username unique inside issuer
-  string username = 3;
+  string username = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).required = true
+  ];
   // Optional metadata
   map<string, string> metadata = 4;
 }
 
 
 message DeleteContactRequest {
-  string id = 1;
-}
-
-
-message GetContactRequest {
-  string id = 1;
+  string id = 1 [(buf.validate.field).string.uuid = true];
 }
 
 message CanSendRequest {
-  string from_id = 1;
-  string to_id = 2;
+  string from_id = 1 [(buf.validate.field).string.uuid = true];
+  string to_id = 2 [(buf.validate.field).string.uuid = true];
 }
 
 message CanSendResponse {
