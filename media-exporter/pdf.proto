@@ -61,78 +61,84 @@ service PdfService {
 
 // Request for generating a screen recording PDF.
 message CreateScreenrecordingRequest {
-  int64 agent_id = 1;          // Unique identifier of the agent.
-  int64 from = 2;              // Start timestamp of the range (Unix millis).
-  int64 to = 3;                // End timestamp of the range (Unix millis).
-  repeated int64 file_ids = 4;   // Optional: specific file IDs to include in the PDF.
+  int64 agent_id = 1; // Unique identifier of the agent.
+  int64 from = 2; // Start timestamp of the range (Unix millis).
+  int64 to = 3; // End timestamp of the range (Unix millis).
+  repeated int64 file_ids = 4; // Optional: specific file IDs to include in the PDF.
 }
 
 // Request for generating a call media PDF.
 message CreateCallExportRequest {
-  string call_id = 1;          // Unique identifier of the call.
-  int64 from = 3;              // Start timestamp of the range (Unix millis).
-  int64 to = 4;                // End timestamp of the range (Unix millis).
-  repeated int64 file_ids = 5;   // Optional: specific file IDs to include in the PDF.
+  string call_id = 1; // Unique identifier of the call.
+  int64 from = 3; // Start timestamp of the range (Unix millis).
+  int64 to = 4; // End timestamp of the range (Unix millis).
+  repeated int64 file_ids = 5; // Optional: specific file IDs to include in the PDF.
 }
 
 // Request for retrieving paginated export history for an agent.
 message ListScreenrecordingHistoryRequest {
   int64 agent_id = 1;
-  int32 page = 2;              // Page number (1-based).
-  int32 size = 3;              // Number of items per page.
+  int32 page = 2; // Page number (1-based).
+  int32 size = 3; // Number of items per page.]
+
+  // SQL-like ordering: "updated_at desc", "name asc"
+  string sort = 4;
 }
 
 // Request for retrieving paginated export history for a call.
 message ListCallHistoryRequest {
   string call_id = 1;
-  int32 page = 2;              // Page number (1-based).
-  int32 size = 3;              // Number of items per page.
+  int32 page = 2; // Page number (1-based).
+  int32 size = 3; // Number of items per page.
+
+  // SQL-like ordering: "updated_at desc", "name asc"
+  string sort = 4;
 }
 
 // Response containing a page of export history records.
 message ListExportsResponse {
-  int32 page = 1;              // Current page number.
-  bool next = 2;               // Indicates if there are more records available.
+  int32 page = 1; // Current page number.
+  bool next = 2; // Indicates if there are more records available.
   repeated ExportRecord items = 3; // List of export records.
 }
 
 // Metadata about an export task immediately after creation.
 message ExportTask {
-  string task_id = 1;          // Unique ID to track the background task.
-  string file_name = 2;        // Target name of the PDF file.
-  string mime_type = 3;        // MIME type (usually application/pdf).
-  ExportStatus status = 4;     // Current lifecycle status of the task.
-  int64 size = 5;              // File size in bytes (0 if not yet generated).
+  string task_id = 1; // Unique ID to track the background task.
+  string file_name = 2; // Target name of the PDF file.
+  string mime_type = 3; // MIME type (usually application/pdf).
+  ExportStatus status = 4; // Current lifecycle status of the task.
+  int64 size = 5; // File size in bytes (0 if not yet generated).
 }
 
 // Represents a persisted record of a PDF export.
 message ExportRecord {
-  int64 id = 1;                // Internal database record ID.
-  string name = 2;             // Display name of the export.
-  int64 file_id = 3;           // Reference to the file in the storage system.
-  string mime_type = 4;        // MIME type of the generated file.
-  int64 created_at = 5;        // Creation timestamp (Unix millis).
-  int64 updated_at = 6;        // Last update timestamp (Unix millis).
-  int64 created_by = 7;        // User ID who initiated the export.
-  int64 updated_by = 8;        // User ID who last modified the record.
-  ExportStatus status = 9;     // Final status of the export process.
+  int64 id = 1; // Internal database record ID.
+  string name = 2; // Display name of the export.
+  int64 file_id = 3; // Reference to the file in the storage system.
+  string mime_type = 4; // MIME type of the generated file.
+  int64 created_at = 5; // Creation timestamp (Unix millis).
+  int64 updated_at = 6; // Last update timestamp (Unix millis).
+  int64 created_by = 7; // User ID who initiated the export.
+  int64 updated_by = 8; // User ID who last modified the record.
+  ExportStatus status = 9; // Final status of the export process.
 }
 
 // Request to delete a history record.
 message DeleteExportRequest {
-  int64 id = 1;                // ID of the record to remove.
+  int64 id = 1; // ID of the record to remove.
 }
 
 // Response confirming the deletion of a record.
 message DeleteExportResponse {
-  int64 id = 1;                // ID of the deleted record.
+  int64 id = 1; // ID of the deleted record.
 }
 
 // Status of the PDF generation process.
 enum ExportStatus {
   EXPORT_STATUS_UNSPECIFIED = 0;
-  PENDING = 1;                 // Task is queued and waiting for a worker.
-  PROCESSING = 2;              // PDF is currently being rendered.
-  DONE = 3;                    // Export finished successfully.
-  FAILED = 4;                  // Export failed during generation.
+  PENDING = 1; // Task is queued and waiting for a worker.
+  PROCESSING = 2; // PDF is currently being rendered.
+  DONE = 3; // Export finished successfully.
+  FAILED = 4; // Export failed during generation.
 }
