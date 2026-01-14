@@ -82,8 +82,20 @@ message DeleteContactRequest {
 }
 
 message CanSendRequest {
-  string from_id = 1 [(buf.validate.field).string.uuid = true];
-  string to_id = 2 [(buf.validate.field).string.uuid = true];
+  message Peer {
+    oneof kind {
+      string contact_id = 1[
+        (buf.validate.field).string.uuid = true
+      ];
+      string bot_id = 2[
+        (buf.validate.field).string.uuid = true
+      ];
+    }
+  }
+
+  Peer from_id = 1;
+  Peer to_id = 2;
+  int32 domain_id = 3;
 }
 
 message CanSendResponse {
