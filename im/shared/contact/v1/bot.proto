@@ -1,0 +1,96 @@
+syntax = "proto3";
+
+package webitel.im.shared.contact.v1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/webitel/im-contact-service/gen/go/api/v1;impb";
+
+message WebitelBot {
+  string id = 1;
+  int32 domain_id = 2;
+  int64 created_at = 3;
+  int64 updated_at = 4;
+  int64 flow_id = 5;
+  string display_name = 6;
+}
+
+message SearchBotsRequest {
+  int32 domain_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int32.gt = 0
+  ];
+  int32 page = 2;
+  int32 size = 3;
+  string sort = 4;
+  string q = 5;
+  repeated int64 flow_ids = 6;
+  repeated string display_names = 7;
+  repeated string ids = 8;
+}
+
+message SearchBotsResponse {
+  repeated WebitelBot webitel_bot_list = 1;
+  bool next = 2; 
+}
+
+message CreateBotsRequest {
+  int32 domain_id = 1[
+    (buf.validate.field).required = true,
+    (buf.validate.field).int32.gt = 0
+  ];
+  int64 flow_id = 2[
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64.gt = 0
+  ];
+  string display_name = 3;
+}
+
+message CreateBotsResponse {
+    WebitelBot webitel_bot = 1;
+}
+
+message UpdateBotsRequest {
+  int32 domain_id = 1[
+    (buf.validate.field).required = true,
+    (buf.validate.field).int32.gt = 0
+  ];
+  string id = 2[
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+  optional int64 flow_id = 3;
+  optional string display_name = 4;
+}
+
+message UpdateBotsResponse {
+  WebitelBot webitel_bot = 1;
+}
+
+message DeleteBotsRequest {
+ int32 domain_id = 1[
+    (buf.validate.field).required = true,
+    (buf.validate.field).int32.gt = 0
+ ];
+ optional string id = 2;
+ optional int64 flow_id = 3; 
+}
+
+message DeleteBotsResponse {
+  
+}
+
+message EnsureBotRequest {
+  int32 domain_id = 1[
+    (buf.validate.field).required = true,
+    (buf.validate.field).int32.gt = 0
+  ];
+  int64 flow_id = 2[
+    (buf.validate.field).required = true,
+    (buf.validate.field).int32.gt = 0
+  ];
+}
+
+message EnsureBotResponse {
+    WebitelBot webitel_bot = 1;
+}

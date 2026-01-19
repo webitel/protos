@@ -1,0 +1,114 @@
+syntax = "proto3";
+
+package webitel.im.shared.thread.v1;
+
+import "shared/thread/v1/message_history.proto";
+import "shared/thread/v1/message.proto";
+
+
+option go_package = "github.com/webitel/protos/messaging/thread/v1;impb";
+
+
+message Thread {
+    // Unique identifier for the thread.
+  string id = 1;
+  // User who created the thread.
+  string created_by = 2;
+   // Timestamp when the thread was created.
+  int64 created_at = 3;
+  // User who last updated the thread.
+  string updated_by = 4;
+  // Timestamp when the thread was last updated.
+  int64 updated_at = 5;
+
+  // Owner of the thread.
+  string owner = 6;
+  // Admins of the thread.
+  repeated string admins = 7;
+  // Members of the thread.
+  repeated string members = 8;
+
+  // Subject of the thread.
+  string subject = 9;
+  // Description of the thread.
+  string description = 10;
+
+  // Image associated with the thread.
+  ImageInput thread_photo = 11;
+}
+
+// Represents the request for creating a group thread.
+message CreateGroupThreadRequest {
+  //The Id of the user who is creating the group thread.
+  string creator = 1;
+
+  //The list of member IDs who will be part of the group thread.
+  repeated string members = 2;
+
+  //The title of the group thread.
+  string subject = 3;
+
+  //The description of group thread.
+  string description = 4;
+
+// Image associated with the thread.
+  ImageInput thread_photo = 5;
+}
+
+// The response message for creating a group thread.
+// This message contains the created group thread.
+message CreateGroupThreadResponse {
+  Thread thread = 1;
+}
+
+// The type of a thread.
+enum ThreadType {
+  // Represents an unspecified thread type.
+  UNSPECIFIED = 0;
+  // Represents a direct thread.
+  DIRECT = 1;
+  // Represents a group thread.
+  GROUP = 2;
+  // Represents a channel thread.
+  CHANNEL = 3;
+}
+
+// Represents the request for searching a group thread.
+message SearchThreadRequest {
+  //? should it be Peer type
+  // The member Id.
+  string member = 1;
+  // The search query.
+  string q = 2;
+  // The cursor Id for pagination.
+  optional string cursor_id = 3;
+  // The maximum number of results to return.
+  int32 limit = 4;
+
+  // The types of searching threads.
+  repeated ThreadType thread_types = 5; 
+}
+
+//Represents the response for searching a group thread.
+message SearchThreadResponse {
+    // List of threads.
+    repeated Thread threads = 1;
+    // Boolean flag indicating if there are more results available for pagination.
+    bool has_next = 2;
+}
+
+// Represents the request for adding a member to a group thread.
+message AddMemberToGroupThreadRequest {
+  string thread_id = 1;
+  string from_member = 2;
+  repeated string members = 3;
+}
+
+message AddMemberToGroupThreadResponse {
+  message MemberJoinResult {
+    bool success = 1;
+    string contact_id = 2;
+    string message = 3;
+  }
+  repeated MemberJoinResult member_join_result = 1;
+}

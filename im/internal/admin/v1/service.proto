@@ -2,64 +2,19 @@ syntax = "proto3";
 
 package webitel.im.internal.admin.v1;
 
-import "admin/v1/application.proto";
-import "admin/v1/application_input.proto";
+import "shared/admin/v1/application.proto";
+import "shared/admin/v1/application_input.proto";
 
 import "google/rpc/status.proto";
+import "shared/admin/v1/requests.proto";
 
 // Applications (Admin) Service
 service Applications {
   // Get Application(s) list
-  rpc SearchApps(SearchAppRequest) returns (ApplicationList);
-  rpc DeleteApps(DeleteAppRequest) returns (ApplicationList);
+  rpc SearchApps(webitel.im.shared.admin.v1.SearchAppRequest) returns (webitel.im.shared.admin.v1.ApplicationList);
+  rpc DeleteApps(webitel.im.shared.admin.v1.DeleteAppRequest) returns (webitel.im.shared.admin.v1.ApplicationList);
 
-  rpc CreateApp(CreateAppRequest) returns (Application);
-  rpc UpdateApp(UpdateAppRequest) returns (Application);
+  rpc CreateApp(webitel.im.shared.admin.v1.CreateAppRequest) returns (webitel.im.shared.admin.v1.Application);
+  rpc UpdateApp(webitel.im.shared.admin.v1.UpdateAppRequest) returns (webitel.im.shared.admin.v1.Application);
   // rpc RevokeApp(RevokeAppRequest) returns ();
 }
-
-// 
-message ApplicationList {
-  // List of Application record(s) 
-  repeated Application data = 1;
-  // Number of the dataset page.
-  int32 page = 2;
-  // Is there more results ?
-  // Is this a partial results page ?
-  bool next = 3;
-}
-
-message SearchAppRequest {
-  // Query string as a term of search
-  string q = 1;
-  // Filter by [client_id]
-  string id = 2;
-
-  // Set of (App) fields to be returned into result
-  repeated string fields = 3;
-  // Page number. Offset
-  int32 page = 4;
-  // Size number. Limit records per page
-  int32 size = 5;
-}
-
-message CreateAppRequest {
-  InputApp app = 1;
-}
-
-message UpdateAppRequest {
-  string id = 1;
-  InputApp app = 2;
-}
-
-message DeleteAppRequest {
-  repeated string id = 1;
-}
-
-message RevokeAppRequest {
-  string id = 1;
-  // The reason. Optional
-  google.rpc.Status reason = 2;
-  bool delete = 3;
-}
-
