@@ -36203,6 +36203,43 @@
       }
     },
     "/users/password": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "ReadPasswordSettings",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "password",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "username",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "domain",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiGetPasswordSettingsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        }
+      },
       "put": {
         "tags": [
           "Users"
@@ -39557,33 +39594,6 @@
     }
   },
   "definitions": {
-    "AccessGrant": {
-      "type": "object",
-      "properties": {
-        "grantable": {
-          "type": "array",
-          "title": "[\"SEARCH\",\"MODIFY\",\"DELETE\",\"CREATE\"]",
-          "items": {
-            "type": "string"
-          }
-        },
-        "grantee": {
-          "title": "NEED to be rechecked !!!",
-          "$ref": "#/definitions/apiRoleId"
-        },
-        "grantor": {
-          "title": "NEED to be rechecked !!!",
-          "$ref": "#/definitions/apiRoleId"
-        },
-        "privileges": {
-          "type": "array",
-          "title": "[\"SEARCH\",\"MODIFY\",\"DELETE\",\"CREATE\"]",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
     "AccessStoreToggleDefaultAccessBody": {
       "type": "object",
       "properties": {
@@ -40228,71 +40238,6 @@
         }
       }
     },
-    "MediaAttributeAudio": {
-      "type": "object",
-      "title": "// Defines an animated GIF\nmessage Animated {}\nDefines an audio",
-      "properties": {
-        "duration": {
-          "type": "integer",
-          "format": "int64",
-          "title": "Duration in seconds"
-        },
-        "performer": {
-          "type": "string",
-          "title": "Song Performer"
-        },
-        "title": {
-          "type": "string",
-          "title": "Name of the song"
-        },
-        "waveform": {
-          "description": "Waveform: consists in a series of bitpacked 5-bit values.",
-          "type": "string",
-          "format": "byte"
-        }
-      }
-    },
-    "MediaAttributeImage": {
-      "type": "object",
-      "title": "Defines the width and height of an image uploaded",
-      "properties": {
-        "animated": {
-          "type": "boolean",
-          "title": "Defines an animated GIF"
-        },
-        "height": {
-          "type": "integer",
-          "format": "int64",
-          "title": "Height of image"
-        },
-        "width": {
-          "type": "integer",
-          "format": "int64",
-          "title": "Width of image"
-        }
-      }
-    },
-    "MediaAttributeVideo": {
-      "type": "object",
-      "title": "Defines a video",
-      "properties": {
-        "duration": {
-          "type": "integer",
-          "format": "int64",
-          "title": "Duration in seconds"
-        },
-        "height": {
-          "type": "integer",
-          "format": "int64",
-          "title": "Video height"
-        },
-        "width": {
-          "type": "integer",
-          "format": "int64",
-          "title": "Video width"
-        }
-      }
-    },
     "OAuth2FederationDeleteOAuthServiceBody": {
       "type": "object",
       "properties": {
@@ -40433,42 +40378,6 @@
         }
       }
     },
-    "RoleMember": {
-      "type": "object",
-      "properties": {
-        "admin": {
-          "type": "boolean",
-          "title": "admin of the group ?"
-        },
-        "created_at": {
-          "type": "string",
-          "format": "int64",
-          "title": "unix"
-        },
-        "created_by": {
-          "type": "string",
-          "title": "user.[id|name]"
-        },
-        "id": {
-          "type": "string",
-          "format": "int64",
-          "title": "user.id"
-        },
-        "name": {
-          "type": "string",
-          "title": "user.name"
-        },
-        "updated_at": {
-          "type": "string",
-          "format": "int64",
-          "title": "unix"
-        },
-        "updated_by": {
-          "type": "string",
-          "title": "user"
-        }
-      }
-    },
     "RolesUpdateRoleBody": {
       "type": "object",
       "properties": {
@@ -40558,68 +40467,6 @@
         }
       }
     },
-    "UpdateAccessRequestChanges": {
-      "type": "object",
-      "properties": {
-        "access": {
-          "type": "string",
-          "title": "[ObAC]: \"crud\" all object class privileges\n[RbAC]: \"r*u*d*\" all object privileges with grant options\n[NOTE]: empty access string denote \"delete\" operation (REVOKE)\n        others - \"add\" or \"replace\" (GRANT)"
-        },
-        "grantee_id": {
-          "type": "string",
-          "format": "int64",
-          "title": "subject (role::object).id"
-        }
-      }
-    },
-    "UploadMediaRequestInputData": {
-      "type": "object",
-      "title": "Multipart Chunk",
-      "properties": {
-        "binary": {
-          "type": "string",
-          "format": "byte"
-        },
-        "cancel": {
-          "$ref": "#/definitions/rpcStatus"
-        },
-        "offset": {
-          "type": "integer",
-          "format": "int64"
-        }
-      }
-    },
-    "UploadMediaRequestInputFile": {
-      "type": "object",
-      "title": "File Metadata",
-      "properties": {
-        "meta": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/contactsMediaAttribute"
-          }
-        },
-        "size": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "type": {
-          "type": "string"
-        }
-      }
-    },
-    "UploadMediaResponseProgress": {
-      "type": "object",
-      "title": "Upload progress",
-      "properties": {
-        "percent": {
-          "type": "number",
-          "format": "float",
-          "title": "0..100"
-        }
-      }
-    },
     "UsersLogoutUserBody": {
       "type": "object"
     },
@@ -40638,40 +40485,6 @@
           "description": "[WHO]: operational; current user NEED to be rechecked !!!",
           "title": "ObjectId object = 1;",
           "$ref": "#/definitions/apiRoleId"
-        }
-      }
-    },
-    "apiAccessScope": {
-      "type": "object",
-      "title": "AccessScope represents authorized access level\nto object class declaration within domain namespace",
-      "properties": {
-        "abac": {
-          "description": "[A]ttribute-[b]ased;  not implemented; next releases ...",
-          "type": "boolean",
-          "title": "Is [?]-[b]ased [A]ccess [C]ontrol *model enabled ?"
-        },
-        "access": {
-          "type": "integer",
-          "format": "int64",
-          "title": "flags: [ CREATE | SELECT | UPDATE | DELETE ]"
-        },
-        "class": {
-          "type": "string",
-          "title": "class: alphanumeric code name"
-        },
-        "id": {
-          "description": "class: object id",
-          "type": "string",
-          "format": "int64",
-          "title": "Inherit::ObjectClass"
-        },
-        "obac": {
-          "type": "boolean",
-          "title": "[O]peration-[b]ased;  Mandatory: control access to object.class (alias: collection, section, etc.)"
-        },
-        "rbac": {
-          "type": "boolean",
-          "title": "[R]ecord-[b]ased; Discretionary: control access to object.entry (alias: resource, record, etc.)"
         }
       }
     },
@@ -40699,297 +40512,6 @@
         "token_type": {
           "description": "REQUIRED. The type of the token issued. Value is case insensitive.",
           "type": "string"
-        }
-      }
-    },
-    "apiAuthorization": {
-      "description": "Authorization. Current.",
-      "type": "object",
-      "properties": {
-        "dc": {
-          "description": "current domain component",
-          "type": "string",
-          "format": "int64",
-          "title": "current::authorization"
-        },
-        "domain": {
-          "type": "string",
-          "title": "current domain name"
-        },
-        "privs": {
-          "description": "map[:priv]:uuid { \"sysadmin\":1, \"CALL_MANAGER\":712342168, \"CALL_CENTER\":32435456 }",
-          "type": "object",
-          "title": "MAC: set of access privileges assigned to current role::subject(s)",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
-        "role_id": {
-          "type": "string",
-          "format": "int64",
-          "title": "current role id"
-        },
-        "roles": {
-          "description": "map[:role]:oid",
-          "type": "object",
-          "title": "authorization::subject(s) whose privileges extends to the current role",
-          "additionalProperties": {
-            "type": "string",
-            "format": "int64"
-          }
-        },
-        "scope": {
-          "description": "[{ \"id\":1, \"class\":\"queue\", \"obac\":false, \"rbac\":true, \"access\":7 },...]",
-          "type": "array",
-          "title": "DAC: set of object class(es) on which at least SELECT privilege is granted to current role::subject(s)",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/apiAccessScope"
-          }
-        },
-        "session": {
-          "title": "session::authorization (primary)",
-          "$ref": "#/definitions/apiSession"
-        },
-        "username": {
-          "type": "string",
-          "title": "current role name"
-        }
-      }
-    },
-    "apiAuthorizationCode": {
-      "type": "object",
-      "properties": {
-        "code": {
-          "description": "REQUIRED. The authorization code generated by the\nauthorization server. The authorization code MUST expire\nshortly after it is issued to mitigate the risk of leaks.\nA maximum authorization code lifetime of 10 minutes is\nRECOMMENDED. The client MUST NOT use the authorization code\nmore than once. If an authorization code is used more than\nonce, the authorization server MUST deny the request and SHOULD\nrevoke (when possible) all tokens previously issued based on\nthat authorization code. The authorization code is bound to\nthe client identifier and redirection URI.",
-          "type": "string"
-        },
-        "state": {
-          "description": "REQUIRED if the \"state\" parameter was present in the client\nauthorization request. The exact value received from the client.\n\n---------------------------------------------------------------------\n HTTP/1.1 302 Found\n  Location: https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA\n  \u0026state=xyz",
-          "type": "string"
-        }
-      }
-    },
-    "apiAuthorizationResponse": {
-      "type": "object",
-      "properties": {
-        "code": {
-          "$ref": "#/definitions/apiAuthorizationCode"
-        },
-        "error": {
-          "$ref": "#/definitions/apiErrorResponse"
-        },
-        "token": {
-          "$ref": "#/definitions/apiAccessToken"
-        }
-      }
-    },
-    "apiCall": {
-      "type": "object",
-      "properties": {
-        "channel": {
-          "$ref": "#/definitions/apiChannel"
-        },
-        "uuid": {
-          "type": "string",
-          "title": "[optional] !uuid ? channel.uuid : uuid"
-        }
-      }
-    },
-    "apiCaller": {
-      "type": "object",
-      "title": "The Caller profile",
-      "properties": {
-        "ANI": {
-          "type": "string",
-          "title": "[optional] [A]utomatic[N]umber[I]dentification"
-        },
-        "answered_at": {
-          "type": "string",
-          "format": "uint64",
-          "title": "[optional]"
-        },
-        "bridged_at": {
-          "type": "string",
-          "format": "uint64",
-          "title": "[optional]"
-        },
-        "callee": {
-          "title": "[optional] leg[B] display",
-          "$ref": "#/definitions/apiCallerId"
-        },
-        "caller": {
-          "title": "[required] leg[A] display; at least is the same as origin",
-          "$ref": "#/definitions/apiCallerId"
-        },
-        "commutation": {
-          "description": "[optional] 'originator' | 'originatee' FIXME: 'bridge' ?",
-          "type": "string",
-          "title": "Other-Leg: oneof below or nothing"
-        },
-        "created_at": {
-          "description": "[required] !",
-          "type": "string",
-          "format": "uint64",
-          "title": "Timing of stages"
-        },
-        "destination": {
-          "type": "string",
-          "title": "[required] [To]: in most cases this is the number"
-        },
-        "direction": {
-          "description": "[required] inbound | outbound",
-          "type": "string",
-          "title": "To:"
-        },
-        "hangup_at": {
-          "type": "string",
-          "format": "uint64",
-          "title": "[optional] unlil hangup state reached"
-        },
-        "onhold_at": {
-          "type": "string",
-          "format": "uint64",
-          "title": "[optional] last 'hold' at time"
-        },
-        "onhold_ms": {
-          "type": "string",
-          "format": "uint64",
-          "title": "[optional] 'hold' time accumulated"
-        },
-        "origin": {
-          "description": "[optional] [From]: source",
-          "title": "From:",
-          "$ref": "#/definitions/apiCallerId"
-        },
-        "originatee": {
-          "title": "defines::leg[B]; thisis:leg[A]",
-          "$ref": "#/definitions/apiCaller"
-        },
-        "originator": {
-          "title": "defines::leg[A]; thisis:leg[B]",
-          "$ref": "#/definitions/apiCaller"
-        },
-        "progress_at": {
-          "type": "string",
-          "format": "uint64",
-          "title": "[optional]"
-        },
-        "progress_media_at": {
-          "type": "string",
-          "format": "uint64",
-          "title": "[optional]"
-        },
-        "proto": {
-          "type": "string",
-          "title": "[required] protocol; channel source: sip|sips|webrtc"
-        },
-        "transferred": {
-          "type": "string",
-          "title": "[optional] transfer source"
-        },
-        "uuid": {
-          "type": "string",
-          "title": "[required] unique_id (channel.uuid)"
-        }
-      }
-    },
-    "apiCallerId": {
-      "description": "CallerId display value.",
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "number": {
-          "type": "string"
-        }
-      }
-    },
-    "apiCertificate": {
-      "type": "object",
-      "properties": {
-        "domains": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
-        "license": {
-          "type": "array",
-          "title": "grants issued",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/apiLicense"
-          }
-        },
-        "next_update": {
-          "type": "string",
-          "format": "int64",
-          "title": "unix: signature expires; update required"
-        },
-        "serial": {
-          "type": "string",
-          "title": "serial number assigned (global::Customer-ID)"
-        },
-        "this_update": {
-          "type": "string",
-          "format": "int64",
-          "title": "unix: issuer signed at"
-        },
-        "valid": {
-          "type": "boolean",
-          "title": "validation status"
-        },
-        "validity": {
-          "title": "int32 competitive = 4; // zero-based competitive sessions limit ?",
-          "$ref": "#/definitions/apiValidity"
-        },
-        "version": {
-          "type": "string",
-          "title": "version"
-        }
-      }
-    },
-    "apiCertificateUsageResponse": {
-      "type": "object",
-      "properties": {
-        "certificate": {
-          "title": "detailed",
-          "$ref": "#/definitions/apiCertificate"
-        }
-      }
-    },
-    "apiChannel": {
-      "type": "object",
-      "properties": {
-        "active": {
-          "type": "string",
-          "title": "[optional] answer_state"
-        },
-        "direction": {
-          "type": "string",
-          "title": "[required] inbound | outbound"
-        },
-        "hangup": {
-          "type": "string",
-          "title": "[optional] hangup_cause"
-        },
-        "profile": {
-          "title": "[required] profile in front of this channel",
-          "$ref": "#/definitions/apiCaller"
-        },
-        "proto": {
-          "type": "string",
-          "title": "[required] source; protocol"
-        },
-        "state": {
-          "type": "string",
-          "title": "[required] call_state"
-        },
-        "uuid": {
-          "type": "string",
-          "title": "[required] unique_id"
         }
       }
     },
@@ -41398,33 +40920,6 @@
         }
       }
     },
-    "apiErrorResponse": {
-      "type": "object",
-      "properties": {
-        "error": {
-          "type": "string"
-        },
-        "error_description": {
-          "type": "string"
-        },
-        "error_uri": {
-          "type": "string"
-        },
-        "state": {
-          "type": "string",
-          "title": "---------------------------------------------------------------------\n HTTP/1.1 302 Found\n  Location: https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA\n  \u0026state=xyz"
-        }
-      }
-    },
-    "apiGenerateTfaKeysForNecessaryUsersResponse": {
-      "type": "object",
-      "properties": {
-        "affected": {
-          "type": "string",
-          "format": "int64"
-        }
-      }
-    },
     "apiGenerateUserTfaKeyResponse": {
       "type": "object",
       "properties": {
@@ -41438,6 +40933,17 @@
       "properties": {
         "customer": {
           "$ref": "#/definitions/apiCustomer"
+        }
+      }
+    },
+    "apiGetPasswordSettingsResponse": {
+      "type": "object",
+      "properties": {
+        "settings": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
         }
       }
     },
@@ -41466,15 +40972,6 @@
           "$ref": "#/definitions/apiObjectId"
         }
       }
-    },
-    "apiGrantAccessResponse": {
-      "type": "object"
-    },
-    "apiGrantCertificateResponse": {
-      "type": "object"
-    },
-    "apiGrantRoleResponse": {
-      "type": "object"
     },
     "apiLDAPCatalog": {
       "type": "object",
@@ -41944,38 +41441,6 @@
         }
       }
     },
-    "apiLicense": {
-      "type": "object",
-      "properties": {
-        "competitive": {
-          "type": "boolean"
-        },
-        "limit": {
-          "type": "integer",
-          "format": "int64",
-          "title": "required: limit count (maximum allowed usage quantity)"
-        },
-        "scope": {
-          "type": "string",
-          "title": "mandatory privilege codename, e.g.: DEVICE, MANAGER, OPERATOR"
-        },
-        "serial": {
-          "type": "string",
-          "title": "serial number assigned (global::License-ID)"
-        },
-        "users": {
-          "type": "object",
-          "title": "users.id (grantees)",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
-        "validity": {
-          "title": "optional",
-          "$ref": "#/definitions/apiValidity"
-        }
-      }
-    },
     "apiLicenseUsageResponse": {
       "type": "object",
       "properties": {
@@ -42112,18 +41577,6 @@
         }
       }
     },
-    "apiListAccessResponse": {
-      "type": "object",
-      "properties": {
-        "list": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/AccessGrant"
-          }
-        }
-      }
-    },
     "apiListAccessResponseV1": {
       "type": "object",
       "properties": {
@@ -42188,9 +41641,6 @@
           }
         }
       }
-    },
-    "apiLogoutResponse": {
-      "type": "object"
     },
     "apiLogoutUserResponse": {
       "type": "object"
@@ -42581,14 +42031,6 @@
         }
       }
     },
-    "apiReadSessionResponse": {
-      "type": "object",
-      "properties": {
-        "session": {
-          "$ref": "#/definitions/apiSession"
-        }
-      }
-    },
     "apiReadUserResponse": {
       "type": "object",
       "properties": {
@@ -42642,15 +42084,6 @@
           "type": "string"
         }
       }
-    },
-    "apiRevokeAccessResponse": {
-      "type": "object"
-    },
-    "apiRevokeCertificateResponse": {
-      "type": "object"
-    },
-    "apiRevokeRoleResponse": {
-      "type": "object"
     },
     "apiRole": {
       "type": "object",
@@ -42741,18 +42174,6 @@
         }
       }
     },
-    "apiRoleMembersResponse": {
-      "type": "object",
-      "properties": {
-        "results": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/RoleMember"
-          }
-        }
-      }
-    },
     "apiRoleMetadataResponse": {
       "type": "object",
       "properties": {
@@ -42762,30 +42183,6 @@
         },
         "value": {
           "title": "Metadata value"
-        }
-      }
-    },
-    "apiSearchCallsResponse": {
-      "type": "object",
-      "properties": {
-        "list": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/apiCall"
-          }
-        }
-      }
-    },
-    "apiSearchCertificatesResponse": {
-      "type": "object",
-      "properties": {
-        "certificates": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/apiCertificate"
-          }
         }
       }
     },
@@ -42952,28 +42349,6 @@
         }
       }
     },
-    "apiSearchSessionsResponse": {
-      "type": "object",
-      "properties": {
-        "items": {
-          "type": "array",
-          "title": "results",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/apiSession"
-          }
-        },
-        "next": {
-          "type": "boolean",
-          "title": "result: has {next} page ?"
-        },
-        "page": {
-          "type": "integer",
-          "format": "int32",
-          "title": "result: {page} number"
-        }
-      }
-    },
     "apiSearchUsersRequest": {
       "type": "object",
       "properties": {
@@ -43091,70 +42466,6 @@
         }
       }
     },
-    "apiSession": {
-      "type": "object",
-      "properties": {
-        "accessed_at": {
-          "type": "string",
-          "format": "int64",
-          "title": "unix: last seen"
-        },
-        "created_at": {
-          "type": "string",
-          "format": "int64",
-          "title": "unix"
-        },
-        "dc": {
-          "type": "string",
-          "format": "int64",
-          "title": "current domain.dc component"
-        },
-        "domain": {
-          "type": "string",
-          "title": "session domain.name"
-        },
-        "expires_at": {
-          "type": "string",
-          "format": "int64",
-          "title": "unix"
-        },
-        "id": {
-          "type": "string",
-          "title": "session key"
-        },
-        "network_ip": {
-          "type": "string",
-          "title": "remote IP address; assigned while authorization"
-        },
-        "roles": {
-          "type": "array",
-          "title": "group.name(s)",
-          "items": {
-            "type": "string"
-          }
-        },
-        "scope": {
-          "type": "array",
-          "title": "permission.name(s)",
-          "items": {
-            "type": "string"
-          }
-        },
-        "user_agent": {
-          "type": "string",
-          "title": "remote User-Agent; assigned while authorization"
-        },
-        "user_id": {
-          "type": "string",
-          "format": "int64",
-          "title": "current user.id"
-        },
-        "username": {
-          "type": "string",
-          "title": "session user-friendly role name"
-        }
-      }
-    },
     "apiSetStatusRequest": {
       "type": "object",
       "properties": {
@@ -43221,20 +42532,6 @@
         }
       }
     },
-    "apiUpdateAccessResponse": {
-      "type": "object",
-      "properties": {
-        "granted": {
-          "type": "string",
-          "format": "int64",
-          "title": "Affected rules count"
-        },
-        "revoked": {
-          "type": "string",
-          "format": "int64"
-        }
-      }
-    },
     "apiUpdateAccessResponseV1": {
       "type": "object",
       "properties": {
@@ -43246,15 +42543,6 @@
         "revoked": {
           "type": "string",
           "format": "int64"
-        }
-      }
-    },
-    "apiUpdateCertificateResponse": {
-      "type": "object",
-      "properties": {
-        "certificate": {
-          "title": "detailed",
-          "$ref": "#/definitions/apiCertificate"
         }
       }
     },
@@ -43680,21 +42968,6 @@
         "username": {
           "type": "string",
           "title": "session end-user login"
-        }
-      }
-    },
-    "apiValidity": {
-      "type": "object",
-      "properties": {
-        "not_after": {
-          "type": "string",
-          "format": "int64",
-          "title": "unix"
-        },
-        "not_before": {
-          "type": "string",
-          "format": "int64",
-          "title": "unix"
         }
       }
     },
@@ -44753,26 +44026,6 @@
         }
       }
     },
-    "contactsImageSize": {
-      "type": "object",
-      "properties": {
-        "height": {
-          "type": "integer",
-          "format": "int32",
-          "title": "Image height"
-        },
-        "size": {
-          "type": "integer",
-          "format": "int32",
-          "title": "Size in bytes"
-        },
-        "width": {
-          "type": "integer",
-          "format": "int32",
-          "title": "Image width"
-        }
-      }
-    },
     "contactsInputComment": {
       "type": "object",
       "required": [
@@ -45524,83 +44777,6 @@
         }
       }
     },
-    "contactsMediaAttribute": {
-      "type": "object",
-      "properties": {
-        "audio": {
-          "$ref": "#/definitions/MediaAttributeAudio"
-        },
-        "filename": {
-          "type": "string"
-        },
-        "image": {
-          "$ref": "#/definitions/MediaAttributeImage"
-        },
-        "video": {
-          "$ref": "#/definitions/MediaAttributeVideo"
-        }
-      }
-    },
-    "contactsMediaFile": {
-      "type": "object",
-      "properties": {
-        "data": {
-          "type": "string",
-          "format": "byte",
-          "title": "Binary content"
-        },
-        "date": {
-          "type": "string",
-          "format": "int64",
-          "title": "Creation date; timestamp(milli)"
-        },
-        "hash": {
-          "description": "md5, sha256, ..",
-          "type": "object",
-          "title": "Check sum, dependent on unique ID",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
-        "id": {
-          "type": "string",
-          "title": "File unique ID"
-        },
-        "meta": {
-          "type": "array",
-          "title": "File attributes metadata",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/contactsMediaAttribute"
-          }
-        },
-        "size": {
-          "type": "integer",
-          "format": "int64",
-          "title": "Size in bytes"
-        },
-        "thumb": {
-          "type": "array",
-          "title": "Thumbnails",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/contactsImageSize"
-          }
-        },
-        "type": {
-          "type": "string",
-          "title": "MIME type"
-        },
-        "video_thumb": {
-          "type": "array",
-          "title": "Video Thumbnails",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/contactsVideoSize"
-          }
-        }
-      }
-    },
     "contactsName": {
       "description": "A contact's name.\nIf the name is a mononym, the family name is empty.\n\nInspired:\nhttps://openid.net/specs/openid-connect-core-1_0.html#StandardClaims\nhttps://developers.google.com/people/api/rest/v1/people#name",
       "type": "object",
@@ -45899,19 +45075,6 @@
         }
       }
     },
-    "contactsUploadMediaResponse": {
-      "type": "object",
-      "properties": {
-        "data": {
-          "title": "PROGRESS",
-          "$ref": "#/definitions/UploadMediaResponseProgress"
-        },
-        "file": {
-          "title": "START|COMPLETE",
-          "$ref": "#/definitions/contactsMediaFile"
-        }
-      }
-    },
     "contactsVariable": {
       "description": "The Contact's variable.\nArbitrary data that is populated by users or clients.\nDuplicate keys and values are allowed.",
       "type": "object",
@@ -46051,32 +45214,6 @@
         ],
         "next": true,
         "page": 1
-      }
-    },
-    "contactsVideoSize": {
-      "type": "object",
-      "title": "Animated profile picture in MPEG4 format",
-      "properties": {
-        "height": {
-          "type": "integer",
-          "format": "int64",
-          "title": "Video height"
-        },
-        "size": {
-          "type": "integer",
-          "format": "int64",
-          "title": "File size in bytes"
-        },
-        "start_ts": {
-          "type": "integer",
-          "format": "int64",
-          "title": "Timestamp that should be shown as static preview to the user (seconds)"
-        },
-        "width": {
-          "type": "integer",
-          "format": "int64",
-          "title": "Video width"
-        }
       }
     },
     "dataDataset": {
