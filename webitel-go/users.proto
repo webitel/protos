@@ -9,6 +9,7 @@ import "presence.proto";
 import "customers.proto";
 import "permission.proto";
 import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
 
 service Users {
 
@@ -60,6 +61,12 @@ service Users {
         option (google.api.http) = {
             put: "/users/password"  // For expired password using username
             body: "*"
+        };
+    }
+
+    rpc ReadPasswordSettings(GetPasswordSettingsRequest) returns (GetPasswordSettingsResponse) {
+        option (google.api.http) = {
+            get: "/users/password"  // Get password validation settings
         };
     }
 
@@ -219,6 +226,16 @@ message UpdatePasswordRequest {
 }
 
 message UpdatePasswordResponse {
+}
+
+message GetPasswordSettingsRequest {
+    string password = 1;
+    string username = 2;
+    string domain = 3;
+}
+
+message GetPasswordSettingsResponse {
+    map<string, string> settings = 1;
 }
 
 
