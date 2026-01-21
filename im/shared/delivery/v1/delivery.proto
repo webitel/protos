@@ -97,9 +97,9 @@ message ThreadMessage {
     string thread_id = 2;
     Peer from = 3;
     Peer to = 4;
-
+    
     int64 created_at = 5;
-    int64 updated_at = 6;
+    int64 edited_at  = 6;
     string text = 7;
     MessageType type = 8;
     oneof content {
@@ -108,19 +108,22 @@ message ThreadMessage {
     }
 }
 
-// Represents a peer in the messaging system.
-// It can be a user, chat, or channel.
+message Identity {
+  string issuer = 1;
+  string name = 2;
+}
+
 message Peer {
+  // Addressing: mandatory routing identifiers
   oneof kind {
-    // User identifier [direct thread]
     string user_id    = 1;
-    // Chat group Id [group thread]
     string chat_id    = 2;
-    // Channel Id [channel thread]
     string channel_id = 3;
-    // bot Id [bot thread]
     string bot_id     = 4;
   }
+
+  // Identity: enriched user data
+  Identity identity = 10;
 }
 
 
