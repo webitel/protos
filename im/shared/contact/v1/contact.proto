@@ -21,29 +21,38 @@ message SearchContactRequest {
   repeated string type = 8;
   repeated string ids = 9;
   repeated string subjects = 10;
+  int32 domain_id = 11 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int32.gt = 0
+  ];
 }
 
 message CreateContactRequest {
   // Issuer of the Contact
   string iss_id = 1 [(buf.validate.field).required = true];
-  string app_id = 3 [(buf.validate.field).required = true];
+  string app_id = 2 [(buf.validate.field).required = true];
 
   // Type of the Contact
-  string type = 4 [(buf.validate.field).required = true];
+  string type = 3 [(buf.validate.field).required = true];
 
   // Display name
-  string name = 5;
+  string name = 4;
   // Username unique inside issuer
-  string username = 6
+  string username = 5
   [
     (buf.validate.field).string.min_len = 1,
     (buf.validate.field).required = true
   ];
   // Optional metadata
-  map<string, string> metadata = 7;
-  string subject = 8 [
+  map<string, string> metadata = 6;
+  string subject = 7 [
     (buf.validate.field).string.min_len = 1,
     (buf.validate.field).required = true
+  ];
+
+  int32 domain_id = 8 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int32.gt = 0
   ];
 }
 
@@ -63,11 +72,20 @@ message UpdateContactRequest {
   string subject = 5 [
     (buf.validate.field).string.min_len = 1
   ];
+
+  int32 domain_id = 6 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int32.gt = 0
+  ];
 }
 
 
 message DeleteContactRequest {
   string id = 1 [(buf.validate.field).string.uuid = true];
+  int32 domain_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int32.gt = 0
+  ];
 }
 
 message CanSendRequest {
@@ -105,17 +123,22 @@ message ContactList {
 message Contact {
   string id = 1;
   string iss_id = 2;
-  string app_id = 4;
-  string type = 5;
+  string app_id = 3;
+  string type = 4;
 
-  string name = 6;
-  string username = 7;
-  map<string, string> metadata = 8;
+  string name = 5;
+  string username = 6;
+  map<string, string> metadata = 7;
 
-  int64 created_at = 9;
+  int64 created_at = 8;
 
-  int64 updated_at = 10;
-  string subject = 11;
+  int64 updated_at = 9;
+  string subject = 10;
+
+  int32 domain_id = 11 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int32.gt = 0
+  ];
 }
 
 
