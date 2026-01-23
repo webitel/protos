@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+
+package webitel.im.shared.gateway.v1;
+
+option go_package = "github.com/webitel/im-gateway-service/gen/api/v1;impb";
+
+
+
+service ContactService {
+  rpc SearchContact(SearchContactRequest) returns (ContactList);
+}
+
+
+message SearchContactRequest {
+  int32 page = 1;
+  int32 size = 2;
+  string q = 3;
+
+  string sort = 4;
+  repeated string fields = 5;
+
+  repeated string type = 8;
+  repeated string subjects = 10;
+}
+
+
+
+message ContactList {
+  int32 page = 1;
+  int32 size = 2;
+  bool next = 3;
+  repeated Contact contacts = 4;
+}
+
+
+
+message Contact {
+  string iss_id = 2;
+  string app_id = 3;
+  string type = 4;
+
+  string name = 5;
+  string username = 6;
+  map<string, string> metadata = 7;
+
+  int64 created_at = 8;
+
+  int64 updated_at = 9;
+  string subject = 10;
+}
+
+
+
+
