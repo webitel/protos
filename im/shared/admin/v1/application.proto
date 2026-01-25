@@ -15,48 +15,49 @@ option go_package = "github.com/webitel/messaging/proto/gen/webitel/messaging/ad
 
 // Application (Access) Configuration.
 message Application {
-  // int64 dc = 0;
+  // Business [Domain] Account ID
+  int64 dc = 1;
 
-  // Application [client_id]
-  string id = 1;
+  // Application [client_id] identifier
+  string id = 2;
   
   // // OPTIONAL. Icon image that references a logo for the Application.
-  // webitel.im.internal.v1.Image logo = 2;
+  // webitel.im.internal.v1.Image logo = 3;
   
   // Application name to be presented to the End-User
-  string name = 2;
+  string name = 4;
   // OPTIONAL. Short description
-  string about = 3;
+  string about = 5;
 
   // // OPTIONAL. Application [client_secret]
   // string secret = 5;
 
   // Revocation status
-  Revocation block = 4;
+  Revocation block = 6;
 
   // Inbound. Application Client(s) Authorization
-  ClientApp client = 5;
+  ClientApp client = 7;
 
   // Outbound. Application Service(s) Configuration
-  ServiceApp service = 6;
+  ServiceApp service = 8;
 
   // Optional. Service User (Bot) account declaration
   // Grants ability to participate in messaging service as User (external Bot) !?.
-  Account account = 7;
+  Account account = 9;
 
   // Optional. Defines special rules for Contacts list selection (I/O).
-  ContactApp contacts = 8;
+  ContactApp contacts = 10;
 
 }
 
 // Application Service Configuration
 message ServiceApp {
 
-  // OPTIONAL. Application [client_secret]
+  // OPTIONAL. Application [client_secret] issued
   string secret = 1;
 
-  // API Rate-Limit(s)
-  Limiter rate_limit = 2;
+  // API Rate-Limit(s) configuration
+  RateLimiter rate_limits = 2;
 
   // [Updates] Handler subscription.
   // Server-to-Server (Webhook) communication.
@@ -127,6 +128,6 @@ message GrpcServiceSubscription {
 message Revocation {
   // Revocation Date
   int64 date = 1;
-  // The reason. Optional
+  // OPTIONAL. The reason
   google.rpc.Status reason = 2;
 }

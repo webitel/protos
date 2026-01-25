@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package webitel.im.internal.auth.v1;
+
+option go_package = "github.com/webitel/messaging/proto/gen/webitel/messaging/auth/v1;adpb";
+
+import "internal/auth/v1/device.proto";
+import "google/protobuf/wrappers.proto";
+import "internal/auth/v1/identity.proto";
+import "internal/auth/v1/oauth.proto";
+import "internal/auth/v1/contact.proto";
+
+// Authorization. Session
+// https://core.telegram.org/constructor/authorization
+message Authorization {
+
+  // Business (Domain) Account ID
+  int64 dc = 1;
+  // Session (internal) identifier
+  string id = 2;
+  // When was the session created
+  int64 date = 3;
+  // Session (device) display name.
+  string name = 4;
+  // Application [client_id] ; VIA
+  string app_id = 5;
+  // Last known (User-Agent) device ; FROM
+  Device device = 6;
+  // Authorized end-user Contact info
+  Contact contact = 7;
+  // OPTIONAL. Grant of an [access_token] for this session Authorization
+  AccessToken token = 8;
+  // Whether this is the current session
+  bool current = 9;
+}
+
+message GetAuthorizationRequest {
+
+  // Page number. Offset previous pages
+  int32 page = 1;
+  // Size number. Limit records per page
+  int32 size = 2;
+
+  // Filter (and) SET
+
+  int64 dc = 10; // business.(domain).id
+  string id = 11; // authorization.(session).id
+  string app_id = 12; // client.(app).id
+  string device_id = 13; // client.(device).id
+  InputContactId contact = 14; // account.(user).id
+
+  google.protobuf.BoolValue push = 15; // [ONLY] With PUSH registration ?
+}
+
+message AuthorizationList {
+  // List of Session(s).
+  repeated Authorization data = 1;
+  // // List of Device(s), mentioned in sessions
+  // repeated Device devices = 2;
+  // repeated Application apps = 3;
+  
+  // Current page number.
+  int32 page = 5;
+  // Has more results ?
+  bool next = 6;
+}
