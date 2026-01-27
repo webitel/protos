@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package webitel.im.gateway.v1;
+
+// Use a descriptive alias for the Go package to avoid naming collisions
+option go_package = "github.com/webitel/im-gateway-service/gen/api/v1;gateway";
+
+// Contacts provides an interface to manage and search external chat profiles
+// integrated into the Webitel ecosystem (e.g., Telegram, Viber, WebChat).
+service Contacts {
+  // Search retrieves a paginated list of contacts based on filters and search queries.
+  rpc Search(SearchRequest) returns (SearchList);
+}
+
+// SearchRequest defines filters and pagination parameters for the contact lookup.
+message SearchRequest {
+  // --- Pagination & Sorting ---
+  
+  // Page number to retrieve (starts from 1).
+  int32 page = 1;
+  // Number of items per page.
+  int32 size = 2;
+  // Sorting criteria (e.g., "name" or "-created_at").
+  string sort = 4;
+  // List of specific fields to include in the response. If empty, all fields are returned.
+  repeated string fields = 5;
+
+  // --- Filtering ---
+  
+  // Full-text search query (matches against name or username).
+  string q = 3;
+  // Filter by channel types (e.g., ["telegram", "viber"]).
+  repeated string type = 8;
+  // Filter by internal system subjects/user IDs.
+  repeated string subjects = 10;
+}
+
+// SearchList represents a paginated collection of Contact entities.
+message SearchList {
+  // Current page number.
+  int32 page = 1;
+  // Number of items returned in this batch.
+  int32 size = 2;
+  // Indicates if there are more pages available.
+  bool next = 3;
+  // List of contacts found.
+  repeated Contact items = 4;
+}
+
+// Contact represents an external messaging identity.
+message Contact {
+  // Provider-specific unique identifier (Issuer ID).
+  string iss_id = 2;
+  // Identifier of the specific integration app or bot.
+  string app_id = 3;
+  // Channel type (e.g., 'webchat', 'telegram').
+  string type = 4;
+
+  // Display name of the contact.
+  string name = 5;
+  // Technical username or handle.
+  string username = 6;
+  // Additional dynamic attributes provided by the messenger.
+  map<string, string> metadata = 7;
+
+  // Record creation timestamp (Unix Epoch in milliseconds).
+  int64 created_at = 8;
+  // Last record update timestamp (Unix Epoch in milliseconds).
+  int64 updated_at = 9;
+  // Associated internal system subject/identifier.
+  string subject = 10;
+}

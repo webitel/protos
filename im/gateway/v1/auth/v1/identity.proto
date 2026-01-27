@@ -1,133 +1,16 @@
 syntax = "proto3";
 
-package webitel.im.internal.auth.v1;
+package webitel.im.gateway.auth.v1;
 
 option go_package = "github.com/webitel/messaging/proto/gen/webitel/messaging/auth/v1;adpb";
 
 // import "internal/auth/v1/contact.proto";
 import "google/protobuf/struct.proto";
 
-// Contact (End-User) profile at the Issuer.
+// Identity (IdToken) of the Contact at the Issuer.
 // https://openid.net/specs/openid-connect-core-1_0.html#Claims
-message Contact {
+message Identity {
 
-  // [IM] Service (Business) Account ID.
-  int64 dc = 1;
-
-  // [IM] Service (Provider) Account ID.
-  string id = 2;
-
-  // REQUIRED. Issuer Identifier for the Issuer of the response.
-  // The iss value is a case sensitive URL using the https scheme that contains scheme, host,
-  // and optionally, port number and path components and no query or fragment components.
-  string iss = 3;
-  // REQUIRED. Subject Identifier.
-  // A locally unique and never reassigned identifier within the Issuer for the End-User,
-  // which is intended to be consumed by the Client, e.g., 24400320 or AItOawmwtWwcT0k51BayewNvutrJUqsvl6qs7A4.
-  // It MUST NOT exceed 255 ASCII characters in length.
-  // The sub value is a case sensitive string.
-  string sub = 4;
-
-  // READONLY. Application [client_id] that first registered this Contact.
-  string app = 5;
-
-  // OPTIONAL. Well-known [issuer] protocol [alias] name.
-  // if unsepcified - [iss] value is used by default.
-  // 
-  // For example: An issuer could be a client application configured for native "Text Gateway(s)" service.
-  // It could provide various types of contacts (users) depending on the account for which the webhook update been received.
-  //
-  // { iss:webitel.messaging.v1.gate, sub:576404592 type:telegram }
-  // { iss:webitel.messaging.v1.gate, sub:17841456370441444 type:instagram }
-  // { iss:webitel.messaging.v1.gate, sub:6JX8OdQsPgTlAR/2ftnV/Q== type:viber }
-  string type = 6;
-
-  // REQUIRED. End-User's full name in displayable form including all name parts,
-  // possibly including titles and suffixes, ordered according to the End-User's locale and preferences.
-  string name = 10;
-  // Given name(s) or first name(s) of the End-User.
-  // Note that in some cultures, people can have multiple given names;
-  // all can be present, with the names being separated by space characters.
-  string given_name = 11;
-  // Middle name(s) of the End-User.
-  // Note that in some cultures, people can have multiple middle names;
-  // all can be present, with the names being separated by space characters.
-  // Also note that in some cultures, middle names are not used.
-  string middle_name = 12;
-  // Surname(s) or last name(s) of the End-User.
-  // Note that in some cultures, people can have multiple family names or no family name;
-  // all can be present, with the names being separated by space characters.
-  string family_name = 13;
-
-  // [preferred_username]. Mention
-  string username = 15;
-  // OPTIONAL. End-User's birthday, represented as an ISO 8601:2004 [ISO8601‑2004] YYYY-MM-DD format.
-  // The year MAY be 0000, indicating that it is omitted.
-  // To represent only the year, YYYY format is allowed.
-  string birthdate = 20;
-  // OPTIONAL. String from zoneinfo [zoneinfo] time zone database representing the End-User's time zone.
-  // For example, Europe/Kyiv or America/Los_Angeles.
-  string zoneinfo = 21;
-  // OPTIONAL. URL of the End-User's profile page.
-  // The contents of this Web page SHOULD be about the End-User.
-  // NOTE: Issuer SP (IdP) related URL.
-  string profile = 22;
-  // OPTIONAL. URL of the End-User's profile picture.
-  // This URL MUST refer to an image file
-  // (for example, a PNG, JPEG, or GIF image file),
-  // rather than to a Web page containing an image.
-  string picture = 23;
-  // OPTIONAL. End-User's gender.
-  // Values defined by this specification are `female` and `male`.
-  // Other values MAY be used when neither of the defined values are applicable.
-  string gender = 24;
-  // End-User's locale, represented as a BCP47 [RFC5646] language tag.
-  // This is typically an ISO 639-1 Alpha-2 [ISO639‑1] language code in lowercase
-  // and an ISO 3166-1 Alpha-2 [ISO3166‑1] country code in uppercase,
-  // separated by a dash. For example, `en-US` or `uk-UA`.
-  string locale = 25;
-  // End-User's preferred e-mail address.
-  // Its value MUST conform to the RFC 5322 [RFC5322] addr-spec syntax.
-  // The RP MUST NOT rely upon this value being unique, as discussed in Section 5.7.
-  string email = 30;
-  // True if the End-User's e-mail address has been verified; otherwise false.
-  bool email_verified = 31;
-  // End-User's preferred telephone number.
-  // E.164 is RECOMMENDED as the format of this Claim, for example, +1 (425) 555-1212 or +56 (2) 687 2400.
-  // If the phone number contains an extension, it is RECOMMENDED that
-  // the extension be represented using the RFC 3966 [RFC3966] extension syntax, for example, +1 (604) 555-1234;ext=5678.
-  string phone_number = 32;
-  // True if the End-User's phone number has been verified; otherwise false.
-  bool phone_number_verified = 33;
-
-  // End-User's extra attributes (claims) metadata.
-  google.protobuf.Struct metadata = 40;
-
-  // // Additional source(s) associated with given "identity".
-  // // Used to merge two or more well-known end-user subjects.
-  // repeated SourceId sources = 25;
-
-  // Time the End-User's information was last updated.
-  // Its value is a JSON number representing the number of seconds from 1970-01-01T0:0:0Z as measured in UTC until the date/time.
-  int64 created_at = 50;
-  int64 updated_at = 51;
-  int64 deleted_at = 52;
-}
-
-// InputContactId: Reference to Contact by ID or SourceId
-message InputContactId {
-  // int64 dc = 1;
-  oneof input {
-    // Contact by (internal) identifier
-    string id = 1;
-    // Contact by (external) resource
-    // Composite key: ( sub @ iss )
-    SourceId source = 2;
-  }
-}
-
-// Composite Reference Key ; Issuer + Subject
-message SourceId {
   // REQUIRED. Issuer Identifier for the Issuer of the response.
   // The iss value is a case sensitive URL using the https scheme that contains scheme, host,
   // and optionally, port number and path components and no query or fragment components.
@@ -138,4 +21,83 @@ message SourceId {
   // It MUST NOT exceed 255 ASCII characters in length.
   // The sub value is a case sensitive string.
   string sub = 2;
+
+  // // OPTIONAL. Well-known [issuer] protocol [alias] name.
+  // // if unsepcified - [iss] value is used.
+  // // 
+  // // For example: An issuer could be a client application configured for native "Text Gateway(s)" service.
+  // // It could provide various types of contacts (users) depending on the account for which the webhook update been received.
+  // //
+  // // { iss:webitel.messaging.v1.gate, sub:576404592 type:telegram }
+  // // { iss:webitel.messaging.v1.gate, sub:17841456370441444 type:instagram }
+  // // { iss:webitel.messaging.v1.gate, sub:6JX8OdQsPgTlAR/2ftnV/Q== type:viber }
+  // string type = 3;
+
+  // REQUIRED. End-User's full name in displayable form including all name parts,
+  // possibly including titles and suffixes, ordered according to the End-User's locale and preferences.
+  string name = 3;
+  // Given name(s) or first name(s) of the End-User.
+  // Note that in some cultures, people can have multiple given names;
+  // all can be present, with the names being separated by space characters.
+  string given_name = 4;
+  // Middle name(s) of the End-User.
+  // Note that in some cultures, people can have multiple middle names;
+  // all can be present, with the names being separated by space characters.
+  // Also note that in some cultures, middle names are not used.
+  string middle_name = 5;
+  // Surname(s) or last name(s) of the End-User.
+  // Note that in some cultures, people can have multiple family names or no family name;
+  // all can be present, with the names being separated by space characters.
+  string family_name = 6;
+  // OPTIONAL. End-User's birthday, represented as an ISO 8601:2004 [ISO8601‑2004] YYYY-MM-DD format.
+  // The year MAY be 0000, indicating that it is omitted.
+  // To represent only the year, YYYY format is allowed.
+  string birthdate = 7;
+  // OPTIONAL. String from zoneinfo [zoneinfo] time zone database representing the End-User's time zone.
+  // For example, Europe/Kyiv or America/Los_Angeles.
+  string zoneinfo = 8;
+  // OPTIONAL. URL of the End-User's profile page.
+  // The contents of this Web page SHOULD be about the End-User.
+  // NOTE: Issuer SP (IdP) related URL.
+  string profile = 9;
+  // OPTIONAL. URL of the End-User's profile picture.
+  // This URL MUST refer to an image file
+  // (for example, a PNG, JPEG, or GIF image file),
+  // rather than to a Web page containing an image.
+  string picture = 10;
+  // OPTIONAL. End-User's gender.
+  // Values defined by this specification are `female` and `male`.
+  // Other values MAY be used when neither of the defined values are applicable.
+  string gender = 11;
+  // End-User's locale, represented as a BCP47 [RFC5646] language tag.
+  // This is typically an ISO 639-1 Alpha-2 [ISO639‑1] language code in lowercase
+  // and an ISO 3166-1 Alpha-2 [ISO3166‑1] country code in uppercase,
+  // separated by a dash. For example, `en-US` or `uk-UA`.
+  string locale = 12;
+  // End-User's preferred e-mail address.
+  // Its value MUST conform to the RFC 5322 [RFC5322] addr-spec syntax.
+  // The RP MUST NOT rely upon this value being unique, as discussed in Section 5.7.
+  string email = 13;
+  // True if the End-User's e-mail address has been verified; otherwise false.
+  bool email_verified = 14;
+  // End-User's preferred telephone number.
+  // E.164 is RECOMMENDED as the format of this Claim, for example, +1 (425) 555-1212 or +56 (2) 687 2400.
+  // If the phone number contains an extension, it is RECOMMENDED that
+  // the extension be represented using the RFC 3966 [RFC3966] extension syntax, for example, +1 (604) 555-1234;ext=5678.
+  string phone_number = 15;
+  // True if the End-User's phone number has been verified; otherwise false.
+  bool phone_number_verified = 16;
+
+  // End-User's extra attributes (claims) metadata.
+  google.protobuf.Struct metadata = 17;
+
+  // // Additional source(s) associated with given "identity".
+  // // Used to merge two or more well-known end-user subjects.
+  // repeated SourceId sources = 25;
+
+  // // Time the End-User's information was last updated.
+  // // Its value is a JSON number representing the number of seconds from 1970-01-01T0:0:0Z as measured in UTC until the date/time.
+  // int64 created_at = 18;
+  // int64 updated_at = 19;
+  // int64 deleted_at = 20;
 }
