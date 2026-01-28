@@ -44,18 +44,21 @@ message ServerEvent {
   oneof payload {
     // Confirmation of successful stream establishment.
     ConnectedEvent connected_event = 4;
+    
+    //Notification sent before the server closes the stream.
+    DisconnectedEvent disconnected_event = 5;
 
     // A new incoming message from a chat/thread.
-    NewMessageEvent message_event = 5;
+    NewMessageEvent message_event = 6;
 
     // Acknowledgement of a previously sent message or processed action.
-    AckEvent ack_event = 6;
+    AckEvent ack_event = 7;
 
     // Notification about a stream-level or business-logic error.
-    ErrorEvent error_event = 7;
+    ErrorEvent error_event = 8;
 
     // Heartbeat signal to maintain connection and detect "half-open" sockets.
-    PingEvent ping_event = 8;
+    PingEvent ping_event = 9;
   }
 }
 
@@ -79,12 +82,28 @@ message ConnectedEvent {
   string server_version = 3;
 }
 
+
+// DisconnectedEvent is sent by the server just before forcefully closing the stream.
+message DisconnectedEvent {
+  // Human-readable explanation of why the connection is being closed.
+  string reason = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Human-readable reason for disconnection"
+    }
+  ];
+
+  // Machine-readable code to help the client decide on reconnection strategy.
+  // Examples: "SESSION_EVICTED", "SERVER_SHUTDOWN", "INACTIVITY", "AUTH_EXPIRED".
+  string code = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Machine-readable termination code"
+    }
+  ];
+}
+
 // NewMessageEvent contains a message that needs to be delivered to the client.
 message NewMessageEvent {
-  // Unique delivery identifier (can be used for client-side idempotency).
-  string id = 1;
-
-  // The actual message object with content, metadata, and sender info.
+ // The actual message object with content, metadata, and sender info.
  ThreadMessage  message = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "Message delivered via the stream",
