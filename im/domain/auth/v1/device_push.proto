@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package webitel.im.domain.auth.v1;
+
+option go_package = "github.com/webitel/messaging/proto/gen/webitel/messaging/auth/v1;adpb";
+
+// import "internal/auth/v1/webitel/messaging/admin/v1/application.proto";
+// import "internal/auth/v1/webitel/messaging/admin/v1/application_input.proto";
+
+
+// PUSH (token) Subscription
+// https://core.telegram.org/api/push-updates#subscribing-to-notifications
+message PUSHSubscription {
+
+  // Kind of PUSHSubscription device token
+  oneof token {
+
+    // // Register client's device (X-Portal-Device)
+    // // for custom (external) PUSH notification proxy service
+    // bool proxy = 3;
+
+    // [F]irebase [C]loud [M]essaging Service (firebase token for google firebase)
+    string fcm = 1;
+
+    // [A]pple [P]ush [N]otification Service (device token for apple push)
+    string apn = 2;
+
+    // // 3 - MPNS (channel URI for microsoft push)
+    // string MPNS = 3;
+
+    // // 4 - Simple push (endpoint for firefox's deprecated simple push API): note that this push type can also be used by an open source push notification spec like UnifiedPush ».
+    // // Simple push works by sending a simple PUT request with a version=number payload to the specified HTTPS endpoint every time a relevant message is received: upon receiving such a notification, clients should connect to the MTProto API and fetch updates.
+    // // (Note that the number won't necessarily be incremental in Telegram's implementation, just treat each distinct request as a signal that a new message is waiting to be fetched via MTProto).
+    // string PUSH = 4;
+    // // 5 - Ubuntu phone (token for ubuntu push)
+    // // 6 - Blackberry (token for blackberry push)
+    // // 7 - MTProto separate session
+    // // 8 - WNS (windows push)
+    // string WNS = 8;
+    // // 9 - APNS VoIP (token for apple push VoIP)
+    // // 10 - Web push (web push, see below)
+    // // 11 - MPNS VoIP (token for microsoft push VoIP)
+    // // 12 - Tizen (token for tizen push)
+
+    // For 10 web push, the token must be a JSON-encoded object with the following keys:
+    // endpoint: Absolute URL exposed by the push service where the application server can send push messages
+    // keys: P-256 elliptic curve Diffie-Hellman parameters in the following object
+    // p256dh: Base64url-encoded P-256 elliptic curve Diffie-Hellman public key
+    // auth: Base64url-encoded authentication secret
+    WebPushSubscription web = 3;
+  }
+  // For FCM and APNS VoIP, optional encryption key used to encrypt push notifications
+  bytes secret = 4;
+}
+
+// WebPUSH subscription
+message WebPushSubscription {
+
+  // endpoint: Absolute URL exposed by the push service where the application server can send push messages
+  string endpoint = 1;
+
+  // keys: P-256 elliptic curve Diffie-Hellman parameters in the following object
+  // p256dh: Base64url-encoded P-256 elliptic curve Diffie-Hellman public key
+  // auth: Base64url-encoded authentication secret
+  message Key {
+    // auth: Base64url-encoded authentication secret
+    bytes auth = 1;
+    // p256dh: Base64url-encoded P-256 elliptic curve Diffie-Hellman public key
+    bytes p256dh = 2;
+  }
+
+  // P-256 elliptic curve Diffie-Hellman parameters
+  Key key = 2;
+}
