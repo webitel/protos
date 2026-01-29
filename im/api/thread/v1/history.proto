@@ -6,93 +6,16 @@ import "google/api/annotations.proto";
 import "api/thread/v1/peer.proto";
 import "google/protobuf/any.proto";
 import "buf/validate/validate.proto";
+import "domain/thread/v1/message_history.proto";
 option go_package = "github.com/webitel/im-gateway-service/gen/api/v1;impb";
 
 // History service provides operations for retrieving and searching message history in threads.
 service History {
   // Search for messages in a thread.
-  rpc SearchThreadMessagesHistory(SearchMessageHistoryRequest) returns (SearchMessageHistoryResponse) {
+  rpc SearchThreadMessagesHistory(webitel.im.domain.thread.v1.SearchMessageHistoryRequest) returns (webitel.im.domain.thread.v1.SearchMessageHistoryResponse) {
     option (google.api.http) = {
       get: "messaging/v1/{thread_id}/messages"
     };
   }
 }
 
-message HistoryMessageCursor {
-  int64  created_at = 1;
-  string id = 2[
-    (buf.validate.field).string.uuid = true
-  ];
-  bool direction = 3;
-}
-
-message SearchMessageHistoryRequest {
-  repeated string fields = 1;
-
-  repeated string ids          = 2;
-  repeated string thread_ids   = 3;
-  repeated string sender_ids   = 4;
-  repeated string receiver_ids = 5;
-  repeated int32  types        = 6;
-
-  optional HistoryMessageCursor cursor = 7;
-  uint32                        size   = 8;
-}
-
-message DocumentDTO {
-  string id         = 1;
-  string message_id = 2;
-  int64  file_id    = 3;
-  string name       = 4;
-  string mime       = 5;
-  int64  size       = 6;
-  int64  created_at = 7;
-}
-
-message ImageDTO {
-  string id         = 1;
-  string message_id = 2;
-  int64  file_id    = 3;
-  string mime       = 4;
-  int32  width      = 5;
-  int32  height     = 6;
-  int64  created_at = 7;
-}
-
-message MessageDTO {
-  string                           id          = 1;
-  string                           thread_id   = 2;
-  string                           sender_id   = 3;
-  string                           receiver_id = 4;
-  int32                            type        = 5;
-  string                           body        = 6;
-  map<string, google.protobuf.Any> metadata    = 7;
-
-  int64 created_at = 8;
-  int64 updated_at = 9;
-
-  repeated DocumentDTO documents = 10;
-  repeated ImageDTO    images    = 11;
-}
-
-/*
- * @exclude
- * facebook cursor-based pagination example: https://stackoverflow.com/a/41475843
- */
-
-message Cursors {
-  HistoryMessageCursor after  = 1;
-  HistoryMessageCursor before = 2;
-}
-
-message Paging {
-  Cursors cursors = 1;
-}
-
-message SearchMessageHistoryResponse {
-  repeated MessageDTO  messages    = 1;
-  HistoryMessageCursor next_cursor = 2;
-  bool                 next        = 3;
-  repeated string      from        = 4;
-  Paging               paging      = 5;
-}
