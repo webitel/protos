@@ -1,51 +1,46 @@
 syntax = "proto3";
 
-package webitel.im.service.thread.v1;
+package webitel.im.api.v1;
 
 
-import "service/thread/v1/peer.proto";
 import "google/api/annotations.proto";
+import "api/v1/peer.proto";
 
-option go_package = "github.com/webitel/im-thread-service/gen/go/api/v1;impb";
+option go_package = "github.com/webitel/im-gateway-service/gen/api/v1;gateway";
 
-
-// The Message service entity provides methods for sending messages to a specified recipient [peer].
+// Messenger delivers messages from external API to the internal thread system.
 service Message {
-  // Sends a text message to a specified recipient [peer].
+  // SendText delivers a plain text message.
+  // We use the shared Request/Response types directly to avoid duplication.
   rpc SendText(SendTextRequest) returns (SendTextResponse) {
     option (google.api.http) = {
-      post: "messaging/v1/messages/text"
-      body: "*"
-    };
-  }
-  
-  // Sends a document message to a specified recipient [peer].
-  // This method sends a document message to the recipient [peer] specified in the request.
-  // The document can be uploaded as a internal file via id or provided as a URL.
-  rpc SendDocument(SendDocumentRequest) returns (SendDocumentResponse) {
-    option (google.api.http) = {
-      post: "messaging/v1/messages/file"
+      post: "/v1/messages/text"
       body: "*"
     };
   }
 
-  // Sends an image message to a specified recipient [peer].
+  // SendFile delivers documents or files.
+  rpc SendFile(SendDocumentRequest) returns (SendDocumentResponse) {
+    option (google.api.http) = {
+      post: "/v1/messages/file"
+      body: "*"
+    };
+  }
+
+  // SendImage delivers image-specific messages.
   rpc SendImage(SendImageRequest) returns (SendImageResponse) {
     option (google.api.http) = {
-      post: "messaging/v1/messages/image"
+      post: "/v1/messages/image"
       body: "*"
     };
   }
-
 }
 
 
-
+// Represents a request to send a text message.
 message SendTextRequest {
-  Peer   from        = 1;
-  Peer   to          = 2;
-  string body        = 3;
-  int64 domain_id    = 4;
+  Peer   to          = 1;
+  string body        = 2;
 }
 
 // Represents a response to send a text message.
@@ -60,32 +55,30 @@ message SendTextResponse {
 message DocumentInput {
   string id = 1;
   string url = 2;
-  string file_name = 3;
+  string file_name = 3; 
   string mime_type = 4;
   optional int64 size_bytes = 5;
 }
 
 message DocumentRequest {
   repeated DocumentInput documents = 1;
-  string body = 2;
+  string body = 2; 
 }
 
 // Represents a request to send a message with document.
 message SendDocumentRequest {
-  Peer   from        = 1;
-  Peer   to          = 2;
-  DocumentRequest document = 3;
-  int64 domain_id    = 4;
+  Peer   to                = 1;
+  DocumentRequest document = 2;
 }
 
-// Represents a response to send message with document.
+// Represents a response to send message with document. 
 message SendDocumentResponse {
   Peer to = 1;
   string id = 2;
 }
 
-// Represents `Image` entity with
-// necessary fields.
+// Represents `Image` entity with 
+// necessary fields. 
 message ImageInput {
   string id = 1;
   string name = 2;
@@ -100,10 +93,8 @@ message ImageRequest {
 
 // Represents a request to send an message with image.
 message SendImageRequest {
-  Peer   from        = 1;
-  Peer   to          = 2;
-  ImageRequest image = 3;
-  int64 domain_id    = 4;
+  Peer   to          = 1;
+  ImageRequest image = 2;
 }
 
 // Represents a response to send message with image.

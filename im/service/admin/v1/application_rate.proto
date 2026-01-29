@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package webitel.im.service.admin.v1;
+
+import "google/protobuf/wrappers.proto";
+
+option go_package = "github.com/webitel/messaging/proto/gen/webitel/messaging/admin/v1;adpb";
+
+// Limit Algorithms.
+enum LimitAlgo {
+  TOKEN_BUCKET = 0;
+  LEAKY_BUCKET = 1; // not implemented
+  FIXED_WINDOW = 2;
+  SLIDING_WINDOW = 3; // not implemented
+}
+
+// // Limit Rate of requests.
+// message LimitRate {
+//   // Number of permitted requests.
+//   int32 max = 1;
+//   // Per time interval. Window. Seconds.
+//   int32 per = 2;
+// }
+
+
+enum LimitKey {
+  // Global. Key unspecified.
+  global = 0;
+  // Remote client IP address
+  client_ip = 1;
+  // Client device associated.
+  // Same as [X-Portal-Device] header
+  client_id = 2;
+  // Internal account identifier.
+  // MAY combine several external identities.
+  account_id = 3;
+  // External identity [sub]ject-id signed-in.
+  account_sub = 4;
+}
+
+message LimitZone {
+  // string name = 0;
+  string key = 1; // [LimitKey]
+  string algo = 2; // [LimitAlgo] known: fixed_window, token_bucket
+  string rate = 3; // [LimitRate] format: "10r/s"
+
+  // Algorith specific options
+
+  google.protobuf.UInt32Value burst = 11;
+  google.protobuf.UInt32Value delay = 12;
+
+  // LimitRate rate = 2;
+  // LimitAlgo algo = 3;
+}
+
+message LimitRequest {
+  // string zone = 0;
+  // uint32 burst = 1;
+  // uint32 delay = 2;
+  google.protobuf.UInt32Value burst = 1;
+  google.protobuf.UInt32Value delay = 2;
+}
+
+// Limit Group of Zone(s) Request
+message LimitGroup {
+  // Zone(s) limit request options
+  map<string, LimitRequest> zone = 1;
+}
+
+// RateLimiter maps [path]:zone(s) group request(s) configuration limit(s)
+message RateLimiter {
+  // Zone(s) map key rate limit and strategy
+  map<string, LimitZone> zone = 1;
+  // Path associates the rate limit zone request with API endpoint
+  map<string, LimitGroup> path = 2;
+  // map<string,<map,LimitReq>> path = 2;
+}
+
+// Use to disclose current LimitRequest state
+// google.rpc.Status.Details[LimitStatus]
+//
+// https://github.com/webitel/webitel.go/blob/main/service/portal/server/RATE_LIMIT.md
+message LimitResponse {
+  // Server Date of request
+  int64 date = 1;
+  // The maximum number of requests you're permitted to make
+	int32 limit = 2;
+  // Allowed request(s). Cost of the Request. Mostly: 1.
+	int32 allowed = 3;
+  // The number of requests remaining in the current rate limit window.
+	int32 remaining = 4;
+  // DENIED. Specifies how long the user agent ought to wait before making a follow-up request.
+  // Number of seconds to wait.
+	int32 retry_after = 5;
+  // Specifies the time delay at which the rate limit window will reset.
+  // Rounded, in seconds.
+	int32 reset_after = 6;
+}

@@ -1,0 +1,194 @@
+syntax = "proto3";
+
+package webitel.im.api.v1;
+
+option go_package = "github.com/webitel/messaging/proto/gen/webitel/messaging/auth/v1;adpb";
+
+import "api/v1/identity.proto";
+
+// import "internal/auth/v1/webitel/messaging/v1/contact.proto";
+// import "internal/auth/v1/webitel/messaging/v1/user.proto";
+
+// option go_package = "github.com/webitel/messaging/proto/gen/webitel/messaging/auth/v1;authpb";
+
+// Access Token Request
+message TokenRequest {
+
+  // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+  //   // POST /portal/token
+  //   example: "{\"scope\":[\"call\",\"chat\"],\"grant_type\":\"identity\",\"response_type\":[\"token\",\"user\",\"call\",\"chat\"],\"identity\":{\"iss\":\"https://my.example.org/accounts\",\"sub\":\"j.doe\",\"name\":\"John Doe\",\"given_name\":\"John\",\"family_name\":\"Doe\",\"middle_name\":\"\",\"birthdate\":\"\",\"zoneinfo\":\"US/Arizona\",\"profile\":\"https://my.example.org/people/j.doe\",\"picture\":\"\",\"gender\":\"male\",\"locale\":\"en-US\",\"email\":\"j.doe@mx.example.org\",\"email_verified\":true,\"phone_number\":\"+1 202-555-0190\",\"phone_number_verified\":false,\"metadata\":{\"extra_var\":\"my string\",\"complex_var\":{\"array\":[73,\"str\",null,{}]}},\"sources\":[{\"sub\":\"phone:2025550190\"},{\"iss\":\"https://my.example.org/support\",\"sub\":\"m3lJ9VzG8yF6wzwQ\"}]},\"push\":{\"FCM\":\"android_client_firebase_cloud_messaging_subscription_token\"}}"
+  // };
+
+  // ------------- Authorization ------------ //
+
+  // RECOMMENDED. An opaque value used by the client to maintain
+  // state between the request and callback.  The authorization
+  // server includes this value when redirecting the user-agent back
+  // to the client.  The parameter SHOULD be used for preventing
+  // cross-site request forgery
+  string state = 1;
+
+  // OPTIONAL. The scope of the access request
+  // Posible values are:
+  // * chat ; [I]nstant [M]essaging service
+  // * call ; [V]oice[o]ver[IP] SIP service
+  repeated string scope = 2;
+
+  // The client identifier issued to the client during the registration process.
+  // REQUIRED, if the client is not authenticating with the authorization server.
+  // May be transmitted in header: [X-Webitel-Client].
+  string client_id = 3;
+  
+  // REQUIRED. The client secret. The client MAY omit the
+  // parameter if the client secret is an empty string.
+  //
+  // Including the client credentials in the request-body using the two
+  // parameters is NOT RECOMMENDED and SHOULD be limited to clients unable
+  // to directly utilize the HTTP Basic authentication scheme (or other
+  // password-based HTTP authentication schemes). The parameters can only
+  // be transmitted in the request-body and MUST NOT be included in the
+  // request URI.
+  //
+  // Keep it a secret.
+  string client_secret = 4;
+
+  // ---------------- Request ----------------- //
+
+  // // REQUIRED. Response type.
+  // // Posible values ; - [ NOT ] + supported
+  // // + token    ; Access token response
+  // // - id_token ;
+  // // Extensions
+  // // + user     ; End-User account profile
+  // // + call     ; SIP account credentials
+  // // + chat     ; IM account details
+  // repeated string response_type = 5;
+
+  // // REQUIRED. Grant type.
+  // // Posible values ; - [ NOT ] + supported
+  // // - authorization_code ; Authorization Code Grant
+  // // - client_credentials ; Client Credentials Grant !
+  // // - refresh_token      ; Refreshing an Access Token
+  // // - password           ; Resource Owner Password Credentials Grant
+  // // Extension Grants
+  // // + identity           ; Public end-User Identity Grant
+  // string grant_type = 6;
+
+  // // Authorization code grant.
+  // // REQUIRED. When [grant_type] is set to "authorization_code".
+  // string code = 7;
+
+  // // Refresh token string to obtain NEW access token.
+  // // REQUIRED. When [grant_type] is set to "refresh_token".
+  // string refresh_token = 8;
+
+  // // Identity of the end-User account association.
+  // // REQUIRED. When [grant_type] is set to "identity".
+  // Identity identity = 9;
+
+
+  // REQUIRED. Grant type.
+  // Posible values ; - [ NOT ] + supported
+  // - authorization_code ; Authorization Code Grant
+  // - client_credentials ; Client Credentials Grant
+  // - refresh_token      ; Refreshing an Access Token
+  // - password           ; Resource Owner Password Credentials Grant
+  // Extension Grants
+  // + identity           ; Public end-User Identity Grant
+  oneof grant_type {
+
+    // Authorization code grant.
+    // REQUIRED. When grant_type is set to "authorization_code".
+    string code = 5;
+    // Refresh token string to obtain NEW access token.
+    // REQUIRED. When grant_type is set to "refresh_token".
+    string refresh_token = 6;
+
+    // Identity of the end-User account association.
+    // REQUIRED. When grant_type is set to "identity".
+    Identity identity = 7;
+
+  }
+
+  // // -------------- Extensions ---------------- //
+
+  // // OPTIONAL. Sign up client device for PUSH notifications.
+  // PUSHSubscription push = 21;
+}
+
+// Access Token Response
+message AccessToken {
+
+  // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+  //   // GET /portal/token
+  //   example: "{\"expires_in\":3555,\"token_type\":\"bearer\",\"access_token\":\"LxEYRr_5YIiNnvQXgZ-y_I830xuhrSQi-EsgzbQhdIMPxScSIsiey8s1KKSoD4CP\",\"scope\":[\"call\",\"chat\"],\"user\":{\"identity\":{\"iss\":\"https://my.example.org/accounts\",\"sub\":\"j.doe\",\"name\":\"John Doe\",\"given_name\":\"John\",\"family_name\":\"Doe\",\"middle_name\":\"\",\"birthdate\":\"\",\"zoneinfo\":\"US/Arizona\",\"profile\":\"https://my.example.org/people/j.doe\",\"picture\":\"\",\"gender\":\"male\",\"locale\":\"en-US\",\"email\":\"j.doe@mx.example.org\",\"email_verified\":true,\"phone_number\":\"+1 202-555-0190\",\"phone_number_verified\":false,\"metadata\":{\"extra_var\":\"my string\",\"complex_var\":{\"array\":[73,\"str\",null,{}]}}}},\"call\":{\"proxy\":\"sip:example.org:5064;transport=udp\",\"realm\":\"demo.webitel.com\",\"user_id\":\"F3-frzuRNTOzZ2B-q2S_lQ\"},\"chat\":{\"user\":{\"id\":\"0f36b039bd0936c9a4b9d48abd6f4f15\",\"type\":\"portal\",\"name\":\"You\"}}}"
+  // };
+  
+  // REQUIRED. The type of the token issued. Value is case insensitive.
+  string token_type = 1;
+  
+  // REQUIRED. The access token issued by the authorization server.
+  string access_token = 2;
+  
+  // OPTIONAL. The refresh token, which can be used to obtain
+  // new access tokens using the same authorization grant.
+  string refresh_token = 3;
+
+  // RECOMMENDED. The lifetime in seconds of the access token.
+  int32 expires_in = 4;
+
+  // OPTIONAL, if identical to the scope requested by the client;
+  // otherwise, REQUIRED. The scope of the access token.
+  repeated string scope = 5;
+
+  // REQUIRED if the "state" parameter was present in the client
+  // authorization request. The exact value received from the client.
+  string state = 6;
+
+  // ---------------- OpenID Connect ---------------- //
+
+  // // OpenID Connect. Not supported
+  // string id_token = 11;
+
+  // ------------------ Extensions ------------------ //
+  
+  // // End-User account profile.
+  // UserProfile user = 21;
+
+  // // VoIP / SIP service credentials.
+  // CallAccount call = 22;
+  
+  // // [I]nstant [M]essaging dialog state.
+  // ChatAccount chat = 23;
+
+}
+
+message InspectRequest {
+  // [X-Webitel-Access] ;
+  // [X-Webitel-Device] ;
+  // [X-Webitel-Client] ;
+}
+
+message InspectToken {
+  
+  // RECOMMENDED. The lifetime in seconds of the access token.
+  int32 expires_in = 1;
+
+  // // Current (self) User.
+  // User user = 2;
+
+  // session
+  // device
+  // user
+
+  // List of permissions that the user has granted for the app in this access token.
+  repeated string scope = 2;
+}
+
+message LogoutRequest {
+  // X-Webitel-Access ;
+}
+
+message LogoutResponse {
+  // No Data
+}
