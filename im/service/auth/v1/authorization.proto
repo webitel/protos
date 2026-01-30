@@ -10,6 +10,26 @@ import "service/auth/v1/identity.proto";
 import "service/auth/v1/oauth.proto";
 import "google/protobuf/wrappers.proto";
 
+
+
+message GetAuthorizationRequest {
+
+  // Page number. Offset previous pages
+  int32 page = 1;
+  // Size number. Limit records per page
+  int32 size = 2;
+
+  // Filter (and) SET
+
+  int64 dc = 10; // business.(domain).id
+  string id = 11; // authorization.(session).id
+  string app_id = 12; // client.(app).id
+  string device_id = 13; // client.(device).id
+  InputContactId contact = 14; // account.(user).id
+
+  google.protobuf.BoolValue push = 15; // [ONLY] With PUSH registration ?
+}
+
 // Authorization. Session
 // https://core.telegram.org/constructor/authorization
 message Authorization {
@@ -26,7 +46,7 @@ message Authorization {
   // Last known (User-Agent) device ; FROM
   Device device = 6;
   // Authorized end-user Contact info
-  AuthContact contact = 7;
+  Contact contact = 7;
   // OPTIONAL. Grant of an [access_token] for this session Authorization
   AccessToken token = 8;
   // Whether this is the current session
