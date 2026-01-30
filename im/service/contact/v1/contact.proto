@@ -4,6 +4,7 @@ package webitel.im.service.contact.v1;
 
 import "google/protobuf/struct.proto";
 import "buf/validate/validate.proto";
+import "google/protobuf/field_mask.proto";
 
 option go_package = "github.com/webitel/im-contact-service/gen/go/api/v1;impb";
 
@@ -76,6 +77,71 @@ message UpdateContactRequest {
   int32 domain_id = 6 [
     (buf.validate.field).required = true,
     (buf.validate.field).int32.gt = 0
+  ];
+}
+
+// PatchContactRequest represents a partial update request for a Contact entity.
+// Only fields specified in the field_mask will be updated.
+//
+// Validation rules:
+// - id and domain_id are required to uniquely identify the contact.
+// - username must be non-empty when provided.
+// - field_mask must reference only mutable fields.
+// - metadata max key-value pairs = 50, value min length = 1 and max length = 1024.
+message PatchContactRequest {
+
+  // Unique identifier of the contact.
+  // Must be a valid UUID.
+  string id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  // Human-readable display name of the contact.
+  // Optional. If present in field_mask, updates the contact name.
+  string name = 2;
+
+  // Unique username of the contact within the domain.
+  // Required when included in field_mask.
+  // Must be a non-empty string.
+  string username = 3[
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+
+  // Arbitrary key-value metadata associated with the contact.
+  // Keys and values must be UTF-8 encoded strings.
+  // Existing metadata keys will be overwritten if present in field_mask.
+  map<string, string> metadata = 4 [
+    (buf.validate.field).map.max_pairs = 50,
+    (buf.validate.field).map.keys.string.min_len = 1,
+    (buf.validate.field).map.values.string.max_len = 1024
+  ];
+
+
+  // Subject or short description associated with the contact.
+  string subject = 5 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+
+  // Identifier of the domain to which the contact belongs.
+  // Must be a positive integer.
+  int32 domain_id = 6 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int32.gt = 0
+  ];
+
+  // Field mask specifying which fields should be updated.
+  // Only fields explicitly listed here will be modified.
+  //
+  // Supported paths:
+  // - "name"
+  // - "username"
+  // - "metadata"
+  // - "subject"
+  google.protobuf.FieldMask field_mask = 7[
+    (buf.validate.field).required = true
   ];
 }
 
