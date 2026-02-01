@@ -2,14 +2,57 @@ syntax = "proto3";
 
 package webitel.im.service.auth.v1;
 
-option go_package = "github.com/webitel/messaging/proto/gen/webitel/messaging/auth/v1;adpb";
-
 import "service/auth/v1/identity.proto";
 
-// import "internal/auth/v1/webitel/messaging/v1/contact.proto";
-// import "internal/auth/v1/webitel/messaging/v1/user.proto";
+option go_package = "github.com/webitel/im-account-service/proto/gen/im/service/auth/v1;authpb";
 
-// option go_package = "github.com/webitel/messaging/proto/gen/webitel/messaging/auth/v1;authpb";
+// Access Token Grant Response
+message AccessToken {
+
+  // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+  //   // GET /portal/token
+  //   example: "{\"expires_in\":3555,\"token_type\":\"bearer\",\"access_token\":\"LxEYRr_5YIiNnvQXgZ-y_I830xuhrSQi-EsgzbQhdIMPxScSIsiey8s1KKSoD4CP\",\"scope\":[\"call\",\"chat\"],\"user\":{\"identity\":{\"iss\":\"https://my.example.org/accounts\",\"sub\":\"j.doe\",\"name\":\"John Doe\",\"given_name\":\"John\",\"family_name\":\"Doe\",\"middle_name\":\"\",\"birthdate\":\"\",\"zoneinfo\":\"US/Arizona\",\"profile\":\"https://my.example.org/people/j.doe\",\"picture\":\"\",\"gender\":\"male\",\"locale\":\"en-US\",\"email\":\"j.doe@mx.example.org\",\"email_verified\":true,\"phone_number\":\"+1 202-555-0190\",\"phone_number_verified\":false,\"metadata\":{\"extra_var\":\"my string\",\"complex_var\":{\"array\":[73,\"str\",null,{}]}}}},\"call\":{\"proxy\":\"sip:example.org:5064;transport=udp\",\"realm\":\"demo.webitel.com\",\"user_id\":\"F3-frzuRNTOzZ2B-q2S_lQ\"},\"chat\":{\"user\":{\"id\":\"0f36b039bd0936c9a4b9d48abd6f4f15\",\"type\":\"portal\",\"name\":\"You\"}}}"
+  // };
+  
+  // REQUIRED. The type of the token issued. Value is case insensitive.
+  string token_type = 1;
+  
+  // REQUIRED. The access token issued by the authorization server.
+  string access_token = 2;
+  
+  // OPTIONAL. The refresh token, which can be used to obtain
+  // new access tokens using the same authorization grant.
+  string refresh_token = 3;
+
+  // RECOMMENDED. The lifetime in seconds of the access token.
+  int32 expires_in = 4;
+
+  // OPTIONAL, if identical to the scope requested by the client;
+  // otherwise, REQUIRED. The scope of the access token.
+  repeated string scope = 5;
+
+  // REQUIRED if the "state" parameter was present in the client
+  // authorization request. The exact value received from the client.
+  string state = 6;
+
+  // ---------------- OpenID Connect ---------------- //
+
+  // // OpenID Connect. Not supported
+  // string id_token = 11;
+
+  // ------------------ Extensions ------------------ //
+  
+  // // End-User account profile.
+  // UserProfile user = 21;
+
+  // // VoIP / SIP service credentials.
+  // CallAccount call = 22;
+  
+  // // [I]nstant [M]essaging dialog state.
+  // ChatAccount chat = 23;
+
+}
+
 
 // Access Token Request
 message TokenRequest {
@@ -114,81 +157,4 @@ message TokenRequest {
 
   // // OPTIONAL. Sign up client device for PUSH notifications.
   // PUSHSubscription push = 21;
-}
-
-// Access Token Response
-message AccessToken {
-
-  // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-  //   // GET /portal/token
-  //   example: "{\"expires_in\":3555,\"token_type\":\"bearer\",\"access_token\":\"LxEYRr_5YIiNnvQXgZ-y_I830xuhrSQi-EsgzbQhdIMPxScSIsiey8s1KKSoD4CP\",\"scope\":[\"call\",\"chat\"],\"user\":{\"identity\":{\"iss\":\"https://my.example.org/accounts\",\"sub\":\"j.doe\",\"name\":\"John Doe\",\"given_name\":\"John\",\"family_name\":\"Doe\",\"middle_name\":\"\",\"birthdate\":\"\",\"zoneinfo\":\"US/Arizona\",\"profile\":\"https://my.example.org/people/j.doe\",\"picture\":\"\",\"gender\":\"male\",\"locale\":\"en-US\",\"email\":\"j.doe@mx.example.org\",\"email_verified\":true,\"phone_number\":\"+1 202-555-0190\",\"phone_number_verified\":false,\"metadata\":{\"extra_var\":\"my string\",\"complex_var\":{\"array\":[73,\"str\",null,{}]}}}},\"call\":{\"proxy\":\"sip:example.org:5064;transport=udp\",\"realm\":\"demo.webitel.com\",\"user_id\":\"F3-frzuRNTOzZ2B-q2S_lQ\"},\"chat\":{\"user\":{\"id\":\"0f36b039bd0936c9a4b9d48abd6f4f15\",\"type\":\"portal\",\"name\":\"You\"}}}"
-  // };
-  
-  // REQUIRED. The type of the token issued. Value is case insensitive.
-  string token_type = 1;
-  
-  // REQUIRED. The access token issued by the authorization server.
-  string access_token = 2;
-  
-  // OPTIONAL. The refresh token, which can be used to obtain
-  // new access tokens using the same authorization grant.
-  string refresh_token = 3;
-
-  // RECOMMENDED. The lifetime in seconds of the access token.
-  int32 expires_in = 4;
-
-  // OPTIONAL, if identical to the scope requested by the client;
-  // otherwise, REQUIRED. The scope of the access token.
-  repeated string scope = 5;
-
-  // REQUIRED if the "state" parameter was present in the client
-  // authorization request. The exact value received from the client.
-  string state = 6;
-
-  // ---------------- OpenID Connect ---------------- //
-
-  // // OpenID Connect. Not supported
-  // string id_token = 11;
-
-  // ------------------ Extensions ------------------ //
-  
-  // // End-User account profile.
-  // UserProfile user = 21;
-
-  // // VoIP / SIP service credentials.
-  // CallAccount call = 22;
-  
-  // // [I]nstant [M]essaging dialog state.
-  // ChatAccount chat = 23;
-
-}
-
-message InspectRequest {
-  // [X-Webitel-Access] ;
-  // [X-Webitel-Device] ;
-  // [X-Webitel-Client] ;
-}
-
-message InspectToken {
-  
-  // RECOMMENDED. The lifetime in seconds of the access token.
-  int32 expires_in = 1;
-
-  // // Current (self) User.
-  // User user = 2;
-
-  // session
-  // device
-  // user
-
-  // List of permissions that the user has granted for the app in this access token.
-  repeated string scope = 2;
-}
-
-message LogoutRequest {
-  // X-Webitel-Access ;
-}
-
-message LogoutResponse {
-  // No Data
 }

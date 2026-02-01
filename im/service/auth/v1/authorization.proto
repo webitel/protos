@@ -2,33 +2,14 @@ syntax = "proto3";
 
 package webitel.im.service.auth.v1;
 
-option go_package = "github.com/webitel/messaging/proto/gen/webitel/messaging/auth/v1;adpb";
-
 import "service/auth/v1/contact.proto";
 import "service/auth/v1/device.proto";
 import "service/auth/v1/identity.proto";
-import "service/auth/v1/oauth.proto";
+import "service/auth/v1/token.proto";
+
 import "google/protobuf/wrappers.proto";
 
-
-
-message GetAuthorizationRequest {
-
-  // Page number. Offset previous pages
-  int32 page = 1;
-  // Size number. Limit records per page
-  int32 size = 2;
-
-  // Filter (and) SET
-
-  int64 dc = 10; // business.(domain).id
-  string id = 11; // authorization.(session).id
-  string app_id = 12; // client.(app).id
-  string device_id = 13; // client.(device).id
-  InputContactId contact = 14; // account.(user).id
-
-  google.protobuf.BoolValue push = 15; // [ONLY] With PUSH registration ?
-}
+option go_package = "github.com/webitel/im-account-service/proto/gen/im/service/auth/v1;authpb";
 
 // Authorization. Session
 // https://core.telegram.org/constructor/authorization
@@ -53,11 +34,10 @@ message Authorization {
   bool current = 9;
 }
 
-
-
 message AuthorizationList {
   // List of Session(s).
   repeated Authorization data = 1;
+  
   // // List of Device(s), mentioned in sessions
   // repeated Device devices = 2;
   // repeated Application apps = 3;
@@ -66,4 +46,22 @@ message AuthorizationList {
   int32 page = 5;
   // Has more results ?
   bool next = 6;
+}
+
+message GetAuthorizationRequest {
+
+  // Page number. Offset previous pages
+  int32 page = 1;
+  // Size number. Limit records per page
+  int32 size = 2;
+
+  // Filter (and) SET
+
+  int64 dc = 10; // business.(domain).id
+  string id = 11; // authorization.(session).id
+  string app_id = 12; // client.(app).id
+  string device_id = 13; // client.(device).id
+  InputContact contact = 14; // account.(user).id
+
+  google.protobuf.BoolValue push = 15; // [ONLY] With PUSH registration ?
 }

@@ -2,37 +2,9 @@ syntax = "proto3";
 
 package webitel.im.service.auth.v1;
 
-option go_package = "github.com/webitel/messaging/proto/gen/webitel/messaging/auth/v1;adpb";
-
-// import "internal/auth/v1/contact.proto";
 import "google/protobuf/struct.proto";
 
-
-
-message InputContactId {
-  // int64 dc = 1;
-  oneof input {
-    // Contact by (internal) identifier
-    string id = 1;
-    // Contact by (external) resource
-    // Composite key: ( sub @ iss )
-    SourceId source = 2;
-  }
-}
-
-
-message SourceId {
-  // REQUIRED. Issuer Identifier for the Issuer of the response.
-  // The iss value is a case sensitive URL using the https scheme that contains scheme, host,
-  // and optionally, port number and path components and no query or fragment components.
-  string iss = 1;
-  // REQUIRED. Subject Identifier.
-  // A locally unique and never reassigned identifier within the Issuer for the End-User,
-  // which is intended to be consumed by the Client, e.g., 24400320 or AItOawmwtWwcT0k51BayewNvutrJUqsvl6qs7A4.
-  // It MUST NOT exceed 255 ASCII characters in length.
-  // The sub value is a case sensitive string.
-  string sub = 2;
-}
+option go_package = "github.com/webitel/im-account-service/proto/gen/im/service/auth/v1;authpb";
 
 // Contact (End-User) profile at the Issuer.
 // https://openid.net/specs/openid-connect-core-1_0.html#Claims
@@ -139,4 +111,31 @@ message Contact {
   int64 created_at = 50;
   int64 updated_at = 51;
   int64 deleted_at = 52;
+}
+
+// Composite Reference Key
+// [RE]Source ( Issuer / Subject )
+message SourceId {
+  // REQUIRED. Issuer Identifier for the Issuer of the response.
+  // The iss value is a case sensitive URL using the https scheme that contains scheme, host,
+  // and optionally, port number and path components and no query or fragment components.
+  string iss = 1;
+  // REQUIRED. Subject Identifier.
+  // A locally unique and never reassigned identifier within the Issuer for the End-User,
+  // which is intended to be consumed by the Client, e.g., 24400320 or AItOawmwtWwcT0k51BayewNvutrJUqsvl6qs7A4.
+  // It MUST NOT exceed 255 ASCII characters in length.
+  // The sub value is a case sensitive string.
+  string sub = 2;
+}
+
+// InputContact reference for input
+message InputContact {
+  // int64 dc = 1;
+  oneof input {
+    // Contact by (internal) subject identifier
+    string id = 1;
+    // Contact by (external) subject at issuer
+    // Composite key: ( sub @ iss )
+    SourceId source = 2;
+  }
 }
