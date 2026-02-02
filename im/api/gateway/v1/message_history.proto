@@ -1,7 +1,6 @@
 syntax = "proto3";
 package webitel.im.api.gateway.v1;
 
-import "api/gateway/v1/peer.proto";
 import "google/protobuf/any.proto";
 import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
@@ -9,91 +8,241 @@ import "google/api/annotations.proto";
 option go_package = "github.com/webitel/im-gateway-service/gen/api/gateway/v1;gateway";
 
 
-service History {
-  // Search for messages in a thread.
+// MessageHistory service provides read-only access
+// to message history within threads.
+service MessageHistory {
+  
+  // Searches messages within a specific thread.
+  // Supports cursor-based pagination and field selection.
   rpc SearchThreadMessagesHistory(SearchMessageHistoryRequest) returns (SearchMessageHistoryResponse) {
     option (google.api.http) = {
       get: "messaging/v1/{thread_id}/messages"
     };
-  }
+  }  
 }
 
-
+// HistoryMessageCursor represents a cursor used for
+// cursor based pagination of message history.
 message HistoryMessageCursor {
-  int64  created_at = 1;
+
+  // Message creation timestamp (Unix time, microseconds).
+  int64  created_at = 1 [
+    (buf.validate.field).int64.gt = 0
+  ];
+
+  // Unique message identifier.
   string id = 2[
     (buf.validate.field).string.uuid = true
   ];
+
+  // Pagination direction.
+  // true - backward (older messages).
+  // false - forward (newer messages).
   bool direction = 3;
 }
 
+
+// SearchMessageHistoryRequest defines filtering,
+// pagination and projection options for searching
+// message history.
 message SearchMessageHistoryRequest {
+
+  // List of message fields to be returned.
+  // Used to reduce payload size.
   repeated string fields = 1;
 
-  repeated string ids          = 2;
-  repeated string thread_ids   = 3;
-  repeated string sender_ids   = 4;
-  repeated string receiver_ids = 5;
-  repeated int32  types        = 6;
+  // Filter by specific message IDs.
+  repeated string ids = 2 [
+    (buf.validate.field).repeated.items.string.uuid = true,
+    (buf.validate.field).repeated.max_items = 100
+  ];
 
-  optional HistoryMessageCursor cursor = 7;
-  uint32                        size   = 8;
+  // Filter by thread IDs.
+  repeated string thread_ids = 3 [
+    (buf.validate.field).repeated.items.string.uuid = true,
+    (buf.validate.field).repeated.max_items = 50
+  ];
+
+  // Filter messages by sender user IDs.
+  repeated string sender_ids = 4 [
+    (buf.validate.field).repeated.items.string.uuid = true,
+    (buf.validate.field).repeated.max_items = 50
+  ];
+
+  // Filter messages by receiver user IDs. 
+  repeated string receiver_ids = 5 [
+    (buf.validate.field).repeated.items.string.uuid = true,
+    (buf.validate.field).repeated.max_items = 50
+  ];
+
+  // Filter messages by message types.
+  repeated int32 types = 6 [
+    (buf.validate.field).repeated.items.int32.gte = 1,
+    (buf.validate.field).repeated.items.int32.lte = 4,
+    (buf.validate.field).repeated.max_items = 4
+  ];
+
+  // Domain identifier used to data isolation.
+  int32 domain_id = 7[
+    (buf.validate.field).int32.gt = 0
+  ];
+
+  // Cursor for cursor-based pagination.
+  // If omitted, search starts from the most recent messages. 
+  optional HistoryMessageCursor cursor = 8;
+
+  // Maximum number of messages to return.
+  uint32                        size   = 9 [
+    (buf.validate.field).uint32 = {
+      gte: 1,
+      lte: 100
+    },
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
 }
 
+
+// Document represents a file attachment
+// associated with a message.
 message Document {
+
+  // Document identifier.
   string id         = 1;
+
+  // Identifier of the message this document belongs to.
   string message_id = 2;
+
+  // File storage identifier.
   int64  file_id    = 3;
+
+  // Original file name.
   string name       = 4;
+
+  // MIME type of the document.
   string mime       = 5;
+
+  // File size in bytes.
   int64  size       = 6;
+
+  // Creation timestamp (Unix time, milliseconds).
   int64  created_at = 7;
+
+  // Public signed URL for downloading the document.
+  string url = 8;
 }
 
+// Image represents an image attachment
+// associated with a message.
 message Image {
+
+  // Image identifier.
   string id         = 1;
+
+  // Identifier of the message this message belongs to. 
   string message_id = 2;
+
+  // File storage identifier.
   int64  file_id    = 3;
+
+  // MIME type of the image.
   string mime       = 4;
+
+  // Image width in pixels.
   int32  width      = 5;
+
+  // Image height in pixels.
   int32  height     = 6;
+
+  // Creation timestamp (Unix time, milliseconds).
   int64  created_at = 7;
+
+  // Public signed URL for accessing the image.
+  string url = 8;
 }
 
+
+// HistoryMessage represents a single message
+// in thread history. 
 message HistoryMessage {
+
+  // Unique message identifier.
   string                           id          = 1;
+
+  // Identifier of the thread the message belongs to.
   string                           thread_id   = 2;
+
+  // Sender user identifier.
   string                           sender_id   = 3;
+
+  // Receiver user identifier.
   string                           receiver_id = 4;
+
+  // Message type identifier.
   int32                            type        = 5;
+
+  // Message body content.
   string                           body        = 6;
+
+  // Arbitrary message metadata.
+  // Can contain structured data depending on message type. 
   map<string, google.protobuf.Any> metadata    = 7;
 
+  // Message creation timestamp (Unix time, milliseconds). 
   int64 created_at = 8;
+
+  // Message last update timestamp (Unix time, milliseconds).
   int64 updated_at = 9;
 
+  // List of document attachments.
   repeated Document documents = 10;
+
+  // List of image attachments.
   repeated Image    images    = 11;
 }
 
 /*
  * @exclude
- * facebook cursor-based pagination example: https://stackoverflow.com/a/41475843
- */
+ * Example of cursor-based pagination inspired by
+ * Facebook Graph API
+ * https://stackoverflow.com/a/41475843
+*/
 
+
+// Cursors contains for navigating
+// forward and backward through message history.
 message Cursors {
+
+  // Cursor pointing to the next page of results.
   HistoryMessageCursor after  = 1;
+
+  // Cursor pointing to the previous page of results.
   HistoryMessageCursor before = 2;
 }
 
+
+// Paging contains pagination metadata.
 message Paging {
+
+  // Cursor-based pagination information.
   Cursors cursors = 1;
 }
 
+// SearchMessageHistoryResponse contains
+// message history search results and pagination metadata.
 message SearchMessageHistoryResponse {
+
+  // List of messages matching the search criteria.
   repeated HistoryMessage  messages    = 1;
+
+  // Cursor pointing to the next page of messages.
   HistoryMessageCursor next_cursor = 2;
+
+  // Indicates whether more messages are available.
   bool                 next        = 3;
+
+  // List of unique sender IDs present in the response.
   repeated string      from        = 4;
+
+  // Detailed paging metadata.
   Paging               paging      = 5;
 }
