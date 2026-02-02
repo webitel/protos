@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package webitel.im.api.gateway.v1;
+
+
+import "buf/validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+
+// Use a descriptive alias for the Go package to avoid naming collisions
+option go_package = "github.com/webitel/im-gateway-service/gen/api/gateway/v1;gateway";
+
+
+service Bots {
+  rpc CreateBot(CreateBotRequest) returns (Bot);
+  rpc UpdateBot(UpdateBotRequest) returns (Bot);
+  rpc DeleteBot(DeleteBotRequest) returns (Bot);
+}
+
+
+message CreateBotRequest {
+  string name = 1 [(buf.validate.field).required = true];
+  string username = 2 [(buf.validate.field).required = true];
+  string schema_id = 3 [
+    (buf.validate.field).required = true
+  ];
+  map<string, string> metadata = 4;
+}
+
+message UpdateBotRequest {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+  google.protobuf.FieldMask field_mask = 2 [
+    (buf.validate.field).required = true
+  ];
+  string name = 3;
+  string username = 4;
+  string schema_id = 5;
+  map<string, string> metadata = 6;
+}
+
+message DeleteBotRequest {
+  string id = 1;
+}
+
+message Bot {
+  string id = 1;
+  string name = 2;
+  string username = 3;
+  string schema_id = 4;
+  map<string, string> metadata = 5;
+}
