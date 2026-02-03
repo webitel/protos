@@ -171,11 +171,11 @@ message HistoryMessage {
   // Identifier of the thread the message belongs to.
   string                           thread_id   = 2;
 
-  // Sender user identifier.
-  string                           sender_id   = 3;
+  // Sender user aggregated information.
+  MessageParticipant                           sender   = 3;
 
-  // Receiver user identifier.
-  string                           receiver_id = 4;
+  // Receiver user aggregated information.
+  MessageParticipant                           receiver = 4;
 
   // Message type identifier.
   int32                            type        = 5;
@@ -227,6 +227,20 @@ message Paging {
   Cursors cursors = 1;
 }
 
+// MessageParticipant represents aggregated participant information
+// present in the message history response.
+message MessageParticipant {
+
+  // Client-readable sender subject or display name.
+  string subject = 1;
+
+  // Client issuer for the sender.
+  string issuer = 2;
+
+  // Sender type.
+  string type = 3;
+}
+
 // SearchMessageHistoryResponse contains
 // message history search results and pagination metadata.
 message SearchMessageHistoryResponse {
@@ -240,8 +254,9 @@ message SearchMessageHistoryResponse {
   // Indicates whether more messages are available.
   bool                 next        = 3;
 
-  // List of unique sender IDs present in the response.
-  repeated string      from        = 4;
+  // List of unique message senders present
+  // in the current response page.
+  repeated MessageParticipant      from        = 4;
 
   // Detailed paging metadata.
   Paging               paging      = 5;
