@@ -3,6 +3,7 @@ syntax = "proto3";
 package webitel.im.api.gateway.v1;
 
 import "buf/validate/validate.proto";
+import "api/gateway/v1/peer.proto";
 
 option go_package = "github.com/webitel/im-gateway-service/gen/api/gateway/v1;gateway";
 
@@ -115,10 +116,8 @@ message ThreadSearchRequest {
         (buf.validate.field).repeated.items.enum.not_in = 0
     ];
 
-    // Filter threads by owner user IDs.
-    repeated string owners = 5 [
-        (buf.validate.field).repeated.items.string.uuid = true
-    ];
+    // Filter threads by owners.
+    repeated PeerIdentity owners = 5;
 
     // Full-text search query.
     // Typically applied to subject.
@@ -127,9 +126,7 @@ message ThreadSearchRequest {
     ];
 
     // Filter threads where specified users are members.
-    repeated string member_ids = 7 [
-        (buf.validate.field).repeated.items.string.uuid = true
-    ];
+    repeated PeerIdentity member_ids = 7;
 
     // Maximum number of threads to return per page.
     // Must be greater than 0 and less than or equal to 100.
