@@ -2055,11 +2055,13 @@
         "tags": [
           "AgentService"
         ],
+        "summary": "Searches queues where the specified agent is assigned.\nSupports pagination, sorting and free-text search.",
         "operationId": "SearchAgentInQueue",
         "parameters": [
           {
             "type": "string",
             "format": "int64",
+            "description": "Unique identifier of the agent.",
             "name": "id",
             "in": "path",
             "required": true
@@ -2067,22 +2069,26 @@
           {
             "type": "integer",
             "format": "int32",
+            "description": "Page number (1-based).",
             "name": "page",
             "in": "query"
           },
           {
             "type": "integer",
             "format": "int32",
+            "description": "Maximum number of records per page.",
             "name": "size",
             "in": "query"
           },
           {
             "type": "string",
+            "description": "Free-text search query.\nTypically applied to queue name.",
             "name": "q",
             "in": "query"
           },
           {
             "type": "string",
+            "description": "Sorting expression.",
             "name": "sort",
             "in": "query"
           },
@@ -2092,6 +2098,7 @@
               "type": "string"
             },
             "collectionFormat": "multi",
+            "description": "List of fields to be returned in the response.\nUsed for response projection and payload optimization.",
             "name": "fields",
             "in": "query"
           }
@@ -46100,70 +46107,93 @@
       }
     },
     "engine.AgentInQueue": {
+      "description": "AgentInQueue represents agent assignment\nand configuration within a specific queue.",
       "type": "object",
       "properties": {
         "active_members": {
+          "description": "Number of members currently active in the queue.",
           "type": "integer",
           "format": "int32"
         },
         "agents": {
+          "description": "Aggregated agent statistics for the queue.",
           "$ref": "#/definitions/engine.AgentInQueue.AgentsInQueue"
         },
         "count_members": {
+          "description": "Total number of members assigned to the queue.",
           "type": "integer",
           "format": "int32"
         },
         "enabled": {
+          "description": "Indicates whether the queue is enabled.",
           "type": "boolean"
         },
         "max_member_limit": {
+          "description": "Maximum number of members allowed in the queue.",
           "type": "integer",
           "format": "int32"
         },
         "priority": {
+          "description": "Agent priority within the queue.",
           "type": "integer",
           "format": "int32"
         },
         "queue": {
+          "description": "Queue reference.",
           "$ref": "#/definitions/engine.Lookup"
         },
         "strategy": {
+          "description": "Call distribution strategy used by the queue.",
           "type": "string"
         },
         "type": {
+          "description": "Queue type.",
           "type": "integer",
           "format": "int32"
         },
         "waiting_members": {
+          "description": "Number of members currently waiting in the queue.",
           "type": "integer",
           "format": "int32"
         }
       }
     },
     "engine.AgentInQueue.AgentsInQueue": {
+      "description": "AgentsInQueue contains aggregated statistics\nabout agents assigned to queue.",
       "type": "object",
       "properties": {
         "allow_pause": {
+          "description": "Indicates whether pause is allowed for agents.\nIf unset, pause availability is not defined.",
           "type": "integer",
           "format": "int32"
         },
+        "busy": {
+          "description": "Number of agents currently on call.",
+          "type": "integer",
+          "format": "int64"
+        },
         "free": {
+          "description": "Number of agents that are online and in 'waiting' (idle) state.",
           "type": "integer",
           "format": "int64"
         },
         "offline": {
+          "description": "Number of agents currently offline.",
           "type": "integer",
           "format": "int64"
         },
         "online": {
+          "description": "Number of agents currently online.",
           "type": "integer",
           "format": "int64"
         },
         "pause": {
+          "description": "Number of agents currently in pause state.",
           "type": "integer",
           "format": "int64"
         },
         "total": {
+          "description": "Total number of agents assigned to the queue.",
           "type": "integer",
           "format": "int64"
         }
@@ -50242,9 +50272,11 @@
       }
     },
     "engine.ListAgentInQueue": {
+      "description": "ListAgentInQueue contains search results\nand pagination metadata.",
       "type": "object",
       "properties": {
         "items": {
+          "description": "List of agent-to-queue assignments.",
           "type": "array",
           "items": {
             "type": "object",
@@ -50252,6 +50284,7 @@
           }
         },
         "next": {
+          "description": "Indicates weather more records are available.",
           "type": "boolean"
         }
       }
@@ -52924,6 +52957,10 @@
     "engine.QueueReportGeneralAgentStatus": {
       "type": "object",
       "properties": {
+        "busy": {
+          "type": "integer",
+          "format": "int64"
+        },
         "free": {
           "type": "integer",
           "format": "int64"
