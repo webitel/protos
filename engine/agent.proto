@@ -86,6 +86,8 @@ service AgentService {
         };
     }
 
+    // Searches queues where the specified agent is assigned.
+    // Supports pagination, sorting and free-text search.
     rpc SearchAgentInQueue(SearchAgentInQueueRequest) returns (ListAgentInQueue) {
         option (google.api.http) = {
             get: "/call_center/agents/{id}/queues"
@@ -455,39 +457,101 @@ message ListAgentStateHistory {
     repeated AgentState items = 2;
 }
 
+// AgentInQueue represents agent assignment
+// and configuration within a specific queue.
 message AgentInQueue {
+
+    // AgentsInQueue contains aggregated statistics
+    // about agents assigned to queue.
     message AgentsInQueue {
+
+        // Number of agents currently online.
         uint32 online = 1;
+
+        // Number of agents currently in pause state.
         uint32 pause = 2;
+
+        // Number of agents currently offline.
         uint32 offline = 3;
+
+        // Number of agents that are online and in 'waiting' (idle) state.
         uint32 free = 4;
+
+        // Total number of agents assigned to the queue.
         uint32 total =  5;
+
+        // Indicates whether pause is allowed for agents.
+        // If unset, pause availability is not defined.
         google.protobuf.Int32Value allow_pause = 6;
+
+        // Number of agents currently on call.
+        uint32 busy = 7;
     }
+
+    // Queue reference.
     Lookup queue = 1;
+
+    // Agent priority within the queue.
     int32 priority = 2;
+
+    // Queue type.
     int32 type = 3;
+
+    // Call distribution strategy used by the queue.
     string strategy = 4;
+
+    // Indicates whether the queue is enabled.
     bool enabled = 5;
+
+    // Total number of members assigned to the queue.
     int32 count_members = 6;
+
+    // Number of members currently waiting in the queue.
     int32 waiting_members = 7;
+
+    // Number of members currently active in the queue.
     int32 active_members = 8;
+
+    // Aggregated agent statistics for the queue. 
     AgentsInQueue agents = 9;
+
+    // Maximum number of members allowed in the queue.
     int32 max_member_limit = 10;
 }
 
+// ListAgentInQueue contains search results
+// and pagination metadata.
 message ListAgentInQueue {
+
+    // Indicates weather more records are available.
     bool next = 1;
+
+    // List of agent-to-queue assignments.
     repeated AgentInQueue items = 2;
 }
 
+// SearchAgentInQueueRequest defines parameters
+// for searching queues associated with an agent.
 message SearchAgentInQueueRequest {
+
+    // Unique identifier of the agent.
     int64 id = 1;
+
+    // Page number (1-based).
     int32 page = 2;
+
+    // Maximum number of records per page.
     int32 size = 3;
+
+    // Free-text search query.
+    // Typically applied to queue name.
     string q = 4;
 
+    // Sorting expression. 
     string sort = 5;
+
+    // List of fields to be returned in the response.
+    // Used for response projection and payload optimization.
     repeated string fields = 6;
 }
 
