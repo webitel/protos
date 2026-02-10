@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+package webitel.im.service.admin.v1;
+
+import "service/admin/v1/application.proto";
+import "service/admin/v1/application_input.proto";
+
+import "google/rpc/status.proto";
+
+option go_package = "github.com/webitel/im-account-service/proto/gen/im/service/admin/v1;adminpb";
+
+// Applications (Admin) Service
+service Applications {
+  // Search for Application(s)
+  rpc SearchApps(SearchAppRequest) returns (ApplicationList);
+  // Revoke / Delete Application(s) 
+  rpc DeleteApps(DeleteAppRequest) returns (ApplicationList);
+  // Create NEW Application
+  rpc CreateApp(CreateAppRequest) returns (Application);
+  // Update Application configuration
+  rpc UpdateApp(UpdateAppRequest) returns (Application);
+  // rpc RevokeApp(RevokeAppRequest) returns ();
+}
+
+// 
+message ApplicationList {
+  // List of Application (configuration) record(s) 
+  repeated Application data = 1;
+  // Number of the current dataset page.
+  int32 page = 2;
+  // Is there more results ?
+  // Is this a partial result ?
+  bool next = 3;
+}
+
+message SearchAppRequest {
+  // Page number. Offset
+  int32 page = 1;
+  // Size number. Limit records per page
+  int32 size = 2;
+  // Set of (App) fields to be returned into result
+  repeated string fields = 3;
+  // Sort result by field(s) order
+  repeated string sort = 4;
+
+  // Query string as a term of search
+  string q = 11;
+  // Filter by Business Account [domain.id]
+  int64 dc = 12;
+  // Filter by Business Application [client_id]
+  string id = 13;
+}
+
+message CreateAppRequest {
+  // NEW configuration for create
+  InputApp app = 1;
+}
+
+message UpdateAppRequest {
+  // App [client_id] for update
+  string id = 1;
+  // NEW configuration source
+  InputApp app = 2;
+}
+
+message DeleteAppRequest {
+  // App [client_id] for delete
+  repeated string id = 1;
+}
+
+message RevokeAppRequest {
+  // App [client_id] to revoke
+  string id = 1;
+  // The reason. Optional
+  google.rpc.Status reason = 2;
+  // Delete App permanently ?
+  bool delete = 3;
+}
+

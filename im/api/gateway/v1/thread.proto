@@ -1,0 +1,196 @@
+syntax = "proto3";
+
+package webitel.im.api.gateway.v1;
+
+import "buf/validate/validate.proto";
+import "api/gateway/v1/peer.proto";
+
+option go_package = "github.com/webitel/im-gateway-service/gen/api/gateway/v1;gateway";
+
+// Thread service provides operations for managing 
+// and interacting with threads.
+service ThreadManagement { 
+
+    // Searches threads using filtering, sorting,
+    // and pagination parameters.
+    rpc Search(ThreadSearchRequest) returns (SearchThreadResponse);
+}
+
+
+// ThreadKind defines the type of a thread.
+// It determines the business rules and available features for the thread.
+enum ThreadKind {
+
+    // Unknown or unspecified thread type.
+    // Must not be used in valid requests.
+    UNKNOWN = 0;
+
+    // One-to-one private thread between two users.
+    DIRECT = 1;
+
+    // Group thread with multiple members.
+    GROUP = 2;
+
+    // Channel-style thread (broadcast or topic based communication).
+    CHANNEL = 3;
+}
+
+// ExternalParticipant represents aggregated participant information
+// present in the thread history response.
+message ExternalParticipant {
+
+    // Client issuer for the sender.
+    string issuer = 1;
+
+    // Client-readable participant subject or display name.
+    string subject = 2;
+
+    // Participant type.
+    string type = 3;
+}
+
+// Thread represents a thread (aka chat or conversation) entity.
+message Thread {
+
+    // Unique thread identifier.
+    string id = 1;
+
+    // Domain identifier the thread belongs to.
+    int32 domain_id = 2;
+
+    // Thread creation timestamp (Unix time, milliseconds).
+    int64 created_at = 3;
+
+    // Last update timestamp (Unix time, milliseconds).
+    int64 updated_at = 4;
+
+    // Type of the thread.
+    ThreadKind kind = 5;
+
+    // Aggregated user information of the thread owner.
+    ExternalParticipant owner = 6;
+
+    // List of users aggregated information with admin privileges.
+    repeated ExternalParticipant admins = 7;
+
+    // List of member users aggregated information.
+    repeated ExternalParticipant member_ids = 8;
+
+    // Thread subject or title.
+    string subject = 9;
+
+    // Optional thread description.
+    string description = 10;
+
+    // Detailed member information.
+    repeated ThreadMember members = 11;
+}
+
+//#endregion
+
+//#region Search
+
+// ThreadSearchRequest defines requested fields, filters, sorting and pagination
+// options for searching thread.
+message ThreadSearchRequest {
+
+    // List of fields that should be returned in the response.
+    // If empty, a default set of fields is returned.
+    // Used for response optimization.
+    repeated string fields = 1;
+
+    // Filter by specific thread IDs.
+    repeated string ids = 2 [
+        (buf.validate.field).repeated.items.string.uuid = true
+    ];
+
+    // Filter threads by domain IDs.
+    repeated int32 domain_ids = 3 [
+        (buf.validate.field).repeated.items.int32.gt = 0
+    ];
+
+    // Filter threads by their kinds.
+    // UNKNOWN (0) is not allowed.
+    repeated ThreadKind kinds = 4 [
+        (buf.validate.field).repeated.items.enum.defined_only = true,
+        (buf.validate.field).repeated.items.enum.not_in = 0
+    ];
+
+    // Filter threads by owners.
+    repeated PeerIdentity owners = 5;
+
+    // Full-text search query.
+    // Typically applied to subject.
+    string q = 6[
+        (buf.validate.field).string = {min_len: 0, max_len: 256}
+    ];
+
+    // Filter threads where specified users are members.
+    repeated PeerIdentity member_ids = 7;
+
+    // Maximum number of threads to return per page.
+    // Must be greater than 0 and less than or equal to 100.
+    int32 size = 8 [
+        (buf.validate.field).int32 = {gt: 0, lte: 100},
+        (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+    ];
+
+    // Sorting field.
+    // Optional "+" or "-" prefix indicates ascending or descending order.
+    // Example: "-created_at", "subject"
+    string sort = 9 [
+        (buf.validate.field).string.pattern = "^[+-]?[a-z_]+$",
+        (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+    ];
+
+    // Page number (1-based).
+    int32 page = 10 [
+        (buf.validate.field).int32.gte = 1,
+        (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+    ];
+}
+
+// SearchThreadResponse contains the list of threads
+// and pagination metadata.
+message SearchThreadResponse {
+
+    // List of threads matching the search criteria.
+    repeated Thread threads = 1;
+
+    // Indicates whether there is a next page available.
+    bool next = 2;
+}
+
+
+// ThreadMember represents a thread participant
+// with optional type-specific settings.
+message ThreadMember {
+
+    // User aggregated information.
+    ExternalParticipant member = 1;
+
+    // Direct thread specific settings.
+    // Present only for DIRECT threads.
+    ThreadDirectSettings direct_settings = 2;
+}
+
+// ThreadDirectSettings defines settings
+// specific to direct (one-to-one) threads.
+message ThreadDirectSettings {
+
+    // Settings identifier.
+    string id = 1;
+
+    // Domain identifier.
+    int32 domain_id = 2;
+
+    // Creation timestamp (Unix time, milliseconds).
+    int64 created_at = 3;
+
+    // Last update timestamp (Unix time, milliseconds).
+    int64 updated_at = 4;
+
+    // Custom title for the direct thread.
+    // Usually represents the display name of the conversation.
+    string title = 5;
+}

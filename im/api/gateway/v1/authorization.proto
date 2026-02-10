@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package webitel.im.api.gateway.v1;
+
+option go_package = "github.com/webitel/im-gateway-service/gen/api/gateway/v1;gateway";
+
+import "api/gateway/v1/auth_contact.proto";
+import "api/gateway/v1/device.proto";
+import "api/gateway/v1/identity.proto";
+import "api/gateway/v1/oauth.proto";
+import "google/protobuf/wrappers.proto";
+
+// Authorization. Session
+message Authorization {
+  // When was the session created
+  int64 date = 3;
+  // Session (device) display name.
+  string name = 4;
+  // Application [client_id] ; VIA
+  string app_id = 5;
+  // Last known (User-Agent) device ; FROM
+  Device device = 6;
+  // Authorized end-user Contact info
+  AuthContact contact = 7;
+  // OPTIONAL. Grant of an [access_token] for this session Authorization
+  AccessToken token = 8;
+  // Whether this is the current session
+  bool current = 9;
+}
+
+
+
+message AuthorizationList {
+  // List of Session(s).
+  repeated Authorization data = 1;
+  // // List of Device(s), mentioned in sessions
+  // repeated Device devices = 2;
+  // repeated Application apps = 3;
+  
+  // Current page number.
+  int32 page = 5;
+  // Has more results ?
+  bool next = 6;
+}

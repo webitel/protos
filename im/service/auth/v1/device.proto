@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package webitel.im.service.auth.v1;
+
+// import "internal/auth/v1/webitel/messaging/admin/v1/application.proto";
+// import "internal/auth/v1/webitel/messaging/admin/v1/application_input.proto";
+
+import "service/auth/v1/device_push.proto";
+
+option go_package = "github.com/webitel/im-account-service/proto/gen/im/service/auth/v1;authpb";
+
+// [User-Agent] string & details
+message UserAgent {
+
+  string name = 1; // app [code]name
+  string version = 2; // app version
+
+  string os = 3;
+  string os_version = 4;
+
+  string device = 5; // optional ; brand / model
+
+  bool mobile = 6;
+	bool tablet = 7;
+	bool desktop = 8;
+	bool bot = 9;
+  // [User-Agent] source string
+  string string = 10;
+}
+
+// Device (Client) endpoint. [FROM]
+message Device {
+  // // Registered (server) identifier
+  // string id = 1;
+
+  // Subscriber ( consumer | client ) identifier ; [X-Webitel-Device]
+  string id = 1;
+  // Last known IP address [FROM]
+  string ip = 2;
+  // [User-Agent] as (remote) client (application) info
+  UserAgent app = 4;
+  // PUSH token registration
+  PUSHSubscription push = 5;
+}

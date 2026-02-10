@@ -1,0 +1,133 @@
+syntax = "proto3";
+
+package webitel.im.service.admin.v1;
+
+import "service/admin/v1/account.proto";
+import "service/admin/v1/application_auth.proto";
+import "service/admin/v1/application_push.proto";
+import "service/admin/v1/application_rate.proto";
+import "service/admin/v1/contacts.proto";
+// import "webitel/messaging/v1/media.proto";
+
+import "google/rpc/status.proto";
+
+option go_package = "github.com/webitel/im-account-service/proto/gen/im/service/admin/v1;adminpb";
+
+// Application (Access) Configuration.
+message Application {
+  // Business [Domain] Account ID
+  int64 dc = 1;
+
+  // Application [client_id] identifier
+  string id = 2;
+  
+  // // OPTIONAL. Icon image that references a logo for the Application.
+  // webitel.im.internal.v1.Image logo = 3;
+  
+  // Application name to be presented to the End-User
+  string name = 4;
+  // OPTIONAL. Short description
+  string about = 5;
+
+  // // OPTIONAL. Application [client_secret]
+  // string secret = 5;
+
+  // Revocation status
+  Revocation block = 6;
+
+  // Inbound. Application Client(s) Authorization
+  ClientApp client = 7;
+
+  // Outbound. Application Service(s) Configuration
+  ServiceApp service = 8;
+
+  // Optional. Service User (Bot) account declaration
+  // Grants ability to participate in messaging service as User (external Bot) !?.
+  Account account = 9;
+
+  // Optional. Defines special rules for Contacts list selection (I/O).
+  ContactApp contacts = 10;
+
+}
+
+// Application Service Configuration
+message ServiceApp {
+
+  // OPTIONAL. Application [client_secret] issued
+  string secret = 1;
+
+  // API Rate-Limit(s) configuration
+  RateLimiter rate_limits = 2;
+
+  // [Updates] Handler subscription.
+  // Server-to-Server (Webhook) communication.
+  EventSubscription send_update = 3;
+
+  // PUSH Notification Service account(s) available
+  // Server-to-Client / User (Notification) communication.
+  PUSHServiceClient push_service = 4;
+
+}
+
+// Event [Updates] Subscription
+message EventSubscription {
+
+  // Endpoint to send Update(s) to ..
+  oneof endpoint {
+    // HTTP Webhook
+    WebhookSubscription web = 1;
+    // gRPC Service
+    GrpcServiceSubscription grpc = 2;
+  }
+
+  // Update.Data.(type)s subscribed to ..
+  repeated string events = 3;
+
+  // OPTIONAL. A secret token to be sent in a header “X-Webitel-Event-Token” in every webhook request, 1-256 characters. Only characters A-Z, a-z, 0-9, _ and - are allowed.
+  // The header is useful to ensure that the request comes from a webhook set by you.
+  string token = 4;
+}
+
+// Webhook [Update] Event Subscription
+// https://core.telegram.org/bots/api#setwebhook
+message WebhookSubscription {
+  // REQUIRED. HTTPS URL to POST updates to.
+  string url = 1;
+  // OPTIONAL. The fixed IP address which will be used to send
+  // webhook requests instead of the IP address resolved through DNS.
+  string addr = 2;
+
+  // enum Proto {
+  //   http2 = 0;   // HTTP/2.0
+  //   http1 = 1; // HTTP/1.1
+  // }
+
+  // Codec for Update encoding
+  enum Codec {
+    // application/json
+    JSON  = 0;
+    // application/proto
+    PROTO = 1;
+  }
+
+  // Update(s) content encoding
+  Codec codec = 3;
+}
+
+// GRPC Service [Update] Event Subscription
+message GrpcServiceSubscription {
+  // REQUIRED. HTTPS URL [http(s)://]host[:port] endpoint that should
+  // implement [webitel.im.internal.client.v1.UpdateHandler] service
+  // to be able to receive Update(s) requests ..
+  string host = 1;
+  // OPTIONAL. The fixed IP address which will be used to send Update(s)
+  // instead of the IP address resolved through DNS.
+  string addr = 2;
+}
+
+message Revocation {
+  // Revocation Date
+  int64 date = 1;
+  // OPTIONAL. The reason
+  google.rpc.Status reason = 2;
+}

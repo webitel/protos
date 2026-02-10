@@ -1,0 +1,106 @@
+syntax = "proto3";
+
+package webitel.im.service.admin.v1;
+
+// import "messaging/v1/device.proto";
+// import "messaging/v1/media.proto";
+
+option go_package = "github.com/webitel/im-account-service/proto/gen/im/service/admin/v1;adminpb";
+
+// Contact Identity Provider Configuration
+// Inspired by: https://openid.net/specs/openid-connect-registration-1_0.html#ClientMetadata
+message IdentityProvider {
+
+  // Issuer Identifier(s) for the "identity" grant type.
+  // Value is a case sensitive URL using the https scheme that contains
+  // scheme, host, and optionally, port number and path components and no query or fragment components.
+  // Used for the grant_type "identity" of Token endpoint.
+  //
+  // If "identity" is allowed (exists within grant_types values),
+  // a list of known issuer(s) MUST be specified here.
+  // The combination of data of the profiles from different issuers
+  // is carried out according to the reverse priority of this specification:
+  // the primary issuer is the first, the following ones are secondary ..
+  //
+  // For each profile, the publisher must specify an unique issuer identifier.
+  // Any attempts by the publisher to use an unknown (not from this list) issuer will fail.
+  // This approach is used as an additional layer of security to establish trust in
+  // a client application that has gained access the portal application.
+  repeated string issuers = 1;
+
+  // Contact.proto registered for Application
+  // First protos[0] as a default contact.proto
+  // map["$(issuer)"] = "$(proto)" ; [ N:1 ]
+  map<string, string> protos = 2;
+
+  // OPTIONAL. URL for the Client's JWK Set [JWK] document, which MUST use the https scheme.
+  // If the Client signs requests to the Server, it contains the signing key(s) the Server uses to validate signatures from the Client.
+  // The JWK Set MAY also contain the Client's encryption keys(s), which are used by the Server to encrypt responses to the Client.
+  // When both signing and encryption keys are made available, a use (public key use) parameter value is REQUIRED for all keys in the referenced JWK Set to indicate each key's intended usage.
+  // Although some algorithms allow the same key to be used for both signatures and encryption, doing so is NOT RECOMMENDED, as it is less secure.
+  // The JWK x5c parameter MAY be used to provide X.509 representations of keys provided. When used, the bare key values MUST still be present and MUST match those in the certificate.
+  // The JWK Set MUST NOT contain private or symmetric key values.
+  string jwks_uri = 3;
+
+  // OPTIONAL. Client's JWK Set [JWK] document, passed by value.
+  // The semantics of the jwks parameter are the same as the jwks_uri parameter, other than that the JWK Set is passed by value, rather than by reference.
+  // This parameter is intended only to be used by Clients that, for some reason, are unable to use the jwks_uri parameter, for instance, by native applications that might not have a location to host the contents of the JWK Set.
+  // If a Client can use jwks_uri, it MUST NOT use jwks. One significant downside of jwks is that it does not enable key rotation (which jwks_uri does, as described in Section 10 of OpenID Connect Core 1.0 [OpenID.Core]).
+  // The jwks_uri and jwks parameters MUST NOT be used together. The JWK Set MUST NOT contain private or symmetric key values.
+  bytes jwks = 4;
+
+  // OPTIONAL. JWT claims of the Contact identity (mapping)
+  // Inspired: https://openid.net/specs/openid-connect-core-1_0.html#Claims
+  // map [identity.field] = jwt.(payload).claim[ "|" .. ] ;
+  // STADARD claims:
+  // - iss
+  // - sub
+  // - name
+  // - given_name
+  // - middle_name
+  // - family_name
+  // - birthdate
+  // - gender
+  // - locale
+  // - zoneinfo
+  // - picture
+  // - profile
+  // - email
+  // - email_verified
+  // - phone_number
+  // - phone_number_verified
+  // REQUIRED:
+  // - iss
+  // - sub
+  // - [name|given_name|middle_name|family_name]
+  map<string, string> jwt_identity = 5;
+
+  // FIXME: OPTIONAL.
+  // device_id: X-Webitel-Device authorization from JWT claim
+  // client_token: X-Webitel-Client authorization from JWT claim
+}
+
+// ContactApp I/O Specification.
+message ContactApp {
+
+  // [Id]entity [P]rovider specification.
+  // Provides the ability to supply your own user accounts.
+  IdentityProvider auth = 1;
+  
+  // Exclusive rules (filters) to list Contacts (Peers) available VIA Application
+  // If not specified - ALL public contacts are shown
+  repeated ContactListRule list = 2;
+}
+
+// Describes a contact(s) selection rule in list
+message ContactListRule {
+  // Selection Rule
+  oneof rule {
+    // all users of a specific proto / issuer
+    string proto = 1;
+    // specific, single user by id
+    string user_id = 2;
+    // // internal schema as a bot
+    // ContactBot bot = 3;
+  }
+}
