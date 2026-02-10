@@ -19,6 +19,9 @@
     },
     {
       "name": "Account"
+    },
+    {
+      "name": "ThreadManagement"
     }
   ],
   "consumes": [
@@ -396,13 +399,13 @@
           "type": "string",
           "description": "Identifier of the thread the message belongs to."
         },
-        "sender_id": {
-          "type": "string",
-          "description": "Sender user identifier."
+        "sender": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageParticipant",
+          "description": "Sender user aggregated information."
         },
-        "receiver_id": {
-          "type": "string",
-          "description": "Receiver user identifier."
+        "receiver": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageParticipant",
+          "description": "Receiver user aggregated information."
         },
         "type": {
           "type": "integer",
@@ -543,6 +546,24 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.MessageParticipant": {
+      "type": "object",
+      "properties": {
+        "subject": {
+          "type": "string",
+          "description": "Client-readable sender subject or display name."
+        },
+        "issuer": {
+          "type": "string",
+          "description": "Client issuer for the sender."
+        },
+        "type": {
+          "type": "string",
+          "description": "Sender type."
+        }
+      },
+      "description": "MessageParticipant represents aggregated participant information\npresent in the message history response."
+    },
     "webitel.im.api.gateway.v1.Paging": {
       "type": "object",
       "properties": {
@@ -604,9 +625,10 @@
         "from": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageParticipant"
           },
-          "description": "List of unique sender IDs present in the response."
+          "description": "List of unique message senders present\nin the current response page."
         },
         "paging": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.Paging",
