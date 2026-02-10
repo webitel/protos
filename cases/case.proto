@@ -39,6 +39,14 @@ service Cases {
     };
   }
 
+  // RPC method for exporting cases to CSV or XLSX format (server-side streaming).
+  rpc ExportCases(ExportCasesRequest) returns (stream ExportCasesResponse) {
+    option (option.access) = ACTION_READ;
+    option (google.api.http) = {
+      get: "/cases/export"
+    };
+  }
+
   // RPC method to retrieve a specific case by its etag identifier.
   rpc LocateCase(LocateCaseRequest) returns (Case) {
     option (option.access) = ACTION_READ;
@@ -307,4 +315,23 @@ message InputCase {
 
   // Custom data extension fields ..
   google.protobuf.Struct custom = 100;
+}
+
+message ExportCasesRequest {
+  int32 page = 1;                      
+  int32 size = 2;                   
+  string q = 3;                     
+  repeated string ids = 4;          
+  string sort = 5;                  
+  repeated string fields = 6;       
+  repeated string filters = 7;      
+  string contact_id = 8;            
+  string qin = 9;                   
+  string filters_v1 = 10;           
+  string format = 11;               
+}
+
+message ExportCasesResponse {
+  // File data chunk (streamed in 64KB chunks)
+  bytes data = 1;
 }
