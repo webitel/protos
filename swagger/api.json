@@ -12338,6 +12338,109 @@
         }
       }
     },
+    "/cases/export": {
+      "get": {
+        "tags": [
+          "Cases"
+        ],
+        "summary": "RPC method for exporting cases to CSV or XLSX format (server-side streaming).",
+        "operationId": "ExportCases",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "ids",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "filters",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "contact_id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "qin",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "filters_v1",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "format",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "title": "Stream result of webitel.cases.ExportCasesResponse",
+              "properties": {
+                "error": {
+                  "$ref": "#/definitions/google.rpc.Status"
+                },
+                "result": {
+                  "$ref": "#/definitions/webitel.cases.ExportCasesResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/cases/priorities": {
       "get": {
         "tags": [
@@ -58755,6 +58858,16 @@
         },
         "type": {
           "$ref": "#/definitions/webitel.cases.CaseTimelineEventType"
+        }
+      }
+    },
+    "webitel.cases.ExportCasesResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "string",
+          "format": "byte",
+          "title": "File data chunk (streamed in 64KB chunks)"
         }
       }
     },
