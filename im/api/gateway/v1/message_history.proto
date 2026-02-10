@@ -11,14 +11,14 @@ option go_package = "github.com/webitel/im-gateway-service/gen/api/gateway/v1;ga
 // MessageHistory service provides read-only access
 // to message history within threads.
 service MessageHistory {
-  
+
   // Searches messages within a specific thread.
   // Supports cursor-based pagination and field selection.
   rpc SearchThreadMessagesHistory(SearchMessageHistoryRequest) returns (SearchMessageHistoryResponse) {
     option (google.api.http) = {
-      get: "messaging/v1/{thread_id}/messages"
+      get: "/messaging/v1/{thread_ids}/messages"
     };
-  }  
+  }
 }
 
 // HistoryMessageCursor represents a cursor used for
@@ -69,7 +69,7 @@ message SearchMessageHistoryRequest {
     (buf.validate.field).repeated.max_items = 50
   ];
 
-  // Filter messages by receiver user IDs. 
+  // Filter messages by receiver user IDs.
   repeated string receiver_ids = 5 [
     (buf.validate.field).repeated.items.string.uuid = true,
     (buf.validate.field).repeated.max_items = 50
@@ -88,7 +88,7 @@ message SearchMessageHistoryRequest {
   ];
 
   // Cursor for cursor-based pagination.
-  // If omitted, search starts from the most recent messages. 
+  // If omitted, search starts from the most recent messages.
   optional HistoryMessageCursor cursor = 8;
 
   // Maximum number of messages to return.
@@ -138,7 +138,7 @@ message Image {
   // Image identifier.
   string id         = 1;
 
-  // Identifier of the message this message belongs to. 
+  // Identifier of the message this message belongs to.
   string message_id = 2;
 
   // File storage identifier.
@@ -162,7 +162,7 @@ message Image {
 
 
 // HistoryMessage represents a single message
-// in thread history. 
+// in thread history.
 message HistoryMessage {
 
   // Unique message identifier.
@@ -184,10 +184,10 @@ message HistoryMessage {
   string                           body        = 6;
 
   // Arbitrary message metadata.
-  // Can contain structured data depending on message type. 
+  // Can contain structured data depending on message type.
   map<string, google.protobuf.Any> metadata    = 7;
 
-  // Message creation timestamp (Unix time, milliseconds). 
+  // Message creation timestamp (Unix time, milliseconds).
   int64 created_at = 8;
 
   // Message last update timestamp (Unix time, milliseconds).

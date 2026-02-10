@@ -2,26 +2,19 @@ version: v2
 managed:
   enabled: true
   override:
-    # Forces all generated files into a single Go package, 
-    # merging 'internal' and 'shared' protos into one directory.
-    - file_option: go_package
-      value: github.com/webitel/protos/gen/go/im/delivery/v1;deliveryv1
+    - file_option: go_package_prefix
+      value: webitel.go/api/im
 
 plugins:
-  # Standard Go Protobuf generator
-  - remote: buf.build/protocolbuffers/go:v1.34.1
-    out: ../gen/go
+  - remote: buf.build/grpc-ecosystem/openapiv2
+    out: ../swagger
     opt:
-      # 'module' tells Buf to strip this prefix from the output path,
-      # ensuring files land in delivery/v1/ instead of a deep nested path.
-      - module=github.com/webitel/protos/gen/go/im
-  
-  # gRPC Go generator
-  - remote: buf.build/grpc/go:v1.5.1
-    out: ../gen/go
-    opt:
-      - module=github.com/webitel/protos/gen/go/im
-
-inputs:
-  # The relative path to the source proto files
-  - directory: "../../protos/im"
+      - version=false
+      - json_names_for_fields=false
+      - allow_delete_body=true
+      - include_package_in_tags=false
+      - allow_repeated_fields_in_body=false
+      - fqn_for_openapi_name=true
+      - merge_file_name=im-gateway
+      - allow_merge=true
+      - simple_operation_ids=true
