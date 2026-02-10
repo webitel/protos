@@ -12160,7 +12160,7 @@
           "CaseComments"
         ],
         "summary": "Delete a specific comment by its etag",
-        "operationId": "DeleteComment",
+        "operationId": "DeleteCommentMixin5",
         "parameters": [
           {
             "type": "string",
@@ -12202,7 +12202,7 @@
           "CaseComments"
         ],
         "summary": "Update a specific comment by its etag",
-        "operationId": "UpdateComment",
+        "operationId": "UpdateCommentMixin5",
         "parameters": [
           {
             "type": "string",
@@ -13986,7 +13986,7 @@
           "CaseComments"
         ],
         "summary": "Publish comment into a specific case",
-        "operationId": "PublishComment",
+        "operationId": "PublishCommentMixin5",
         "parameters": [
           {
             "type": "string",
@@ -14752,7 +14752,7 @@
         "tags": [
           "CaseTimeline"
         ],
-        "operationId": "GetTimeline",
+        "operationId": "GetTimelineMixin5",
         "parameters": [
           {
             "type": "string",
@@ -14848,7 +14848,7 @@
         "tags": [
           "CaseTimeline"
         ],
-        "operationId": "GetTimelineCounter",
+        "operationId": "GetTimelineCounterMixin5",
         "parameters": [
           {
             "type": "string",
@@ -18135,7 +18135,7 @@
           "Comments"
         ],
         "summary": "Publish comment for a Contact.",
-        "operationId": "PublishComment_Comments",
+        "operationId": "PublishComment",
         "parameters": [
           {
             "type": "string",
@@ -18186,7 +18186,7 @@
           "Comments"
         ],
         "summary": "Update (edit) specific Comment text owned",
-        "operationId": "UpdateComment_Comments",
+        "operationId": "UpdateComment",
         "parameters": [
           {
             "type": "string",
@@ -18263,7 +18263,7 @@
           "Comments"
         ],
         "summary": "Delete Comment(s) for Contact ...",
-        "operationId": "DeleteComment_Comments",
+        "operationId": "DeleteComment",
         "parameters": [
           {
             "type": "string",
@@ -21648,7 +21648,7 @@
         "tags": [
           "Timeline"
         ],
-        "operationId": "GetTimeline_Timeline",
+        "operationId": "GetTimeline",
         "parameters": [
           {
             "type": "string",
@@ -21744,7 +21744,7 @@
         "tags": [
           "Timeline"
         ],
-        "operationId": "GetTimelineCounter_Timeline",
+        "operationId": "GetTimelineCounter",
         "parameters": [
           {
             "type": "string",
@@ -27643,6 +27643,127 @@
         }
       }
     },
+    "/messaging/v1/{thread_ids}/messages": {
+      "get": {
+        "tags": [
+          "MessageHistory"
+        ],
+        "summary": "Searches messages within a specific thread.\nSupports cursor-based pagination and field selection.",
+        "operationId": "SearchThreadMessagesHistory",
+        "parameters": [
+          {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "csv",
+            "description": "Filter by thread IDs.",
+            "name": "thread_ids",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "List of message fields to be returned.\nUsed to reduce payload size.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Filter by specific message IDs.",
+            "name": "ids",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Filter messages by sender user IDs.",
+            "name": "sender_ids",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Filter messages by receiver user IDs.",
+            "name": "receiver_ids",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "collectionFormat": "multi",
+            "description": "Filter messages by message types.",
+            "name": "types",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Domain identifier used to data isolation.",
+            "name": "domain_id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Message creation timestamp (Unix time, microseconds).",
+            "name": "cursor.created_at",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Unique message identifier.",
+            "name": "cursor.id",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Pagination direction.\ntrue - backward (older messages).\nfalse - forward (newer messages).",
+            "name": "cursor.direction",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "description": "Maximum number of messages to return.",
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SearchMessageHistoryResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/oauth/apps": {
       "get": {
         "tags": [
@@ -30637,7 +30758,7 @@
         "tags": [
           "FTSService"
         ],
-        "operationId": "Search",
+        "operationId": "SearchMixin6",
         "parameters": [
           {
             "type": "integer",
@@ -35080,7 +35201,7 @@
           "Types"
         ],
         "summary": "Lookup data types registry.",
-        "operationId": "Search_Types",
+        "operationId": "SearchMixin3",
         "parameters": [
           {
             "type": "string",
@@ -35497,7 +35618,7 @@
           "Extensions"
         ],
         "summary": "Search for type extensions.",
-        "operationId": "SearchType_Extensions",
+        "operationId": "SearchTypeMixin3",
         "parameters": [
           {
             "type": "integer",
@@ -35621,7 +35742,7 @@
           "Extensions"
         ],
         "summary": "Type extension details.",
-        "operationId": "LocateType_Extensions",
+        "operationId": "LocateTypeMixin3",
         "parameters": [
           {
             "type": "string",
@@ -35652,7 +35773,7 @@
           "Extensions"
         ],
         "summary": "Update type extension.",
-        "operationId": "UpdateType_Extensions",
+        "operationId": "UpdateTypeMixin3",
         "parameters": [
           {
             "type": "string",
@@ -35691,7 +35812,7 @@
           "Extensions"
         ],
         "summary": "Create type extension.",
-        "operationId": "CreateType_Extensions",
+        "operationId": "CreateTypeMixin3",
         "parameters": [
           {
             "type": "string",
@@ -35731,7 +35852,7 @@
           "Extensions"
         ],
         "summary": "Delete extension for types.",
-        "operationId": "DeleteType_Extensions",
+        "operationId": "DeleteTypeMixin3",
         "parameters": [
           {
             "minItems": 1,
@@ -35777,7 +35898,7 @@
           "Types"
         ],
         "summary": "Structured data type details.",
-        "operationId": "Locate",
+        "operationId": "LocateMixin3",
         "parameters": [
           {
             "type": "string",
@@ -37468,13 +37589,115 @@
         }
       }
     },
+    "/v1/messages/file": {
+      "post": {
+        "tags": [
+          "Message"
+        ],
+        "summary": "SendFile delivers documents or files.",
+        "operationId": "SendFile",
+        "parameters": [
+          {
+            "description": "Represents a request to send a message with document.",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SendDocumentRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SendDocumentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/messages/image": {
+      "post": {
+        "tags": [
+          "Message"
+        ],
+        "summary": "SendImage delivers image-specific messages.",
+        "operationId": "SendImage",
+        "parameters": [
+          {
+            "description": "Represents a request to send an message with image.",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SendImageRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SendImageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/messages/text": {
+      "post": {
+        "tags": [
+          "Message"
+        ],
+        "summary": "SendText delivers a plain text message.\nWe use the shared Request/Response types directly to avoid duplication.",
+        "operationId": "SendText",
+        "parameters": [
+          {
+            "description": "Represents a request to send a text message.",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SendTextRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SendTextResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/v2/dataset/{repo}": {
       "get": {
         "tags": [
           "Records"
         ],
         "summary": "Search dataset records",
-        "operationId": "Search_Records",
+        "operationId": "Search",
         "parameters": [
           {
             "type": "string",
@@ -37659,7 +37882,7 @@
           "Records"
         ],
         "summary": "Locate dataset record",
-        "operationId": "Locate_Records",
+        "operationId": "Locate",
         "parameters": [
           {
             "type": "string",
@@ -62047,6 +62270,419 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.Cursors": {
+      "description": "Cursors contains for navigating\nforward and backward through message history.",
+      "type": "object",
+      "properties": {
+        "after": {
+          "description": "Cursor pointing to the next page of results.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.HistoryMessageCursor"
+        },
+        "before": {
+          "description": "Cursor pointing to the previous page of results.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.HistoryMessageCursor"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.Document": {
+      "description": "Document represents a file attachment\nassociated with a message.",
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "description": "Creation timestamp (Unix time, milliseconds).",
+          "type": "string",
+          "format": "int64"
+        },
+        "file_id": {
+          "description": "File storage identifier.",
+          "type": "string",
+          "format": "int64"
+        },
+        "id": {
+          "description": "Document identifier.",
+          "type": "string"
+        },
+        "message_id": {
+          "description": "Identifier of the message this document belongs to.",
+          "type": "string"
+        },
+        "mime": {
+          "description": "MIME type of the document.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Original file name.",
+          "type": "string"
+        },
+        "size": {
+          "description": "File size in bytes.",
+          "type": "string",
+          "format": "int64"
+        },
+        "url": {
+          "description": "Public signed URL for downloading the document.",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.DocumentInput": {
+      "description": "Represents `Document` message with necessary fields\nto process it into frequently used `document`\nentity in messaging systems.",
+      "type": "object",
+      "properties": {
+        "file_name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "mime_type": {
+          "type": "string"
+        },
+        "size_bytes": {
+          "type": "string",
+          "format": "int64"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.DocumentRequest": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "string"
+        },
+        "documents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.DocumentInput"
+          }
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.HistoryMessage": {
+      "description": "HistoryMessage represents a single message\nin thread history.",
+      "type": "object",
+      "properties": {
+        "body": {
+          "description": "Message body content.",
+          "type": "string"
+        },
+        "created_at": {
+          "description": "Message creation timestamp (Unix time, milliseconds).",
+          "type": "string",
+          "format": "int64"
+        },
+        "documents": {
+          "description": "List of document attachments.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.Document"
+          }
+        },
+        "id": {
+          "description": "Unique message identifier.",
+          "type": "string"
+        },
+        "images": {
+          "description": "List of image attachments.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.Image"
+          }
+        },
+        "metadata": {
+          "description": "Arbitrary message metadata.\nCan contain structured data depending on message type.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
+        },
+        "receiver": {
+          "description": "Receiver user aggregated information.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageParticipant"
+        },
+        "sender": {
+          "description": "Sender user aggregated information.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageParticipant"
+        },
+        "thread_id": {
+          "description": "Identifier of the thread the message belongs to.",
+          "type": "string"
+        },
+        "type": {
+          "description": "Message type identifier.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "updated_at": {
+          "description": "Message last update timestamp (Unix time, milliseconds).",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.HistoryMessageCursor": {
+      "description": "HistoryMessageCursor represents a cursor used for\ncursor based pagination of message history.",
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "description": "Message creation timestamp (Unix time, microseconds).",
+          "type": "string",
+          "format": "int64"
+        },
+        "direction": {
+          "description": "Pagination direction.\ntrue - backward (older messages).\nfalse - forward (newer messages).",
+          "type": "boolean"
+        },
+        "id": {
+          "description": "Unique message identifier.",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.Image": {
+      "description": "Image represents an image attachment\nassociated with a message.",
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "description": "Creation timestamp (Unix time, milliseconds).",
+          "type": "string",
+          "format": "int64"
+        },
+        "file_id": {
+          "description": "File storage identifier.",
+          "type": "string",
+          "format": "int64"
+        },
+        "height": {
+          "description": "Image height in pixels.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "id": {
+          "description": "Image identifier.",
+          "type": "string"
+        },
+        "message_id": {
+          "description": "Identifier of the message this message belongs to.",
+          "type": "string"
+        },
+        "mime": {
+          "description": "MIME type of the image.",
+          "type": "string"
+        },
+        "url": {
+          "description": "Public signed URL for accessing the image.",
+          "type": "string"
+        },
+        "width": {
+          "description": "Image width in pixels.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.ImageInput": {
+      "description": "Represents `Image` entity with \nnecessary fields.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "link": {
+          "type": "string"
+        },
+        "mime_type": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.ImageRequest": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "string"
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.ImageInput"
+          }
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.MessageParticipant": {
+      "description": "MessageParticipant represents aggregated participant information\npresent in the message history response.",
+      "type": "object",
+      "properties": {
+        "issuer": {
+          "description": "Client issuer for the sender.",
+          "type": "string"
+        },
+        "subject": {
+          "description": "Client-readable sender subject or display name.",
+          "type": "string"
+        },
+        "type": {
+          "description": "Sender type.",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.Paging": {
+      "description": "Paging contains pagination metadata.",
+      "type": "object",
+      "properties": {
+        "cursors": {
+          "description": "Cursor-based pagination information.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Cursors"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.Peer": {
+      "description": "Represents a peer in the messaging system.\nIt can be a user, chat, or channel.",
+      "type": "object",
+      "properties": {
+        "channel_id": {
+          "type": "string",
+          "title": "Channel Id [channel thread]"
+        },
+        "contact": {
+          "title": "User identifier [direct thread]",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.PeerIdentity"
+        },
+        "group_id": {
+          "type": "string",
+          "title": "Chat group Id [group thread]"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.PeerIdentity": {
+      "type": "object",
+      "properties": {
+        "iss": {
+          "type": "string"
+        },
+        "sub": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.SearchMessageHistoryResponse": {
+      "description": "SearchMessageHistoryResponse contains\nmessage history search results and pagination metadata.",
+      "type": "object",
+      "properties": {
+        "from": {
+          "description": "List of unique message senders present\nin the current response page.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageParticipant"
+          }
+        },
+        "messages": {
+          "description": "List of messages matching the search criteria.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.HistoryMessage"
+          }
+        },
+        "next": {
+          "description": "Indicates whether more messages are available.",
+          "type": "boolean"
+        },
+        "next_cursor": {
+          "description": "Cursor pointing to the next page of messages.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.HistoryMessageCursor"
+        },
+        "paging": {
+          "description": "Detailed paging metadata.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Paging"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.SendDocumentRequest": {
+      "description": "Represents a request to send a message with document.",
+      "type": "object",
+      "properties": {
+        "document": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.DocumentRequest"
+        },
+        "to": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Peer"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.SendDocumentResponse": {
+      "description": "Represents a response to send message with document.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "to": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Peer"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.SendImageRequest": {
+      "description": "Represents a request to send an message with image.",
+      "type": "object",
+      "properties": {
+        "image": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ImageRequest"
+        },
+        "to": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Peer"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.SendImageResponse": {
+      "description": "Represents a response to send message with image.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "to": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Peer"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.SendTextRequest": {
+      "description": "Represents a request to send a text message.",
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "string"
+        },
+        "to": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Peer"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.SendTextResponse": {
+      "description": "Represents a response to send a text message.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "to": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Peer"
+        }
+      }
+    },
     "webitel_media_exporter.DeleteExportResponse": {
       "description": "Response confirming the deletion of a record.",
       "type": "object",
@@ -63615,271 +64251,6 @@
     },
     {
       "name": "WebHookService"
-    },
-    {
-      "name": "BackendProfileService"
-    },
-    {
-      "name": "CognitiveProfileService"
-    },
-    {
-      "name": "FileService"
-    },
-    {
-      "name": "FilePoliciesService"
-    },
-    {
-      "name": "FileTranscriptService"
-    },
-    {
-      "name": "ImportTemplateService"
-    },
-    {
-      "name": "MediaFileService"
-    },
-    {
-      "name": "ChatService"
-    },
-    {
-      "description": "**Messages** Service",
-      "name": "Messages"
-    },
-    {
-      "name": "AgentChatService"
-    },
-    {
-      "name": "CasesChatCatalog"
-    },
-    {
-      "name": "ContactLinkingService"
-    },
-    {
-      "name": "ContactsChatCatalog"
-    },
-    {
-      "name": "ConfigService"
-    },
-    {
-      "name": "LoggerService"
-    },
-    {
-      "name": "Presence"
-    },
-    {
-      "name": "Customers"
-    },
-    {
-      "name": "Permissions"
-    },
-    {
-      "name": "Users"
-    },
-    {
-      "name": "Roles"
-    },
-    {
-      "name": "AC"
-    },
-    {
-      "name": "AccessStore"
-    },
-    {
-      "name": "OAuth2"
-    },
-    {
-      "name": "SA"
-    },
-    {
-      "name": "Auth"
-    },
-    {
-      "name": "Devices"
-    },
-    {
-      "name": "CallManager"
-    },
-    {
-      "name": "CA"
-    },
-    {
-      "name": "Classes"
-    },
-    {
-      "name": "Comments"
-    },
-    {
-      "name": "Labels"
-    },
-    {
-      "name": "Emails"
-    },
-    {
-      "name": "Upload"
-    },
-    {
-      "name": "Photos"
-    },
-    {
-      "name": "Phones"
-    },
-    {
-      "name": "Managers"
-    },
-    {
-      "name": "Variables"
-    },
-    {
-      "name": "Languages"
-    },
-    {
-      "name": "Timezones"
-    },
-    {
-      "name": "IMClients"
-    },
-    {
-      "name": "ContactGroups"
-    },
-    {
-      "name": "Contacts"
-    },
-    {
-      "name": "DynamicConditions"
-    },
-    {
-      "name": "DynamicGroups"
-    },
-    {
-      "name": "Groups"
-    },
-    {
-      "name": "Timeline"
-    },
-    {
-      "name": "Records"
-    },
-    {
-      "name": "Types"
-    },
-    {
-      "name": "Dictionaries"
-    },
-    {
-      "name": "Extensions"
-    },
-    {
-      "name": "Domains"
-    },
-    {
-      "name": "Articles"
-    },
-    {
-      "name": "KnowledgebaseSearch"
-    },
-    {
-      "name": "Spaces"
-    },
-    {
-      "name": "Tags"
-    },
-    {
-      "name": "LDAP"
-    },
-    {
-      "name": "OAuth2Federation"
-    },
-    {
-      "name": "TwoFactorAuthentication"
-    },
-    {
-      "name": "UserAccessTokens"
-    },
-    {
-      "name": "UserSettings"
-    },
-    {
-      "name": "AgentAbsenceService"
-    },
-    {
-      "name": "AgentWorkingConditionsService"
-    },
-    {
-      "name": "AgentWorkingScheduleService"
-    },
-    {
-      "name": "ForecastCalculationService"
-    },
-    {
-      "name": "PauseTemplateService"
-    },
-    {
-      "name": "ShiftTemplateService"
-    },
-    {
-      "name": "WorkingConditionService"
-    },
-    {
-      "name": "WorkingScheduleService"
-    },
-    {
-      "name": "Services"
-    },
-    {
-      "name": "CaseComments"
-    },
-    {
-      "name": "RelatedCases"
-    },
-    {
-      "name": "CaseFiles"
-    },
-    {
-      "name": "CaseLinks"
-    },
-    {
-      "name": "Priorities"
-    },
-    {
-      "name": "StatusConditions"
-    },
-    {
-      "name": "Sources"
-    },
-    {
-      "name": "SLAConditions"
-    },
-    {
-      "name": "Cases"
-    },
-    {
-      "name": "CaseCommunications"
-    },
-    {
-      "name": "CaseTimeline"
-    },
-    {
-      "name": "Catalogs"
-    },
-    {
-      "name": "CloseReasons"
-    },
-    {
-      "name": "CloseReasonGroups"
-    },
-    {
-      "name": "SLAs"
-    },
-    {
-      "name": "Statuses"
-    },
-    {
-      "name": "FTSService"
-    },
-    {
-      "name": "PdfService"
-    },
-    {
-      "name": "MeetingService"
     }
   ]
 }
