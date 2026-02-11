@@ -2,7 +2,7 @@ name: Swagger
 
 on:
   push:
-    branches: [ main, "fix/buf-settings" ]
+    branches: [main, "fix/buf-settings"]
     paths:
       - "swagger/*.swagger.json"
       - ".github/workflows/swagger-mix.yml"
@@ -18,7 +18,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions: { contents: write }
     steps:
-
       # TODO: use the hosted tool cache: @actions/tool-cache
       - name: Download go-swagger
         env:
@@ -39,28 +38,28 @@ jobs:
           script: |
             const fs = require('fs');
             const path = require('path');
-            
+
             const swaggerDir = 'swagger';
             const files = fs.readdirSync(swaggerDir)
               .filter(f => f.endsWith('.swagger.json'))
               .map(f => path.join(swaggerDir, f));
-            
+
             core.info(`🔍 Found ${files.length} swagger files`);
 
             const operationIds = {};
             const swaggerFiles = {};
-            
+
             files.forEach(file => {
               const swagger = JSON.parse(fs.readFileSync(file, 'utf8'));
               swaggerFiles[file] = swagger;
-            
+
               Object.entries(swagger.paths || {}).forEach(([pathKey, pathItem]) => {
                 Object.entries(pathItem).forEach(([method, operation]) => {
                   if (operation.operationId) {
                     if (!operationIds[operation.operationId]) {
                       operationIds[operation.operationId] = [];
                     }
-            
+
                     operationIds[operation.operationId].push({
                       file, pathKey, method, operation
                     });
@@ -68,17 +67,17 @@ jobs:
                 });
               });
             });
-            
+
             const duplicates = [];
             Object.entries(operationIds).forEach(([opId, occurrences]) => {
               if (occurrences.length > 1) {
                 occurrences.sort((a, b) => a.file.localeCompare(b.file));
-            
+
                 for (let i = 1; i < occurrences.length; i++) {
                   const occ = occurrences[i];
                   const suffix = occ.operation.tags?.[0] || (i + 1);
                   const newOpId = `${opId}_${suffix}`;
-            
+
                   duplicates.push({
                     file: occ.file,
                     path: occ.pathKey,
@@ -87,16 +86,16 @@ jobs:
                     newId: newOpId,
                     tag: occ.operation.tags?.[0] || 'N/A'
                   });
-            
+
                   occ.operation.operationId = newOpId;
                 }
               }
             });
-            
+
             Object.entries(swaggerFiles).forEach(([file, swagger]) => {
               fs.writeFileSync(file, JSON.stringify(swagger, null, 2));
             });
-            
+
             core.info(`✅ Cross-file deduplication complete`);
             if (duplicates.length > 0) {
               core.warning(`Found ${duplicates.length} duplicate operationIds across files`);
@@ -123,11 +122,12 @@ jobs:
             swagger/fts.swagger.json \
             swagger/media-exporter.swagger.json \
             swagger/meetings.swagger.json \
+            swagger/im-gateway.swagger.json \
             --output swagger/api.json
-          
+
           EXIT_CODE=$?
           set -e
-          
+
           if [ $EXIT_CODE -ne 0 ]; then
             echo "::warning::Swagger mixin finished with exit code $EXIT_CODE. Continuing as planned."
           fi
