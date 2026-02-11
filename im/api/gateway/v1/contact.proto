@@ -2,6 +2,9 @@ syntax = "proto3";
 
 package webitel.im.api.gateway.v1;
 
+// Import for HTTP annotations
+import "google/api/annotations.proto";
+
 // Use a descriptive alias for the Go package to avoid naming collisions
 option go_package = "github.com/webitel/im-gateway-service/gen/api/gateway/v1;gateway";
 
@@ -9,15 +12,16 @@ option go_package = "github.com/webitel/im-gateway-service/gen/api/gateway/v1;ga
 // integrated into the Webitel ecosystem (e.g., Telegram, Viber, WebChat).
 service Contacts {
   // Search retrieves a paginated list of contacts based on filters and search queries.
-  rpc Search(SearchContactRequest) returns (ContactList);
+  rpc Search(SearchContactRequest) returns (ContactList) {
+    option (google.api.http) = {
+      get: "/v1/contacts"
+    };
+  }
 }
-
-
-
 // SearchRequest defines filters and pagination parameters for the contact lookup.
 message SearchContactRequest {
   // --- Pagination & Sorting ---
-  
+
   // Page number to retrieve (starts from 1).
   int32 page = 1;
   // Number of items per page.
@@ -28,7 +32,7 @@ message SearchContactRequest {
   repeated string fields = 5;
 
   // --- Filtering ---
-  
+
   // Full-text search query (matches against name or username).
   string q = 3;
   // Filter by channel types (e.g., ["telegram", "viber"]).

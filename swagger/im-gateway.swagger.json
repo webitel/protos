@@ -31,7 +31,547 @@
     "application/json"
   ],
   "paths": {
-    "/messaging/v1/{thread_ids}/messages": {
+    "/v1/auth/device": {
+      "delete": {
+        "summary": "Deletes a device by its token, stops sending PUSH-notifications to it.",
+        "operationId": "UnregisterDevice",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.UnregisterDeviceResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "push",
+            "description": "PUSH Notification subscription",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.PUSHSubscription"
+            }
+          }
+        ],
+        "tags": [
+          "Account"
+        ]
+      },
+      "put": {
+        "summary": "Register device to receive PUSH notifications",
+        "operationId": "RegisterDevice",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.RegisterDeviceResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "push",
+            "description": "PUSH Notification subscription",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.PUSHSubscription"
+            }
+          }
+        ],
+        "tags": [
+          "Account"
+        ]
+      }
+    },
+    "/v1/auth/logout": {
+      "post": {
+        "summary": "Logout Device Request",
+        "operationId": "Logout",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.LogoutResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "tags": [
+          "Account"
+        ]
+      }
+    },
+    "/v1/auth/token": {
+      "get": {
+        "summary": "Inspect current Authorization credentials",
+        "operationId": "Inspect",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.Authorization"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "tags": [
+          "Account"
+        ]
+      },
+      "post": {
+        "summary": "// Authorization Request. Part of OAuth flow\nrpc Auth(AuthRequest) returns (AuthResponse);",
+        "operationId": "Token",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.Authorization"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.TokenRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Account"
+        ]
+      }
+    },
+    "/v1/bots": {
+      "post": {
+        "summary": "Create a new bot",
+        "operationId": "CreateBot",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.Bot"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.CreateBotRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Bots"
+        ]
+      }
+    },
+    "/v1/bots/{id}": {
+      "delete": {
+        "summary": "Delete a bot",
+        "operationId": "DeleteBot",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.Bot"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Bots"
+        ]
+      },
+      "patch": {
+        "summary": "Update existing bot",
+        "operationId": "UpdateBot",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.Bot"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.Bots.UpdateBotBody"
+            }
+          }
+        ],
+        "tags": [
+          "Bots"
+        ]
+      }
+    },
+    "/v1/contacts": {
+      "get": {
+        "summary": "Search retrieves a paginated list of contacts based on filters and search queries.",
+        "operationId": "Search",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ContactList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "description": "Page number to retrieve (starts from 1).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "description": "Number of items per page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "sort",
+            "description": "Sorting criteria (e.g., \"name\" or \"-created_at\").",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "description": "List of specific fields to include in the response. If empty, all fields are returned.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "q",
+            "description": "Full-text search query (matches against name or username).",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "description": "Filter by channel types (e.g., [\"telegram\", \"viber\"]).",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "subjects",
+            "description": "Filter by internal system subjects/user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Contacts"
+        ]
+      }
+    },
+    "/v1/messages/file": {
+      "post": {
+        "summary": "SendFile delivers documents or files.",
+        "operationId": "SendFile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SendDocumentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "Represents a request to send a message with document.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SendDocumentRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Message"
+        ]
+      }
+    },
+    "/v1/messages/image": {
+      "post": {
+        "summary": "SendImage delivers image-specific messages.",
+        "operationId": "SendImage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SendImageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "Represents a request to send an message with image.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SendImageRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Message"
+        ]
+      }
+    },
+    "/v1/messages/text": {
+      "post": {
+        "summary": "SendText delivers a plain text message.\nWe use the shared Request/Response types directly to avoid duplication.",
+        "operationId": "SendText",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SendTextResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "Represents a request to send a text message.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SendTextRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Message"
+        ]
+      }
+    },
+    "/v1/threads": {
+      "get": {
+        "summary": "Search threads with filters",
+        "operationId": "Search",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SearchThreadResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "fields",
+            "description": "List of fields that should be returned in the response.\nIf empty, a default set of fields is returned.\nUsed for response optimization.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "ids",
+            "description": "Filter by specific thread IDs.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "domain_ids",
+            "description": "Filter threads by domain IDs.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "kinds",
+            "description": "Filter threads by their kinds.\nUNKNOWN (0) is not allowed.\n\n - UNKNOWN: Unknown or unspecified thread type.\nMust not be used in valid requests.\n - DIRECT: One-to-one private thread between two users.\n - GROUP: Group thread with multiple members.\n - CHANNEL: Channel-style thread (broadcast or topic based communication).",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "UNKNOWN",
+                "DIRECT",
+                "GROUP",
+                "CHANNEL"
+              ]
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "q",
+            "description": "Full-text search query.\nTypically applied to subject.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "size",
+            "description": "Maximum number of threads to return per page.\nMust be greater than 0 and less than or equal to 100.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "sort",
+            "description": "Sorting field.\nOptional \"+\" or \"-\" prefix indicates ascending or descending order.\nExample: \"-created_at\", \"subject\"",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "description": "Page number (1-based).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "ThreadManagement"
+        ]
+      }
+    },
+    "/v1/{thread_ids}/messages": {
       "get": {
         "summary": "Searches messages within a specific thread.\nSupports cursor-based pagination and field selection.",
         "operationId": "SearchThreadMessagesHistory",
@@ -161,108 +701,6 @@
           "MessageHistory"
         ]
       }
-    },
-    "/v1/messages/file": {
-      "post": {
-        "summary": "SendFile delivers documents or files.",
-        "operationId": "SendFile",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.im.api.gateway.v1.SendDocumentResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/google.rpc.Status"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "description": "Represents a request to send a message with document.",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/webitel.im.api.gateway.v1.SendDocumentRequest"
-            }
-          }
-        ],
-        "tags": [
-          "Message"
-        ]
-      }
-    },
-    "/v1/messages/image": {
-      "post": {
-        "summary": "SendImage delivers image-specific messages.",
-        "operationId": "SendImage",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.im.api.gateway.v1.SendImageResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/google.rpc.Status"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "description": "Represents a request to send an message with image.",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/webitel.im.api.gateway.v1.SendImageRequest"
-            }
-          }
-        ],
-        "tags": [
-          "Message"
-        ]
-      }
-    },
-    "/v1/messages/text": {
-      "post": {
-        "summary": "SendText delivers a plain text message.\nWe use the shared Request/Response types directly to avoid duplication.",
-        "operationId": "SendText",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.im.api.gateway.v1.SendTextResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/google.rpc.Status"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "description": "Represents a request to send a text message.",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/webitel.im.api.gateway.v1.SendTextRequest"
-            }
-          }
-        ],
-        "tags": [
-          "Message"
-        ]
-      }
     }
   },
   "definitions": {
@@ -276,6 +714,14 @@
       },
       "additionalProperties": {},
       "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "google.protobuf.NullValue": {
+      "type": "string",
+      "enum": [
+        "NULL_VALUE"
+      ],
+      "default": "NULL_VALUE",
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
     },
     "google.rpc.Status": {
       "type": "object",
@@ -296,6 +742,311 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.AccessToken": {
+      "type": "object",
+      "properties": {
+        "token_type": {
+          "type": "string",
+          "description": "REQUIRED. The type of the token issued. Value is case insensitive."
+        },
+        "access_token": {
+          "type": "string",
+          "description": "REQUIRED. The access token issued by the authorization server."
+        },
+        "refresh_token": {
+          "type": "string",
+          "description": "OPTIONAL. The refresh token, which can be used to obtain\nnew access tokens using the same authorization grant."
+        },
+        "expires_in": {
+          "type": "integer",
+          "format": "int32",
+          "description": "RECOMMENDED. The lifetime in seconds of the access token."
+        },
+        "scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "OPTIONAL, if identical to the scope requested by the client;\notherwise, REQUIRED. The scope of the access token."
+        },
+        "state": {
+          "type": "string",
+          "description": "REQUIRED if the \"state\" parameter was present in the client\nauthorization request. The exact value received from the client."
+        }
+      },
+      "title": "Access Token Response"
+    },
+    "webitel.im.api.gateway.v1.AuthContact": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "[IM] Service (Provider) Account ID."
+        },
+        "iss": {
+          "type": "string",
+          "description": "REQUIRED. Issuer Identifier for the Issuer of the response.\nThe iss value is a case sensitive URL using the https scheme that contains scheme, host,\nand optionally, port number and path components and no query or fragment components."
+        },
+        "sub": {
+          "type": "string",
+          "description": "REQUIRED. Subject Identifier.\nA locally unique and never reassigned identifier within the Issuer for the End-User,\nwhich is intended to be consumed by the Client, e.g., 24400320 or AItOawmwtWwcT0k51BayewNvutrJUqsvl6qs7A4.\nIt MUST NOT exceed 255 ASCII characters in length.\nThe sub value is a case sensitive string."
+        },
+        "name": {
+          "type": "string",
+          "description": "REQUIRED. End-User's full name in displayable form including all name parts,\npossibly including titles and suffixes, ordered according to the End-User's locale and preferences."
+        },
+        "given_name": {
+          "type": "string",
+          "description": "Given name(s) or first name(s) of the End-User.\nNote that in some cultures, people can have multiple given names;\nall can be present, with the names being separated by space characters."
+        },
+        "middle_name": {
+          "type": "string",
+          "description": "Middle name(s) of the End-User.\nNote that in some cultures, people can have multiple middle names;\nall can be present, with the names being separated by space characters.\nAlso note that in some cultures, middle names are not used."
+        },
+        "family_name": {
+          "type": "string",
+          "description": "Surname(s) or last name(s) of the End-User.\nNote that in some cultures, people can have multiple family names or no family name;\nall can be present, with the names being separated by space characters."
+        },
+        "username": {
+          "type": "string",
+          "title": "[preferred_username]. Mention"
+        },
+        "birthdate": {
+          "type": "string",
+          "description": "OPTIONAL. End-User's birthday, represented as an ISO 8601:2004 [ISO8601‑2004] YYYY-MM-DD format.\nThe year MAY be 0000, indicating that it is omitted.\nTo represent only the year, YYYY format is allowed."
+        },
+        "zoneinfo": {
+          "type": "string",
+          "description": "OPTIONAL. String from zoneinfo [zoneinfo] time zone database representing the End-User's time zone.\nFor example, Europe/Kyiv or America/Los_Angeles."
+        },
+        "profile": {
+          "type": "string",
+          "description": "OPTIONAL. URL of the End-User's profile page.\nThe contents of this Web page SHOULD be about the End-User.\nNOTE: Issuer SP (IdP) related URL."
+        },
+        "picture": {
+          "type": "string",
+          "description": "OPTIONAL. URL of the End-User's profile picture.\nThis URL MUST refer to an image file\n(for example, a PNG, JPEG, or GIF image file),\nrather than to a Web page containing an image."
+        },
+        "gender": {
+          "type": "string",
+          "description": "OPTIONAL. End-User's gender.\nValues defined by this specification are `female` and `male`.\nOther values MAY be used when neither of the defined values are applicable."
+        },
+        "locale": {
+          "type": "string",
+          "description": "End-User's locale, represented as a BCP47 [RFC5646] language tag.\nThis is typically an ISO 639-1 Alpha-2 [ISO639‑1] language code in lowercase\nand an ISO 3166-1 Alpha-2 [ISO3166‑1] country code in uppercase,\nseparated by a dash. For example, `en-US` or `uk-UA`."
+        },
+        "email": {
+          "type": "string",
+          "description": "End-User's preferred e-mail address.\nIts value MUST conform to the RFC 5322 [RFC5322] addr-spec syntax.\nThe RP MUST NOT rely upon this value being unique, as discussed in Section 5.7."
+        },
+        "email_verified": {
+          "type": "boolean",
+          "description": "True if the End-User's e-mail address has been verified; otherwise false."
+        },
+        "phone_number": {
+          "type": "string",
+          "description": "End-User's preferred telephone number.\nE.164 is RECOMMENDED as the format of this Claim, for example, +1 (425) 555-1212 or +56 (2) 687 2400.\nIf the phone number contains an extension, it is RECOMMENDED that\nthe extension be represented using the RFC 3966 [RFC3966] extension syntax, for example, +1 (604) 555-1234;ext=5678."
+        },
+        "phone_number_verified": {
+          "type": "boolean",
+          "description": "True if the End-User's phone number has been verified; otherwise false."
+        },
+        "metadata": {
+          "type": "object",
+          "description": "End-User's extra attributes (claims) metadata."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Time the End-User's information was last updated.\nIts value is a JSON number representing the number of seconds from 1970-01-01T0:0:0Z as measured in UTC until the date/time."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "deleted_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "title": "Contact (End-User) profile at the Issuer.\nhttps://openid.net/specs/openid-connect-core-1_0.html#Claims"
+    },
+    "webitel.im.api.gateway.v1.Authorization": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "int64",
+          "title": "When was the session created"
+        },
+        "name": {
+          "type": "string",
+          "description": "Session (device) display name."
+        },
+        "app_id": {
+          "type": "string",
+          "title": "Application [client_id] ; VIA"
+        },
+        "device": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Device",
+          "title": "Last known (User-Agent) device ; FROM"
+        },
+        "contact": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.AuthContact",
+          "title": "Authorized end-user Contact info"
+        },
+        "token": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.AccessToken",
+          "title": "OPTIONAL. Grant of an [access_token] for this session Authorization"
+        },
+        "current": {
+          "type": "boolean",
+          "title": "Whether this is the current session"
+        }
+      },
+      "title": "Authorization. Session"
+    },
+    "webitel.im.api.gateway.v1.Bot": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "schema_id": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.Bots.UpdateBotBody": {
+      "type": "object",
+      "properties": {
+        "field_mask": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "schema_id": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.Contact": {
+      "type": "object",
+      "properties": {
+        "iss_id": {
+          "type": "string",
+          "description": "Provider-specific unique identifier (Issuer ID)."
+        },
+        "app_id": {
+          "type": "string",
+          "description": "Identifier of the specific integration app or bot."
+        },
+        "type": {
+          "type": "string",
+          "description": "Channel type (e.g., 'webchat', 'telegram')."
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the contact."
+        },
+        "username": {
+          "type": "string",
+          "description": "Technical username or handle."
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Additional dynamic attributes provided by the messenger."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Record creation timestamp (Unix Epoch in milliseconds)."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Last record update timestamp (Unix Epoch in milliseconds)."
+        },
+        "subject": {
+          "type": "string",
+          "description": "Associated internal system subject/identifier."
+        }
+      },
+      "description": "Contact represents an external messaging identity."
+    },
+    "webitel.im.api.gateway.v1.ContactList": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Current page number."
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items returned in this batch."
+        },
+        "next": {
+          "type": "boolean",
+          "description": "Indicates if there are more pages available."
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.Contact"
+          },
+          "description": "List of contacts found."
+        }
+      },
+      "description": "SearchList represents a paginated collection of Contact entities."
+    },
+    "webitel.im.api.gateway.v1.CreateBotRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "schema_id": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.Cursors": {
       "type": "object",
       "properties": {
@@ -309,6 +1060,23 @@
         }
       },
       "description": "Cursors contains for navigating\nforward and backward through message history."
+    },
+    "webitel.im.api.gateway.v1.Device": {
+      "type": "object",
+      "properties": {
+        "ip": {
+          "type": "string",
+          "title": "Last known IP address [FROM]"
+        },
+        "app": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.UserAgent",
+          "title": "[User-Agent] as (remote) client (application) info"
+        },
+        "push": {
+          "type": "string"
+        }
+      },
+      "title": "Device (Client) endpoint. [FROM]"
     },
     "webitel.im.api.gateway.v1.Document": {
       "type": "object",
@@ -387,6 +1155,24 @@
           "type": "string"
         }
       }
+    },
+    "webitel.im.api.gateway.v1.ExternalParticipant": {
+      "type": "object",
+      "properties": {
+        "issuer": {
+          "type": "string",
+          "description": "Client issuer for the sender."
+        },
+        "subject": {
+          "type": "string",
+          "description": "Client-readable participant subject or display name."
+        },
+        "type": {
+          "type": "string",
+          "description": "Participant type."
+        }
+      },
+      "description": "ExternalParticipant represents aggregated participant information\npresent in the thread history response."
     },
     "webitel.im.api.gateway.v1.HistoryMessage": {
       "type": "object",
@@ -471,6 +1257,80 @@
       },
       "description": "HistoryMessageCursor represents a cursor used for\ncursor based pagination of message history."
     },
+    "webitel.im.api.gateway.v1.Identity": {
+      "type": "object",
+      "properties": {
+        "iss": {
+          "type": "string",
+          "description": "REQUIRED. Issuer Identifier for the Issuer of the response.\nThe iss value is a case sensitive URL using the https scheme that contains scheme, host,\nand optionally, port number and path components and no query or fragment components."
+        },
+        "sub": {
+          "type": "string",
+          "description": "REQUIRED. Subject Identifier.\nA locally unique and never reassigned identifier within the Issuer for the End-User,\nwhich is intended to be consumed by the Client, e.g., 24400320 or AItOawmwtWwcT0k51BayewNvutrJUqsvl6qs7A4.\nIt MUST NOT exceed 255 ASCII characters in length.\nThe sub value is a case sensitive string."
+        },
+        "name": {
+          "type": "string",
+          "description": "REQUIRED. End-User's full name in displayable form including all name parts,\npossibly including titles and suffixes, ordered according to the End-User's locale and preferences."
+        },
+        "given_name": {
+          "type": "string",
+          "description": "Given name(s) or first name(s) of the End-User.\nNote that in some cultures, people can have multiple given names;\nall can be present, with the names being separated by space characters."
+        },
+        "middle_name": {
+          "type": "string",
+          "description": "Middle name(s) of the End-User.\nNote that in some cultures, people can have multiple middle names;\nall can be present, with the names being separated by space characters.\nAlso note that in some cultures, middle names are not used."
+        },
+        "family_name": {
+          "type": "string",
+          "description": "Surname(s) or last name(s) of the End-User.\nNote that in some cultures, people can have multiple family names or no family name;\nall can be present, with the names being separated by space characters."
+        },
+        "birthdate": {
+          "type": "string",
+          "description": "OPTIONAL. End-User's birthday, represented as an ISO 8601:2004 [ISO8601‑2004] YYYY-MM-DD format.\nThe year MAY be 0000, indicating that it is omitted.\nTo represent only the year, YYYY format is allowed."
+        },
+        "zoneinfo": {
+          "type": "string",
+          "description": "OPTIONAL. String from zoneinfo [zoneinfo] time zone database representing the End-User's time zone.\nFor example, Europe/Kyiv or America/Los_Angeles."
+        },
+        "profile": {
+          "type": "string",
+          "description": "OPTIONAL. URL of the End-User's profile page.\nThe contents of this Web page SHOULD be about the End-User.\nNOTE: Issuer SP (IdP) related URL."
+        },
+        "picture": {
+          "type": "string",
+          "description": "OPTIONAL. URL of the End-User's profile picture.\nThis URL MUST refer to an image file\n(for example, a PNG, JPEG, or GIF image file),\nrather than to a Web page containing an image."
+        },
+        "gender": {
+          "type": "string",
+          "description": "OPTIONAL. End-User's gender.\nValues defined by this specification are `female` and `male`.\nOther values MAY be used when neither of the defined values are applicable."
+        },
+        "locale": {
+          "type": "string",
+          "description": "End-User's locale, represented as a BCP47 [RFC5646] language tag.\nThis is typically an ISO 639-1 Alpha-2 [ISO639‑1] language code in lowercase\nand an ISO 3166-1 Alpha-2 [ISO3166‑1] country code in uppercase,\nseparated by a dash. For example, `en-US` or `uk-UA`."
+        },
+        "email": {
+          "type": "string",
+          "description": "End-User's preferred e-mail address.\nIts value MUST conform to the RFC 5322 [RFC5322] addr-spec syntax.\nThe RP MUST NOT rely upon this value being unique, as discussed in Section 5.7."
+        },
+        "email_verified": {
+          "type": "boolean",
+          "description": "True if the End-User's e-mail address has been verified; otherwise false."
+        },
+        "phone_number": {
+          "type": "string",
+          "description": "End-User's preferred telephone number.\nE.164 is RECOMMENDED as the format of this Claim, for example, +1 (425) 555-1212 or +56 (2) 687 2400.\nIf the phone number contains an extension, it is RECOMMENDED that\nthe extension be represented using the RFC 3966 [RFC3966] extension syntax, for example, +1 (604) 555-1234;ext=5678."
+        },
+        "phone_number_verified": {
+          "type": "boolean",
+          "description": "True if the End-User's phone number has been verified; otherwise false."
+        },
+        "metadata": {
+          "type": "object",
+          "description": "End-User's extra attributes (claims) metadata."
+        }
+      },
+      "title": "Identity (IdToken) of the Contact at the Issuer.\nhttps://openid.net/specs/openid-connect-core-1_0.html#Claims"
+    },
     "webitel.im.api.gateway.v1.Image": {
       "type": "object",
       "properties": {
@@ -546,6 +1406,10 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.LogoutResponse": {
+      "type": "object",
+      "title": "No Data"
+    },
     "webitel.im.api.gateway.v1.MessageParticipant": {
       "type": "object",
       "properties": {
@@ -563,6 +1427,29 @@
         }
       },
       "description": "MessageParticipant represents aggregated participant information\npresent in the message history response."
+    },
+    "webitel.im.api.gateway.v1.PUSHSubscription": {
+      "type": "object",
+      "properties": {
+        "fcm": {
+          "type": "string",
+          "title": "[F]irebase [C]loud [M]essaging Service (firebase token for google firebase)"
+        },
+        "apn": {
+          "type": "string",
+          "title": "[A]pple [P]ush [N]otification Service (device token for apple push)"
+        },
+        "web": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.WebPushSubscription",
+          "title": "For 10 web push, the token must be a JSON-encoded object with the following keys:\nendpoint: Absolute URL exposed by the push service where the application server can send push messages\nkeys: P-256 elliptic curve Diffie-Hellman parameters in the following object\np256dh: Base64url-encoded P-256 elliptic curve Diffie-Hellman public key\nauth: Base64url-encoded authentication secret"
+        },
+        "secret": {
+          "type": "string",
+          "format": "byte",
+          "title": "For FCM and APNS VoIP, optional encryption key used to encrypt push notifications"
+        }
+      },
+      "title": "PUSH (token) Subscription\nhttps://core.telegram.org/api/push-updates#subscribing-to-notifications"
     },
     "webitel.im.api.gateway.v1.Paging": {
       "type": "object",
@@ -603,6 +1490,10 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.RegisterDeviceResponse": {
+      "type": "object",
+      "title": "No Reply ; Error status if failed"
+    },
     "webitel.im.api.gateway.v1.SearchMessageHistoryResponse": {
       "type": "object",
       "properties": {
@@ -636,6 +1527,24 @@
         }
       },
       "description": "SearchMessageHistoryResponse contains\nmessage history search results and pagination metadata."
+    },
+    "webitel.im.api.gateway.v1.SearchThreadResponse": {
+      "type": "object",
+      "properties": {
+        "threads": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.Thread"
+          },
+          "description": "List of threads matching the search criteria."
+        },
+        "next": {
+          "type": "boolean",
+          "description": "Indicates whether there is a next page available."
+        }
+      },
+      "description": "SearchThreadResponse contains the list of threads\nand pagination metadata."
     },
     "webitel.im.api.gateway.v1.SendDocumentRequest": {
       "type": "object",
@@ -708,6 +1617,236 @@
         }
       },
       "description": "Represents a response to send a text message."
+    },
+    "webitel.im.api.gateway.v1.Thread": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique thread identifier."
+        },
+        "domain_id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Domain identifier the thread belongs to."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Thread creation timestamp (Unix time, milliseconds)."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Last update timestamp (Unix time, milliseconds)."
+        },
+        "kind": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadKind",
+          "description": "Type of the thread."
+        },
+        "owner": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ExternalParticipant",
+          "description": "Aggregated user information of the thread owner."
+        },
+        "admins": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.ExternalParticipant"
+          },
+          "description": "List of users aggregated information with admin privileges."
+        },
+        "member_ids": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.ExternalParticipant"
+          },
+          "description": "List of member users aggregated information."
+        },
+        "subject": {
+          "type": "string",
+          "description": "Thread subject or title."
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional thread description."
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadMember"
+          },
+          "description": "Detailed member information."
+        }
+      },
+      "description": "Thread represents a thread (aka chat or conversation) entity."
+    },
+    "webitel.im.api.gateway.v1.ThreadDirectSettings": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Settings identifier."
+        },
+        "domain_id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Domain identifier."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Creation timestamp (Unix time, milliseconds)."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Last update timestamp (Unix time, milliseconds)."
+        },
+        "title": {
+          "type": "string",
+          "description": "Custom title for the direct thread.\nUsually represents the display name of the conversation."
+        }
+      },
+      "description": "ThreadDirectSettings defines settings\nspecific to direct (one-to-one) threads."
+    },
+    "webitel.im.api.gateway.v1.ThreadKind": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "DIRECT",
+        "GROUP",
+        "CHANNEL"
+      ],
+      "default": "UNKNOWN",
+      "description": "ThreadKind defines the type of a thread.\nIt determines the business rules and available features for the thread.\n\n - UNKNOWN: Unknown or unspecified thread type.\nMust not be used in valid requests.\n - DIRECT: One-to-one private thread between two users.\n - GROUP: Group thread with multiple members.\n - CHANNEL: Channel-style thread (broadcast or topic based communication)."
+    },
+    "webitel.im.api.gateway.v1.ThreadMember": {
+      "type": "object",
+      "properties": {
+        "member": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ExternalParticipant",
+          "description": "User aggregated information."
+        },
+        "direct_settings": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadDirectSettings",
+          "description": "Direct thread specific settings.\nPresent only for DIRECT threads."
+        }
+      },
+      "description": "ThreadMember represents a thread participant\nwith optional type-specific settings."
+    },
+    "webitel.im.api.gateway.v1.TokenRequest": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "type": "string",
+          "title": "RECOMMENDED. An opaque value used by the client to maintain\nstate between the request and callback.  The authorization\nserver includes this value when redirecting the user-agent back\nto the client.  The parameter SHOULD be used for preventing\ncross-site request forgery"
+        },
+        "scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "OPTIONAL. The scope of the access request\nPosible values are:\n* chat ; [I]nstant [M]essaging service\n* call ; [V]oice[o]ver[IP] SIP service"
+        },
+        "client_id": {
+          "type": "string",
+          "description": "The client identifier issued to the client during the registration process.\nREQUIRED, if the client is not authenticating with the authorization server.\nMay be transmitted in header: [X-Webitel-Client]."
+        },
+        "client_secret": {
+          "type": "string",
+          "description": "REQUIRED. The client secret. The client MAY omit the\nparameter if the client secret is an empty string.\n\nIncluding the client credentials in the request-body using the two\nparameters is NOT RECOMMENDED and SHOULD be limited to clients unable\nto directly utilize the HTTP Basic authentication scheme (or other\npassword-based HTTP authentication schemes). The parameters can only\nbe transmitted in the request-body and MUST NOT be included in the\nrequest URI.\n\nKeep it a secret."
+        },
+        "code": {
+          "type": "string",
+          "description": "Authorization code grant.\nREQUIRED. When grant_type is set to \"authorization_code\"."
+        },
+        "refresh_token": {
+          "type": "string",
+          "description": "Refresh token string to obtain NEW access token.\nREQUIRED. When grant_type is set to \"refresh_token\"."
+        },
+        "identity": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Identity",
+          "description": "Identity of the end-User account association.\nREQUIRED. When grant_type is set to \"identity\"."
+        }
+      },
+      "title": "Access Token Request"
+    },
+    "webitel.im.api.gateway.v1.UnregisterDeviceResponse": {
+      "type": "object",
+      "title": "No Reply ; Error status if failed"
+    },
+    "webitel.im.api.gateway.v1.UserAgent": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "app [code]name"
+        },
+        "version": {
+          "type": "string",
+          "title": "app version"
+        },
+        "os": {
+          "type": "string"
+        },
+        "os_version": {
+          "type": "string"
+        },
+        "device": {
+          "type": "string",
+          "title": "optional ; brand / model"
+        },
+        "mobile": {
+          "type": "boolean"
+        },
+        "tablet": {
+          "type": "boolean"
+        },
+        "desktop": {
+          "type": "boolean"
+        },
+        "bot": {
+          "type": "boolean"
+        },
+        "string": {
+          "type": "string",
+          "title": "[User-Agent] source string"
+        }
+      },
+      "title": "[User-Agent] string \u0026 details"
+    },
+    "webitel.im.api.gateway.v1.WebPushSubscription": {
+      "type": "object",
+      "properties": {
+        "endpoint": {
+          "type": "string",
+          "title": "endpoint: Absolute URL exposed by the push service where the application server can send push messages"
+        },
+        "key": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.WebPushSubscription.Key",
+          "title": "P-256 elliptic curve Diffie-Hellman parameters"
+        }
+      },
+      "title": "WebPUSH subscription"
+    },
+    "webitel.im.api.gateway.v1.WebPushSubscription.Key": {
+      "type": "object",
+      "properties": {
+        "auth": {
+          "type": "string",
+          "format": "byte",
+          "title": "auth: Base64url-encoded authentication secret"
+        },
+        "p256dh": {
+          "type": "string",
+          "format": "byte",
+          "title": "p256dh: Base64url-encoded P-256 elliptic curve Diffie-Hellman public key"
+        }
+      },
+      "title": "keys: P-256 elliptic curve Diffie-Hellman parameters in the following object\np256dh: Base64url-encoded P-256 elliptic curve Diffie-Hellman public key\nauth: Base64url-encoded authentication secret"
     }
   }
 }

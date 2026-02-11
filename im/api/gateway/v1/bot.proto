@@ -2,18 +2,33 @@ syntax = "proto3";
 
 package webitel.im.api.gateway.v1;
 
-
 import "buf/validate/validate.proto";
 import "google/protobuf/field_mask.proto";
-
-// Use a descriptive alias for the Go package to avoid naming collisions
-option go_package = "github.com/webitel/im-gateway-service/gen/api/gateway/v1;gateway";
-
+import "google/api/annotations.proto"; // Необхідно для http-шляхів
 
 service Bots {
-  rpc CreateBot(CreateBotRequest) returns (Bot);
-  rpc UpdateBot(UpdateBotRequest) returns (Bot);
-  rpc DeleteBot(DeleteBotRequest) returns (Bot);
+  // Create a new bot
+  rpc CreateBot(CreateBotRequest) returns (Bot) {
+    option (google.api.http) = {
+      post: "/v1/bots"
+      body: "*"
+    };
+  }
+
+  // Update existing bot
+  rpc UpdateBot(UpdateBotRequest) returns (Bot) {
+    option (google.api.http) = {
+      patch: "/v1/bots/{id}"
+      body: "*"
+    };
+  }
+
+  // Delete a bot
+  rpc DeleteBot(DeleteBotRequest) returns (Bot) {
+    option (google.api.http) = {
+      delete: "/v1/bots/{id}"
+    };
+  }
 }
 
 
