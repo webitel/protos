@@ -54,35 +54,32 @@ message Thread {
     // Unique thread identifier.
     string id = 1;
 
-    // Domain identifier the thread belongs to.
-    int32 domain_id = 2;
-
     // Thread creation timestamp (Unix time, milliseconds).
-    int64 created_at = 3;
+    int64 created_at = 2;
 
     // Last update timestamp (Unix time, milliseconds).
-    int64 updated_at = 4;
+    int64 updated_at = 3;
 
     // Type of the thread.
-    ThreadKind kind = 5;
+    ThreadKind kind = 4;
 
     // Aggregated user information of the thread owner.
-    ExternalParticipant owner = 6;
+    ExternalParticipant owner = 5;
 
     // List of users aggregated information with admin privileges.
-    repeated ExternalParticipant admins = 7;
+    repeated ExternalParticipant admins = 6;
 
     // List of member users aggregated information.
-    repeated ExternalParticipant member_ids = 8;
+    repeated ExternalParticipant member_ids = 7;
 
     // Thread subject or title.
-    string subject = 9;
+    string subject = 8;
 
     // Optional thread description.
-    string description = 10;
+    string description = 9;
 
     // Detailed member information.
-    repeated ThreadMember members = 11;
+    repeated ThreadMember members = 10;
 }
 
 //#endregion
@@ -103,33 +100,26 @@ message ThreadSearchRequest {
         (buf.validate.field).repeated.items.string.uuid = true
     ];
 
-    // Filter threads by domain IDs.
-    repeated int32 domain_ids = 3 [
-        (buf.validate.field).repeated.items.int32.gt = 0
-    ];
 
     // Filter threads by their kinds.
     // UNKNOWN (0) is not allowed.
-    repeated ThreadKind kinds = 4 [
+    repeated ThreadKind kinds = 3 [
         (buf.validate.field).repeated.items.enum.defined_only = true,
         (buf.validate.field).repeated.items.enum.not_in = 0
     ];
 
     // Filter threads by owners.
-    repeated PeerIdentity owners = 5;
+    repeated PeerIdentity owners = 4;
 
     // Full-text search query.
     // Typically applied to subject.
-    string q = 6[
+    string q = 5[
         (buf.validate.field).string = {min_len: 0, max_len: 256}
     ];
 
-    // Filter threads where specified users are members.
-    repeated PeerIdentity member_ids = 7;
-
     // Maximum number of threads to return per page.
     // Must be greater than 0 and less than or equal to 100.
-    int32 size = 8 [
+    int32 size = 6 [
         (buf.validate.field).int32 = {gt: 0, lte: 100},
         (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
     ];
@@ -137,13 +127,13 @@ message ThreadSearchRequest {
     // Sorting field.
     // Optional "+" or "-" prefix indicates ascending or descending order.
     // Example: "-created_at", "subject"
-    string sort = 9 [
+    string sort = 7 [
         (buf.validate.field).string.pattern = "^[+-]?[a-z_]+$",
         (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
     ];
 
     // Page number (1-based).
-    int32 page = 10 [
+    int32 page = 8 [
         (buf.validate.field).int32.gte = 1,
         (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
     ];
