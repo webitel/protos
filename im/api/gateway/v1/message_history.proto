@@ -69,14 +69,8 @@ message SearchMessageHistoryRequest {
     (buf.validate.field).repeated.max_items = 50
   ];
 
-  // Filter messages by receiver user IDs.
-  repeated string receiver_ids = 5 [
-    (buf.validate.field).repeated.items.string.uuid = true,
-    (buf.validate.field).repeated.max_items = 50
-  ];
-
   // Filter messages by message types.
-  repeated int32 types = 6 [
+  repeated int32 types = 5 [
     (buf.validate.field).repeated.items.int32.gte = 1,
     (buf.validate.field).repeated.items.int32.lte = 4,
     (buf.validate.field).repeated.max_items = 4
@@ -84,10 +78,10 @@ message SearchMessageHistoryRequest {
 
   // Cursor for cursor-based pagination.
   // If omitted, search starts from the most recent messages.
-  optional HistoryMessageCursor cursor = 7;
+  optional HistoryMessageCursor cursor = 6;
 
   // Maximum number of messages to return.
-  uint32                        size   = 8 [
+  uint32                        size   = 7 [
     (buf.validate.field).uint32 = {
       gte: 1,
       lte: 100
@@ -168,31 +162,28 @@ message HistoryMessage {
 
   // Sender user aggregated information.
   MessageParticipant                           sender   = 3;
-
-  // Receiver user aggregated information.
-  MessageParticipant                           receiver = 4;
-
+  
   // Message type identifier.
-  int32                            type        = 5;
+  int32                            type        = 4;
 
   // Message body content.
-  string                           body        = 6;
+  string                           body        = 5;
 
   // Arbitrary message metadata.
   // Can contain structured data depending on message type.
-  map<string, google.protobuf.Any> metadata    = 7;
+  map<string, google.protobuf.Any> metadata    = 6;
 
   // Message creation timestamp (Unix time, milliseconds).
-  int64 created_at = 8;
+  int64 created_at = 7;
 
   // Message last update timestamp (Unix time, milliseconds).
-  int64 updated_at = 9;
+  int64 updated_at = 8;
 
   // List of document attachments.
-  repeated Document documents = 10;
+  repeated Document documents = 9;
 
   // List of image attachments.
-  repeated Image    images    = 11;
+  repeated Image    images    = 10;
 }
 
 /*
