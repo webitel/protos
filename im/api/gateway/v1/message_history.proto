@@ -16,7 +16,7 @@ service MessageHistory {
   // Supports cursor-based pagination and field selection.
   rpc SearchThreadMessagesHistory(SearchMessageHistoryRequest) returns (SearchMessageHistoryResponse) {
     option (google.api.http) = {
-      get: "/v1/{thread_ids}/messages"
+      get: "/v1/{thread_id}/messages"
     };
   }
 }
@@ -58,9 +58,8 @@ message SearchMessageHistoryRequest {
   ];
 
   // Filter by thread IDs.
-  repeated string thread_ids = 3 [
-    (buf.validate.field).repeated.items.string.uuid = true,
-    (buf.validate.field).repeated.max_items = 50
+   string thread_id= 3 [
+    (buf.validate.field).string.uuid = true
   ];
 
   // Filter messages by sender user IDs.
