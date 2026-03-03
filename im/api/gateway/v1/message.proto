@@ -34,8 +34,19 @@ service Message {
       body: "*"
     };
   }
+  // Mark message as read by id.
+  rpc Read(ReadMessageRequest) returns (ReadMessageResponse) {
+    option (google.api.http) = {
+      post: "/v1/messages/{id}/read"
+    };
+  }
 }
 
+message ReadMessageRequest {
+  string id = 1;
+  string thread_id = 2;
+}
+message ReadMessageResponse {}
 
 // Represents a request to send a text message.
 message SendTextRequest {
