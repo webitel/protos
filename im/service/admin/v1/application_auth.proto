@@ -5,48 +5,52 @@ package webitel.im.service.admin.v1;
 option go_package = "github.com/webitel/im-account-service/proto/gen/im/service/admin/v1;adminpb";
 
 
-// Application (Client) Authorization
-message ClientApp {
+import "service/admin/v1/application_idp.proto";
+
+// Application (Client) Authorization constraints
+message AppClients {
+
+  // ----- Client (Device) constraints ----- //
 
   // OPTIONAL. [FROM] Allowed [U]ser-[A]gent(s)
   repeated string ua = 1;
-  // OPTIONAL. [FROM] Allowed [WEB] Origin(s)
-  ClientNet net = 2;
   // OPTIONAL. [FROM] Allowed [NET]work(s)
+  ClientNet net = 2;
+  // OPTIONAL. [FROM] Allowed [WEB]Origin(s)
   ClientWeb web = 3;
 
-  // REQUIRED. License [CUSTOMER_PORTAL] product.
-  // **NOTE**: Used to limit the number of concurrent [external] user dialogs.
-  LookupID product = 4;
+  // ----- Client (Login) constraints ----- //
 
-  // OPTIONAL. Limit the number of concurrent [external] user dialogs.
-  // Can be used to distribute the load of a joint product between individual apps.
-  // The maximum value is limited by the license `product` number.
-  // The default value corresponds to maximum.
-  int32 max_usage = 5;
+  // Issuer Identifier(s) for the "identity" grant type.
+  // Value is a case sensitive URL using the https scheme that contains
+  // scheme, host, and optionally, port number and path components and no query or fragment components.
+  // Used for the grant_type "identity" of Token endpoint.
+  //
+  // If "identity" is allowed (exists within grant_types values),
+  // a list of known issuer(s) MUST be specified here.
+  // The combination of data of the profiles from different issuers
+  // is carried out according to the reverse priority of this specification:
+  // the primary issuer is the first, the following ones are secondary ..
+  //
+  // For each profile, the publisher must specify an unique issuer identifier.
+  // Any attempts by the publisher to use an unknown (not from this list) issuer will fail.
+  // This approach is used as an additional layer of security to establish trust in
+  // a client application that has gained access the portal application.
+  
+  // REQUIRED.
+  // Trusted Issuer(-s) / Contact.[proto]type(-s)
+  // allowed to authorize VIA this application.
+  //
+  // New Contact.[proto]type is issuer identifier, by default.
+  // Alternatively, you can register a friendly Contact.[proto]type for Issuer.
+  // Contact.[proto] type is ONLY used when creating NEW Contacts of an Issuer.
+  //
+  // map[ issuer ] = proto   ; [ N:1 ]
+  map<string, string> iDp = 11; // iDp
 
-  // Idle session timeout (in: minutes)
-  // **NOTE**: The user will be forcibly logged out after minutes of inactivity.
-  // Default: 10. Minimum: 1. Maximum: 1440. 24h
-  int32 max_idle = 6;
-
-  // Maximum session lifetime period. (in: minutes)
-  // ( -0 ) NO limit. Awaits for user logout action ..
-  // ( +1 ) Forbids refreshing an access token after ( issued + max_age ). Login required after
-  int32 max_age = 7;
-
+  // JWT Authentication scheme configuration.
+  JwtIdentity jwt = 12;
 }
-
-// LookupID Reference.
-message LookupID {
-  // Object IDentifier.
-  string id = 1;
-  // Type specific Object ID.
-  string type = 2;
-  // Display Object name.
-  string name = 3;
-}
-
 
 // Client [sub]network configuration
 message ClientNet {
@@ -59,3 +63,45 @@ message ClientWeb {
   // [FROM] Origin pattern(s) allowed
   repeated string origin = 1;
 }
+
+// // Application (Client) Authorization
+// message ClientApp {
+
+//   // OPTIONAL. [FROM] Allowed [U]ser-[A]gent(s)
+//   repeated string ua = 1;
+//   // OPTIONAL. [FROM] Allowed [WEB] Origin(s)
+//   ClientNet net = 2;
+//   // OPTIONAL. [FROM] Allowed [NET]work(s)
+//   ClientWeb web = 3;
+
+//   // REQUIRED. License [CUSTOMER_PORTAL] product.
+//   // **NOTE**: Used to limit the number of concurrent [external] user dialogs.
+//   LookupID product = 4;
+
+//   // OPTIONAL. Limit the number of concurrent [external] user dialogs.
+//   // Can be used to distribute the load of a joint product between individual apps.
+//   // The maximum value is limited by the license `product` number.
+//   // The default value corresponds to maximum.
+//   int32 max_usage = 5;
+
+//   // Idle session timeout (in: minutes)
+//   // **NOTE**: The user will be forcibly logged out after minutes of inactivity.
+//   // Default: 10. Minimum: 1. Maximum: 1440. 24h
+//   int32 max_idle = 6;
+
+//   // Maximum session lifetime period. (in: minutes)
+//   // ( -0 ) NO limit. Awaits for user logout action ..
+//   // ( +1 ) Forbids refreshing an access token after ( issued + max_age ). Login required after
+//   int32 max_age = 7;
+
+// }
+
+// // LookupID Reference.
+// message LookupID {
+//   // Object IDentifier.
+//   string id = 1;
+//   // Type specific Object ID.
+//   string type = 2;
+//   // Display Object name.
+//   string name = 3;
+// }
