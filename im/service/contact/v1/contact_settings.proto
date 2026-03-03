@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package webitel.im.service.contact.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/any.proto";
+
+option go_package = "github.com/webitel/im-contact-service/gen/go/api/v1;impb";
+
+
+
+
+service ContactSettings {
+  rpc Get(GetContactSettingsRequest) returns (Settings);
+  rpc Update(UpdateContactSettingsRequest) returns (Settings);
+}
+
+message GetContactSettingsRequest {
+  string contact_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+}
+
+message UpdateContactSettingsRequest {
+  string contact_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+
+  Settings settings = 2 [
+    (buf.validate.field).required = true
+  ];
+
+}
+
+
+message Settings {
+    string id = 1;
+    string contact_id = 2;
+    int64 updated_at = 3;
+    repeated Rule rules = 4;
+}
+
+message Rule{
+    RuleType type = 1;
+   oneof value {
+      bool switcher = 2;
+      ListRuleValue list = 3;
+   } 
+}
+
+
+message ListRuleValue {
+    repeated int32 values = 1;
+}
+
+
+enum RuleType {
+  UNKNOWN_RULE= 0;
+  ALLOW_ADD_TO_GROUPS = 1;
+  ALLOW_BOT_MESSAGES = 2;
+  CREATE_GROUP_ON_DIRECT = 3;
+}
