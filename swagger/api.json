@@ -37898,6 +37898,42 @@
         }
       }
     },
+    "/v1/messages/{id}/read": {
+      "post": {
+        "tags": [
+          "Message"
+        ],
+        "summary": "Mark message as read by id.",
+        "operationId": "Read",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "thread_id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ReadMessageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/v1/threads": {
       "get": {
         "tags": [
@@ -37985,7 +38021,7 @@
         }
       }
     },
-    "/v1/{thread_ids}/messages": {
+    "/v1/{thread_id}/messages": {
       "get": {
         "tags": [
           "MessageHistory"
@@ -37994,14 +38030,9 @@
         "operationId": "SearchThreadMessagesHistory",
         "parameters": [
           {
-            "minItems": 1,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "csv",
+            "type": "string",
             "description": "Filter by thread IDs.",
-            "name": "thread_ids",
+            "name": "thread_id",
             "in": "path",
             "required": true
           },
@@ -59068,6 +59099,10 @@
           "title": "User who created the catalog",
           "$ref": "#/definitions/general.Lookup"
         },
+        "default_priority": {
+          "title": "Default priority for cases created under this catalog",
+          "$ref": "#/definitions/webitel.cases.Priority"
+        },
         "description": {
           "type": "string",
           "title": "Description of the catalog (optional)"
@@ -59727,6 +59762,10 @@
           "type": "string",
           "title": "Code for external integrations (optional)"
         },
+        "default_priority": {
+          "title": "Default priority for cases created under this catalog (required)",
+          "$ref": "#/definitions/general.Lookup"
+        },
         "description": {
           "type": "string",
           "title": "Description of the catalog (optional)"
@@ -59908,6 +59947,10 @@
           "type": "string",
           "title": "Code for external integrations (optional)"
         },
+        "default_priority": {
+          "title": "Default priority for cases created under this service (optional)",
+          "$ref": "#/definitions/general.Lookup"
+        },
         "description": {
           "type": "string",
           "title": "Description of the service (optional)"
@@ -60064,6 +60107,10 @@
         "code": {
           "type": "string",
           "title": "Code for external integrations (optional)"
+        },
+        "default_priority": {
+          "title": "Default priority for cases created under this service (optional)",
+          "$ref": "#/definitions/general.Lookup"
         },
         "description": {
           "type": "string",
@@ -60651,6 +60698,10 @@
         "created_by": {
           "title": "User who created the service",
           "$ref": "#/definitions/general.Lookup"
+        },
+        "default_priority": {
+          "title": "Default priority for cases created under this service (optional, inherits from parent if not set)",
+          "$ref": "#/definitions/webitel.cases.Priority"
         },
         "description": {
           "type": "string",
@@ -63089,6 +63140,10 @@
         "type": {
           "description": "Participant type.",
           "type": "string"
+        },
+        "username": {
+          "description": "Participant name.",
+          "type": "string"
         }
       }
     },
@@ -63412,6 +63467,9 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.ReadMessageResponse": {
+      "type": "object"
+    },
     "webitel.im.api.gateway.v1.RegisterDeviceResponse": {
       "type": "object",
       "title": "No Reply ; Error status if failed"
@@ -63475,6 +63533,10 @@
         "document": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.DocumentRequest"
         },
+        "send_id": {
+          "type": "string",
+          "title": "optional client-generated id for deduplication"
+        },
         "to": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.Peer"
         }
@@ -63499,6 +63561,10 @@
         "image": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ImageRequest"
         },
+        "send_id": {
+          "type": "string",
+          "title": "optional client-generated id for deduplication"
+        },
         "to": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.Peer"
         }
@@ -63522,6 +63588,10 @@
       "properties": {
         "body": {
           "type": "string"
+        },
+        "send_id": {
+          "type": "string",
+          "title": "optional client-generated id for deduplication"
         },
         "to": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.Peer"
@@ -65540,6 +65610,9 @@
       "name": "WorkingScheduleService"
     },
     {
+      "name": "Priorities"
+    },
+    {
       "name": "Services"
     },
     {
@@ -65553,9 +65626,6 @@
     },
     {
       "name": "CaseLinks"
-    },
-    {
-      "name": "Priorities"
     },
     {
       "name": "StatusConditions"

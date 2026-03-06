@@ -465,6 +465,43 @@
         ]
       }
     },
+    "/v1/messages/{id}/read": {
+      "post": {
+        "summary": "Mark message as read by id.",
+        "operationId": "Read",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ReadMessageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "thread_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Message"
+        ]
+      }
+    },
     "/v1/threads": {
       "get": {
         "summary": "Search threads with filters",
@@ -559,7 +596,7 @@
         ]
       }
     },
-    "/v1/{thread_ids}/messages": {
+    "/v1/{thread_id}/messages": {
       "get": {
         "summary": "Searches messages within a specific thread.\nSupports cursor-based pagination and field selection.",
         "operationId": "SearchThreadMessagesHistory",
@@ -579,16 +616,11 @@
         },
         "parameters": [
           {
-            "name": "thread_ids",
+            "name": "thread_id",
             "description": "Filter by thread IDs.",
             "in": "path",
             "required": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "csv",
-            "minItems": 1
+            "type": "string"
           },
           {
             "name": "fields",
@@ -1139,6 +1171,10 @@
         "type": {
           "type": "string",
           "description": "Participant type."
+        },
+        "username": {
+          "type": "string",
+          "description": "Participant name."
         }
       },
       "description": "ExternalParticipant represents aggregated participant information\npresent in the thread history response."
@@ -1463,6 +1499,9 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.ReadMessageResponse": {
+      "type": "object"
+    },
     "webitel.im.api.gateway.v1.RegisterDeviceResponse": {
       "type": "object",
       "title": "No Reply ; Error status if failed"
@@ -1527,6 +1566,10 @@
         },
         "document": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.DocumentRequest"
+        },
+        "send_id": {
+          "type": "string",
+          "title": "optional client-generated id for deduplication"
         }
       },
       "description": "Represents a request to send a message with document."
@@ -1551,6 +1594,10 @@
         },
         "image": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ImageRequest"
+        },
+        "send_id": {
+          "type": "string",
+          "title": "optional client-generated id for deduplication"
         }
       },
       "description": "Represents a request to send an message with image."
@@ -1575,6 +1622,10 @@
         },
         "body": {
           "type": "string"
+        },
+        "send_id": {
+          "type": "string",
+          "title": "optional client-generated id for deduplication"
         }
       },
       "description": "Represents a request to send a text message."
