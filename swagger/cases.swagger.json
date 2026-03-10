@@ -1,10 +1,13 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "service.proto",
+    "title": "priority.proto",
     "version": "version not set"
   },
   "tags": [
+    {
+      "name": "Priorities"
+    },
     {
       "name": "Services"
     },
@@ -19,9 +22,6 @@
     },
     {
       "name": "CaseLinks"
-    },
-    {
-      "name": "Priorities"
     },
     {
       "name": "StatusConditions"
@@ -1077,106 +1077,6 @@
         ],
         "tags": [
           "CaseComments"
-        ]
-      }
-    },
-    "/cases/export": {
-      "get": {
-        "summary": "RPC method for exporting cases to CSV or XLSX format (server-side streaming).",
-        "operationId": "ExportCases",
-        "responses": {
-          "200": {
-            "description": "A successful response.(streaming responses)",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "result": {
-                  "$ref": "#/definitions/webitel.cases.ExportCasesResponse"
-                },
-                "error": {
-                  "$ref": "#/definitions/google.rpc.Status"
-                }
-              },
-              "title": "Stream result of webitel.cases.ExportCasesResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/google.rpc.Status"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "q",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "ids",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          },
-          {
-            "name": "sort",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          },
-          {
-            "name": "filters",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          },
-          {
-            "name": "contact_id",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "qin",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "filters_v1",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "format",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "Cases"
         ]
       }
     },
@@ -6184,6 +6084,10 @@
         "searched": {
           "type": "boolean",
           "title": "flag showing whether the catalog was searched"
+        },
+        "default_priority": {
+          "$ref": "#/definitions/webitel.cases.Priority",
+          "title": "Default priority for cases created under this catalog"
         }
       },
       "title": "Catalog message represents the main catalog entity with metadata"
@@ -6526,16 +6430,6 @@
         }
       }
     },
-    "webitel.cases.ExportCasesResponse": {
-      "type": "object",
-      "properties": {
-        "data": {
-          "type": "string",
-          "format": "byte",
-          "title": "File data chunk (streamed in 64KB chunks)"
-        }
-      }
-    },
     "webitel.cases.FieldChange": {
       "type": "object",
       "properties": {
@@ -6817,6 +6711,10 @@
             "$ref": "#/definitions/general.Lookup"
           },
           "title": "List of skill IDs associated with the catalog"
+        },
+        "default_priority": {
+          "$ref": "#/definitions/general.Lookup",
+          "title": "Default priority for cases created under this catalog (required)"
         }
       },
       "title": "InputCatalog message contains the fields for creating or updating a catalog"
@@ -6984,6 +6882,10 @@
           "type": "string",
           "format": "int64",
           "title": "ID of the root catalog"
+        },
+        "default_priority": {
+          "$ref": "#/definitions/general.Lookup",
+          "title": "Default priority for cases created under this service (optional)"
         }
       }
     },
@@ -7140,6 +7042,10 @@
           "type": "string",
           "format": "int64",
           "title": "ID of the root catalog"
+        },
+        "default_priority": {
+          "$ref": "#/definitions/general.Lookup",
+          "title": "Default priority for cases created under this service (optional)"
         }
       },
       "title": "InputService message contains the fields for creating or updating a service"
@@ -7753,6 +7659,10 @@
         "searched": {
           "type": "boolean",
           "title": "flag showing whether the catalog was searched"
+        },
+        "default_priority": {
+          "$ref": "#/definitions/webitel.cases.Priority",
+          "title": "Default priority for cases created under this service (optional, inherits from parent if not set)"
         }
       },
       "title": "Service message represents a service entity within a catalog"

@@ -37,15 +37,29 @@ service Message {
     };
   }
 
+  // Mark message as read by id.
+  rpc Read(ReadMessageRequest) returns (ReadMessageResponse) {
+    option (google.api.http) = {
+      post: "/v1/messages/{id}/read"
+    };
+  }
 }
 
+message ReadMessageRequest {
+  string id = 1;
+  string user_id = 2;
+  string thread_id = 3;
+  int32 domain_id = 4;
+}
 
+message ReadMessageResponse {}
 
 message SendTextRequest {
   Peer   from        = 1;
   Peer   to          = 2;
   string body        = 3;
   int64 domain_id    = 4;
+  string send_id     = 20; // optional client-generated id for deduplication
 }
 
 // Represents a response to send a text message.
@@ -76,6 +90,7 @@ message SendDocumentRequest {
   Peer   to          = 2;
   DocumentRequest document = 3;
   int64 domain_id    = 4;
+  string send_id     = 20; // optional client-generated id for deduplication
 }
 
 // Represents a response to send message with document.
@@ -104,6 +119,7 @@ message SendImageRequest {
   Peer   to          = 2;
   ImageRequest image = 3;
   int64 domain_id    = 4;
+  string send_id     = 20; // optional client-generated id for deduplication
 }
 
 // Represents a response to send message with image.

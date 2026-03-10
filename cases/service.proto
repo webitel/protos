@@ -4,6 +4,7 @@ package webitel.cases;
 option go_package = "github.com/webitel/cases/api/cases;cases";
 
 import "general.proto";
+import "priority.proto";
 import "google/api/visibility.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "google/api/annotations.proto";
@@ -43,6 +44,8 @@ message Service {
   repeated Service service = 16;
     // flag showing whether the catalog was searched
     bool searched = 17;
+  // Default priority for cases created under this service (optional, inherits from parent if not set)
+  Priority default_priority = 18;
 }
 
 // ServiceList message contains a list of services with pagination
@@ -75,6 +78,8 @@ message InputService {
   general.Lookup assignee = 8;
   // ID of the root catalog
   int64 root_id = 9;
+  // Default priority for cases created under this service (optional)
+  general.Lookup default_priority = 10;
 }
 
 message InputCreateService {
@@ -96,6 +101,8 @@ message InputCreateService {
   general.Lookup assignee = 8;
   // ID of the root catalog
   int64 catalog_id = 9;
+  // Default priority for cases created under this service (optional)
+  general.Lookup default_priority = 10;
 }
 
 // CreateServiceRequest message for creating a new service
