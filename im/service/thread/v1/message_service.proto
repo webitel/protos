@@ -5,6 +5,8 @@ package webitel.im.service.thread.v1;
 
 import "service/thread/v1/peer.proto";
 import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
+import "buf/validate/validate.proto";
 
 option go_package = "github.com/webitel/im-thread-service/gen/go/api/v1;impb";
 
@@ -43,6 +45,20 @@ service Message {
       post: "/v1/messages/{id}/read"
     };
   }
+
+  // Sends an interactive message (buttons, lists, CTA).
+  // Supports idempotency via send_id. 
+  rpc SendInteractive(SendInteractiveMessageRequest) returns (SendMessageResponse);
+
+  // Handles user interaction callbacks.
+  // Should be called by client when user interacts with UI.
+  rpc SendInteractionCallback(InteractionCallback) returns (InteractionCallback);
+
+  // Sends a geographic location message.
+  rpc SendLocation(SendLocationRequest) returns (SendMessageResponse);
+
+  // Sends a contact card.
+  rpc SendContact(SendContactRequest) returns (SendMessageResponse);
 }
 
 message ReadMessageRequest {
@@ -126,4 +142,311 @@ message SendImageRequest {
 message SendImageResponse {
     Peer to = 1;
     string id = 2;
+}
+
+
+// SendMessageResponse represents the result of a send operation.
+// Contains the generated message ID and list of recipients.
+message SendMessageResponse {
+
+  // List of recipients of the message.
+  repeated Peer to = 1;
+
+  // Unique message identifier.
+  string id = 2;
+}
+
+// SendLocationRequest sends a geographic location message.
+message SendLocationRequest {
+
+  // Sender of the message.
+  Peer from = 1 [(buf.validate.field).required = true];
+
+  // Recipient of the message.
+  Peer to = 2 [(buf.validate.field).required = true];
+
+  // Domain identifier.
+  int32 domain_id = 3 [(buf.validate.field).int32 = {gt: 0}];
+
+  // Latitude in degrees. Must be between -90 and +90.
+  double latitude = 4 [(buf.validate.field).double = {
+    gte: -90,
+    lte: 90
+  }];
+
+  // Longitude in degrees. Must be between -180 and +180.
+  double longitude = 5 [(buf.validate.field).double = {
+    gte: -180,
+    lte: 180
+  }];
+
+  // Optional location name (e.g., "Central Park").
+  optional string name = 6;
+
+  // Optional human-readable address.
+  optional string address = 7;
+
+  // Arbitrary metadata.
+  google.protobuf.Struct metadata = 8;
+}
+
+// SendContactRequest sends contact information.
+message SendContactRequest {
+
+  // Sender of the message.
+  Peer from = 1 [(buf.validate.field).required = true];
+
+  // Recipient of the message.
+  Peer to = 2 [(buf.validate.field).required = true];
+
+  // Domain identifier.
+  int32 domain_id = 3 [(buf.validate.field).int32 = {
+    gt: 0
+  }];
+
+  // Full name of the contact.
+  optional string name = 4;
+
+  // Email must be valid if provided.
+  optional string email = 5 [(buf.validate.field).string = {
+    email: true,
+    max_len: 254
+  }];
+
+  // Phone number in E.164 format recommended.
+  optional string phone_number = 6 [(buf.validate.field).string = {
+    pattern: "^[+]?[0-9]{7,15}$"
+  }];
+
+  // Key-value metadata specific to contact.
+  map<string, string> contact_metadata = 7  [(buf.validate.field).map = {
+    max_pairs: 50,
+    keys: { string: { max_len: 64 }},
+    values: { string: { max_len: 256 }}
+  }];
+
+  // Arbitrary metadata.
+  google.protobuf.Struct metadata = 8;
+}
+
+// SendInteractiveMessageRequest sends a structured interactive message.
+message SendInteractiveMessageRequest {
+
+  // Sender of the message.
+  Peer from = 1;
+
+  // Recipient of the message.
+  Peer to = 2;
+
+  // Domain identifier.
+  int32 domain_id = 3;
+
+  // Optional idempotency key for deduplication.
+  optional string send_id = 4;
+
+  // Interactive payload.
+  Interactive interactive = 5;
+
+  // Arbitrary metadata.
+  google.protobuf.Struct metadata = 6;
+}
+
+// Interactive represents a rich message with UI elements.
+message Interactive {
+
+  // Optional header content.
+  oneof header {
+
+    // Document attachments header.
+    Documents document = 1;
+
+    // Images attachment header.
+    Images image = 2;
+
+    // Plain text header.
+    string text = 3; 
+  }
+
+  // Main message body.
+  string body = 4;
+
+  // Optional footer text.
+  optional string footer = 5;
+
+  // Force to block user keyboard.
+  bool single_use = 6;
+
+  // Interaction type.
+  oneof kind {
+
+    // Markup matrix with buttons.
+    KeyboardMarkup markup = 7;
+
+    // List reply with main list button text and sections with buttons.
+    KeyboardListReply list_reply = 8;
+
+    // Call to action button.
+    KeyboardButton cta = 9;
+  }
+}
+
+// Media container for images attachments. 
+message Images {
+
+  // Images to be attached to the header of interactive message.
+  // Max allowed images: 10. 
+  repeated ImageInput images = 1 [(buf.validate.field).repeated = {
+    max_items: 10
+  }];
+}
+
+// Media container for documents attachments.
+message Documents {
+
+  // Documents to be attached to the header of interactive message.
+  // Max allowed documents: 10.
+  repeated DocumentInput documents = 1 [(buf.validate.field).repeated = {
+    max_items: 10
+  }];
+}
+
+// List-style interactive menu.
+message KeyboardListReply {
+
+  // Title of the main button, that on-click show up list.
+  string main_button_title = 1 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 64
+  }];
+
+  // List with sections with buttons.
+  repeated KeyboardRowWithSection sections = 2 [(buf.validate.field).repeated = {
+    min_items: 1,
+    max_items: 10
+  }];
+}
+
+// Grid-style buttons.
+message KeyboardMarkup {
+
+  // Rows of buttons matrix.
+  repeated KeyboardRow rows = 1 [(buf.validate.field).repeated = {
+    min_items: 1,
+    max_items: 10
+  }];
+}
+
+// Represents a row of buttons grouped under a specific logical section header.
+// Useful for creating categorized menus or structured interactive interfaces.
+message KeyboardRowWithSection {
+
+  // The header text for this section. Must be concise and descriptive.
+  string section = 1 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 64
+  }];
+
+  // Collection of buttons within this section. 
+  // Minimum of 1 button is required to prevent empty sections.
+  repeated KeyboardButton  buttons = 2 [(buf.validate.field).repeated = {
+    min_items: 1,
+    max_items: 10
+  }];
+}
+
+// A standard horizontal row of interactive buttons without a section header.
+message KeyboardRow {
+
+  // Horizontal collection of buttons. 
+  // Capped at 10 to ensure UI responsiveness and prevent overflow.
+  repeated KeyboardButton  buttons = 1 [(buf.validate.field).repeated = {
+    min_items: 1,
+    max_items: 10
+  }];
+}
+
+// Defines a single interactive element within the keyboard.
+// Each button must have a unique identifier and a specific action type.
+message KeyboardButton {
+
+  // Unique idempotent identifier for the button. 
+  // Used by the frontend to track state and prevent duplicate interactions.
+  string button_id = 1;
+
+  // The human-readable label displayed on the button.
+  string button_label_text = 2;
+
+  // Polymorphic definition of the button's behavior.
+  oneof kind {
+    option (buf.validate.oneof).required = true;
+
+    // Directs the user to an external web resource.
+    KeyboardButtonURL url = 3;
+
+    // Triggers a backend event (callback) with associated metadata.
+    KeyboardButtonCallback callback = 4;
+
+    // Requests sensitive information from the client (e.g., location or contact).
+    KeyboardButtonRequest request = 5;
+  }
+
+  // Extensible metadata for UI/UX styling (e.g., "color", "theme", "size").
+  // Usage: Allows for future-proofing without breaking schema changes.
+  google.protobuf.Struct metadata = 6;
+}
+
+// Action: Navigates the user to a specific URI.
+message KeyboardButtonURL {
+
+  // Must be a valid absolute URI (e.g., https://example.com).
+  string url = 1 [(buf.validate.field).string.uri = true];
+}
+
+// Action: Sends an asynchronous signal to the backend service.
+message KeyboardButtonCallback {
+
+  // Opaque data payload passed back to the server upon interaction.
+  string data = 1;
+}
+
+// Defines types of platform-specific data requests.
+enum KeyboardButtonRequestAction {
+
+  // Default fallback to prevent accidental execution of unknown actions.
+  UNKNOWN_KEYBOARD_BUTTON_REQUEST = 0;
+
+  // Requests access to the user's contact book.
+  CONTACT = 1;
+
+  // Requests access to the user's current GPS coordinates.
+  LOCATION = 2;
+}
+
+// Action: Prompts the client to share specific device data.
+message KeyboardButtonRequest {
+
+  // The specific action to be performed by the client application.
+  KeyboardButtonRequestAction action = 1 [(buf.validate.field).enum.defined_only = true];
+}
+
+// Client sends callback event when user clicks a button.
+message InteractionCallback {
+
+  // User who clicked the button.
+  Peer clicked_by = 1 [(buf.validate.field).required = true];
+
+  // Original message ID.
+  string in_reply_to = 2 [
+    (buf.validate.field).required = true, 
+    (buf.validate.field).string.uuid = true
+  ];
+
+  // Button identifier.
+  string button_code = 3;
+
+  // Optional callback payload.
+  string callback_data = 4;
+
+  // Unix time in milliseconds when callback button was clicked.
+  int64 clicked_at = 5;
 }
