@@ -4,6 +4,7 @@ package webitel.im.api.gateway.v1;
 import "google/protobuf/any.proto";
 import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
 
 option go_package = "github.com/webitel/im-gateway-service/gen/api/gateway/v1;gateway";
 
@@ -21,24 +22,54 @@ service MessageHistory {
   }
 }
 
-// HistoryMessageCursor represents a cursor used for
-// cursor based pagination of message history.
-message HistoryMessageCursor {
+// HistoryMessageCursorResponse defines next/prev id for keyset-pagination.
+message HistoryMessageCursorResponse {
 
-  // Message creation timestamp (Unix time, microseconds).
-  int64  created_at = 1 [
-    (buf.validate.field).int64.gt = 0
-  ];
+  // Unique identifier last message where cursor stopped.
+  string id = 1;
+}
 
-  // Unique message identifier.
-  string id = 2[
+
+// HistoryMessageCursorRequest represents a cursor-based pagination request
+// for retrieving messages relative to a specific message ID.
+//
+// This request is used in keyset pagination, where the `id` field acts as a
+// cursor pointing to a reference message in the history. The server returns
+// messages either before or after this cursor depending on the `before` flag.
+//
+// Pagination semantics:
+//   - The `id` must be a valid UUID of an existing message.
+//   - The result set is always ordered consistently (e.g., by creation time).
+//   - The `before` flag controls the direction of traversal in the message history.
+//
+// Direction behavior:
+//   - before = true:
+//       Fetch messages that come *before* the given message in history
+//       (i.e., older messages).
+//
+//   - before = false:
+//       Fetch messages that come *after* the given message
+//       (i.e., newer messages, moving toward the present).
+//
+// Notes:
+//   - This approach avoids offset-based pagination issues such as skipping
+//     or duplicating records when data changes.
+//   - Typically used for chat/message history scrolling.
+//   - The number of returned messages is controlled separately (e.g., via limit).
+//
+message HistoryMessageCursorRequest {
+  // Cursor identifier.
+  // Must be a valid UUID referencing an existing message.
+  // Defines the starting point for pagination.
+  string id = 1 [
     (buf.validate.field).string.uuid = true
   ];
 
-  // Pagination direction.
-  // true - backward (older messages).
-  // false - forward (newer messages).
-  bool direction = 3;
+  // Pagination direction flag.
+  //
+  // true  -> fetch newer messages (back before history)
+  // false -> fetch older messages (back to older history)
+  bool before = 2;
 }
 
 
@@ -77,7 +108,7 @@ message SearchMessageHistoryRequest {
 
   // Cursor for cursor-based pagination.
   // If omitted, search starts from the most recent messages.
-  optional HistoryMessageCursor cursor = 6;
+optional HistoryMessageCursorRequest cursor = 6;
 
   // Maximum number of messages to return.
   uint32                        size   = 7 [
@@ -170,7 +201,7 @@ message HistoryMessage {
 
   // Arbitrary message metadata.
   // Can contain structured data depending on message type.
-  map<string, google.protobuf.Any> metadata    = 6;
+  google.protobuf.Struct metadata    = 6;
 
   // Message creation timestamp (Unix time, milliseconds).
   int64 created_at = 7;
@@ -185,49 +216,24 @@ message HistoryMessage {
   repeated Image    images    = 10;
 }
 
-/*
- * @exclude
- * Example of cursor-based pagination inspired by
- * Facebook Graph API
- * https://stackoverflow.com/a/41475843
-*/
-
-
-// Cursors contains for navigating
-// forward and backward through message history.
-message Cursors {
-
-  // Cursor pointing to the next page of results.
-  HistoryMessageCursor after  = 1;
-
-  // Cursor pointing to the previous page of results.
-  HistoryMessageCursor before = 2;
-}
-
-
-// Paging contains pagination metadata.
-message Paging {
-
-  // Cursor-based pagination information.
-  Cursors cursors = 1;
-}
 
 // MessageParticipant represents aggregated participant information
 // present in the message history response.
 message MessageParticipant {
 
   // Client-readable sender subject or display name.
-  string subject = 1;
+  string sub = 1;
 
   // Client issuer for the sender.
-  string issuer = 2;
+  string iss = 2;
 
   // Sender type.
   string type = 3;
 
   // Sender username.
-  string username = 4;
+  string name = 4;
 
+  // Represents if user is automation bot or actual user of system.
   bool is_bot = 5;
 }
 
@@ -236,18 +242,11 @@ message MessageParticipant {
 message SearchMessageHistoryResponse {
 
   // List of messages matching the search criteria.
-  repeated HistoryMessage  messages    = 1;
+  repeated HistoryMessage  items    = 1;
 
-  // Cursor pointing to the next page of messages.
-  HistoryMessageCursor next_cursor = 2;
+  // Cursor that represents position to get older messages (used without 'before' param).
+  HistoryMessageCursorResponse        next_cursor   = 2;
 
-  // Indicates whether more messages are available.
-  bool                 next        = 3;
-
-  // List of unique message senders present
-  // in the current response page.
-  repeated MessageParticipant      from        = 4;
-
-  // Detailed paging metadata.
-  Paging               paging      = 5;
+  // Cursor that represents position to get newest messages (used with 'before' param).
+  HistoryMessageCursorResponse        prev_cursor   = 3;
 }

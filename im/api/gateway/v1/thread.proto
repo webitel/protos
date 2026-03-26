@@ -5,7 +5,10 @@ package webitel.im.api.gateway.v1;
 import "buf/validate/validate.proto";
 import "api/gateway/v1/peer.proto";
 import "google/api/annotations.proto";
+import "api/gateway/v1/message_history.proto";
 
+// ThreadManagement service provides access to group threads manipulating
+// and read-only access for direct threads.
 service ThreadManagement {
     // Search threads with filters
     rpc Search(ThreadSearchRequest) returns (SearchThreadResponse) {
@@ -39,16 +42,19 @@ enum ThreadKind {
 message ExternalParticipant {
 
     // Client issuer for the sender.
-    string issuer = 1;
+    string iss = 1;
 
     // Client-readable participant subject or display name.
-    string subject = 2;
+    string sub = 2;
 
     // Participant type.
     string type = 3;
 
     // Participant name.
-    string username = 4;
+    string name = 4;
+
+    // Represents if user is automation bot or actual user of system.
+    bool is_bot = 5;
 }
 
 // Thread represents a thread (aka chat or conversation) entity.
@@ -83,6 +89,9 @@ message Thread {
 
     // Detailed member information.
     repeated ThreadMember members = 10;
+
+    // Last message of the linked thread.
+    webitel.im.api.gateway.v1.HistoryMessage last_msg = 11;
 }
 
 //#endregion
@@ -140,7 +149,7 @@ message ThreadSearchRequest {
 message SearchThreadResponse {
 
     // List of threads matching the search criteria.
-    repeated Thread threads = 1;
+    repeated Thread items = 1;
 
     // Indicates whether there is a next page available.
     bool next = 2;
