@@ -27757,102 +27757,6 @@
         }
       }
     },
-    "/messaging/v1/{thread_id}/messages": {
-      "get": {
-        "tags": [
-          "webitel.im.service.thread.v1.MessageHistory"
-        ],
-        "summary": "Search for messages in a thread.",
-        "operationId": "MessageHistory_SearchThreadMessagesHistory",
-        "parameters": [
-          {
-            "type": "string",
-            "name": "thread_id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
-            "name": "fields",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
-            "name": "ids",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
-            "name": "sender_ids",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "collectionFormat": "multi",
-            "name": "types",
-            "in": "query"
-          },
-          {
-            "type": "integer",
-            "format": "int32",
-            "name": "domain_id",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "format": "int64",
-            "name": "cursor.created_at",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "name": "cursor.id",
-            "in": "query"
-          },
-          {
-            "type": "boolean",
-            "name": "cursor.direction",
-            "in": "query"
-          },
-          {
-            "type": "integer",
-            "format": "int64",
-            "name": "size",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.im.service.thread.v1.SearchMessageHistoryResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/google.rpc.Status"
-            }
-          }
-        }
-      }
-    },
     "/oauth/apps": {
       "get": {
         "tags": [
@@ -38280,6 +38184,96 @@
         }
       }
     },
+    "/v1/{thread_id_1}/messages": {
+      "get": {
+        "tags": [
+          "webitel.im.service.thread.v1.MessageHistory"
+        ],
+        "summary": "Search for messages in a thread.",
+        "operationId": "MessageHistory_SearchThreadMessagesHistory",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "thread_id_1",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "ids",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "sender_ids",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "collectionFormat": "multi",
+            "name": "types",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "domain_id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "cursor.id",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "name": "cursor.before",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.service.thread.v1.SearchMessageHistoryResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/v1/{thread_id}/messages": {
       "get": {
         "tags": [
@@ -38338,21 +38332,14 @@
           },
           {
             "type": "string",
-            "format": "int64",
-            "description": "Message creation timestamp (Unix time, microseconds).",
-            "name": "cursor.created_at",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "description": "Unique message identifier.",
+            "description": "Cursor identifier.\nMust be a valid UUID referencing an existing message.\nDefines the starting point for pagination.",
             "name": "cursor.id",
             "in": "query"
           },
           {
             "type": "boolean",
-            "description": "Pagination direction.\ntrue - backward (older messages).\nfalse - forward (newer messages).",
-            "name": "cursor.direction",
+            "description": "Pagination direction flag.\n\ntrue  -\u003e fetch newer messages (back before history)\nfalse -\u003e fetch older messages (back to older history)",
+            "name": "cursor.before",
             "in": "query"
           },
           {
@@ -63278,20 +63265,6 @@
         }
       }
     },
-    "webitel.im.api.gateway.v1.Cursors": {
-      "description": "Cursors contains for navigating\nforward and backward through message history.",
-      "type": "object",
-      "properties": {
-        "after": {
-          "description": "Cursor pointing to the next page of results.",
-          "$ref": "#/definitions/webitel.im.api.gateway.v1.HistoryMessageCursor"
-        },
-        "before": {
-          "description": "Cursor pointing to the previous page of results.",
-          "$ref": "#/definitions/webitel.im.api.gateway.v1.HistoryMessageCursor"
-        }
-      }
-    },
     "webitel.im.api.gateway.v1.Device": {
       "type": "object",
       "title": "Device (Client) endpoint. [FROM]",
@@ -63391,20 +63364,24 @@
       "description": "ExternalParticipant represents aggregated participant information\npresent in the thread history response.",
       "type": "object",
       "properties": {
-        "issuer": {
+        "is_bot": {
+          "description": "Represents if user is automation bot or actual user of system.",
+          "type": "boolean"
+        },
+        "iss": {
           "description": "Client issuer for the sender.",
           "type": "string"
         },
-        "subject": {
+        "name": {
+          "description": "Participant name.",
+          "type": "string"
+        },
+        "sub": {
           "description": "Client-readable participant subject or display name.",
           "type": "string"
         },
         "type": {
           "description": "Participant type.",
-          "type": "string"
-        },
-        "username": {
-          "description": "Participant name.",
           "type": "string"
         }
       }
@@ -63444,10 +63421,7 @@
         },
         "metadata": {
           "description": "Arbitrary message metadata.\nCan contain structured data depending on message type.",
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/google.protobuf.Any"
-          }
+          "type": "object"
         },
         "sender": {
           "description": "Sender user aggregated information.",
@@ -63469,21 +63443,26 @@
         }
       }
     },
-    "webitel.im.api.gateway.v1.HistoryMessageCursor": {
-      "description": "HistoryMessageCursor represents a cursor used for\ncursor based pagination of message history.",
+    "webitel.im.api.gateway.v1.HistoryMessageCursorRequest": {
+      "description": "HistoryMessageCursorRequest represents a cursor-based pagination request\nfor retrieving messages relative to a specific message ID.\n\nThis request is used in keyset pagination, where the `id` field acts as a\ncursor pointing to a reference message in the history. The server returns\nmessages either before or after this cursor depending on the `before` flag.\n\nPagination semantics:\n  - The `id` must be a valid UUID of an existing message.\n  - The result set is always ordered consistently (e.g., by creation time).\n  - The `before` flag controls the direction of traversal in the message history.\n\nDirection behavior:\n  - before = true:\n      Fetch messages that come *before* the given message in history\n      (i.e., older messages).\n\n  - before = false:\n      Fetch messages that come *after* the given message\n      (i.e., newer messages, moving toward the present).\n\nNotes:\n  - This approach avoids offset-based pagination issues such as skipping\n    or duplicating records when data changes.\n  - Typically used for chat/message history scrolling.\n  - The number of returned messages is controlled separately (e.g., via limit).",
       "type": "object",
       "properties": {
-        "created_at": {
-          "description": "Message creation timestamp (Unix time, microseconds).",
-          "type": "string",
-          "format": "int64"
-        },
-        "direction": {
-          "description": "Pagination direction.\ntrue - backward (older messages).\nfalse - forward (newer messages).",
+        "before": {
+          "description": "Pagination direction flag.\n\ntrue  -\u003e fetch newer messages (back before history)\nfalse -\u003e fetch older messages (back to older history)",
           "type": "boolean"
         },
         "id": {
-          "description": "Unique message identifier.",
+          "description": "Cursor identifier.\nMust be a valid UUID referencing an existing message.\nDefines the starting point for pagination.",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.HistoryMessageCursorResponse": {
+      "description": "HistoryMessageCursorResponse defines next/prev id for keyset-pagination.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier last message where cursor stopped.",
           "type": "string"
         }
       }
@@ -63646,22 +63625,23 @@
       "type": "object",
       "properties": {
         "is_bot": {
+          "description": "Represents if user is automation bot or actual user of system.",
           "type": "boolean"
         },
-        "issuer": {
+        "iss": {
           "description": "Client issuer for the sender.",
           "type": "string"
         },
-        "subject": {
+        "name": {
+          "description": "Sender username.",
+          "type": "string"
+        },
+        "sub": {
           "description": "Client-readable sender subject or display name.",
           "type": "string"
         },
         "type": {
           "description": "Sender type.",
-          "type": "string"
-        },
-        "username": {
-          "description": "Sender username.",
           "type": "string"
         }
       }
@@ -63686,16 +63666,6 @@
         "web": {
           "title": "For 10 web push, the token must be a JSON-encoded object with the following keys:\nendpoint: Absolute URL exposed by the push service where the application server can send push messages\nkeys: P-256 elliptic curve Diffie-Hellman parameters in the following object\np256dh: Base64url-encoded P-256 elliptic curve Diffie-Hellman public key\nauth: Base64url-encoded authentication secret",
           "$ref": "#/definitions/webitel.im.api.gateway.v1.WebPushSubscription"
-        }
-      }
-    },
-    "webitel.im.api.gateway.v1.Paging": {
-      "description": "Paging contains pagination metadata.",
-      "type": "object",
-      "properties": {
-        "cursors": {
-          "description": "Cursor-based pagination information.",
-          "$ref": "#/definitions/webitel.im.api.gateway.v1.Cursors"
         }
       }
     },
@@ -63743,15 +63713,7 @@
       "description": "SearchMessageHistoryResponse contains\nmessage history search results and pagination metadata.",
       "type": "object",
       "properties": {
-        "from": {
-          "description": "List of unique message senders present\nin the current response page.",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageParticipant"
-          }
-        },
-        "messages": {
+        "items": {
           "description": "List of messages matching the search criteria.",
           "type": "array",
           "items": {
@@ -63759,17 +63721,13 @@
             "$ref": "#/definitions/webitel.im.api.gateway.v1.HistoryMessage"
           }
         },
-        "next": {
-          "description": "Indicates whether more messages are available.",
-          "type": "boolean"
-        },
         "next_cursor": {
-          "description": "Cursor pointing to the next page of messages.",
-          "$ref": "#/definitions/webitel.im.api.gateway.v1.HistoryMessageCursor"
+          "description": "Cursor that represents position to get older messages (used without 'before' param).",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.HistoryMessageCursorResponse"
         },
-        "paging": {
-          "description": "Detailed paging metadata.",
-          "$ref": "#/definitions/webitel.im.api.gateway.v1.Paging"
+        "prev_cursor": {
+          "description": "Cursor that represents position to get newest messages (used with 'before' param).",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.HistoryMessageCursorResponse"
         }
       }
     },
@@ -63777,17 +63735,17 @@
       "description": "SearchThreadResponse contains the list of threads\nand pagination metadata.",
       "type": "object",
       "properties": {
-        "next": {
-          "description": "Indicates whether there is a next page available.",
-          "type": "boolean"
-        },
-        "threads": {
+        "items": {
           "description": "List of threads matching the search criteria.",
           "type": "array",
           "items": {
             "type": "object",
             "$ref": "#/definitions/webitel.im.api.gateway.v1.Thread"
           }
+        },
+        "next": {
+          "description": "Indicates whether there is a next page available.",
+          "type": "boolean"
         }
       }
     },
@@ -63903,6 +63861,10 @@
         "kind": {
           "description": "Type of the thread.",
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadKind"
+        },
+        "last_msg": {
+          "description": "Last message of the linked thread.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.HistoryMessage"
         },
         "member_ids": {
           "description": "List of member users aggregated information.",
@@ -64100,17 +64062,6 @@
         }
       }
     },
-    "webitel.im.service.thread.v1.Cursors": {
-      "type": "object",
-      "properties": {
-        "after": {
-          "$ref": "#/definitions/webitel.im.service.thread.v1.HistoryMessageCursor"
-        },
-        "before": {
-          "$ref": "#/definitions/webitel.im.service.thread.v1.HistoryMessageCursor"
-        }
-      }
-    },
     "webitel.im.service.thread.v1.Document": {
       "type": "object",
       "properties": {
@@ -64208,10 +64159,7 @@
           }
         },
         "metadata": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/google.protobuf.Any"
-          }
+          "type": "object"
         },
         "sender_id": {
           "type": "string"
@@ -64229,16 +64177,20 @@
         }
       }
     },
-    "webitel.im.service.thread.v1.HistoryMessageCursor": {
+    "webitel.im.service.thread.v1.HistoryMessageCursorRequest": {
       "type": "object",
       "properties": {
-        "created_at": {
-          "type": "string",
-          "format": "int64"
-        },
-        "direction": {
+        "before": {
           "type": "boolean"
         },
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.service.thread.v1.HistoryMessageCursorResponse": {
+      "type": "object",
+      "properties": {
         "id": {
           "type": "string"
         }
@@ -64321,14 +64273,6 @@
         }
       }
     },
-    "webitel.im.service.thread.v1.Paging": {
-      "type": "object",
-      "properties": {
-        "cursors": {
-          "$ref": "#/definitions/webitel.im.service.thread.v1.Cursors"
-        }
-      }
-    },
     "webitel.im.service.thread.v1.Peer": {
       "description": "Represents a peer in the messaging system.\nIt can be a user, chat, or channel.",
       "type": "object",
@@ -64366,21 +64310,18 @@
             "type": "string"
           }
         },
-        "messages": {
+        "items": {
           "type": "array",
           "items": {
             "type": "object",
             "$ref": "#/definitions/webitel.im.service.thread.v1.HistoryMessage"
           }
         },
-        "next": {
-          "type": "boolean"
-        },
         "next_cursor": {
-          "$ref": "#/definitions/webitel.im.service.thread.v1.HistoryMessageCursor"
+          "$ref": "#/definitions/webitel.im.service.thread.v1.HistoryMessageCursorResponse"
         },
-        "paging": {
-          "$ref": "#/definitions/webitel.im.service.thread.v1.Paging"
+        "prev_cursor": {
+          "$ref": "#/definitions/webitel.im.service.thread.v1.HistoryMessageCursorResponse"
         }
       }
     },
