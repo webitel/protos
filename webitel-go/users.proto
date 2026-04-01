@@ -8,6 +8,7 @@ import "oid.proto";
 import "presence.proto";
 import "customers.proto";
 import "permission.proto";
+import "auth.proto";
 import "google/api/annotations.proto";
 
 service Users {
@@ -73,6 +74,12 @@ service Users {
         option (google.api.http) = {
             post: "/users/{id}/logout"
             body: "*"
+        };
+    }
+
+    rpc GetUserWarnings(GetUserWarningsRequest) returns (GetUserWarningsResponse) {
+        option (google.api.http) = {
+            get: "/users/warnings"
         };
     }
 }
@@ -244,4 +251,10 @@ message LogoutUserRequest {
 
 message LogoutUserResponse {
 
+}
+
+message GetUserWarningsRequest {}
+
+message GetUserWarningsResponse {
+    repeated UserWarning warnings = 1;
 }
