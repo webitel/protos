@@ -16,8 +16,43 @@
     "application/json"
   ],
   "paths": {
+    "/meetings": {
+      "post": {
+        "summary": "CreateMeeting creates a new meeting session with specific parameters and returns its URL.",
+        "operationId": "CreateMeeting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/web_meeting_backend.CreateMeetingResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "Request to create a new meeting.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/web_meeting_backend.CreateMeetingRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MeetingService"
+        ]
+      }
+    },
     "/meetings/{id}": {
       "get": {
+        "summary": "GetMeetingView retrieves public-facing information about a meeting.",
         "operationId": "GetMeetingView",
         "responses": {
           "200": {
@@ -36,6 +71,7 @@
         "parameters": [
           {
             "name": "id",
+            "description": "Unique identifier of the meeting.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -48,6 +84,7 @@
     },
     "/meetings/{id}/satisfaction": {
       "post": {
+        "summary": "SatisfactionMeeting submits feedback or a satisfaction rating for a completed meeting.",
         "operationId": "SatisfactionMeeting",
         "responses": {
           "200": {
@@ -66,6 +103,7 @@
         "parameters": [
           {
             "name": "id",
+            "description": "Unique identifier of the meeting.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -114,86 +152,139 @@
         }
       }
     },
-    "web_meeting_backend.CreateMeetingResponse": {
+    "web_meeting_backend.CreateMeetingRequest": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string"
-        },
-        "url": {
-          "type": "string"
-        }
-      }
-    },
-    "web_meeting_backend.DeleteMeetingResponse": {
-      "type": "object"
-    },
-    "web_meeting_backend.Meeting": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
         "title": {
-          "type": "string"
-        },
-        "created_at": {
           "type": "string",
-          "format": "int64"
+          "description": "Title or topic of the meeting."
         },
-        "expires_at": {
+        "expire_sec": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Expiration time in seconds from the moment of creation."
+        },
+        "base_path": {
+          "type": "string",
+          "description": "Base path for the generated meeting URL."
         },
         "variables": {
           "type": "object",
           "additionalProperties": {
             "type": "string"
-          }
+          },
+          "description": "Custom metadata or configuration variables."
+        },
+        "domain_id": {
+          "type": "string",
+          "format": "int64",
+          "description": "Identifier of the domain owning the meeting."
+        }
+      },
+      "description": "Request to create a new meeting."
+    },
+    "web_meeting_backend.CreateMeetingResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the created meeting."
         },
         "url": {
-          "type": "string"
+          "type": "string",
+          "description": "Full URL to access the meeting."
+        }
+      },
+      "description": "Response containing the created meeting details."
+    },
+    "web_meeting_backend.DeleteMeetingResponse": {
+      "type": "object",
+      "description": "Empty response for meeting deletion."
+    },
+    "web_meeting_backend.Meeting": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the meeting."
+        },
+        "title": {
+          "type": "string",
+          "description": "Title or topic of the meeting."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Timestamp when the meeting was created (Unix)."
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Timestamp when the meeting link expires (Unix)."
+        },
+        "variables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Custom metadata or configuration variables."
+        },
+        "url": {
+          "type": "string",
+          "description": "Full URL to join the meeting."
         },
         "satisfaction": {
-          "type": "string"
+          "type": "string",
+          "description": "Current satisfaction rating."
         },
         "allow_satisfaction": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Flag indicating if satisfaction feedback is allowed."
         }
-      }
+      },
+      "description": "Detailed meeting information."
     },
     "web_meeting_backend.MeetingService.SatisfactionMeetingBody": {
       "type": "object",
       "properties": {
         "satisfaction": {
-          "type": "string"
+          "type": "string",
+          "description": "The satisfaction value or score."
         }
-      }
+      },
+      "description": "Request to submit meeting satisfaction feedback."
     },
     "web_meeting_backend.MeetingView": {
       "type": "object",
       "properties": {
         "title": {
-          "type": "string"
+          "type": "string",
+          "description": "Title or topic of the meeting."
         },
         "created_at": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Timestamp when the meeting was created (Unix)."
         },
         "expires_at": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Timestamp when the meeting link expires (Unix)."
         },
         "satisfaction": {
-          "type": "string"
+          "type": "string",
+          "description": "Current satisfaction rating."
         },
         "allow_satisfaction": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Flag indicating if satisfaction feedback is allowed."
         }
-      }
+      },
+      "description": "Public view of the meeting (limited fields)."
     },
     "web_meeting_backend.SatisfactionMeetingResponse": {
-      "type": "object"
+      "type": "object",
+      "description": "Empty response for satisfaction submission."
     }
   }
 }

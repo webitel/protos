@@ -1,19 +1,39 @@
 syntax = "proto3";
+
 package web_meeting_backend;
+
 option go_package = "github.com/webitel/protos/web_meeting_backend";
 
 import "google/api/annotations.proto";
 
+// MeetingService provides APIs for managing web meetings and their lifecycle.
 service MeetingService {
-  rpc CreateMeeting(CreateMeetingRequest) returns (CreateMeetingResponse);
+
+  // CreateMeeting creates a new meeting session with specific parameters and returns its URL.
+  rpc CreateMeeting(CreateMeetingRequest) returns (CreateMeetingResponse) {
+    option (google.api.http) = {
+      post: "/meetings"
+      body: "*"
+    };
+  };
+
+  // CreateMeetingNA is a non-aliased (internal) version for creating meetings.
+  rpc CreateMeetingNA(CreateMeetingRequest) returns (CreateMeetingResponse);
+
+  // GetMeetingView retrieves public-facing information about a meeting.
   rpc GetMeetingView(GetMeetingRequest) returns (MeetingView) {
     option (google.api.http) = {
       get: "/meetings/{id}"
     };
   };
 
+  // GetMeeting retrieves the full meeting data object.
   rpc GetMeeting(GetMeetingRequest) returns (Meeting);
+
+  // DeleteMeeting removes an existing meeting by its unique identifier.
   rpc DeleteMeeting(DeleteMeetingRequest) returns (DeleteMeetingResponse);
+
+  // SatisfactionMeeting submits feedback or a satisfaction rating for a completed meeting.
   rpc SatisfactionMeeting(SatisfactionMeetingRequest) returns (SatisfactionMeetingResponse) {
     option (google.api.http) = {
       post: "/meetings/{id}/satisfaction"
@@ -22,61 +42,94 @@ service MeetingService {
   };
 }
 
+// Request to submit meeting satisfaction feedback.
 message SatisfactionMeetingRequest {
+  // Unique identifier of the meeting.
   string id = 1;
+  // The satisfaction value or score.
   string satisfaction = 2;
 }
 
-message SatisfactionMeetingResponse {
-  
-}
+// Empty response for satisfaction submission.
+message SatisfactionMeetingResponse {}
 
+// Detailed meeting information.
 message Meeting {
+  // Unique identifier of the meeting.
   string id = 1;
+  // Title or topic of the meeting.
   string title = 2;
+  // Timestamp when the meeting was created (Unix).
   int64 created_at = 3;
+  // Timestamp when the meeting link expires (Unix).
   int64 expires_at = 4;
+  // Custom metadata or configuration variables.
   map<string, string> variables = 5;
+  // Full URL to join the meeting.
   string url = 6;
+  // Current satisfaction rating.
   string satisfaction = 7;
+  // Flag indicating if satisfaction feedback is allowed.
   bool allow_satisfaction = 8;
 }
 
+// Public view of the meeting (limited fields).
 message MeetingView {
+  // Title or topic of the meeting.
   string title = 1;
+  // Timestamp when the meeting was created (Unix).
   int64 created_at = 2;
+  // Timestamp when the meeting link expires (Unix).
   int64 expires_at = 3;
+  // Current satisfaction rating.
   string satisfaction = 4;
+  // Flag indicating if satisfaction feedback is allowed.
   bool allow_satisfaction = 5;
 }
 
+// Request to create a new meeting.
 message CreateMeetingRequest {
+  // Title or topic of the meeting.
   string title = 1;
+  // Expiration time in seconds from the moment of creation.
   int64 expire_sec = 2;
+  // Base path for the generated meeting URL.
   string base_path = 3;
-  map<string,string> variables = 4;
+  // Custom metadata or configuration variables.
+  map<string, string> variables = 4;
+  // Identifier of the domain owning the meeting.
   int64 domain_id = 5;
 }
 
+// Response containing the created meeting details.
 message CreateMeetingResponse {
+  // Unique identifier of the created meeting.
   string id = 1;
+  // Full URL to access the meeting.
   string url = 2;
 }
 
+// Request to retrieve meeting details by ID.
 message GetMeetingRequest {
+  // Unique identifier of the meeting.
   string id = 1;
 }
 
+// Response containing technical meeting details.
 message GetMeetingResponse {
+  // Expiration duration or timestamp.
   int64 expire = 1;
+  // Host or server address for the meeting.
   string host = 2;
-  map<string,string> variables = 3;
+  // Custom metadata or configuration variables.
+  map<string, string> variables = 3;
 }
 
+// Request to delete a meeting.
 message DeleteMeetingRequest {
+  // Unique identifier of the meeting to be deleted.
   string id = 1;
 }
 
-message DeleteMeetingResponse {
-
-}
+// Empty response for meeting deletion.
+message DeleteMeetingResponse {}
