@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package webitel.im.service.thread.v1;
+
+import "buf/validate/validate.proto";
+
+service ThreadPermissionManagement {
+  rpc GetThreadPermissions(GetThreadPermissionsRequest) returns (GetThreadPermissionsResponse);
+  rpc UpdateThreadPermissions(UpdateThreadPermissionsRequest) returns (ThreadPermissions);
+}
+
+message GetThreadPermissionsRequest {
+  int64  page      = 1;
+  int64  size      = 2;
+  string thread_id = 3[
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+  optional string member_id            = 4;
+  optional string request_initiator_id = 5;
+
+}
+
+message GetThreadPermissionsResponse {
+  repeated ThreadPermissions permissions = 1;
+
+}
+
+message ThreadPermissions {
+  string id               = 1;
+  string thread_dialog_id = 2;
+  string thread_id        = 3;
+  string member_id        = 4;
+  int64  created_at       = 5;
+  int64  updated_at       = 6;
+
+  bool can_send_messages              = 7;
+  bool can_add_members                = 8;
+  bool can_remove_members             = 9;
+  bool can_change_members_permissions = 10;
+  bool can_change_thread_info         = 11;
+}
+
+message UpdateThreadPermissionsRequest {
+  string          thread_id            = 1[
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+  string          member_id            = 2;
+  optional string request_initiator_id = 3;
+
+  optional bool can_send_messages              = 4;
+  optional bool can_add_members                = 5;
+  optional bool can_remove_members             = 6;
+  optional bool can_change_members_permissions = 7;
+  optional bool can_update_thread_info         = 8;
+}
