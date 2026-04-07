@@ -11,13 +11,24 @@ import "api/gateway/v1/message_history.proto";
 // and read-only access for direct threads.
 service ThreadManagement {
     // Search threads with filters
-    rpc Search(ThreadSearchRequest) returns (SearchThreadResponse) {
-        option (google.api.http) = {
-            get: "/v1/threads"
-        };
-    }
+  rpc Search(ThreadSearchRequest) returns (SearchThreadResponse) {
+    option (google.api.http) = {
+      get: "/v1/threads"
+    };
+  }
+  // Add member to the thread.
+  rpc AddMember(AddMemberRequest) returns (AddMemberResponse) {
+    option (google.api.http) = {
+      post: "/v1/threads/{thread_id}/members"
+    };
+  }
+  // Remove member from the thread.
+  rpc RemoveMember(RemoveMemberRequest) returns (RemoveMemberResponse) {
+    option (google.api.http) = {
+      delete: "/v1/threads/{thread_id}/members/{member_id}"
+    };
+  };
 }
-
 
 // ThreadKind defines the type of a thread.
 // It determines the business rules and available features for the thread.
@@ -25,16 +36,16 @@ enum ThreadKind {
 
     // Unknown or unspecified thread type.
     // Must not be used in valid requests.
-    UNKNOWN = 0;
+  UNKNOWN = 0;
 
     // One-to-one private thread between two users.
-    DIRECT = 1;
+  DIRECT = 1;
 
     // Group thread with multiple members.
-    GROUP = 2;
+  GROUP = 2;
 
     // Channel-style thread (broadcast or topic based communication).
-    CHANNEL = 3;
+  CHANNEL = 3;
 }
 
 // ExternalParticipant represents aggregated participant information
@@ -42,56 +53,47 @@ enum ThreadKind {
 message ExternalParticipant {
 
     // Client issuer for the sender.
-    string iss = 1;
+  string iss = 1;
 
     // Client-readable participant subject or display name.
-    string sub = 2;
+  string sub = 2;
 
     // Participant type.
-    string type = 3;
+  string type = 3;
 
     // Participant name.
-    string name = 4;
+  string name = 4;
 
     // Represents if user is automation bot or actual user of system.
-    bool is_bot = 5;
+  bool is_bot = 5;
 }
 
 // Thread represents a thread (aka chat or conversation) entity.
 message Thread {
 
     // Unique thread identifier.
-    string id = 1;
+  string id = 1;
 
     // Thread creation timestamp (Unix time, milliseconds).
-    int64 created_at = 2;
+  int64 created_at = 2;
 
     // Last update timestamp (Unix time, milliseconds).
-    int64 updated_at = 3;
+  int64 updated_at = 3;
 
     // Type of the thread.
-    ThreadKind kind = 4;
-
-    // Aggregated user information of the thread owner.
-    ExternalParticipant owner = 5;
-
-    // List of users aggregated information with admin privileges.
-    repeated ExternalParticipant admins = 6;
-
-    // List of member users aggregated information.
-    repeated ExternalParticipant member_ids = 7;
+  ThreadKind kind = 4;
 
     // Thread subject or title.
-    string subject = 8;
+  string subject = 8;
 
     // Optional thread description.
-    string description = 9;
+  string description = 9;
 
     // Detailed member information.
-    repeated ThreadMember members = 10;
+  repeated ThreadMember members = 10;
 
     // Last message of the linked thread.
-    webitel.im.api.gateway.v1.HistoryMessage last_msg = 11;
+  webitel.im.api.gateway.v1.HistoryMessage last_msg = 11;
 }
 
 //#endregion
@@ -105,43 +107,43 @@ message ThreadSearchRequest {
     // List of fields that should be returned in the response.
     // If empty, a default set of fields is returned.
     // Used for response optimization.
-    repeated string fields = 1;
+  repeated string fields = 1;
 
     // Filter by specific thread IDs.
-    repeated string ids = 2 [
-        (buf.validate.field).repeated.items.string.uuid = true
-    ];
+  repeated string ids = 2 [
+    (buf.validate.field).repeated.items.string.uuid = true
+  ];
 
     // Filter threads by their kinds.
     // UNKNOWN (0) is not allowed.
-    repeated ThreadKind kinds = 3 [
-        (buf.validate.field).repeated.items.enum.defined_only = true,
-        (buf.validate.field).repeated.items.enum.not_in = 0
-    ];
+  repeated ThreadKind kinds = 3 [
+    (buf.validate.field).repeated.items.enum.defined_only = true,
+    (buf.validate.field).repeated.items.enum.not_in = 0
+  ];
 
     // Filter threads by owners.
-    repeated PeerIdentity owners = 4;
+  repeated PeerIdentity owners = 4;
 
     // Full-text search query.
     // Typically applied to subject.
-    string q = 5[
-        (buf.validate.field).string = {min_len: 0, max_len: 256}
-    ];
+  string q = 5[
+    (buf.validate.field).string = {min_len: 0, max_len: 256}
+  ];
 
     // Maximum number of threads to return per page.
     // Must be greater than 0 and less than or equal to 100.
-    int32 size = 6;
+  int32 size = 6;
 
     // Sorting field.
     // Optional "+" or "-" prefix indicates ascending or descending order.
     // Example: "-created_at", "subject"
-    string sort = 7 [
-        (buf.validate.field).string.pattern = "^[+-]?[a-z_]+$",
-        (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
-    ];
+  string sort = 7 [
+    (buf.validate.field).string.pattern = "^[+-]?[a-z_]+$",
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
 
     // Page number (1-based).
-    int32 page = 8;
+  int32 page = 8;
 }
 
 // SearchThreadResponse contains the list of threads
@@ -149,23 +151,22 @@ message ThreadSearchRequest {
 message SearchThreadResponse {
 
     // List of threads matching the search criteria.
-    repeated Thread items = 1;
+  repeated Thread items = 1;
 
     // Indicates whether there is a next page available.
-    bool next = 2;
+  bool next = 2;
 }
-
 
 // ThreadMember represents a thread participant
 // with optional type-specific settings.
 message ThreadMember {
 
     // User aggregated information.
-    ExternalParticipant member = 1;
+  ExternalParticipant member = 1;
 
     // Direct thread specific settings.
     // Present only for DIRECT threads.
-    ThreadDirectSettings direct_settings = 2;
+  ThreadDirectSettings direct_settings = 2;
 }
 
 // ThreadDirectSettings defines settings
@@ -173,18 +174,62 @@ message ThreadMember {
 message ThreadDirectSettings {
 
     // Settings identifier.
-    string id = 1;
+  string id = 1;
 
     // Domain identifier.
-    int32 domain_id = 2;
+  int32 domain_id = 2;
 
     // Creation timestamp (Unix time, milliseconds).
-    int64 created_at = 3;
+  int64 created_at = 3;
 
     // Last update timestamp (Unix time, milliseconds).
-    int64 updated_at = 4;
+  int64 updated_at = 4;
 
     // Custom title for the direct thread.
     // Usually represents the display name of the conversation.
-    string title = 5;
+  string title = 5;
+}
+
+message AddMemberRequest {
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+  string new_member_id = 3 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+
+  ];
+
+  ThreadRole role = 4 [
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).required = true
+  ];
+}
+
+enum ThreadRole {
+  ROLE_UNSPECIFIED = 0;
+  ROLE_MEMBER      = 1;
+  ROLE_ADMIN       = 2;
+  ROLE_OWNER       = 3;
+  ROLE_SUPERVISOR  = 4;
+}
+
+message AddMemberResponse {
+}
+
+message RemoveMemberRequest {
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  string target_member_id = 3 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+  optional string reason = 4;
+}
+
+message RemoveMemberResponse {
 }
