@@ -17,6 +17,8 @@ service MemberService {
     rpc OutboundCall(OutboundCallRequest) returns (OutboundCallResponse) {}
     rpc TaskJoinToAgent(TaskJoinToAgentRequest) returns (stream QueueEvent) {}
 
+    rpc IMJoinToQueue(IMJoinToQueueRequest) returns (IMJoinToQueueResponse) {}
+
     rpc CancelAttempt(CancelAttemptRequest) returns (CancelAttemptResponse) {}
     rpc CancelAgentDistribute(CancelAgentDistributeRequest) returns (CancelAgentDistributeResponse) {}
 
@@ -31,6 +33,34 @@ service MemberService {
 
     rpc InterceptAttempt(InterceptAttemptRequest) returns (InterceptAttemptResponse) {}
     rpc ResumeAttempt(ResumeAttemptRequest) returns (ResumeAttemptResponse) {}
+}
+
+message IMJoinToQueueRequest {
+    message Queue {
+        int32 id = 1;
+        string name = 2;
+    }
+
+    string thread_id = 1;
+    Queue queue = 2;
+    int32 timeout = 4;
+    int32 priority = 5;
+    map<string,string> variables= 6;
+    int32 bucket_id = 7;
+    int32 sticky_agent_id = 8;
+    message Member {
+        string name = 1;
+        string sub = 2;
+        string last_msg = 3;
+        string last_sub = 4;
+    }
+    Member member = 9;
+
+    int64 domain_id = 100;
+}
+
+message IMJoinToQueueResponse {
+    int64 attempt_id = 1;
 }
 
 message ResumeAttemptRequest {
