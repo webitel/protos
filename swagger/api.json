@@ -27795,6 +27795,102 @@
         }
       }
     },
+    "/messaging/v1/{thread_id}/messages": {
+      "get": {
+        "tags": [
+          "webitel.im.service.thread.v1.MessageHistory"
+        ],
+        "summary": "Search for messages in a thread.",
+        "operationId": "MessageHistory_SearchThreadMessagesHistory",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "thread_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "ids",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "sender_ids",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "collectionFormat": "multi",
+            "name": "types",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "domain_id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "cursor.created_at",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "cursor.id",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "name": "cursor.direction",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.service.thread.v1.SearchMessageHistoryResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/oauth/apps": {
       "get": {
         "tags": [
@@ -64202,6 +64298,17 @@
         }
       }
     },
+    "webitel.im.service.thread.v1.Cursors": {
+      "type": "object",
+      "properties": {
+        "after": {
+          "$ref": "#/definitions/webitel.im.service.thread.v1.HistoryMessageCursor"
+        },
+        "before": {
+          "$ref": "#/definitions/webitel.im.service.thread.v1.HistoryMessageCursor"
+        }
+      }
+    },
     "webitel.im.service.thread.v1.Document": {
       "type": "object",
       "properties": {
@@ -64299,7 +64406,10 @@
           }
         },
         "metadata": {
-          "type": "object"
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
         },
         "sender_id": {
           "type": "string"
@@ -64317,20 +64427,16 @@
         }
       }
     },
-    "webitel.im.service.thread.v1.HistoryMessageCursorRequest": {
+    "webitel.im.service.thread.v1.HistoryMessageCursor": {
       "type": "object",
       "properties": {
-        "before": {
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "direction": {
           "type": "boolean"
         },
-        "id": {
-          "type": "string"
-        }
-      }
-    },
-    "webitel.im.service.thread.v1.HistoryMessageCursorResponse": {
-      "type": "object",
-      "properties": {
         "id": {
           "type": "string"
         }
@@ -64413,6 +64519,14 @@
         }
       }
     },
+    "webitel.im.service.thread.v1.Paging": {
+      "type": "object",
+      "properties": {
+        "cursors": {
+          "$ref": "#/definitions/webitel.im.service.thread.v1.Cursors"
+        }
+      }
+    },
     "webitel.im.service.thread.v1.Peer": {
       "description": "Represents a peer in the messaging system.\nIt can be a user, chat, or channel.",
       "type": "object",
@@ -64450,18 +64564,21 @@
             "type": "string"
           }
         },
-        "items": {
+        "messages": {
           "type": "array",
           "items": {
             "type": "object",
             "$ref": "#/definitions/webitel.im.service.thread.v1.HistoryMessage"
           }
         },
-        "next_cursor": {
-          "$ref": "#/definitions/webitel.im.service.thread.v1.HistoryMessageCursorResponse"
+        "next": {
+          "type": "boolean"
         },
-        "prev_cursor": {
-          "$ref": "#/definitions/webitel.im.service.thread.v1.HistoryMessageCursorResponse"
+        "next_cursor": {
+          "$ref": "#/definitions/webitel.im.service.thread.v1.HistoryMessageCursor"
+        },
+        "paging": {
+          "$ref": "#/definitions/webitel.im.service.thread.v1.Paging"
         }
       }
     },
