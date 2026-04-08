@@ -15,16 +15,19 @@
       "name": "webitel.im.api.gateway.v1.Contacts"
     },
     {
-      "name": "webitel.im.api.gateway.v1.Message"
+      "name": "webitel.im.api.gateway.v1.MessageHistory"
     },
     {
-      "name": "webitel.im.api.gateway.v1.MessageHistory"
+      "name": "webitel.im.api.gateway.v1.Message"
     },
     {
       "name": "webitel.im.api.gateway.v1.Account"
     },
     {
       "name": "webitel.im.api.gateway.v1.ThreadManagement"
+    },
+    {
+      "name": "webitel.im.api.gateway.v1.ThreadPermission"
     },
     {
       "name": "webitel.im.service.admin.v1.Applications"
@@ -48,6 +51,9 @@
       "name": "webitel.im.service.thread.v1.Message"
     },
     {
+      "name": "webitel.im.service.thread.v1.ThreadPermissionManagement"
+    },
+    {
       "name": "webitel.im.service.thread.v1.ThreadManagement"
     }
   ],
@@ -58,107 +64,6 @@
     "application/json"
   ],
   "paths": {
-    "/messaging/v1/messages/file": {
-      "post": {
-        "summary": "Sends a document message to a specified recipient [peer].\nThis method sends a document message to the recipient [peer] specified in the request.\nThe document can be uploaded as a internal file via id or provided as a URL.",
-        "operationId": "Message_SendDocument",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.im.service.thread.v1.SendDocumentResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/google.rpc.Status"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "description": "Represents a request to send a message with document.",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/webitel.im.service.thread.v1.SendDocumentRequest"
-            }
-          }
-        ],
-        "tags": [
-          "webitel.im.service.thread.v1.Message"
-        ]
-      }
-    },
-    "/messaging/v1/messages/image": {
-      "post": {
-        "summary": "Sends an image message to a specified recipient [peer].",
-        "operationId": "Message_SendImage",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.im.service.thread.v1.SendImageResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/google.rpc.Status"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "description": "Represents a request to send an message with image.",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/webitel.im.service.thread.v1.SendImageRequest"
-            }
-          }
-        ],
-        "tags": [
-          "webitel.im.service.thread.v1.Message"
-        ]
-      }
-    },
-    "/messaging/v1/messages/text": {
-      "post": {
-        "summary": "Sends a text message to a specified recipient [peer].",
-        "operationId": "Message_SendText",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.im.service.thread.v1.SendTextResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/google.rpc.Status"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/webitel.im.service.thread.v1.SendTextRequest"
-            }
-          }
-        ],
-        "tags": [
-          "webitel.im.service.thread.v1.Message"
-        ]
-      }
-    },
     "/v1/auth/device": {
       "delete": {
         "summary": "Deletes a device by its token, stops sending PUSH-notifications to it.",
@@ -497,6 +402,40 @@
         ]
       }
     },
+    "/v1/messages/contact": {
+      "post": {
+        "summary": "Sends a contact card.",
+        "operationId": "Message_SendContact",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SendMessageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "SendContactRequest sends contact information.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SendContactRequest"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.Message"
+        ]
+      }
+    },
     "/v1/messages/document": {
       "post": {
         "summary": "SendDocument delivers a document message.",
@@ -565,6 +504,114 @@
         ]
       }
     },
+    "/v1/messages/interactive": {
+      "post": {
+        "summary": "Sends an interactive message (buttons, lists, CTA).\nSupports idempotency via send_id.",
+        "operationId": "Message_SendInteractive",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SendMessageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "SendInteractiveMessageRequest sends a structured interactive message.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SendInteractiveMessageRequest"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.Message"
+        ]
+      }
+    },
+    "/v1/messages/interactive/{in_reply_to}/callback": {
+      "post": {
+        "summary": "Handles user interaction callbacks.\nShould be called by client when user interacts with UI.",
+        "operationId": "Message_SendInteractiveCallback",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.InteractiveCallbackResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "in_reply_to",
+            "description": "Original message ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.Message.SendInteractiveCallbackBody"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.Message"
+        ]
+      }
+    },
+    "/v1/messages/location": {
+      "post": {
+        "summary": "Sends a geographic location message.",
+        "operationId": "Message_SendLocation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SendMessageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "SendLocationRequest sends a geographic location message.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SendLocationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.Message"
+        ]
+      }
+    },
     "/v1/messages/text": {
       "post": {
         "summary": "SendText delivers a plain text message.\nWe use the shared Request/Response types directly to avoid duplication.",
@@ -596,56 +643,6 @@
         ],
         "tags": [
           "webitel.im.api.gateway.v1.Message"
-        ]
-      }
-    },
-    "/v1/messages/{id_1}/read": {
-      "post": {
-        "summary": "Mark message as read by id.",
-        "operationId": "Message_Read",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.im.service.thread.v1.ReadMessageResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/google.rpc.Status"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id_1",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "user_id",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "thread_id",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "domain_id",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          }
-        ],
-        "tags": [
-          "webitel.im.service.thread.v1.Message"
         ]
       }
     },
@@ -773,6 +770,110 @@
             "required": false,
             "type": "integer",
             "format": "int32"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadManagement"
+        ]
+      }
+    },
+    "/v1/threads/{thread_id}/members": {
+      "delete": {
+        "summary": "Remove member from the thread.",
+        "operationId": "ThreadManagement_RemoveMember",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.RemoveMemberResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "member.sub",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "member.iss",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "reason",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadManagement"
+        ]
+      },
+      "post": {
+        "summary": "Add member to the thread.",
+        "operationId": "ThreadManagement_AddMember",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.AddMemberResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "member.sub",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "member.iss",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ROLE_UNSPECIFIED",
+              "ROLE_MEMBER",
+              "ROLE_ADMIN",
+              "ROLE_OWNER",
+              "ROLE_SUPERVISOR"
+            ],
+            "default": "ROLE_UNSPECIFIED"
           }
         ],
         "tags": [
@@ -1054,6 +1155,9 @@
         }
       },
       "title": "Access Token Response"
+    },
+    "webitel.im.api.gateway.v1.AddMemberResponse": {
+      "type": "object"
     },
     "webitel.im.api.gateway.v1.AuthContact": {
       "type": "object",
@@ -1425,6 +1529,20 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.Documents": {
+      "type": "object",
+      "properties": {
+        "documents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.DocumentInput"
+          },
+          "description": "Documents to be attached to the header of interactive message.\nMax allowed documents: 10."
+        }
+      },
+      "description": "Media container for documents attachments."
+    },
     "webitel.im.api.gateway.v1.ExternalParticipant": {
       "type": "object",
       "properties": {
@@ -1681,9 +1799,218 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.Images": {
+      "type": "object",
+      "properties": {
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.ImageInput"
+          },
+          "description": "Images to be attached to the header of interactive message.\nMax allowed images: 10."
+        }
+      },
+      "description": "Media container for images attachments."
+    },
+    "webitel.im.api.gateway.v1.Interactive": {
+      "type": "object",
+      "properties": {
+        "documents": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Documents",
+          "description": "Document attachments header."
+        },
+        "images": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Images",
+          "description": "Images attachment header."
+        },
+        "single_use": {
+          "type": "boolean",
+          "description": "Force to block user keyboard."
+        },
+        "markup": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.KeyboardMarkup",
+          "description": "Markup matrix with buttons."
+        },
+        "list_reply": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.KeyboardListReply",
+          "description": "List reply with main list button text and sections with buttons."
+        }
+      },
+      "description": "Interactive represents a rich message with UI elements."
+    },
+    "webitel.im.api.gateway.v1.InteractiveCallbackResponse": {
+      "type": "object",
+      "properties": {
+        "reacted_by": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Peer",
+          "description": "User who clicked the button."
+        },
+        "in_reply_to": {
+          "type": "string",
+          "description": "Original message ID."
+        },
+        "button_code": {
+          "type": "string",
+          "description": "Button identifier."
+        },
+        "callback_data": {
+          "type": "string",
+          "description": "Optional callback payload."
+        },
+        "reacted_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Unix time in milliseconds when callback button was clicked."
+        }
+      },
+      "description": "Response sent back to the client after a button click."
+    },
+    "webitel.im.api.gateway.v1.KeyboardButton": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique idempotent identifier for the button.\nUsed by the frontend to track state and prevent duplicate interactions."
+        },
+        "label": {
+          "type": "string",
+          "description": "The human-readable label displayed on the button."
+        },
+        "url": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.KeyboardButtonURL",
+          "description": "Directs the user to an external web resource."
+        },
+        "callback": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.KeyboardButtonCallback",
+          "description": "Triggers a backend event (callback) with associated metadata."
+        },
+        "request": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.KeyboardButtonRequest",
+          "description": "Requests sensitive information from the client (e.g., location or contact)."
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Extensible metadata for UI/UX styling (e.g., \"color\", \"theme\", \"size\").\nUsage: Allows for future-proofing without breaking schema changes."
+        }
+      },
+      "description": "Defines a single interactive element within the keyboard.\nEach button must have a unique identifier and a specific action type."
+    },
+    "webitel.im.api.gateway.v1.KeyboardButtonCallback": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "string",
+          "description": "Opaque data payload passed back to the server upon interaction."
+        }
+      },
+      "description": "Action: Sends an asynchronous signal to the backend service."
+    },
+    "webitel.im.api.gateway.v1.KeyboardButtonRequest": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string",
+          "description": "The specific action to be performed by the client application."
+        }
+      },
+      "description": "Action: Prompts the client to share specific device data."
+    },
+    "webitel.im.api.gateway.v1.KeyboardButtonURL": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "Must be a valid absolute URI (e.g., https://example.com)."
+        }
+      },
+      "description": "Action: Navigates the user to a specific URI."
+    },
+    "webitel.im.api.gateway.v1.KeyboardListReply": {
+      "type": "object",
+      "properties": {
+        "main_button_title": {
+          "type": "string",
+          "description": "Title of the main button, that on-click show up list."
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.KeyboardRowWithSection"
+          },
+          "description": "List with sections with buttons."
+        }
+      },
+      "description": "List-style interactive menu."
+    },
+    "webitel.im.api.gateway.v1.KeyboardMarkup": {
+      "type": "object",
+      "properties": {
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.KeyboardRow"
+          },
+          "description": "Rows of buttons matrix."
+        }
+      },
+      "description": "Grid-style buttons."
+    },
+    "webitel.im.api.gateway.v1.KeyboardRow": {
+      "type": "object",
+      "properties": {
+        "buttons": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.KeyboardButton"
+          },
+          "description": "Horizontal collection of buttons.\nCapped at 10 to ensure UI responsiveness and prevent overflow."
+        }
+      },
+      "description": "A standard horizontal row of interactive buttons without a section header."
+    },
+    "webitel.im.api.gateway.v1.KeyboardRowWithSection": {
+      "type": "object",
+      "properties": {
+        "section": {
+          "type": "string",
+          "description": "The header text for this section. Must be concise and descriptive."
+        },
+        "buttons": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.KeyboardButton"
+          },
+          "description": "Collection of buttons within this section.\nMinimum of 1 button is required to prevent empty sections."
+        }
+      },
+      "description": "Represents a row of buttons grouped under a specific logical section header.\nUseful for creating categorized menus or structured interactive interfaces."
+    },
     "webitel.im.api.gateway.v1.LogoutResponse": {
       "type": "object",
       "title": "No Data"
+    },
+    "webitel.im.api.gateway.v1.Message.SendInteractiveCallbackBody": {
+      "type": "object",
+      "properties": {
+        "reacted_by": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Peer",
+          "description": "User who clicked the button."
+        },
+        "button_code": {
+          "type": "string",
+          "description": "Button identifier."
+        },
+        "callback_data": {
+          "type": "string",
+          "description": "Optional callback payload."
+        }
+      },
+      "description": "Client sends callback event when user clicks a button."
     },
     "webitel.im.api.gateway.v1.MessageParticipant": {
       "type": "object",
@@ -1774,6 +2101,9 @@
       "type": "object",
       "title": "No Reply ; Error status if failed"
     },
+    "webitel.im.api.gateway.v1.RemoveMemberResponse": {
+      "type": "object"
+    },
     "webitel.im.api.gateway.v1.SearchMessageHistoryResponse": {
       "type": "object",
       "properties": {
@@ -1813,6 +2143,36 @@
         }
       },
       "description": "SearchThreadResponse contains the list of threads\nand pagination metadata."
+    },
+    "webitel.im.api.gateway.v1.SendContactRequest": {
+      "type": "object",
+      "properties": {
+        "to": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Peer",
+          "description": "Recipient of the message."
+        },
+        "name": {
+          "type": "string",
+          "description": "Full name of the contact."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email must be valid if provided."
+        },
+        "phone_number": {
+          "type": "string",
+          "description": "Phone number in E.164 format recommended."
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Arbitrary metadata."
+        },
+        "send_id": {
+          "type": "string",
+          "description": "Optional send ID for idempotency."
+        }
+      },
+      "description": "SendContactRequest sends contact information."
     },
     "webitel.im.api.gateway.v1.SendDocumentRequest": {
       "type": "object",
@@ -1870,6 +2230,82 @@
       },
       "description": "Represents a response to send message with image."
     },
+    "webitel.im.api.gateway.v1.SendInteractiveMessageRequest": {
+      "type": "object",
+      "properties": {
+        "to": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Peer",
+          "description": "Recipient of the message."
+        },
+        "send_id": {
+          "type": "string",
+          "description": "Optional idempotency key for deduplication."
+        },
+        "interactive": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Interactive",
+          "description": "Interactive payload."
+        },
+        "body": {
+          "type": "string",
+          "description": "Body text for the message."
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Arbitrary metadata."
+        }
+      },
+      "description": "SendInteractiveMessageRequest sends a structured interactive message."
+    },
+    "webitel.im.api.gateway.v1.SendLocationRequest": {
+      "type": "object",
+      "properties": {
+        "to": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Peer",
+          "description": "Recipient of the message."
+        },
+        "latitude": {
+          "type": "number",
+          "format": "double",
+          "description": "Latitude in degrees. Must be between -90 and +90."
+        },
+        "longitude": {
+          "type": "number",
+          "format": "double",
+          "description": "Longitude in degrees. Must be between -180 and +180."
+        },
+        "name": {
+          "type": "string",
+          "description": "Optional location name (e.g., \"Central Park\")."
+        },
+        "address": {
+          "type": "string",
+          "description": "Optional human-readable address."
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Arbitrary metadata."
+        },
+        "send_id": {
+          "type": "string",
+          "description": "Optional send ID for idempotency."
+        }
+      },
+      "description": "SendLocationRequest sends a geographic location message."
+    },
+    "webitel.im.api.gateway.v1.SendMessageResponse": {
+      "type": "object",
+      "properties": {
+        "to": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Peer",
+          "description": "Recipient of the message."
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique message identifier."
+        }
+      },
+      "description": "SendMessageResponse represents the result of a send operation.\nContains the generated message ID and list of recipients."
+    },
     "webitel.im.api.gateway.v1.SendTextRequest": {
       "type": "object",
       "properties": {
@@ -1918,26 +2354,6 @@
         "kind": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadKind",
           "description": "Type of the thread."
-        },
-        "owner": {
-          "$ref": "#/definitions/webitel.im.api.gateway.v1.ExternalParticipant",
-          "description": "Aggregated user information of the thread owner."
-        },
-        "admins": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.im.api.gateway.v1.ExternalParticipant"
-          },
-          "description": "List of users aggregated information with admin privileges."
-        },
-        "member_ids": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.im.api.gateway.v1.ExternalParticipant"
-          },
-          "description": "List of member users aggregated information."
         },
         "subject": {
           "type": "string",
@@ -2015,6 +2431,17 @@
         }
       },
       "description": "ThreadMember represents a thread participant\nwith optional type-specific settings."
+    },
+    "webitel.im.api.gateway.v1.ThreadRole": {
+      "type": "string",
+      "enum": [
+        "ROLE_UNSPECIFIED",
+        "ROLE_MEMBER",
+        "ROLE_ADMIN",
+        "ROLE_OWNER",
+        "ROLE_SUPERVISOR"
+      ],
+      "default": "ROLE_UNSPECIFIED"
     },
     "webitel.im.api.gateway.v1.TokenRequest": {
       "type": "object",
@@ -2159,43 +2586,6 @@
         }
       }
     },
-    "webitel.im.service.thread.v1.DocumentInput": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "url": {
-          "type": "string"
-        },
-        "file_name": {
-          "type": "string"
-        },
-        "mime_type": {
-          "type": "string"
-        },
-        "size_bytes": {
-          "type": "string",
-          "format": "int64"
-        }
-      },
-      "description": "Represents `Document` message with necessary fields\nto process it into frequently used `document`\nentity in messaging systems."
-    },
-    "webitel.im.service.thread.v1.DocumentRequest": {
-      "type": "object",
-      "properties": {
-        "documents": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.im.service.thread.v1.DocumentInput"
-          }
-        },
-        "body": {
-          "type": "string"
-        }
-      }
-    },
     "webitel.im.service.thread.v1.HistoryMessage": {
       "type": "object",
       "properties": {
@@ -2261,17 +2651,6 @@
         }
       }
     },
-    "webitel.im.service.thread.v1.Identity": {
-      "type": "object",
-      "properties": {
-        "issuer": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        }
-      }
-    },
     "webitel.im.service.thread.v1.Image": {
       "type": "object",
       "properties": {
@@ -2305,67 +2684,6 @@
         }
       }
     },
-    "webitel.im.service.thread.v1.ImageInput": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "link": {
-          "type": "string"
-        },
-        "mime_type": {
-          "type": "string"
-        }
-      },
-      "description": "Represents `Image` entity with\nnecessary fields."
-    },
-    "webitel.im.service.thread.v1.ImageRequest": {
-      "type": "object",
-      "properties": {
-        "images": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.im.service.thread.v1.ImageInput"
-          }
-        },
-        "body": {
-          "type": "string"
-        }
-      }
-    },
-    "webitel.im.service.thread.v1.Peer": {
-      "type": "object",
-      "properties": {
-        "contact_id": {
-          "type": "string",
-          "title": "Contact identifier [direct thread]"
-        },
-        "group_id": {
-          "type": "string",
-          "title": "Chat group Id [group thread]"
-        },
-        "channel_id": {
-          "type": "string",
-          "title": "Channel Id [channel thread]"
-        },
-        "thread_id": {
-          "type": "string",
-          "title": "Thread ID"
-        },
-        "identity": {
-          "$ref": "#/definitions/webitel.im.service.thread.v1.Identity"
-        }
-      },
-      "description": "Represents a peer in the messaging system.\nIt can be a user, chat, or channel."
-    },
-    "webitel.im.service.thread.v1.ReadMessageResponse": {
-      "type": "object"
-    },
     "webitel.im.service.thread.v1.SearchMessageHistoryResponse": {
       "type": "object",
       "properties": {
@@ -2389,110 +2707,6 @@
           "$ref": "#/definitions/webitel.im.service.thread.v1.HistoryMessageCursorResponse"
         }
       }
-    },
-    "webitel.im.service.thread.v1.SendDocumentRequest": {
-      "type": "object",
-      "properties": {
-        "from": {
-          "$ref": "#/definitions/webitel.im.service.thread.v1.Peer"
-        },
-        "to": {
-          "$ref": "#/definitions/webitel.im.service.thread.v1.Peer"
-        },
-        "document": {
-          "$ref": "#/definitions/webitel.im.service.thread.v1.DocumentRequest"
-        },
-        "domain_id": {
-          "type": "string",
-          "format": "int64"
-        },
-        "send_id": {
-          "type": "string",
-          "title": "optional client-generated id for deduplication"
-        }
-      },
-      "description": "Represents a request to send a message with document."
-    },
-    "webitel.im.service.thread.v1.SendDocumentResponse": {
-      "type": "object",
-      "properties": {
-        "to": {
-          "$ref": "#/definitions/webitel.im.service.thread.v1.Peer"
-        },
-        "id": {
-          "type": "string"
-        }
-      },
-      "description": "Represents a response to send message with document."
-    },
-    "webitel.im.service.thread.v1.SendImageRequest": {
-      "type": "object",
-      "properties": {
-        "from": {
-          "$ref": "#/definitions/webitel.im.service.thread.v1.Peer"
-        },
-        "to": {
-          "$ref": "#/definitions/webitel.im.service.thread.v1.Peer"
-        },
-        "image": {
-          "$ref": "#/definitions/webitel.im.service.thread.v1.ImageRequest"
-        },
-        "domain_id": {
-          "type": "string",
-          "format": "int64"
-        },
-        "send_id": {
-          "type": "string",
-          "title": "optional client-generated id for deduplication"
-        }
-      },
-      "description": "Represents a request to send an message with image."
-    },
-    "webitel.im.service.thread.v1.SendImageResponse": {
-      "type": "object",
-      "properties": {
-        "to": {
-          "$ref": "#/definitions/webitel.im.service.thread.v1.Peer"
-        },
-        "id": {
-          "type": "string"
-        }
-      },
-      "description": "Represents a response to send message with image."
-    },
-    "webitel.im.service.thread.v1.SendTextRequest": {
-      "type": "object",
-      "properties": {
-        "from": {
-          "$ref": "#/definitions/webitel.im.service.thread.v1.Peer"
-        },
-        "to": {
-          "$ref": "#/definitions/webitel.im.service.thread.v1.Peer"
-        },
-        "body": {
-          "type": "string"
-        },
-        "domain_id": {
-          "type": "string",
-          "format": "int64"
-        },
-        "send_id": {
-          "type": "string",
-          "title": "optional client-generated id for deduplication"
-        }
-      }
-    },
-    "webitel.im.service.thread.v1.SendTextResponse": {
-      "type": "object",
-      "properties": {
-        "to": {
-          "$ref": "#/definitions/webitel.im.service.thread.v1.Peer"
-        },
-        "id": {
-          "type": "string"
-        }
-      },
-      "description": "Represents a response to send a text message."
     }
   }
 }
