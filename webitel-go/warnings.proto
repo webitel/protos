@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package api;
+
+option go_package = "webitel.go/api;api";
+
+enum UserWarningId {
+    user_warning_id_unspecified = 0;
+    password_expires_soon = 1;
+    license_expires_soon = 2;
+    license_expired = 3;
+}
+
+message WarningData {
+    PasswordExpiryWarning password_expiry = 1;
+    LicenseExpiryWarning license_expiry = 2;
+}
+
+message UserWarning {
+    UserWarningId id = 1;
+    string detail = 2;
+    WarningData warning_data = 3;
+}
+
+message PasswordExpiryWarning {
+    int64 days_remaining = 1;  // Days until password expires
+    int64 expires_at = 2;      // Unix timestamp when password expires
+}
+
+message LicenseExpiryWarning {
+    int64 days_remaining = 1;  // Days until license expires
+    int64 expires_at = 2;      // Unix timestamp when license expires
+    string license_name = 3;   // Product name of the license
+}
