@@ -881,6 +881,162 @@
         ]
       }
     },
+    "/v1/threads/{thread_id}/variables": {
+      "get": {
+        "operationId": "ThreadManagement_LocateVariables",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadVariables"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadManagement"
+        ]
+      },
+      "post": {
+        "operationId": "ThreadManagement_SetVariables",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadVariables"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadManagement"
+        ]
+      }
+    },
+    "/v1/threads/{thread_id}/variables/flush": {
+      "delete": {
+        "operationId": "ThreadManagement_FlushVariables",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadVariables"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "keys",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadManagement"
+        ]
+      }
+    },
+    "/v1/variables": {
+      "get": {
+        "operationId": "ThreadManagement_SearchVariables",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SearchVariablesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "thread_ids",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadManagement"
+        ]
+      }
+    },
     "/v1/{thread_id_1}/messages": {
       "get": {
         "summary": "Search for messages in a thread.",
@@ -2144,6 +2300,21 @@
       },
       "description": "SearchThreadResponse contains the list of threads\nand pagination metadata."
     },
+    "webitel.im.api.gateway.v1.SearchVariablesResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadVariables"
+          }
+        },
+        "next": {
+          "type": "boolean"
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.SendContactRequest": {
       "type": "object",
       "properties": {
@@ -2374,6 +2545,10 @@
         "last_msg": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.HistoryMessage",
           "description": "Last message of the linked thread."
+        },
+        "variables": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadVariables",
+          "description": "Optional variables associated with the thread."
         }
       },
       "description": "Thread represents a thread (aka chat or conversation) entity."
@@ -2442,6 +2617,20 @@
         "ROLE_SUPERVISOR"
       ],
       "default": "ROLE_UNSPECIFIED"
+    },
+    "webitel.im.api.gateway.v1.ThreadVariables": {
+      "type": "object",
+      "properties": {
+        "thread_id": {
+          "type": "string"
+        },
+        "variables": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.VariableEntry"
+          }
+        }
+      }
     },
     "webitel.im.api.gateway.v1.TokenRequest": {
       "type": "object",
@@ -2523,6 +2712,32 @@
         }
       },
       "title": "[User-Agent] string \u0026 details"
+    },
+    "webitel.im.api.gateway.v1.VariableEntry": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "object"
+        },
+        "set_by": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Contact"
+        },
+        "set_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.VariableEntryRequest": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "object"
+        }
+      }
     },
     "webitel.im.api.gateway.v1.WebPushSubscription": {
       "type": "object",

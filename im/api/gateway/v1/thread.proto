@@ -6,6 +6,9 @@ import "buf/validate/validate.proto";
 import "api/gateway/v1/peer.proto";
 import "google/api/annotations.proto";
 import "api/gateway/v1/message_history.proto";
+import "google/protobuf/struct.proto";
+import "api/gateway/v1/contact.proto";
+
 
 // ThreadManagement service provides access to group threads manipulating
 // and read-only access for direct threads.
@@ -26,6 +29,30 @@ service ThreadManagement {
   rpc RemoveMember(RemoveMemberRequest) returns (RemoveMemberResponse) {
     option (google.api.http) = {
       delete: "/v1/threads/{thread_id}/members"
+    };
+  };
+
+  rpc SetVariables(SetVariablesRequest) returns (ThreadVariables) {
+    option (google.api.http) = {
+      post: "/v1/threads/{thread_id}/variables"
+    };
+  };
+
+  rpc SearchVariables(SearchVariablesRequest) returns (SearchVariablesResponse) {
+    option (google.api.http) = {
+      get: "/v1/variables"
+    };
+  };
+
+  rpc LocateVariables(LocateVariablesRequest) returns (ThreadVariables) {
+    option (google.api.http) = {
+      get: "/v1/threads/{thread_id}/variables"
+    };
+  };
+
+  rpc FlushVariables(FlushVariablesRequest) returns (ThreadVariables) {
+    option (google.api.http) = {
+      delete: "/v1/threads/{thread_id}/variables/flush"
     };
   };
 }
@@ -94,6 +121,9 @@ message Thread {
 
     // Last message of the linked thread.
   webitel.im.api.gateway.v1.HistoryMessage last_msg = 11;
+
+  // Optional variables associated with the thread.
+  ThreadVariables variables = 13;
 }
 
 //#endregion
@@ -230,3 +260,56 @@ message RemoveMemberRequest {
 
 message RemoveMemberResponse {
 }
+
+// #region Thread Variables
+
+message VariableEntry {
+    google.protobuf.Struct value = 1;
+    Contact set_by = 2;
+    int64 set_at = 3;
+}
+
+message VariableEntryRequest {
+    string key = 1;
+    google.protobuf.Struct value = 2;
+}
+
+message ThreadVariables {
+    string thread_id = 1;
+    map<string, VariableEntry> variables = 2;
+}
+
+message SetVariablesRequest {
+    string thread_id = 1 [
+        (buf.validate.field).string.uuid = true
+    ];
+    repeated VariableEntryRequest variables = 2;
+}
+
+message SearchVariablesResponse {
+    repeated ThreadVariables items = 1;
+    bool next = 2;
+}
+
+message SearchVariablesRequest {
+    int32 size = 1;
+    int32 page = 2;
+    repeated string fields = 3;
+    repeated string thread_ids = 4;
+}
+
+message LocateVariablesRequest {
+    string thread_id = 1 [
+        (buf.validate.field).string.uuid = true
+    ];
+}
+
+message FlushVariablesRequest {
+    string thread_id = 1 [
+        (buf.validate.field).string.uuid = true
+    ];
+
+    repeated string keys = 2;
+}
+
+// #endregion
