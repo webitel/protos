@@ -883,6 +883,7 @@
     },
     "/v1/threads/{thread_id}/variables": {
       "get": {
+        "summary": "Retrieves all variables for a specific thread.",
         "operationId": "ThreadManagement_LocateVariables",
         "responses": {
           "200": {
@@ -901,6 +902,7 @@
         "parameters": [
           {
             "name": "thread_id",
+            "description": "Unique identifier for the thread.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -911,6 +913,7 @@
         ]
       },
       "post": {
+        "summary": "Sets or updates variables for a specific thread.\nExisting variables with the same keys will be overwritten if were setted by the caller.\nNew variables will be created if they do not exist.",
         "operationId": "ThreadManagement_SetVariables",
         "responses": {
           "200": {
@@ -929,6 +932,7 @@
         "parameters": [
           {
             "name": "thread_id",
+            "description": "Unique identifier for the thread.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -941,6 +945,7 @@
     },
     "/v1/threads/{thread_id}/variables/flush": {
       "delete": {
+        "summary": "Removes specified variables from a thread with caller's permission.\nIf no keys are provided, all variables may be removed\ndepending on implementation.",
         "operationId": "ThreadManagement_FlushVariables",
         "responses": {
           "200": {
@@ -959,12 +964,14 @@
         "parameters": [
           {
             "name": "thread_id",
+            "description": "Unique identifier for the thread.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "keys",
+            "description": "List of variable keys to flush.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -981,6 +988,7 @@
     },
     "/v1/variables": {
       "get": {
+        "summary": "Searches thread variables across multiple threads.\nSupports pagination and field projection.",
         "operationId": "ThreadManagement_SearchVariables",
         "responses": {
           "200": {
@@ -999,6 +1007,7 @@
         "parameters": [
           {
             "name": "size",
+            "description": "Number of results to return per page.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -1006,6 +1015,7 @@
           },
           {
             "name": "page",
+            "description": "Page number (1-based).",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -1013,6 +1023,7 @@
           },
           {
             "name": "fields",
+            "description": "List of fields to include in the response.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -1023,6 +1034,7 @@
           },
           {
             "name": "thread_ids",
+            "description": "List of thread IDs to filter by.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -2308,12 +2320,15 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadVariables"
-          }
+          },
+          "description": "List of thread variables grouped by thread."
         },
         "next": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Indicates if there are more results to fetch."
         }
-      }
+      },
+      "description": "SearchVariablesResponse contains search results\nand pagination metadata."
     },
     "webitel.im.api.gateway.v1.SendContactRequest": {
       "type": "object",
@@ -2622,15 +2637,18 @@
       "type": "object",
       "properties": {
         "thread_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique identifier for the thread."
         },
         "variables": {
           "type": "object",
           "additionalProperties": {
             "$ref": "#/definitions/webitel.im.api.gateway.v1.VariableEntry"
-          }
+          },
+          "description": "Key-value map of variables.\nKey is the variable name, value contains data and metadata."
         }
-      }
+      },
+      "description": "ThreadVariables contains all variables associated with a thread."
     },
     "webitel.im.api.gateway.v1.TokenRequest": {
       "type": "object",
@@ -2717,27 +2735,34 @@
       "type": "object",
       "properties": {
         "value": {
-          "type": "object"
+          "type": "object",
+          "description": "Arbitrary structured value of the variable.\nSupports dynamic JSON-like content."
         },
         "set_by": {
-          "$ref": "#/definitions/webitel.im.api.gateway.v1.Contact"
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Contact",
+          "description": "Contact who set the variable."
         },
         "set_at": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Timestamp when the variable was set (Unix time, milliseconds)."
         }
-      }
+      },
+      "description": "VariableEntry represents a single variable value\nalong with metadata about who and when it was set."
     },
     "webitel.im.api.gateway.v1.VariableEntryRequest": {
       "type": "object",
       "properties": {
         "key": {
-          "type": "string"
+          "type": "string",
+          "description": "Variable key."
         },
         "value": {
-          "type": "object"
+          "type": "object",
+          "description": "Variable value."
         }
-      }
+      },
+      "description": "VariableEntryRequest represents a variable update operation."
     },
     "webitel.im.api.gateway.v1.WebPushSubscription": {
       "type": "object",
