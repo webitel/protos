@@ -38337,6 +38337,169 @@
         }
       }
     },
+    "/v1/threads/{thread_id}/variables": {
+      "get": {
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadManagement"
+        ],
+        "summary": "Retrieves all variables for a specific thread.",
+        "operationId": "ThreadManagement_LocateVariables",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Unique identifier for the thread.",
+            "name": "thread_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadVariables"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadManagement"
+        ],
+        "summary": "Sets or updates variables for a specific thread.\nExisting variables with the same keys will be overwritten if were setted by the caller.\nNew variables will be created if they do not exist.",
+        "operationId": "ThreadManagement_SetVariables",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Unique identifier for the thread.",
+            "name": "thread_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadVariables"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/threads/{thread_id}/variables/flush": {
+      "delete": {
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadManagement"
+        ],
+        "summary": "Removes specified variables from a thread with caller's permission.\nIf no keys are provided, all variables may be removed\ndepending on implementation.",
+        "operationId": "ThreadManagement_FlushVariables",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Unique identifier for the thread.",
+            "name": "thread_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "List of variable keys to flush.",
+            "name": "keys",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadVariables"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/variables": {
+      "get": {
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadManagement"
+        ],
+        "summary": "Searches thread variables across multiple threads.\nSupports pagination and field projection.",
+        "operationId": "ThreadManagement_SearchVariables",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of results to return per page.",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page number (1-based).",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "List of fields to include in the response.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "List of thread IDs to filter by.",
+            "name": "thread_ids",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SearchVariablesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/v1/{thread_id_1}/messages": {
       "get": {
         "tags": [
@@ -64221,6 +64384,24 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.SearchVariablesResponse": {
+      "description": "SearchVariablesResponse contains search results\nand pagination metadata.",
+      "type": "object",
+      "properties": {
+        "items": {
+          "description": "List of thread variables grouped by thread.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadVariables"
+          }
+        },
+        "next": {
+          "description": "Indicates if there are more results to fetch.",
+          "type": "boolean"
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.SendContactRequest": {
       "description": "SendContactRequest sends contact information.",
       "type": "object",
@@ -64452,6 +64633,10 @@
           "description": "Last update timestamp (Unix time, milliseconds).",
           "type": "string",
           "format": "int64"
+        },
+        "variables": {
+          "description": "Optional variables associated with the thread.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadVariables"
         }
       }
     },
@@ -64519,6 +64704,23 @@
         "ROLE_OWNER",
         "ROLE_SUPERVISOR"
       ]
+    },
+    "webitel.im.api.gateway.v1.ThreadVariables": {
+      "description": "ThreadVariables contains all variables associated with a thread.",
+      "type": "object",
+      "properties": {
+        "thread_id": {
+          "description": "Unique identifier for the thread.",
+          "type": "string"
+        },
+        "variables": {
+          "description": "Key-value map of variables.\nKey is the variable name, value contains data and metadata.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.VariableEntry"
+          }
+        }
+      }
     },
     "webitel.im.api.gateway.v1.TokenRequest": {
       "type": "object",
@@ -64598,6 +64800,39 @@
         "version": {
           "type": "string",
           "title": "app version"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.VariableEntry": {
+      "description": "VariableEntry represents a single variable value\nalong with metadata about who and when it was set.",
+      "type": "object",
+      "properties": {
+        "set_at": {
+          "description": "Timestamp when the variable was set (Unix time, milliseconds).",
+          "type": "string",
+          "format": "int64"
+        },
+        "set_by": {
+          "description": "Contact who set the variable.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Contact"
+        },
+        "value": {
+          "description": "Arbitrary structured value of the variable.\nSupports dynamic JSON-like content.",
+          "type": "object"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.VariableEntryRequest": {
+      "description": "VariableEntryRequest represents a variable update operation.",
+      "type": "object",
+      "properties": {
+        "key": {
+          "description": "Variable key.",
+          "type": "string"
+        },
+        "value": {
+          "description": "Variable value.",
+          "type": "object"
         }
       }
     },
