@@ -6,6 +6,9 @@ import "buf/validate/validate.proto";
 import "api/gateway/v1/peer.proto";
 import "google/api/annotations.proto";
 import "api/gateway/v1/message_history.proto";
+import "google/protobuf/struct.proto";
+import "api/gateway/v1/contact.proto";
+
 
 // ThreadManagement service provides access to group threads manipulating
 // and read-only access for direct threads.
@@ -26,6 +29,39 @@ service ThreadManagement {
   rpc RemoveMember(RemoveMemberRequest) returns (RemoveMemberResponse) {
     option (google.api.http) = {
       delete: "/v1/threads/{thread_id}/members"
+    };
+  };
+
+  // Sets or updates variables for a specific thread.
+  // Existing variables with the same keys will be overwritten if were setted by the caller.
+  // New variables will be created if they do not exist.
+  rpc SetVariables(SetVariablesRequest) returns (ThreadVariables) {
+    option (google.api.http) = {
+      post: "/v1/threads/{thread_id}/variables"
+    };
+  };
+
+  // Searches thread variables across multiple threads.
+  // Supports pagination and field projection.
+  rpc SearchVariables(SearchVariablesRequest) returns (SearchVariablesResponse) {
+    option (google.api.http) = {
+      get: "/v1/variables"
+    };
+  };
+
+  // Retrieves all variables for a specific thread.
+  rpc LocateVariables(LocateVariablesRequest) returns (ThreadVariables) {
+    option (google.api.http) = {
+      get: "/v1/threads/{thread_id}/variables"
+    };
+  };
+
+  // Removes specified variables from a thread with caller's permission.
+  // If no keys are provided, all variables may be removed
+  // depending on implementation.
+  rpc FlushVariables(FlushVariablesRequest) returns (ThreadVariables) {
+    option (google.api.http) = {
+      delete: "/v1/threads/{thread_id}/variables/flush"
     };
   };
 }
@@ -94,6 +130,9 @@ message Thread {
 
     // Last message of the linked thread.
   webitel.im.api.gateway.v1.HistoryMessage last_msg = 11;
+
+  // Optional variables associated with the thread.
+  ThreadVariables variables = 13;
 }
 
 //#endregion
@@ -230,3 +269,108 @@ message RemoveMemberRequest {
 
 message RemoveMemberResponse {
 }
+
+// #region Thread Variables
+
+// VariableEntry represents a single variable value
+// along with metadata about who and when it was set.
+message VariableEntry {
+
+    // Arbitrary structured value of the variable.
+    // Supports dynamic JSON-like content.
+    google.protobuf.Struct value = 1;
+
+    // Contact who set the variable.
+    Contact set_by = 2;
+
+    // Timestamp when the variable was set (Unix time, milliseconds).
+    int64 set_at = 3;
+}
+
+// VariableEntryRequest represents a variable update operation.
+message VariableEntryRequest {
+
+    // Variable key.
+    string key = 1;
+
+    // Variable value.
+    google.protobuf.Struct value = 2;
+}
+
+// ThreadVariables contains all variables associated with a thread.
+message ThreadVariables {
+
+    // Unique identifier for the thread.
+    string thread_id = 1;
+
+    // Key-value map of variables.
+    // Key is the variable name, value contains data and metadata.
+    map<string, VariableEntry> variables = 2;
+}
+
+// SetVariablesRequest defines parameters
+// for setting or updating thread variables.
+message SetVariablesRequest {
+
+    // Unique identifier for the thread.
+    string thread_id = 1 [
+        (buf.validate.field).string.uuid = true
+    ];
+
+    // List of variables to set or update.
+    // Existing variables with the same keys will be overwritten.
+    repeated VariableEntryRequest variables = 2;
+}
+
+// SearchVariablesResponse contains search results
+// and pagination metadata.
+message SearchVariablesResponse {
+
+    // List of thread variables grouped by thread.
+    repeated ThreadVariables items = 1;
+
+    // Indicates if there are more results to fetch.
+    bool next = 2;
+}
+
+// SearchVariablesRequest defines parameters
+// for searching thread variables.
+message SearchVariablesRequest {
+
+    // Number of results to return per page.
+    int32 size = 1;
+
+    // Page number (1-based).
+    int32 page = 2;
+
+    // List of fields to include in the response.
+    repeated string fields = 3;
+
+    // List of thread IDs to filter by.
+    repeated string thread_ids = 4;
+}
+
+// LocateVariablesRequest defines parameters
+// for locating thread variables by thread ID.
+message LocateVariablesRequest {
+
+    // Unique identifier for the thread.
+    string thread_id = 1 [
+        (buf.validate.field).string.uuid = true
+    ];
+}
+
+// FlushVariablesRequest defines parameters
+// for flushing thread variables by thread ID.
+message FlushVariablesRequest {
+
+    // Unique identifier for the thread.
+    string thread_id = 1 [
+        (buf.validate.field).string.uuid = true
+    ];
+
+    // List of variable keys to flush.
+    repeated string keys = 2;
+}
+
+// #endregion
