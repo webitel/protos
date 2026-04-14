@@ -32,6 +32,7 @@ service ThreadManagement {
     // Adds a new member to an existing thread.
   rpc AddMember(AddMemberRequest) returns (AddMemberResponse);
 
+  // Removes a member from a thread.
   rpc RemoveMember(RemoveMemberRequest) returns (RemoveMemberResponse);
 
   rpc SetVariables(SetVariablesRequest) returns (ThreadVariables);
@@ -180,10 +181,8 @@ message SearchThreadResponse {
 message ThreadMember {
   // Unique identifier of the thread member record. (thread_dialog_id)
   string id = 1;
-  // User ID of the thread member.
-  string member_id = 2;
-  // User-specific settings for this thread.
-  ThreadSettings settings = 3;
+  // Contact ID of the thread member.
+  string contact_id = 2;
   // Role of the member in the thread, determining their permissions.
   ThreadRole role = 4;
   // User rights in the thread, determined by their role.
@@ -247,12 +246,12 @@ message AddMemberRequest {
     (buf.validate.field).required = true
   ];
 
-  string initiator_id  = 2 [
+  string initiator_contact_id  = 2 [
     (buf.validate.field).string.uuid = true,
     (buf.validate.field).required = true
   ];
 
-  string new_member_id = 3 [
+  string new_member_contact_id= 3 [
     (buf.validate.field).string.uuid = true,
     (buf.validate.field).required = true
 
@@ -265,15 +264,11 @@ message AddMemberRequest {
 }
 
 message AddMemberResponse {
+  ThreadMember member = 1;
 }
 
 message RemoveMemberRequest {
-  string thread_id = 1 [
-    (buf.validate.field).string.uuid = true,
-    (buf.validate.field).required = true
-  ];
-
-  string initiator_member_id  = 2 [
+  string initiator_contact_id = 2 [
     (buf.validate.field).string.uuid = true,
     (buf.validate.field).required = true
   ];

@@ -5,9 +5,9 @@ import "google/protobuf/any.proto";
 import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/struct.proto";
+import "api/gateway/v1/thread_member.proto";
 
 option go_package = "github.com/webitel/im-gateway-service/gen/api/gateway/v1;gateway";
-
 
 // MessageHistory service provides read-only access
 // to message history within threads.
@@ -28,7 +28,6 @@ message HistoryMessageCursorResponse {
   // Unique identifier last message where cursor stopped.
   string id = 1;
 }
-
 
 // HistoryMessageCursorRequest represents a cursor-based pagination request
 // for retrieving messages relative to a specific message ID.
@@ -72,7 +71,6 @@ message HistoryMessageCursorRequest {
   bool before = 2;
 }
 
-
 // SearchMessageHistoryRequest defines filtering,
 // pagination and projection options for searching
 // message history.
@@ -89,7 +87,7 @@ message SearchMessageHistoryRequest {
   ];
 
   // Filter by thread IDs.
-   string thread_id= 3 [
+  string thread_id= 3 [
     (buf.validate.field).string.uuid = true
   ];
 
@@ -108,43 +106,42 @@ message SearchMessageHistoryRequest {
 
   // Cursor for cursor-based pagination.
   // If omitted, search starts from the most recent messages.
-optional HistoryMessageCursorRequest cursor = 6;
+  optional HistoryMessageCursorRequest cursor = 6;
 
   // Maximum number of messages to return.
   uint32                        size   = 7 [
     (buf.validate.field).uint32 = {
-      gte: 1,
-      lte: 100
+    gte: 1,
+    lte: 100
     },
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
 }
-
 
 // Document represents a file attachment
 // associated with a message.
 message Document {
 
   // Document identifier.
-  string id         = 1;
+  string id = 1;
 
   // Identifier of the message this document belongs to.
   string message_id = 2;
 
   // File storage identifier.
-  int64  file_id    = 3;
+  int64 file_id = 3;
 
   // Original file name.
-  string name       = 4;
+  string name = 4;
 
   // MIME type of the document.
-  string mime       = 5;
+  string mime = 5;
 
   // File size in bytes.
-  int64  size       = 6;
+  int64 size = 6;
 
   // Creation timestamp (Unix time, milliseconds).
-  int64  created_at = 7;
+  int64 created_at = 7;
 
   // Public signed URL for downloading the document.
   string url = 8;
@@ -155,53 +152,52 @@ message Document {
 message Image {
 
   // Image identifier.
-  string id         = 1;
+  string id = 1;
 
   // Identifier of the message this message belongs to.
   string message_id = 2;
 
   // File storage identifier.
-  int64  file_id    = 3;
+  int64 file_id = 3;
 
   // MIME type of the image.
-  string mime       = 4;
+  string mime = 4;
 
   // Image width in pixels.
-  int32  width      = 5;
+  int32 width = 5;
 
   // Image height in pixels.
-  int32  height     = 6;
+  int32 height = 6;
 
   // Creation timestamp (Unix time, milliseconds).
-  int64  created_at = 7;
+  int64 created_at = 7;
 
   // Public signed URL for accessing the image.
   string url = 8;
 }
-
 
 // HistoryMessage represents a single message
 // in thread history.
 message HistoryMessage {
 
   // Unique message identifier.
-  string                           id          = 1;
+  string id = 1;
 
   // Identifier of the thread the message belongs to.
-  string                           thread_id   = 2;
+  string thread_id = 2;
 
   // Sender user aggregated information.
-  MessageParticipant                           sender   = 3;
+  ThreadMember sender = 3;
 
   // Message type identifier.
-  int32                            type        = 4;
+  int32 type = 4;
 
   // Message body content.
-  string                           body        = 5;
+  string body = 5;
 
   // Arbitrary message metadata.
   // Can contain structured data depending on message type.
-  google.protobuf.Struct metadata    = 6;
+  google.protobuf.Struct metadata = 6;
 
   // Message creation timestamp (Unix time, milliseconds).
   int64 created_at = 7;
@@ -213,28 +209,7 @@ message HistoryMessage {
   repeated Document documents = 9;
 
   // List of image attachments.
-  repeated Image    images    = 10;
-}
-
-
-// MessageParticipant represents aggregated participant information
-// present in the message history response.
-message MessageParticipant {
-
-  // Client-readable sender subject or display name.
-  string sub = 1;
-
-  // Client issuer for the sender.
-  string iss = 2;
-
-  // Sender type.
-  string type = 3;
-
-  // Sender username.
-  string name = 4;
-
-  // Represents if user is automation bot or actual user of system.
-  bool is_bot = 5;
+  repeated Image images = 10;
 }
 
 // SearchMessageHistoryResponse contains
@@ -242,11 +217,11 @@ message MessageParticipant {
 message SearchMessageHistoryResponse {
 
   // List of messages matching the search criteria.
-  repeated HistoryMessage  items    = 1;
+  repeated HistoryMessage items = 1;
 
   // Cursor that represents position to get older messages (used without 'before' param).
-  HistoryMessageCursorResponse        next_cursor   = 2;
+  HistoryMessageCursorResponse next_cursor = 2;
 
   // Cursor that represents position to get newest messages (used with 'before' param).
-  HistoryMessageCursorResponse        prev_cursor   = 3;
+  HistoryMessageCursorResponse prev_cursor = 3;
 }

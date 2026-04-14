@@ -10,14 +10,10 @@ service ThreadPermissionManagement {
 }
 
 message GetThreadPermissionsRequest {
-  int64  page      = 1;
-  int64  size      = 2;
-  string thread_id = 3[
-    (buf.validate.field).string.uuid = true,
-    (buf.validate.field).required = true
-  ];
-  optional string member_id            = 4;
-  optional string request_initiator_id = 5;
+  int64           page                 = 1;
+  int64           size                 = 2;
+  optional string member_id            = 3;
+  optional string request_initiator_id = 4;
 
 }
 
@@ -27,26 +23,24 @@ message GetThreadPermissionsResponse {
 }
 
 message ThreadPermissions {
-  string id               = 1;
-  string thread_dialog_id = 2;
-  string thread_id        = 3;
-  string member_id        = 4;
-  int64  created_at       = 5;
-  int64  updated_at       = 6;
+  string id         = 1;
+  string member_id  = 2;
+  string thread_id  = 3;
+  int64  created_at = 4;
+  int64  updated_at = 5;
 
-  bool can_send_messages              = 7;
-  bool can_add_members                = 8;
-  bool can_remove_members             = 9;
-  bool can_change_members_permissions = 10;
-  bool can_change_thread_info         = 11;
+  bool can_send_messages              = 6;
+  bool can_add_members                = 7;
+  bool can_remove_members             = 8;
+  bool can_change_members_permissions = 9;
+  bool can_change_thread_info         = 10;
 }
 
 message UpdateThreadPermissionsRequest {
-  string          thread_id            = 1[
+  string          member_id            = 2[
     (buf.validate.field).string.uuid = true,
     (buf.validate.field).required = true
   ];
-  string          member_id            = 2;
   optional string request_initiator_id = 3;
 
   optional bool can_send_messages              = 4;
