@@ -246,9 +246,8 @@ message AddMemberRequest {
     (buf.validate.field).required = true
   ];
 
-  string initiator_contact_id  = 2 [
-    (buf.validate.field).string.uuid = true,
-    (buf.validate.field).required = true
+  optional string initiator_contact_id  = 2 [
+    (buf.validate.field).string.uuid = true
   ];
 
   string new_member_contact_id= 3 [
@@ -268,9 +267,8 @@ message AddMemberResponse {
 }
 
 message RemoveMemberRequest {
-  string initiator_contact_id = 2 [
-    (buf.validate.field).string.uuid = true,
-    (buf.validate.field).required = true
+  optional string initiator_contact_id = 2 [
+    (buf.validate.field).string.uuid = true
   ];
 
   string target_member_id = 3 [
@@ -288,60 +286,60 @@ message RemoveMemberResponse {
 // #region Thread Variables
 
 message VariableEntry {
-    google.protobuf.Struct value = 1;
-    string set_by = 2;
-    int64 set_at = 3;
+  google.protobuf.Struct value  = 1;
+  string                 set_by = 2;
+  int64                  set_at = 3;
 }
 
 message VariableEntryRequest {
-    string key = 1;
-    google.protobuf.Struct value = 2;
+  string                 key   = 1;
+  google.protobuf.Struct value = 2;
 }
 
 message ThreadVariables {
-    string thread_id = 1;
-    map<string, VariableEntry> variables = 2;
+  string                     thread_id = 1;
+  map<string, VariableEntry> variables = 2;
 }
 
 message SetVariablesRequest {
-    string thread_id = 1 [
-        (buf.validate.field).string.uuid = true
-    ];
-    repeated VariableEntryRequest variables = 2;
-    string member_id = 3 [
-        (buf.validate.field).string.uuid = true
-    ];
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true
+  ];
+  repeated VariableEntryRequest variables = 2;
+  string member_id = 3 [
+    (buf.validate.field).string.uuid = true
+  ];
 
 }
 
 message SearchVariablesResponse {
-    repeated ThreadVariables items = 1;
-    bool next = 2;
+  repeated ThreadVariables items = 1;
+  bool                     next  = 2;
 }
 
 message SearchVariablesRequest {
-    int32 size = 1;
-    int32 page = 2;
-    repeated string fields = 3;
-    repeated string thread_ids = 4;
+  int32           size       = 1;
+  int32           page       = 2;
+  repeated string fields     = 3;
+  repeated string thread_ids = 4;
 }
 
 message LocateVariablesRequest {
-    string thread_id = 1 [
-        (buf.validate.field).string.uuid = true
-    ];
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true
+  ];
 }
 
 message FlushVariablesRequest {
-    string thread_id = 1 [
-        (buf.validate.field).string.uuid = true
-    ];
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true
+  ];
 
-    string member_id = 2 [
-        (buf.validate.field).string.uuid = true
-    ];
+  string member_id = 2 [
+    (buf.validate.field).string.uuid = true
+  ];
 
-    repeated string keys = 3;
+  repeated string keys = 3;
 }
 
 // #endregion
