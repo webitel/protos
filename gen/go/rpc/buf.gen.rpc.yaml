@@ -1,0 +1,30 @@
+version: v2
+
+# clean: true
+
+managed:
+  enabled: true
+  override:
+    - file_option: go_package
+      value: github.com/webitel/protos/gen/go/rpc;pbrpc
+  disable:
+    - file_option: go_package
+      module: buf.build/bufbuild/protovalidate
+    - file_option: go_package
+      module: buf.build/googleapis/googleapis
+
+plugins:
+
+  - remote: buf.build/protocolbuffers/go:v1.36.11
+    out: .
+    opt:
+      - module=github.com/webitel/protos/gen/go/rpc
+
+inputs:
+
+  - git_repo: "https://github.com/webitel/protos"
+    branch: "main"
+    subdir: "rpc"
+
+  # # Local module at provided directory path
+  # - directory: "../../../rpc" # ./[rpc/][go/][gen/]protos
