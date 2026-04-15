@@ -40,6 +40,9 @@ service Message {
 
   // Sends a contact card.
   rpc SendContact(SendContactRequest) returns (SendMessageResponse);
+
+  // Sends a system message (e.g., "User X joined the chat").
+  rpc SendSystemMessage(SendSystemMessageRequest) returns (SendMessageResponse);
 }
 
 message ReadMessageRequest {
@@ -203,6 +206,36 @@ message SendContactRequest {
 
   // Domain ID for multi-tenant isolation.
   int32 domain_id = 9;
+}
+
+message SendSystemMessageRequest {
+
+  // Sender of the message.
+  Peer from = 1 [(buf.validate.field).required = true];
+
+  // Recipient of the message.
+  Peer to = 2 [(buf.validate.field).required = true];
+
+  // System message type (e.g., "user_joined", "user_left").
+  string type = 3 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 64
+  }];
+
+  // System message content (e.g., "User X joined the chat").
+  string body = 4 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 256
+  }];
+
+  // Arbitrary metadata.
+  google.protobuf.Struct metadata = 5;
+
+  // Optional send ID for idempotency.
+  string send_id = 6;
+
+  // Domain ID for multi-tenant isolation.
+  int32 domain_id = 7;
 }
 
 // SendInteractiveMessageRequest sends a structured interactive message.
