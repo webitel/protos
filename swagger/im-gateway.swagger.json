@@ -936,6 +936,14 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadManagement.SetVariablesBody"
+            }
           }
         ],
         "tags": [
@@ -970,15 +978,12 @@
             "type": "string"
           },
           {
-            "name": "keys",
-            "description": "List of variable keys to flush.",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadManagement.FlushVariablesBody"
+            }
           }
         ],
         "tags": [
@@ -2607,6 +2612,33 @@
       ],
       "default": "UNKNOWN",
       "description": "ThreadKind defines the type of a thread.\nIt determines the business rules and available features for the thread.\n\n - UNKNOWN: Unknown or unspecified thread type.\nMust not be used in valid requests.\n - DIRECT: One-to-one private thread between two users.\n - GROUP: Group thread with multiple members.\n - CHANNEL: Channel-style thread (broadcast or topic based communication)."
+    },
+    "webitel.im.api.gateway.v1.ThreadManagement.FlushVariablesBody": {
+      "type": "object",
+      "properties": {
+        "keys": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of variable keys to flush."
+        }
+      },
+      "description": "FlushVariablesRequest defines parameters\nfor flushing thread variables by thread ID."
+    },
+    "webitel.im.api.gateway.v1.ThreadManagement.SetVariablesBody": {
+      "type": "object",
+      "properties": {
+        "variables": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.VariableEntryRequest"
+          },
+          "description": "List of variables to set or update.\nExisting variables with the same keys will be overwritten."
+        }
+      },
+      "description": "SetVariablesRequest defines parameters\nfor setting or updating thread variables."
     },
     "webitel.im.api.gateway.v1.ThreadMember": {
       "type": "object",
