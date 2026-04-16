@@ -13,9 +13,6 @@ on:
       - ".github/workflows/buf-push.yml"
 
 permissions: { contents: read }
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
   detect:
@@ -50,6 +47,9 @@ jobs:
     needs: detect
     if: needs.detect.outputs.modules != '[]'
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.inputs }}
+      cancel-in-progress: true
     strategy:
       fail-fast: false
       matrix:
