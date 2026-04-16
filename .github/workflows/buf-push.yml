@@ -18,24 +18,41 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  detect:
+    name: Detect changed modules
+    runs-on: ubuntu-latest
+    outputs:
+      modules: ${{ steps.filter.outputs.changes }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Detect changed modules
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            cases:          'cases/**'
+            cc:             'cc/**'
+            chat:           'chat/**'
+            engine:         'engine/**'
+            fs:             'fs/**'
+            general:        'general/**'
+            logger:         'logger/**'
+            media-exporter: 'media-exporter/**'
+            storage:        'storage/**'
+            webitel-go:     'webitel-go/**'
+            workflow:       'workflow/**'
+
   push:
     name: Push to BSR
+    needs: detect
+    if: needs.detect.outputs.modules != '[]'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        inputs:
-          - cases
-          - cc
-          - chat
-          - engine
-          - fs
-          - general
-          - logger
-          - media-exporter
-          - storage
-          - webitel-go
-          - workflow
+        inputs: ${{ fromJSON(needs.detect.outputs.modules) }}
 
     steps:
       - name: Checkout repository
