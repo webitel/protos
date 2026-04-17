@@ -78,6 +78,13 @@ service Message {
       body: "*"
     };
   };
+
+  rpc SendSystemMessage(SendSystemMessageRequest) returns (SendMessageResponse) {
+    option (google.api.http) = {
+      post: "/v1/messages/system"
+      body: "*"
+    };
+  };
 }
 
 message ReadMessageRequest {
@@ -240,6 +247,34 @@ message SendInteractiveMessageRequest {
   // Arbitrary metadata.
   google.protobuf.Struct metadata = 6;
 }
+
+message SendSystemMessageRequest {
+
+  // Recipient of the message.
+  Peer to = 2 [(buf.validate.field).required = true];
+
+  // System message type (e.g., "user_joined", "user_left").
+  string type = 3 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 64
+  }];
+
+  // System message content (e.g., "User X joined the chat").
+  string body = 4 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string = {
+      min_len: 1,
+      max_len: 256
+    }
+  ];
+
+  // Arbitrary metadata.
+  google.protobuf.Struct metadata = 5;
+
+  // Optional send ID for idempotency.
+  string send_id = 6;
+}
+
 
 // Interactive represents a rich message with UI elements.
 message Interactive {

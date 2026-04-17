@@ -12,34 +12,54 @@ on:
       - "**/LICENSE"
       - ".github/workflows/buf-push.yml"
 
-permissions: { contents: read }
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+permissions:
+  contents: read
 
 jobs:
-  push:
-    name: Push to BSR
+  detect:
+    name: Detect changed modules
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        inputs:
-          - cases
-          - cc
-          - chat
-          - engine
-          - fs
-          - general
-          - logger
-          - media-exporter
-          - storage
-          - webitel-go
-          - workflow
+    outputs:
+      modules: ${{ steps.filter.outputs.changes }}
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+
+      - name: Detect changed modules
+        id: filter
+        uses: dorny/paths-filter@v4
+        with:
+          filters: |
+            cases: 'cases/**'
+            cc: 'cc/**'
+            chat: 'chat/**'
+            engine: 'engine/**'
+            fs: 'fs/**'
+            general: 'general/**'
+            logger: 'logger/**'
+            media-exporter: 'media-exporter/**'
+            storage: 'storage/**'
+            webitel-go: 'webitel-go/**'
+            workflow: 'workflow/**'
+
+  push:
+    name: Push to BSR
+    needs: detect
+    if: needs.detect.outputs.modules != '[]'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.inputs }}
+      cancel-in-progress: true
+
+    strategy:
+      fail-fast: false
+      matrix:
+        inputs: ${{ fromJSON(needs.detect.outputs.modules) }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
 
       - name: Push modules
         uses: bufbuild/buf-action@v1
