@@ -5,12 +5,12 @@ package webitel.im.api.gateway.v1;
 import "google/api/annotations.proto";
 import "buf/validate/validate.proto";
 
-// ThreadPermissionService defines the gRPC service for managing thread permissions.
+// ThreadPermissionService defines the gRPC service for managing permissions for thread members.
 service ThreadPermission {
     // Get returns all permissions for the specified thread. Optional filter by member_id to get permissions for a specific member.
   rpc Get(GetThreadPermissionsRequest) returns (GetThreadPermissionsResponse);
   // Update updates permissions for a specific member in the thread. The request must include the thread_id and member_id, along with the permissions to update.
-  rpc Update(UpdateThreadPermissionsRequest) returns (ThreadPermissions);
+  rpc Update(UpdateThreadPermissionsRequest) returns (UpdateThreadPermissionsResponse);
 }
 
 message GetThreadPermissionsRequest {
@@ -21,7 +21,7 @@ message GetThreadPermissionsRequest {
 }
 
 message GetThreadPermissionsResponse {
-  repeated ThreadPermissions permissions = 1;
+  ThreadPermissions permissions = 1;
 
 }
 
@@ -39,14 +39,18 @@ message ThreadPermissions {
 }
 
 message UpdateThreadPermissionsRequest {
-  string member_id = 2[
+  string member_id = 1[
     (buf.validate.field).string.uuid = true,
     (buf.validate.field).required = true
   ];
 
-  optional bool can_send_messages              = 4;
-  optional bool can_add_members                = 5;
-  optional bool can_remove_members             = 6;
-  optional bool can_change_members_permissions = 7;
-  optional bool can_update_thread_info         = 8;
+  optional bool can_send_messages              = 2;
+  optional bool can_add_members                = 3;
+  optional bool can_remove_members             = 4;
+  optional bool can_change_members_permissions = 5;
+  optional bool can_change_thread_info         = 6;
+}
+
+message UpdateThreadPermissionsResponse {
+  ThreadPermissions permissions = 1;
 }
