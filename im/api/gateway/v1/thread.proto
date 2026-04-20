@@ -10,7 +10,6 @@ import "api/gateway/v1/peer.proto";
 import "google/protobuf/struct.proto";
 import "api/gateway/v1/contact.proto";
 
-
 // ThreadManagement service provides access to group threads manipulating
 // and read-only access for direct threads.
 service ThreadManagement {
@@ -29,7 +28,7 @@ service ThreadManagement {
   // Remove member from the thread.
   rpc RemoveMember(RemoveMemberRequest) returns (RemoveMemberResponse) {
     option (google.api.http) = {
-      delete: "/v1/threads/{thread_id}/members"
+      delete: "/v1/threads/{thread_id}/members/{member_id}"
     };
   };
 
@@ -64,7 +63,7 @@ service ThreadManagement {
   rpc FlushVariables(FlushVariablesRequest) returns (ThreadVariables) {
     option (google.api.http) = {
       delete: "/v1/threads/{thread_id}/variables/flush",
-      body: "*"
+      body  : "*"
     };
   };
 }
@@ -223,7 +222,11 @@ message AddMemberResponse {
 }
 
 message RemoveMemberRequest {
-  string member_id = 1;
+  string member_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+  string thread_id = 2;
 }
 
 message RemoveMemberResponse {
@@ -237,34 +240,34 @@ message VariableEntry {
 
     // Arbitrary structured value of the variable.
     // Supports dynamic JSON-like content.
-    google.protobuf.Struct value = 1;
+  google.protobuf.Struct value = 1;
 
     // Contact who set the variable.
-    Contact set_by = 2;
+  Contact set_by = 2;
 
     // Timestamp when the variable was set (Unix time, milliseconds).
-    int64 set_at = 3;
+  int64 set_at = 3;
 }
 
 // VariableEntryRequest represents a variable update operation.
 message VariableEntryRequest {
 
     // Variable key.
-    string key = 1;
+  string key = 1;
 
     // Variable value.
-    google.protobuf.Struct value = 2;
+  google.protobuf.Struct value = 2;
 }
 
 // ThreadVariables contains all variables associated with a thread.
 message ThreadVariables {
 
     // Unique identifier for the thread.
-    string thread_id = 1;
+  string thread_id = 1;
 
     // Key-value map of variables.
     // Key is the variable name, value contains data and metadata.
-    map<string, VariableEntry> variables = 2;
+  map<string, VariableEntry> variables = 2;
 }
 
 // SetVariablesRequest defines parameters
@@ -272,13 +275,13 @@ message ThreadVariables {
 message SetVariablesRequest {
 
     // Unique identifier for the thread.
-    string thread_id = 1 [
-        (buf.validate.field).string.uuid = true
-    ];
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true
+  ];
 
     // List of variables to set or update.
     // Existing variables with the same keys will be overwritten.
-    repeated VariableEntryRequest variables = 2;
+  repeated VariableEntryRequest variables = 2;
 }
 
 // SearchVariablesResponse contains search results
@@ -286,10 +289,10 @@ message SetVariablesRequest {
 message SearchVariablesResponse {
 
     // List of thread variables grouped by thread.
-    repeated ThreadVariables items = 1;
+  repeated ThreadVariables items = 1;
 
     // Indicates if there are more results to fetch.
-    bool next = 2;
+  bool next = 2;
 }
 
 // SearchVariablesRequest defines parameters
@@ -297,16 +300,16 @@ message SearchVariablesResponse {
 message SearchVariablesRequest {
 
     // Number of results to return per page.
-    int32 size = 1;
+  int32 size = 1;
 
     // Page number (1-based).
-    int32 page = 2;
+  int32 page = 2;
 
     // List of fields to include in the response.
-    repeated string fields = 3;
+  repeated string fields = 3;
 
     // List of thread IDs to filter by.
-    repeated string thread_ids = 4;
+  repeated string thread_ids = 4;
 }
 
 // LocateVariablesRequest defines parameters
@@ -314,9 +317,9 @@ message SearchVariablesRequest {
 message LocateVariablesRequest {
 
     // Unique identifier for the thread.
-    string thread_id = 1 [
-        (buf.validate.field).string.uuid = true
-    ];
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true
+  ];
 }
 
 // FlushVariablesRequest defines parameters
@@ -324,12 +327,12 @@ message LocateVariablesRequest {
 message FlushVariablesRequest {
 
     // Unique identifier for the thread.
-    string thread_id = 1 [
-        (buf.validate.field).string.uuid = true
-    ];
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true
+  ];
 
     // List of variable keys to flush.
-    repeated string keys = 2;
+  repeated string keys = 2;
 }
 
 // #endregion

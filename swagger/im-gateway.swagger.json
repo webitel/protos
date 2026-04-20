@@ -15,6 +15,12 @@
       "name": "webitel.im.api.gateway.v1.Contacts"
     },
     {
+      "name": "webitel.im.api.gateway.v1.ContactSettingsManagement"
+    },
+    {
+      "name": "webitel.im.api.gateway.v1.ThreadPermission"
+    },
+    {
       "name": "webitel.im.api.gateway.v1.MessageHistory"
     },
     {
@@ -25,9 +31,6 @@
     },
     {
       "name": "webitel.im.api.gateway.v1.ThreadManagement"
-    },
-    {
-      "name": "webitel.im.api.gateway.v1.ThreadPermission"
     },
     {
       "name": "webitel.im.service.admin.v1.Applications"
@@ -402,6 +405,78 @@
         ]
       }
     },
+    "/v1/contacts/self/settings": {
+      "get": {
+        "summary": "Get retrieves the contact settings for the request initiator.",
+        "operationId": "ContactSettingsManagement_Get",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.GetContactSettingsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.ContactSettingsManagement"
+        ]
+      },
+      "patch": {
+        "summary": "Update modifies the contact settings for the request initiator. Only the fields provided in the request will be updated; other existing settings will remain unchanged.",
+        "operationId": "ContactSettingsManagement_Update",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.UpdateContactSettingsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "allow_invites_from",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ALL",
+              "NOBODY",
+              "SAME_ISSUER"
+            ],
+            "default": "ALL"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.ContactSettingsManagement"
+        ]
+      }
+    },
     "/v1/messages/contact": {
       "post": {
         "summary": "Sends a contact card.",
@@ -612,6 +687,38 @@
         ]
       }
     },
+    "/v1/messages/system": {
+      "post": {
+        "operationId": "Message_SendSystemMessage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SendMessageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SendSystemMessageRequest"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.Message"
+        ]
+      }
+    },
     "/v1/messages/text": {
       "post": {
         "summary": "SendText delivers a plain text message.\nWe use the shared Request/Response types directly to avoid duplication.",
@@ -778,53 +885,6 @@
       }
     },
     "/v1/threads/{thread_id}/members": {
-      "delete": {
-        "summary": "Remove member from the thread.",
-        "operationId": "ThreadManagement_RemoveMember",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.im.api.gateway.v1.RemoveMemberResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/google.rpc.Status"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "thread_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "member.sub",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "member.iss",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "reason",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "webitel.im.api.gateway.v1.ThreadManagement"
-        ]
-      },
       "post": {
         "summary": "Add member to the thread.",
         "operationId": "ThreadManagement_AddMember",
@@ -850,13 +910,13 @@
             "type": "string"
           },
           {
-            "name": "member.sub",
+            "name": "contact.sub",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "member.iss",
+            "name": "contact.iss",
             "in": "query",
             "required": false,
             "type": "string"
@@ -878,6 +938,145 @@
         ],
         "tags": [
           "webitel.im.api.gateway.v1.ThreadManagement"
+        ]
+      }
+    },
+    "/v1/threads/{thread_id}/members/{member_id}": {
+      "delete": {
+        "summary": "Remove member from the thread.",
+        "operationId": "ThreadManagement_RemoveMember",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.RemoveMemberResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "member_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadManagement"
+        ]
+      }
+    },
+    "/v1/threads/{thread_id}/members/{member_id}/permissions": {
+      "get": {
+        "summary": "Get returns all permissions for the specified thread. Optional filter by member_id to get permissions for a specific member.",
+        "operationId": "ThreadPermission_Get",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.GetThreadPermissionsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "member_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadPermission"
+        ]
+      },
+      "patch": {
+        "summary": "Update updates permissions for a specific member in the thread. The request must include the thread_id and member_id, along with the permissions to update.",
+        "operationId": "ThreadPermission_Update",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.UpdateThreadPermissionsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "member_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "can_send_messages",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "can_add_members",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "can_remove_members",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "can_change_members_permissions",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "can_change_thread_info",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadPermission"
         ]
       }
     },
@@ -1330,7 +1529,12 @@
       "title": "Access Token Response"
     },
     "webitel.im.api.gateway.v1.AddMemberResponse": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "member": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadMember"
+        }
+      }
     },
     "webitel.im.api.gateway.v1.AuthContact": {
       "type": "object",
@@ -1587,6 +1791,21 @@
       },
       "description": "SearchList represents a paginated collection of Contact entities."
     },
+    "webitel.im.api.gateway.v1.ContactSettings": {
+      "type": "object",
+      "properties": {
+        "contact_id": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "allow_invites_from": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.UserFilter"
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.CreateBotRequest": {
       "type": "object",
       "properties": {
@@ -1716,31 +1935,21 @@
       },
       "description": "Media container for documents attachments."
     },
-    "webitel.im.api.gateway.v1.ExternalParticipant": {
+    "webitel.im.api.gateway.v1.GetContactSettingsResponse": {
       "type": "object",
       "properties": {
-        "iss": {
-          "type": "string",
-          "description": "Client issuer for the sender."
-        },
-        "sub": {
-          "type": "string",
-          "description": "Client-readable participant subject or display name."
-        },
-        "type": {
-          "type": "string",
-          "description": "Participant type."
-        },
-        "name": {
-          "type": "string",
-          "description": "Participant name."
-        },
-        "is_bot": {
-          "type": "boolean",
-          "description": "Represents if user is automation bot or actual user of system."
+        "settings": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ContactSettings"
         }
-      },
-      "description": "ExternalParticipant represents aggregated participant information\npresent in the thread history response."
+      }
+    },
+    "webitel.im.api.gateway.v1.GetThreadPermissionsResponse": {
+      "type": "object",
+      "properties": {
+        "permissions": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadPermissions"
+        }
+      }
     },
     "webitel.im.api.gateway.v1.HistoryMessage": {
       "type": "object",
@@ -1754,7 +1963,7 @@
           "description": "Identifier of the thread the message belongs to."
         },
         "sender": {
-          "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageParticipant",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadMember",
           "description": "Sender user aggregated information."
         },
         "type": {
@@ -2185,32 +2394,6 @@
       },
       "description": "Client sends callback event when user clicks a button."
     },
-    "webitel.im.api.gateway.v1.MessageParticipant": {
-      "type": "object",
-      "properties": {
-        "sub": {
-          "type": "string",
-          "description": "Client-readable sender subject or display name."
-        },
-        "iss": {
-          "type": "string",
-          "description": "Client issuer for the sender."
-        },
-        "type": {
-          "type": "string",
-          "description": "Sender type."
-        },
-        "name": {
-          "type": "string",
-          "description": "Sender username."
-        },
-        "is_bot": {
-          "type": "boolean",
-          "description": "Represents if user is automation bot or actual user of system."
-        }
-      },
-      "description": "MessageParticipant represents aggregated participant information\npresent in the message history response."
-    },
     "webitel.im.api.gateway.v1.PUSHSubscription": {
       "type": "object",
       "properties": {
@@ -2497,6 +2680,31 @@
       },
       "description": "SendMessageResponse represents the result of a send operation.\nContains the generated message ID and list of recipients."
     },
+    "webitel.im.api.gateway.v1.SendSystemMessageRequest": {
+      "type": "object",
+      "properties": {
+        "to": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Peer",
+          "description": "Recipient of the message."
+        },
+        "type": {
+          "type": "string",
+          "description": "System message type (e.g., \"user_joined\", \"user_left\")."
+        },
+        "body": {
+          "type": "string",
+          "description": "System message content (e.g., \"User X joined the chat\")."
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Arbitrary metadata."
+        },
+        "send_id": {
+          "type": "string",
+          "description": "Optional send ID for idempotency."
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.SendTextRequest": {
       "type": "object",
       "properties": {
@@ -2566,41 +2774,16 @@
           "$ref": "#/definitions/webitel.im.api.gateway.v1.HistoryMessage",
           "description": "Last message of the linked thread."
         },
+        "settings": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadSettings",
+          "description": "User-specific settings for this thread."
+        },
         "variables": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadVariables",
           "description": "Optional variables associated with the thread."
         }
       },
       "description": "Thread represents a thread (aka chat or conversation) entity."
-    },
-    "webitel.im.api.gateway.v1.ThreadDirectSettings": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Settings identifier."
-        },
-        "domain_id": {
-          "type": "integer",
-          "format": "int32",
-          "description": "Domain identifier."
-        },
-        "created_at": {
-          "type": "string",
-          "format": "int64",
-          "description": "Creation timestamp (Unix time, milliseconds)."
-        },
-        "updated_at": {
-          "type": "string",
-          "format": "int64",
-          "description": "Last update timestamp (Unix time, milliseconds)."
-        },
-        "title": {
-          "type": "string",
-          "description": "Custom title for the direct thread.\nUsually represents the display name of the conversation."
-        }
-      },
-      "description": "ThreadDirectSettings defines settings\nspecific to direct (one-to-one) threads."
     },
     "webitel.im.api.gateway.v1.ThreadKind": {
       "type": "string",
@@ -2643,16 +2826,54 @@
     "webitel.im.api.gateway.v1.ThreadMember": {
       "type": "object",
       "properties": {
-        "member": {
-          "$ref": "#/definitions/webitel.im.api.gateway.v1.ExternalParticipant",
-          "description": "User aggregated information."
+        "id": {
+          "type": "string"
         },
-        "direct_settings": {
-          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadDirectSettings",
-          "description": "Direct thread specific settings.\nPresent only for DIRECT threads."
+        "contact": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Contact"
+        },
+        "role": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadRole"
+        },
+        "permissions": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadPermissions"
         }
       },
       "description": "ThreadMember represents a thread participant\nwith optional type-specific settings."
+    },
+    "webitel.im.api.gateway.v1.ThreadPermissions": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "member_id": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "can_send_messages": {
+          "type": "boolean"
+        },
+        "can_add_members": {
+          "type": "boolean"
+        },
+        "can_remove_members": {
+          "type": "boolean"
+        },
+        "can_change_members_permissions": {
+          "type": "boolean"
+        },
+        "can_change_thread_info": {
+          "type": "boolean"
+        }
+      }
     },
     "webitel.im.api.gateway.v1.ThreadRole": {
       "type": "string",
@@ -2664,6 +2885,35 @@
         "ROLE_SUPERVISOR"
       ],
       "default": "ROLE_UNSPECIFIED"
+    },
+    "webitel.im.api.gateway.v1.ThreadSettings": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Settings identifier."
+        },
+        "domain_id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Domain identifier."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Creation timestamp (Unix time, milliseconds)."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Last update timestamp (Unix time, milliseconds)."
+        },
+        "title": {
+          "type": "string",
+          "description": "Custom title for the direct thread.\nUsually represents the display name of the conversation."
+        }
+      },
+      "description": "ThreadDirectSettings defines settings\nspecific to direct (one-to-one) threads."
     },
     "webitel.im.api.gateway.v1.ThreadVariables": {
       "type": "object",
@@ -2723,6 +2973,22 @@
       "type": "object",
       "title": "No Reply ; Error status if failed"
     },
+    "webitel.im.api.gateway.v1.UpdateContactSettingsResponse": {
+      "type": "object",
+      "properties": {
+        "settings": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ContactSettings"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.UpdateThreadPermissionsResponse": {
+      "type": "object",
+      "properties": {
+        "permissions": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadPermissions"
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.UserAgent": {
       "type": "object",
       "properties": {
@@ -2762,6 +3028,15 @@
         }
       },
       "title": "[User-Agent] string \u0026 details"
+    },
+    "webitel.im.api.gateway.v1.UserFilter": {
+      "type": "string",
+      "enum": [
+        "ALL",
+        "NOBODY",
+        "SAME_ISSUER"
+      ],
+      "default": "ALL"
     },
     "webitel.im.api.gateway.v1.VariableEntry": {
       "type": "object",
