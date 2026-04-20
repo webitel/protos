@@ -48,13 +48,13 @@
       "name": "webitel.im.service.contact.v1.ContactPrivacy"
     },
     {
+      "name": "webitel.im.service.thread.v1.ThreadPermissionManagement"
+    },
+    {
       "name": "webitel.im.service.thread.v1.MessageHistory"
     },
     {
       "name": "webitel.im.service.thread.v1.Message"
-    },
-    {
-      "name": "webitel.im.service.thread.v1.ThreadPermissionManagement"
     },
     {
       "name": "webitel.im.service.thread.v1.ThreadManagement"
@@ -877,6 +877,37 @@
             "required": false,
             "type": "integer",
             "format": "int32"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadManagement"
+        ]
+      }
+    },
+    "/v1/threads/members/{member_id}": {
+      "delete": {
+        "summary": "Remove member from the thread.",
+        "operationId": "ThreadManagement_RemoveMember",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.RemoveMemberResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "member_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
           }
         ],
         "tags": [
@@ -1934,22 +1965,6 @@
         }
       },
       "description": "Media container for documents attachments."
-    },
-    "webitel.im.api.gateway.v1.GetContactSettingsResponse": {
-      "type": "object",
-      "properties": {
-        "settings": {
-          "$ref": "#/definitions/webitel.im.api.gateway.v1.ContactSettings"
-        }
-      }
-    },
-    "webitel.im.api.gateway.v1.GetThreadPermissionsResponse": {
-      "type": "object",
-      "properties": {
-        "permissions": {
-          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadPermissions"
-        }
-      }
     },
     "webitel.im.api.gateway.v1.HistoryMessage": {
       "type": "object",
@@ -3244,7 +3259,8 @@
         "from": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.service.thread.v1.ThreadMember"
           }
         },
         "next_cursor": {
@@ -3254,6 +3270,76 @@
           "$ref": "#/definitions/webitel.im.service.thread.v1.HistoryMessageCursorResponse"
         }
       }
+    },
+    "webitel.im.service.thread.v1.ThreadMember": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Unique identifier of the thread member record. (thread_dialog_id)"
+        },
+        "contact_id": {
+          "type": "string",
+          "description": "Contact ID of the thread member."
+        },
+        "role": {
+          "$ref": "#/definitions/webitel.im.service.thread.v1.ThreadRole",
+          "description": "Role of the member in the thread, determining their permissions."
+        },
+        "permissions": {
+          "$ref": "#/definitions/webitel.im.service.thread.v1.ThreadPermissions",
+          "description": "User rights in the thread, determined by their role."
+        }
+      },
+      "description": "ThreadMember represents a thread participant\nwith optional type-specific settings."
+    },
+    "webitel.im.service.thread.v1.ThreadPermissions": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "member_id": {
+          "type": "string"
+        },
+        "thread_id": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "can_send_messages": {
+          "type": "boolean"
+        },
+        "can_add_members": {
+          "type": "boolean"
+        },
+        "can_remove_members": {
+          "type": "boolean"
+        },
+        "can_change_members_permissions": {
+          "type": "boolean"
+        },
+        "can_change_thread_info": {
+          "type": "boolean"
+        }
+      }
+    },
+    "webitel.im.service.thread.v1.ThreadRole": {
+      "type": "string",
+      "enum": [
+        "ROLE_UNSPECIFIED",
+        "ROLE_MEMBER",
+        "ROLE_ADMIN",
+        "ROLE_OWNER",
+        "ROLE_SUPERVISOR"
+      ],
+      "default": "ROLE_UNSPECIFIED"
     }
   }
 }
