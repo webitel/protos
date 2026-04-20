@@ -6,9 +6,20 @@ import "buf/validate/validate.proto";
 
 option go_package = "github.com/webitel/im-contact-service/gen/go/api/v1;impb";
 
+// ContactSettingsManagement service provides access to contact settings.
 service ContactSettingsManagement {
-  rpc Get(GetContactSettingsRequest) returns (GetContactSettingsResponse);
-  rpc Update(UpdateContactSettingsRequest) returns (UpdateContactSettingsResponse);
+  // Get retrieves the contact settings for the request initiator.
+  rpc Get(GetContactSettingsRequest) returns (GetContactSettingsResponse) {
+    option (google.api.http) = {
+      get: "/v1/contacts/self/settings"
+    };
+  };
+  // Update modifies the contact settings for the request initiator. Only the fields provided in the request will be updated; other existing settings will remain unchanged.
+  rpc Update(UpdateContactSettingsRequest) returns (UpdateContactSettingsResponse) {
+    option (google.api.http) = {
+      patch: "/v1/contacts/self/settings"
+    };
+  };
 }
 
 message GetContactSettingsRequest {

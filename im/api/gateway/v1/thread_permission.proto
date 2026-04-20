@@ -8,9 +8,17 @@ import "buf/validate/validate.proto";
 // ThreadPermissionService defines the gRPC service for managing permissions for thread members.
 service ThreadPermission {
     // Get returns all permissions for the specified thread. Optional filter by member_id to get permissions for a specific member.
-  rpc Get(GetThreadPermissionsRequest) returns (GetThreadPermissionsResponse);
+  rpc Get(GetThreadPermissionsRequest) returns (GetThreadPermissionsResponse) {
+    option (google.api.http) = {
+      get: "/v1/threads/{thread_id}/members/{member_id}/permissions"
+    };
+  };
   // Update updates permissions for a specific member in the thread. The request must include the thread_id and member_id, along with the permissions to update.
-  rpc Update(UpdateThreadPermissionsRequest) returns (UpdateThreadPermissionsResponse);
+  rpc Update(UpdateThreadPermissionsRequest) returns (UpdateThreadPermissionsResponse) {
+    option (google.api.http) = {
+      patch: "/v1/threads/{thread_id}/members/{member_id}/permissions"
+    };
+  };
 }
 
 message GetThreadPermissionsRequest {
@@ -18,6 +26,7 @@ message GetThreadPermissionsRequest {
     (buf.validate.field).string.uuid = true,
     (buf.validate.field).required = true
   ];
+  string thread_id = 2;
 }
 
 message GetThreadPermissionsResponse {
@@ -43,12 +52,13 @@ message UpdateThreadPermissionsRequest {
     (buf.validate.field).string.uuid = true,
     (buf.validate.field).required = true
   ];
+  string thread_id = 2;
 
-  optional bool can_send_messages              = 2;
-  optional bool can_add_members                = 3;
-  optional bool can_remove_members             = 4;
-  optional bool can_change_members_permissions = 5;
-  optional bool can_change_thread_info         = 6;
+  optional bool can_send_messages              = 3;
+  optional bool can_add_members                = 4;
+  optional bool can_remove_members             = 5;
+  optional bool can_change_members_permissions = 6;
+  optional bool can_change_thread_info         = 7;
 }
 
 message UpdateThreadPermissionsResponse {
