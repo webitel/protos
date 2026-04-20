@@ -48,13 +48,31 @@
       "name": "webitel.im.service.contact.v1.ContactPrivacy"
     },
     {
+      "name": "webitel.im.provider.v1.FacebookService"
+    },
+    {
+      "name": "webitel.im.provider.v1.GateService"
+    },
+    {
+      "name": "webitel.im.provider.v1.ProviderMessageService"
+    },
+    {
+      "name": "webitel.im.provider.v1.MetaAppService"
+    },
+    {
+      "name": "webitel.im.provider.v1.MetaOAuthService"
+    },
+    {
+      "name": "webitel.im.provider.v1.WhatsAppService"
+    },
+    {
+      "name": "webitel.im.service.thread.v1.ThreadPermissionManagement"
+    },
+    {
       "name": "webitel.im.service.thread.v1.MessageHistory"
     },
     {
       "name": "webitel.im.service.thread.v1.Message"
-    },
-    {
-      "name": "webitel.im.service.thread.v1.ThreadPermissionManagement"
     },
     {
       "name": "webitel.im.service.thread.v1.ThreadManagement"
@@ -67,6 +85,664 @@
     "application/json"
   ],
   "paths": {
+    "/im/gates": {
+      "get": {
+        "summary": "/ ListGates returns a collection of all registered gateways within the current domain.",
+        "operationId": "GateService_ListGates",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderListGatesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "description": "Page number (starts from 1)",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "description": "Items per page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "types",
+            "description": "Filter by channel type (Telegram, Facebook, etc.)",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "PROVIDER_TYPE_UNSPECIFIED",
+                "PROVIDER_TYPE_VIBER",
+                "PROVIDER_TYPE_TELEGRAM_BOT",
+                "PROVIDER_TYPE_TELEGRAM_APP",
+                "PROVIDER_TYPE_META_APP",
+                "PROVIDER_TYPE_FACEBOOK",
+                "PROVIDER_TYPE_INSTAGRAM",
+                "PROVIDER_TYPE_WHATSAPP"
+              ]
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "status",
+            "description": "Filter by active/inactive status\n\n - PROVIDER_STATUS_ACTIVE: Provider is healthy and processing messages\n - PROVIDER_STATUS_INACTIVE: Manually disabled by user\n - PROVIDER_STATUS_ERROR: Connection or authentication failed",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "PROVIDER_STATUS_UNSPECIFIED",
+              "PROVIDER_STATUS_ACTIVE",
+              "PROVIDER_STATUS_INACTIVE",
+              "PROVIDER_STATUS_ERROR"
+            ],
+            "default": "PROVIDER_STATUS_UNSPECIFIED"
+          },
+          {
+            "name": "q",
+            "description": "Search query for name or metadata",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.GateService"
+        ]
+      }
+    },
+    "/im/gates/facebook": {
+      "post": {
+        "summary": "/ CreateFacebookGate activates a Facebook Messenger gateway for a specific Page.",
+        "operationId": "FacebookService_CreateFacebookGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderCreateFacebookGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "/ ProviderCreateFacebookGateRequest links a specific Facebook Page as a messaging gateway.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderCreateFacebookGateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.FacebookService"
+        ]
+      }
+    },
+    "/im/gates/facebook/{id}": {
+      "get": {
+        "summary": "/ GetFacebookGate retrieves details of a specific Facebook gateway.",
+        "operationId": "FacebookService_GetFacebookGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderGetFacebookGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.FacebookService"
+        ]
+      },
+      "delete": {
+        "summary": "/ DeleteFacebookGate deactivates the gateway.",
+        "operationId": "FacebookService_DeleteFacebookGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderDeleteFacebookGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.FacebookService"
+        ]
+      },
+      "patch": {
+        "summary": "/ UpdateFacebookGate modifies Facebook gateway settings.",
+        "operationId": "FacebookService_UpdateFacebookGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderUpdateFacebookGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.FacebookService.UpdateFacebookGateBody"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.FacebookService"
+        ]
+      }
+    },
+    "/im/gates/whatsapp": {
+      "post": {
+        "summary": "/ CreateWhatsAppGate registers a WhatsApp Business Account (WABA) gateway.",
+        "operationId": "WhatsAppService_CreateWhatsAppGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderCreateWhatsAppGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "/ ProviderCreateWhatsAppGateRequest connects a WhatsApp Business Account (WABA).",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderCreateWhatsAppGateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.WhatsAppService"
+        ]
+      }
+    },
+    "/im/gates/whatsapp/{id}": {
+      "get": {
+        "summary": "/ GetWhatsAppGate retrieves configuration and status for a WhatsApp gateway.",
+        "operationId": "WhatsAppService_GetWhatsAppGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderGetWhatsAppGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.WhatsAppService"
+        ]
+      },
+      "delete": {
+        "summary": "/ DeleteWhatsAppGate removes the WhatsApp gateway integration.",
+        "operationId": "WhatsAppService_DeleteWhatsAppGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderDeleteWhatsAppGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.WhatsAppService"
+        ]
+      },
+      "patch": {
+        "summary": "/ UpdateWhatsAppGate updates WhatsApp-specific gateway configurations.",
+        "operationId": "WhatsAppService_UpdateWhatsAppGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderUpdateWhatsAppGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.WhatsAppService.UpdateWhatsAppGateBody"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.WhatsAppService"
+        ]
+      }
+    },
+    "/im/meta-apps": {
+      "post": {
+        "summary": "/ CreateMetaApp registers a new Meta Application.",
+        "operationId": "MetaAppService_CreateMetaApp",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderCreateMetaAppResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "/ ProviderCreateMetaAppRequest is used to register a new Meta Developer Application.\n/ This configuration is the foundation for all subsequent OAuth-based integrations.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderCreateMetaAppRequest"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.MetaAppService"
+        ]
+      }
+    },
+    "/im/meta-apps/{id}": {
+      "get": {
+        "summary": "/ GetMetaApp retrieves the configuration details of a specific Meta Application by its ID.",
+        "operationId": "MetaAppService_GetMetaApp",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderGetMetaAppResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.MetaAppService"
+        ]
+      },
+      "delete": {
+        "summary": "/ DeleteMetaApp removes a Meta Application registration.",
+        "operationId": "MetaAppService_DeleteMetaApp",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderDeleteMetaAppResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.MetaAppService"
+        ]
+      },
+      "patch": {
+        "summary": "/ UpdateMetaApp modifies an existing Meta Application configuration.",
+        "operationId": "MetaAppService_UpdateMetaApp",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderUpdateMetaAppResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "The internal ID of the MetaApp record",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.MetaAppService.UpdateMetaAppBody"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.MetaAppService"
+        ]
+      }
+    },
+    "/im/meta-apps/{meta_app_id}/oauth/callback": {
+      "post": {
+        "summary": "/ MetaOAuthCallback processes the authorization code returned by Facebook.",
+        "operationId": "MetaOAuthService_MetaOAuthCallback",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderMetaOAuthCallbackResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "meta_app_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.MetaOAuthService.MetaOAuthCallbackBody"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.MetaOAuthService"
+        ]
+      }
+    },
+    "/im/meta-apps/{meta_app_id}/oauth/start": {
+      "post": {
+        "summary": "/ StartMetaOAuth generates a secure Facebook Authorization URL.",
+        "operationId": "MetaOAuthService_StartMetaOAuth",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderMetaOAuthStartResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "meta_app_id",
+            "description": "Internal ID of the MetaApp to use for this flow",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.MetaOAuthService.StartMetaOAuthBody"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.MetaOAuthService"
+        ]
+      }
+    },
+    "/im/provider/send/document": {
+      "post": {
+        "summary": "SendDocument delivers file attachments to the external chat partner.",
+        "operationId": "ProviderMessageService_SendDocument",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderSendMessageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "ProviderSendDocumentRequest sends a document with an optional caption.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderSendDocumentRequest"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.ProviderMessageService"
+        ]
+      }
+    },
+    "/im/provider/send/image": {
+      "post": {
+        "summary": "SendImage delivers images to the external chat partner.",
+        "operationId": "ProviderMessageService_SendImage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderSendMessageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "ProviderSendImageRequest sends an image with an optional caption.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderSendImageRequest"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.ProviderMessageService"
+        ]
+      }
+    },
+    "/im/provider/send/text": {
+      "post": {
+        "summary": "SendText delivers a plain text message to the external chat partner.",
+        "operationId": "ProviderMessageService_SendText",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderSendMessageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "ProviderSendTextRequest sends a simple text message.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderSendTextRequest"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.ProviderMessageService"
+        ]
+      }
+    },
     "/v1/auth/device": {
       "delete": {
         "summary": "Deletes a device by its token, stops sending PUSH-notifications to it.",
@@ -3101,6 +3777,636 @@
       },
       "title": "keys: P-256 elliptic curve Diffie-Hellman parameters in the following object\np256dh: Base64url-encoded P-256 elliptic curve Diffie-Hellman public key\nauth: Base64url-encoded authentication secret"
     },
+    "webitel.im.provider.v1.FacebookService.UpdateFacebookGateBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "page_token": {
+          "type": "string",
+          "title": "Used for refreshing the access token"
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      },
+      "description": "/ ProviderUpdateFacebookGateRequest updates the operational settings of a Facebook provider."
+    },
+    "webitel.im.provider.v1.MetaAppService.UpdateMetaAppBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Updated display name"
+        },
+        "app_secret": {
+          "type": "string",
+          "title": "Updated App Secret if rotated"
+        },
+        "oauth_redirect_uri": {
+          "type": "string",
+          "title": "Updated callback URI"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Updated list of required permissions"
+        }
+      },
+      "description": "/ ProviderUpdateMetaAppRequest updates the settings for an existing Meta application."
+    },
+    "webitel.im.provider.v1.MetaOAuthService.MetaOAuthCallbackBody": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "title": "The temporary authorization code provided by Meta"
+        },
+        "state": {
+          "type": "string",
+          "title": "The state token previously generated in Start request"
+        }
+      },
+      "description": "/ ProviderMetaOAuthCallbackRequest handles the verification and exchange of the auth code."
+    },
+    "webitel.im.provider.v1.MetaOAuthService.StartMetaOAuthBody": {
+      "type": "object",
+      "properties": {
+        "extra_scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Optional additional permissions for this specific session"
+        }
+      },
+      "description": "/ ProviderMetaOAuthStartRequest initiates the handshake with Meta."
+    },
+    "webitel.im.provider.v1.ProviderCreateFacebookGateRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name of the gateway in Webitel"
+        },
+        "meta_app_id": {
+          "type": "string",
+          "title": "Reference to the parent MetaApp"
+        },
+        "page_id": {
+          "type": "string",
+          "title": "The Facebook Page ID"
+        },
+        "page_token": {
+          "type": "string",
+          "title": "Long-lived Page Access Token"
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      },
+      "description": "/ ProviderCreateFacebookGateRequest links a specific Facebook Page as a messaging gateway."
+    },
+    "webitel.im.provider.v1.ProviderCreateFacebookGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderFacebookGate"
+        }
+      },
+      "description": "/ ProviderCreateFacebookGateResponse returns the newly activated Facebook provider."
+    },
+    "webitel.im.provider.v1.ProviderCreateMetaAppRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Human-readable name for the application"
+        },
+        "app_id": {
+          "type": "string",
+          "title": "Unique Meta App ID from developers.facebook.com"
+        },
+        "app_secret": {
+          "type": "string",
+          "title": "Meta App Secret (should be handled as sensitive data)"
+        },
+        "oauth_redirect_uri": {
+          "type": "string",
+          "title": "The pre-authorized callback URL for OAuth flow"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "List of requested permissions (e.g., pages_messaging)"
+        }
+      },
+      "description": "/ ProviderCreateMetaAppRequest is used to register a new Meta Developer Application.\n/ This configuration is the foundation for all subsequent OAuth-based integrations."
+    },
+    "webitel.im.provider.v1.ProviderCreateMetaAppResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderMetaApp"
+        }
+      },
+      "description": "/ ProviderCreateMetaAppResponse returns the successfully registered Meta application."
+    },
+    "webitel.im.provider.v1.ProviderCreateWhatsAppGateRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "meta_app_id": {
+          "type": "string"
+        },
+        "waba_id": {
+          "type": "string",
+          "title": "WhatsApp Business Account ID"
+        },
+        "phone_number_id": {
+          "type": "string",
+          "title": "Unique ID for the phone number"
+        },
+        "access_token": {
+          "type": "string",
+          "title": "Permanent system user token or WABA token"
+        }
+      },
+      "description": "/ ProviderCreateWhatsAppGateRequest connects a WhatsApp Business Account (WABA)."
+    },
+    "webitel.im.provider.v1.ProviderCreateWhatsAppGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderWhatsAppGate"
+        }
+      },
+      "description": "/ ProviderCreateWhatsAppGateResponse returns the registered WhatsApp provider."
+    },
+    "webitel.im.provider.v1.ProviderDeleteFacebookGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderFacebookGate"
+        }
+      }
+    },
+    "webitel.im.provider.v1.ProviderDeleteMetaAppResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderMetaApp"
+        }
+      },
+      "description": "/ ProviderDeleteMetaAppResponse returns the details of the deleted application."
+    },
+    "webitel.im.provider.v1.ProviderDeleteWhatsAppGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderWhatsAppGate"
+        }
+      }
+    },
+    "webitel.im.provider.v1.ProviderFacebookGate": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "meta_app_id": {
+          "type": "string"
+        },
+        "page_id": {
+          "type": "string"
+        },
+        "page_name": {
+          "type": "string"
+        },
+        "webhook": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderStatus"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "Unix timestamp in milliseconds"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "Unix timestamp in milliseconds"
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "webitel.im.provider.v1.ProviderFile": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Internal Webitel file storage ID"
+        },
+        "url": {
+          "type": "string",
+          "title": "Publicly accessible URL (if required by provider)"
+        },
+        "name": {
+          "type": "string",
+          "title": "Original file name"
+        },
+        "mime_type": {
+          "type": "string",
+          "title": "Media type (e.g., \"image/png\")"
+        },
+        "size": {
+          "type": "string",
+          "format": "int64",
+          "title": "File size in bytes"
+        }
+      },
+      "description": "ProviderFile represents a generic file attachment."
+    },
+    "webitel.im.provider.v1.ProviderGetFacebookGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderFacebookGate"
+        }
+      }
+    },
+    "webitel.im.provider.v1.ProviderGetMetaAppResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderMetaApp"
+        }
+      },
+      "description": "/ ProviderGetMetaAppResponse returns the requested Meta application details."
+    },
+    "webitel.im.provider.v1.ProviderGetWhatsAppGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderWhatsAppGate"
+        }
+      }
+    },
+    "webitel.im.provider.v1.ProviderListGatesResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.provider.v1.ProviderSummary"
+          }
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Current page number."
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items returned in this batch."
+        },
+        "next": {
+          "type": "boolean",
+          "description": "Indicates if there are more pages available."
+        }
+      },
+      "description": "/ ProviderListGatesResponse returns a paginated list of provider summaries."
+    },
+    "webitel.im.provider.v1.ProviderMetaApp": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "app_id": {
+          "type": "string"
+        },
+        "system_user_token": {
+          "type": "string"
+        },
+        "oauth_redirect_uri": {
+          "type": "string"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "Unix timestamp in milliseconds"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "Unix timestamp in milliseconds"
+        }
+      }
+    },
+    "webitel.im.provider.v1.ProviderMetaLinkedPage": {
+      "type": "object",
+      "properties": {
+        "page_id": {
+          "type": "string",
+          "title": "Meta's unique ID for the page/account"
+        },
+        "page_name": {
+          "type": "string",
+          "title": "Display name of the page"
+        },
+        "access_token": {
+          "type": "string",
+          "title": "Initial access token for this specific asset"
+        },
+        "platform": {
+          "type": "string",
+          "title": "Platform identifier: \"facebook\", \"instagram\", or \"whatsapp\""
+        }
+      },
+      "description": "/ ProviderMetaLinkedPage represents a single Meta asset (Page/Account) found during OAuth."
+    },
+    "webitel.im.provider.v1.ProviderMetaOAuthCallbackResponse": {
+      "type": "object",
+      "properties": {
+        "user_access_token": {
+          "type": "string",
+          "title": "Short-lived token representing the user session"
+        },
+        "pages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.provider.v1.ProviderMetaLinkedPage"
+          },
+          "title": "List of Facebook Pages or accounts available to connect"
+        }
+      },
+      "description": "/ ProviderMetaOAuthCallbackResponse provides the user token and discovered assets."
+    },
+    "webitel.im.provider.v1.ProviderMetaOAuthStartResponse": {
+      "type": "object",
+      "properties": {
+        "auth_url": {
+          "type": "string",
+          "title": "The generated Facebook Login URL"
+        },
+        "state": {
+          "type": "string",
+          "title": "Opaque string to prevent CSRF, should be verified in callback"
+        }
+      },
+      "description": "/ ProviderMetaOAuthStartResponse provides the entry point for the user authorization."
+    },
+    "webitel.im.provider.v1.ProviderSendDocumentRequest": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderType"
+        },
+        "gate_id": {
+          "type": "string"
+        },
+        "external_user_id": {
+          "type": "string"
+        },
+        "document": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderFile"
+        },
+        "caption": {
+          "type": "string",
+          "title": "Optional text accompanying the file"
+        }
+      },
+      "description": "ProviderSendDocumentRequest sends a document with an optional caption."
+    },
+    "webitel.im.provider.v1.ProviderSendImageRequest": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderType"
+        },
+        "gate_id": {
+          "type": "string"
+        },
+        "external_user_id": {
+          "type": "string"
+        },
+        "image": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderFile"
+        },
+        "caption": {
+          "type": "string"
+        }
+      },
+      "description": "ProviderSendImageRequest sends an image with an optional caption."
+    },
+    "webitel.im.provider.v1.ProviderSendMessageResponse": {
+      "type": "object",
+      "properties": {
+        "external_id": {
+          "type": "string",
+          "title": "The ID assigned by the external platform (Meta, Telegram, etc.)"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "Unix timestamp of message creation"
+        }
+      },
+      "description": "ProviderSendMessageResponse returns the delivery status and external message ID."
+    },
+    "webitel.im.provider.v1.ProviderSendTextRequest": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderType",
+          "title": "Explicit provider type (FACEBOOK, WHATSAPP, etc.)"
+        },
+        "gate_id": {
+          "type": "string",
+          "title": "Internal ID of the specific configured gateway"
+        },
+        "external_user_id": {
+          "type": "string",
+          "title": "Recipient's platform-specific identifier"
+        },
+        "text": {
+          "type": "string",
+          "title": "The textual content of the message"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Optional platform-specific parameters"
+        }
+      },
+      "description": "ProviderSendTextRequest sends a simple text message."
+    },
+    "webitel.im.provider.v1.ProviderStatus": {
+      "type": "string",
+      "enum": [
+        "PROVIDER_STATUS_UNSPECIFIED",
+        "PROVIDER_STATUS_ACTIVE",
+        "PROVIDER_STATUS_INACTIVE",
+        "PROVIDER_STATUS_ERROR"
+      ],
+      "default": "PROVIDER_STATUS_UNSPECIFIED",
+      "description": "/ ProviderStatus represents the operational state of a provider gateway.\n\n - PROVIDER_STATUS_ACTIVE: Provider is healthy and processing messages\n - PROVIDER_STATUS_INACTIVE: Manually disabled by user\n - PROVIDER_STATUS_ERROR: Connection or authentication failed"
+    },
+    "webitel.im.provider.v1.ProviderSummary": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderType"
+        },
+        "status": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderStatus"
+        },
+        "webhook_url": {
+          "type": "string"
+        },
+        "contact": {
+          "type": "string"
+        },
+        "provider_app_id": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "Unix timestamp in milliseconds"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "Unix timestamp in milliseconds"
+        }
+      }
+    },
+    "webitel.im.provider.v1.ProviderType": {
+      "type": "string",
+      "enum": [
+        "PROVIDER_TYPE_UNSPECIFIED",
+        "PROVIDER_TYPE_VIBER",
+        "PROVIDER_TYPE_TELEGRAM_BOT",
+        "PROVIDER_TYPE_TELEGRAM_APP",
+        "PROVIDER_TYPE_META_APP",
+        "PROVIDER_TYPE_FACEBOOK",
+        "PROVIDER_TYPE_INSTAGRAM",
+        "PROVIDER_TYPE_WHATSAPP"
+      ],
+      "default": "PROVIDER_TYPE_UNSPECIFIED",
+      "description": "/ ProviderType defines the specific provider or protocol used for messaging."
+    },
+    "webitel.im.provider.v1.ProviderUpdateFacebookGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderFacebookGate"
+        }
+      },
+      "description": "/ ProviderUpdateFacebookGateResponse returns the updated Facebook provider."
+    },
+    "webitel.im.provider.v1.ProviderUpdateMetaAppResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderMetaApp"
+        }
+      },
+      "description": "/ ProviderUpdateMetaAppResponse returns the Meta application after modifications."
+    },
+    "webitel.im.provider.v1.ProviderUpdateWhatsAppGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderWhatsAppGate"
+        }
+      },
+      "description": "/ ProviderUpdateWhatsAppGateResponse returns the updated WhatsApp provider."
+    },
+    "webitel.im.provider.v1.ProviderWhatsAppGate": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "meta_app_id": {
+          "type": "string"
+        },
+        "waba_id": {
+          "type": "string"
+        },
+        "phone_number_id": {
+          "type": "string"
+        },
+        "phone_display": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderStatus"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "Unix timestamp in milliseconds"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "Unix timestamp in milliseconds"
+        }
+      }
+    },
+    "webitel.im.provider.v1.WhatsAppService.UpdateWhatsAppGateBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "access_token": {
+          "type": "string"
+        }
+      },
+      "description": "/ ProviderUpdateWhatsAppGateRequest updates WhatsApp-specific tokens or names."
+    },
     "webitel.im.service.thread.v1.Document": {
       "type": "object",
       "properties": {
@@ -3244,7 +4550,8 @@
         "from": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.service.thread.v1.ThreadMember"
           }
         },
         "next_cursor": {
@@ -3254,6 +4561,76 @@
           "$ref": "#/definitions/webitel.im.service.thread.v1.HistoryMessageCursorResponse"
         }
       }
+    },
+    "webitel.im.service.thread.v1.ThreadMember": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Unique identifier of the thread member record. (thread_dialog_id)"
+        },
+        "contact_id": {
+          "type": "string",
+          "description": "Contact ID of the thread member."
+        },
+        "role": {
+          "$ref": "#/definitions/webitel.im.service.thread.v1.ThreadRole",
+          "description": "Role of the member in the thread, determining their permissions."
+        },
+        "permissions": {
+          "$ref": "#/definitions/webitel.im.service.thread.v1.ThreadPermissions",
+          "description": "User rights in the thread, determined by their role."
+        }
+      },
+      "description": "ThreadMember represents a thread participant\nwith optional type-specific settings."
+    },
+    "webitel.im.service.thread.v1.ThreadPermissions": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "member_id": {
+          "type": "string"
+        },
+        "thread_id": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "can_send_messages": {
+          "type": "boolean"
+        },
+        "can_add_members": {
+          "type": "boolean"
+        },
+        "can_remove_members": {
+          "type": "boolean"
+        },
+        "can_change_members_permissions": {
+          "type": "boolean"
+        },
+        "can_change_thread_info": {
+          "type": "boolean"
+        }
+      }
+    },
+    "webitel.im.service.thread.v1.ThreadRole": {
+      "type": "string",
+      "enum": [
+        "ROLE_UNSPECIFIED",
+        "ROLE_MEMBER",
+        "ROLE_ADMIN",
+        "ROLE_OWNER",
+        "ROLE_SUPERVISOR"
+      ],
+      "default": "ROLE_UNSPECIFIED"
     }
   }
 }
