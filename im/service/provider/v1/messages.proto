@@ -1,0 +1,187 @@
+syntax = "proto3";
+
+package webitel.im.provider.v1;
+
+import "service/provider/v1/enums.proto";
+import "service/provider/v1/entities.proto";
+
+option go_package = "github.com/webitel/im-provider-service/gen/go/api/v1;impb";
+
+// --- Meta Application Management ---
+
+/// ProviderCreateMetaAppRequest is used to register a new Meta Developer Application.
+/// This configuration is the foundation for all subsequent OAuth-based integrations.
+message ProviderCreateMetaAppRequest {
+  string name = 1; // Human-readable name for the application
+  string app_id = 2; // Unique Meta App ID from developers.facebook.com
+  string app_secret = 3; // Meta App Secret (should be handled as sensitive data)
+  string oauth_redirect_uri = 4; // The pre-authorized callback URL for OAuth flow
+  repeated string scopes = 5; // List of requested permissions (e.g., pages_messaging)
+}
+
+/// ProviderCreateMetaAppResponse returns the successfully registered Meta application.
+message ProviderCreateMetaAppResponse {
+  webitel.im.provider.v1.ProviderMetaApp item = 1;
+}
+
+/// ProviderGetMetaAppRequest is used to fetch a Meta application configuration by its unique ID.
+message ProviderGetMetaAppRequest {
+  string id = 1;
+}
+
+/// ProviderGetMetaAppResponse returns the requested Meta application details.
+message ProviderGetMetaAppResponse {
+  webitel.im.provider.v1.ProviderMetaApp item = 1;
+}
+
+/// ProviderUpdateMetaAppRequest updates the settings for an existing Meta application.
+message ProviderUpdateMetaAppRequest {
+  string id = 1; // The internal ID of the MetaApp record
+  string name = 2; // Updated display name
+  string app_secret = 3; // Updated App Secret if rotated
+  string oauth_redirect_uri = 4; // Updated callback URI
+  repeated string scopes = 5; // Updated list of required permissions
+}
+
+/// ProviderUpdateMetaAppResponse returns the Meta application after modifications.
+message ProviderUpdateMetaAppResponse {
+  webitel.im.provider.v1.ProviderMetaApp item = 1;
+}
+
+/// ProviderDeleteMetaAppRequest removes a Meta application from the service.
+message ProviderDeleteMetaAppRequest {
+  string id = 1;
+}
+
+/// ProviderDeleteMetaAppResponse returns the details of the deleted application.
+message ProviderDeleteMetaAppResponse {
+  webitel.im.provider.v1.ProviderMetaApp item = 1;
+}
+
+// --- Meta OAuth Flow ---
+
+/// ProviderMetaOAuthStartRequest initiates the handshake with Meta.
+message ProviderMetaOAuthStartRequest {
+  string meta_app_id = 1; // Internal ID of the MetaApp to use for this flow
+  repeated string extra_scopes = 2; // Optional additional permissions for this specific session
+}
+
+/// ProviderMetaOAuthStartResponse provides the entry point for the user authorization.
+message ProviderMetaOAuthStartResponse {
+  string auth_url = 1; // The generated Facebook Login URL
+  string state = 2; // Opaque string to prevent CSRF, should be verified in callback
+}
+
+/// ProviderMetaOAuthCallbackRequest handles the verification and exchange of the auth code.
+message ProviderMetaOAuthCallbackRequest {
+  string meta_app_id = 1;
+  string code = 2; // The temporary authorization code provided by Meta
+  string state = 3; // The state token previously generated in Start request
+}
+
+/// ProviderMetaOAuthCallbackResponse provides the user token and discovered assets.
+message ProviderMetaOAuthCallbackResponse {
+  string user_access_token = 1; // Short-lived token representing the user session
+  repeated ProviderMetaLinkedPage pages = 2; // List of Facebook Pages or accounts available to connect
+}
+
+/// ProviderMetaLinkedPage represents a single Meta asset (Page/Account) found during OAuth.
+message ProviderMetaLinkedPage {
+  string page_id = 1; // Meta's unique ID for the page/account
+  string page_name = 2; // Display name of the page
+  string access_token = 3; // Initial access token for this specific asset
+  string platform = 4; // Platform identifier: "facebook", "instagram", or "whatsapp"
+}
+
+// --- Platform Specific Provider Gates (CRUD) ---
+
+/// ProviderCreateFacebookGateRequest links a specific Facebook Page as a messaging gateway.
+message ProviderCreateFacebookGateRequest {
+  string name = 1; // Name of the gateway in Webitel
+  string meta_app_id = 2; // Reference to the parent MetaApp
+  string page_id = 3; // The Facebook Page ID
+  string page_token = 4; // Long-lived Page Access Token
+  bool enabled = 5;
+}
+
+/// ProviderCreateFacebookGateResponse returns the newly activated Facebook provider.
+message ProviderCreateFacebookGateResponse {
+  webitel.im.provider.v1.ProviderFacebookGate item = 1;
+}
+
+/// ProviderGetFacebookGateRequest fetches a Facebook provider configuration.
+message ProviderGetFacebookGateRequest { string id = 1; }
+message ProviderGetFacebookGateResponse { webitel.im.provider.v1.ProviderFacebookGate item = 1; }
+
+/// ProviderUpdateFacebookGateRequest updates the operational settings of a Facebook provider.
+message ProviderUpdateFacebookGateRequest {
+  string id = 1;
+  string name = 2;
+  string page_token = 3; // Used for refreshing the access token
+  bool enabled = 4;
+}
+
+/// ProviderUpdateFacebookGateResponse returns the updated Facebook provider.
+message ProviderUpdateFacebookGateResponse {
+  webitel.im.provider.v1.ProviderFacebookGate item = 1;
+}
+
+/// ProviderDeleteFacebookGateRequest removes the Facebook integration.
+message ProviderDeleteFacebookGateRequest { string id = 1; }
+message ProviderDeleteFacebookGateResponse { webitel.im.provider.v1.ProviderFacebookGate item = 1; }
+
+/// ProviderCreateWhatsAppGateRequest connects a WhatsApp Business Account (WABA).
+message ProviderCreateWhatsAppGateRequest {
+  string name = 1;
+  string meta_app_id = 2;
+  string waba_id = 3; // WhatsApp Business Account ID
+  string phone_number_id = 4; // Unique ID for the phone number
+  string access_token = 5; // Permanent system user token or WABA token
+}
+
+/// ProviderCreateWhatsAppGateResponse returns the registered WhatsApp provider.
+message ProviderCreateWhatsAppGateResponse {
+  webitel.im.provider.v1.ProviderWhatsAppGate item = 1;
+}
+
+/// ProviderGetWhatsAppGateRequest fetches a WhatsApp provider configuration.
+message ProviderGetWhatsAppGateRequest { string id = 1; }
+message ProviderGetWhatsAppGateResponse { webitel.im.provider.v1.ProviderWhatsAppGate item = 1; }
+
+/// ProviderUpdateWhatsAppGateRequest updates WhatsApp-specific tokens or names.
+message ProviderUpdateWhatsAppGateRequest {
+  string id = 1;
+  string name = 2;
+  string access_token = 3;
+}
+
+/// ProviderUpdateWhatsAppGateResponse returns the updated WhatsApp provider.
+message ProviderUpdateWhatsAppGateResponse {
+  webitel.im.provider.v1.ProviderWhatsAppGate item = 1;
+}
+
+/// ProviderDeleteWhatsAppGateRequest removes the WhatsApp integration.
+message ProviderDeleteWhatsAppGateRequest { string id = 1; }
+message ProviderDeleteWhatsAppGateResponse { webitel.im.provider.v1.ProviderWhatsAppGate item = 1; }
+
+// --- Generic Discovery & Resource Management ---
+
+/// ProviderListGatesRequest contains pagination and filtering logic for discovering providers.
+message ProviderListGatesRequest {
+  int32 page = 1; // Page number (starts from 1)
+  int32 size = 2; // Items per page
+  repeated webitel.im.provider.v1.ProviderType types = 3; // Filter by channel type (Telegram, Facebook, etc.)
+  webitel.im.provider.v1.ProviderStatus status = 4; // Filter by active/inactive status
+  string q = 5; // Search query for name or metadata
+}
+
+/// ProviderListGatesResponse returns a paginated list of provider summaries.
+message ProviderListGatesResponse {
+  repeated webitel.im.provider.v1.ProviderSummary items = 1;
+    // Current page number.
+  int32 page = 2;
+  // Number of items returned in this batch.
+  int32 size = 3;
+  // Indicates if there are more pages available.
+  bool next = 4;
+}

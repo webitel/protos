@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package webitel.im.provider.v1;
+
+import "google/api/annotations.proto";
+import "service/provider/v1/entities.proto";
+import "service/provider/v1/messages.proto";
+
+option go_package = "github.com/webitel/im-provider-service/gen/go/api/v1;impb";
+
+service WhatsAppService {
+  /// CreateWhatsAppGate registers a WhatsApp Business Account (WABA) gateway.
+  rpc CreateWhatsAppGate (ProviderCreateWhatsAppGateRequest) returns (ProviderCreateWhatsAppGateResponse) {
+    option (google.api.http) = { post: "/im/gates/whatsapp", body: "*" };
+  }
+
+  /// GetWhatsAppGate retrieves configuration and status for a WhatsApp gateway.
+  rpc GetWhatsAppGate (ProviderGetWhatsAppGateRequest) returns (ProviderGetWhatsAppGateResponse) {
+    option (google.api.http) = { get: "/im/gates/whatsapp/{id}" };
+  }
+
+  /// UpdateWhatsAppGate updates WhatsApp-specific gateway configurations.
+  rpc UpdateWhatsAppGate (ProviderUpdateWhatsAppGateRequest) returns (ProviderUpdateWhatsAppGateResponse) {
+    option (google.api.http) = { patch: "/im/gates/whatsapp/{id}", body: "*" };
+  }
+
+  /// DeleteWhatsAppGate removes the WhatsApp gateway integration.
+  rpc DeleteWhatsAppGate (ProviderDeleteWhatsAppGateRequest) returns (ProviderDeleteWhatsAppGateResponse) {
+    option (google.api.http) = { delete: "/im/gates/whatsapp/{id}" };
+  }
+}

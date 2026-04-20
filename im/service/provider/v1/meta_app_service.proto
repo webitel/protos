@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package webitel.im.provider.v1;
+
+import "google/api/annotations.proto";
+import "service/provider/v1/entities.proto";
+import "service/provider/v1/messages.proto";
+
+option go_package = "github.com/webitel/im-provider-service/gen/go/api/v1;impb";
+
+/// MetaAppService defines the RPC methods for managing Meta Applications, which are used to integrate with Facebook's suite of messaging platforms (Messenger, Instagram, WhatsApp) through a unified interface. This service allows clients to create, retrieve, update, and delete Meta Application configurations, as well as handle OAuth flows for authentication and authorization with Facebook's APIs.
+service MetaAppService {
+  /// CreateMetaApp registers a new Meta Application. 
+  rpc CreateMetaApp (ProviderCreateMetaAppRequest) returns (ProviderCreateMetaAppResponse) {
+    option (google.api.http) = { post: "/im/meta-apps", body: "*" };
+  }
+
+  /// GetMetaApp retrieves the configuration details of a specific Meta Application by its ID.
+  rpc GetMetaApp (ProviderGetMetaAppRequest) returns (ProviderGetMetaAppResponse) {
+    option (google.api.http) = { get: "/im/meta-apps/{id}" };
+  }
+
+  /// UpdateMetaApp modifies an existing Meta Application configuration.
+  rpc UpdateMetaApp (ProviderUpdateMetaAppRequest) returns (ProviderUpdateMetaAppResponse) {
+    option (google.api.http) = { patch: "/im/meta-apps/{id}", body: "*" };
+  }
+
+  /// DeleteMetaApp removes a Meta Application registration.
+  rpc DeleteMetaApp (ProviderDeleteMetaAppRequest) returns (ProviderDeleteMetaAppResponse) {
+    option (google.api.http) = { delete: "/im/meta-apps/{id}" };
+  }
+}

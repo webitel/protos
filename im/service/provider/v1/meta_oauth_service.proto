@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package webitel.im.provider.v1;
+
+import "google/api/annotations.proto";
+import "service/provider/v1/entities.proto";
+import "service/provider/v1/messages.proto";
+
+option go_package = "github.com/webitel/im-provider-service/gen/go/api/v1;impb";
+
+/// MetaOAuthService defines the RPC methods for handling the OAuth flow with Facebook for Meta Applications. This service provides endpoints to initiate the OAuth process by generating an authorization URL and to handle the callback from Facebook after the user authorizes the application, allowing the server to exchange the authorization code for access tokens and complete the integration setup.
+service MetaOAuthService {
+  /// StartMetaOAuth generates a secure Facebook Authorization URL.
+  rpc StartMetaOAuth (ProviderMetaOAuthStartRequest) returns (ProviderMetaOAuthStartResponse) {
+    option (google.api.http) = { post: "/im/meta-apps/{meta_app_id}/oauth/start", body: "*" };
+  }
+
+  /// MetaOAuthCallback processes the authorization code returned by Facebook.
+  rpc MetaOAuthCallback (ProviderMetaOAuthCallbackRequest) returns (ProviderMetaOAuthCallbackResponse) {
+    option (google.api.http) = { post: "/im/meta-apps/{meta_app_id}/oauth/callback", body: "*" };
+  }
+}

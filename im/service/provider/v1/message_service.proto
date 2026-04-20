@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package webitel.im.provider.v1;
+
+import "google/api/annotations.proto";
+import "service/provider/v1/enums.proto"; 
+
+option go_package = "github.com/webitel/im-provider-service/gen/go/api/v1;impb";
+
+// InboundMessageService handles incoming messages from external platforms.
+service ProviderMessageService {
+  
+  // SendText delivers a plain text message to the external chat partner.
+  rpc SendText(ProviderSendTextRequest) returns (ProviderSendMessageResponse) {
+    option (google.api.http) = {
+      post: "/im/provider/send/text"
+      body: "*"
+    };
+  }
+  
+  // SendDocument delivers file attachments to the external chat partner.
+  rpc SendDocument(ProviderSendDocumentRequest) returns (ProviderSendMessageResponse) {
+    option (google.api.http) = {
+      post: "/im/provider/send/document"
+      body: "*"
+    };
+  }
+
+  // SendImage delivers images to the external chat partner.
+  rpc SendImage(ProviderSendImageRequest) returns (ProviderSendMessageResponse) {
+    option (google.api.http) = {
+      post: "/im/provider/send/image"
+      body: "*"
+    };
+  }
+}
+
+// --- Shared Types ---
+
+// ProviderSendMessageResponse returns the delivery status and external message ID.
+message ProviderSendMessageResponse {
+  string external_id = 1; // The ID assigned by the external platform (Meta, Telegram, etc.)
+  int64 created_at = 2; // Unix timestamp of message creation
+}
+
+// ProviderFile represents a generic file attachment.
+message ProviderFile {
+  string id = 1; // Internal Webitel file storage ID
+  string url = 2; // Publicly accessible URL (if required by provider)
+  string name = 3; // Original file name
+  string mime_type = 4; // Media type (e.g., "image/png")
+  int64 size = 5; // File size in bytes
+}
+
+// --- Requests ---
+
+// ProviderSendTextRequest sends a simple text message.
+message ProviderSendTextRequest {
+  ProviderType type = 1; // Explicit provider type (FACEBOOK, WHATSAPP, etc.)
+  string gate_id = 2; // Internal ID of the specific configured gateway
+  string external_user_id = 3; // Recipient's platform-specific identifier
+  string text = 4; // The textual content of the message
+  
+  map<string, string> metadata = 10; // Optional platform-specific parameters
+}
+
+// ProviderSendDocumentRequest sends a document with an optional caption.
+message ProviderSendDocumentRequest {
+  ProviderType type = 1;
+  string gate_id = 2;
+  string external_user_id = 3;
+  ProviderFile document = 4;
+  string caption = 5; // Optional text accompanying the file
+}
+
+// ProviderSendImageRequest sends an image with an optional caption.
+message ProviderSendImageRequest {
+  ProviderType type = 1;
+  string gate_id = 2;
+  string external_user_id = 3;
+  ProviderFile image = 4;
+  string caption = 5;
+}
