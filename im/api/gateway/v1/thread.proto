@@ -2,115 +2,106 @@ syntax = "proto3";
 
 package webitel.im.api.gateway.v1;
 
+import "api/gateway/v1/contact.proto";
+import "api/gateway/v1/message_history.proto";
+import "api/gateway/v1/peer.proto";
+import "api/gateway/v1/thread_member.proto";
 import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
-import "api/gateway/v1/message_history.proto";
-import "api/gateway/v1/thread_member.proto";
-import "api/gateway/v1/peer.proto";
 import "google/protobuf/struct.proto";
-import "api/gateway/v1/contact.proto";
 
 // ThreadManagement service provides access to group threads manipulating
 // and read-only access for direct threads.
 service ThreadManagement {
-    // Search threads with filters
+  // Search threads with filters
   rpc Search(ThreadSearchRequest) returns (SearchThreadResponse) {
-    option (google.api.http) = {
-      get: "/v1/threads"
-    };
+    option (google.api.http) = {get: "/v1/threads"};
   }
   // Add member to the thread.
   rpc AddMember(AddMemberRequest) returns (AddMemberResponse) {
     option (google.api.http) = {
       post: "/v1/threads/{thread_id}/members"
+      body: "*"
     };
   }
   // Remove member from the thread.
   rpc RemoveMember(RemoveMemberRequest) returns (RemoveMemberResponse) {
-    option (google.api.http) = {
-      delete: "/v1/threads/{thread_id}/members/{member_id}"
-    };
-  };
+    option (google.api.http) = {delete: "/v1/threads/{thread_id}/members/{member_id}"};
+  }
 
   // Sets or updates variables for a specific thread.
   // Existing variables with the same keys will be overwritten if were setted by the caller.
   // New variables will be created if they do not exist.
   rpc SetVariables(SetVariablesRequest) returns (ThreadVariables) {
     option (google.api.http) = {
-      post: "/v1/threads/{thread_id}/variables",
+      post: "/v1/threads/{thread_id}/variables"
       body: "*"
     };
-  };
+  }
 
   // Searches thread variables across multiple threads.
   // Supports pagination and field projection.
   rpc SearchVariables(SearchVariablesRequest) returns (SearchVariablesResponse) {
-    option (google.api.http) = {
-      get: "/v1/variables"
-    };
-  };
+    option (google.api.http) = {get: "/v1/variables"};
+  }
 
   // Retrieves all variables for a specific thread.
   rpc LocateVariables(LocateVariablesRequest) returns (ThreadVariables) {
-    option (google.api.http) = {
-      get: "/v1/threads/{thread_id}/variables"
-    };
-  };
+    option (google.api.http) = {get: "/v1/threads/{thread_id}/variables"};
+  }
 
   // Removes specified variables from a thread with caller's permission.
   // If no keys are provided, all variables may be removed
   // depending on implementation.
   rpc FlushVariables(FlushVariablesRequest) returns (ThreadVariables) {
     option (google.api.http) = {
-      delete: "/v1/threads/{thread_id}/variables/flush",
-      body  : "*"
+      delete: "/v1/threads/{thread_id}/variables/flush"
+      body: "*"
     };
-  };
+  }
 }
 
 // ThreadKind defines the type of a thread.
 // It determines the business rules and available features for the thread.
 enum ThreadKind {
-
-    // Unknown or unspecified thread type.
-    // Must not be used in valid requests.
+  // Unknown or unspecified thread type.
+  // Must not be used in valid requests.
   UNKNOWN = 0;
 
-    // One-to-one private thread between two users.
+  // One-to-one private thread between two users.
   DIRECT = 1;
 
-    // Group thread with multiple members.
+  // Group thread with multiple members.
   GROUP = 2;
 
-    // Channel-style thread (broadcast or topic based communication).
+  // Channel-style thread (broadcast or topic based communication).
   CHANNEL = 3;
 }
 
 // Thread represents a thread (aka chat or conversation) entity.
 message Thread {
-
-    // Unique thread identifier.
+  // Unique thread identifier.
   string id = 1;
 
-    // Thread creation timestamp (Unix time, milliseconds).
+  // Thread creation timestamp (Unix time, milliseconds).
   int64 created_at = 2;
 
-    // Last update timestamp (Unix time, milliseconds).
+  // Last update timestamp (Unix time, milliseconds).
   int64 updated_at = 3;
 
-    // Type of the thread.
+  // Type of the thread.
   ThreadKind type = 4;
 
-    // Thread subject or title.
+  // Thread subject or title.
   string subject = 8;
 
-    // Optional thread description.
+  // Optional thread description.
   string description = 9;
 
-    // Detailed member information.
+  // Detailed member information.
   repeated ThreadMember members = 10;
 
-    // Last message of the linked thread.
+  // Last message of the linked thread.
   HistoryMessage last_msg = 11;
 
   // User-specific settings for this thread.
@@ -127,78 +118,74 @@ message Thread {
 // ThreadSearchRequest defines requested fields, filters, sorting and pagination
 // options for searching thread.
 message ThreadSearchRequest {
-
-    // List of fields that should be returned in the response.
-    // If empty, a default set of fields is returned.
-    // Used for response optimization.
+  // List of fields that should be returned in the response.
+  // If empty, a default set of fields is returned.
+  // Used for response optimization.
   repeated string fields = 1;
 
-    // Filter by specific thread IDs.
-  repeated string ids = 2 [
-    (buf.validate.field).repeated.items.string.uuid = true
-  ];
+  // Filter by specific thread IDs.
+  repeated string ids = 2 [(buf.validate.field).repeated.items.string.uuid = true];
 
-    // Filter threads by their kinds.
-    // UNKNOWN (0) is not allowed.
+  // Filter threads by their kinds.
+  // UNKNOWN (0) is not allowed.
   repeated ThreadKind kinds = 3 [
     (buf.validate.field).repeated.items.enum.defined_only = true,
     (buf.validate.field).repeated.items.enum.not_in = 0
   ];
 
-    // Filter threads by owners.
+  // Filter threads by owners.
   // repeated ThreadMember owners = 4;
 
-    // Full-text search query.
-    // Typically applied to subject.
-  string q = 5[
-    (buf.validate.field).string = {min_len: 0, max_len: 256}
-  ];
+  // Full-text search query.
+  // Typically applied to subject.
+  string q = 5 [(buf.validate.field).string = {
+    min_len: 0
+    max_len: 256
+  }];
 
-    // Maximum number of threads to return per page.
-    // Must be greater than 0 and less than or equal to 100.
+  // Maximum number of threads to return per page.
+  // Must be greater than 0 and less than or equal to 100.
   int32 size = 6;
 
-    // Sorting field.
-    // Optional "+" or "-" prefix indicates ascending or descending order.
-    // Example: "-created_at", "subject"
+  // Sorting field.
+  // Optional "+" or "-" prefix indicates ascending or descending order.
+  // Example: "-created_at", "subject"
   string sort = 7 [
     (buf.validate.field).string.pattern = "^[+-]?[a-z_]+$",
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
 
-    // Page number (1-based).
+  // Page number (1-based).
   int32 page = 8;
 }
 
 // SearchThreadResponse contains the list of threads
 // and pagination metadata.
 message SearchThreadResponse {
-
-    // List of threads matching the search criteria.
+  // List of threads matching the search criteria.
   repeated Thread items = 1;
 
-    // Indicates whether there is a next page available.
+  // Indicates whether there is a next page available.
   bool next = 2;
 }
 
 // ThreadDirectSettings defines settings
 // specific to direct (one-to-one) threads.
 message ThreadSettings {
-
-    // Settings identifier.
+  // Settings identifier.
   string id = 1;
 
-    // Domain identifier.
+  // Domain identifier.
   int32 domain_id = 2;
 
-    // Creation timestamp (Unix time, milliseconds).
+  // Creation timestamp (Unix time, milliseconds).
   int64 created_at = 3;
 
-    // Last update timestamp (Unix time, milliseconds).
+  // Last update timestamp (Unix time, milliseconds).
   int64 updated_at = 4;
 
-    // Custom title for the direct thread.
-    // Usually represents the display name of the conversation.
+  // Custom title for the direct thread.
+  // Usually represents the display name of the conversation.
   string title = 5;
 }
 
@@ -207,9 +194,7 @@ message AddMemberRequest {
     (buf.validate.field).string.uuid = true,
     (buf.validate.field).required = true
   ];
-  PeerIdentity contact = 3 [
-    (buf.validate.field).required = true
-  ];
+  PeerIdentity contact = 3 [(buf.validate.field).required = true];
 
   ThreadRole role = 4 [
     (buf.validate.field).enum.defined_only = true,
@@ -229,109 +214,94 @@ message RemoveMemberRequest {
   string thread_id = 2;
 }
 
-message RemoveMemberResponse {
-}
+message RemoveMemberResponse {}
 
 // #region Thread Variables
 
 // VariableEntry represents a single variable value
 // along with metadata about who and when it was set.
 message VariableEntry {
-
-    // Arbitrary structured value of the variable.
-    // Supports dynamic JSON-like content.
+  // Arbitrary structured value of the variable.
+  // Supports dynamic JSON-like content.
   google.protobuf.Struct value = 1;
 
-    // Contact who set the variable.
+  // Contact who set the variable.
   Contact set_by = 2;
 
-    // Timestamp when the variable was set (Unix time, milliseconds).
+  // Timestamp when the variable was set (Unix time, milliseconds).
   int64 set_at = 3;
 }
 
 // VariableEntryRequest represents a variable update operation.
 message VariableEntryRequest {
-
-    // Variable key.
+  // Variable key.
   string key = 1;
 
-    // Variable value.
+  // Variable value.
   google.protobuf.Struct value = 2;
 }
 
 // ThreadVariables contains all variables associated with a thread.
 message ThreadVariables {
-
-    // Unique identifier for the thread.
+  // Unique identifier for the thread.
   string thread_id = 1;
 
-    // Key-value map of variables.
-    // Key is the variable name, value contains data and metadata.
+  // Key-value map of variables.
+  // Key is the variable name, value contains data and metadata.
   map<string, VariableEntry> variables = 2;
 }
 
 // SetVariablesRequest defines parameters
 // for setting or updating thread variables.
 message SetVariablesRequest {
+  // Unique identifier for the thread.
+  string thread_id = 1 [(buf.validate.field).string.uuid = true];
 
-    // Unique identifier for the thread.
-  string thread_id = 1 [
-    (buf.validate.field).string.uuid = true
-  ];
-
-    // List of variables to set or update.
-    // Existing variables with the same keys will be overwritten.
+  // List of variables to set or update.
+  // Existing variables with the same keys will be overwritten.
   repeated VariableEntryRequest variables = 2;
 }
 
 // SearchVariablesResponse contains search results
 // and pagination metadata.
 message SearchVariablesResponse {
-
-    // List of thread variables grouped by thread.
+  // List of thread variables grouped by thread.
   repeated ThreadVariables items = 1;
 
-    // Indicates if there are more results to fetch.
+  // Indicates if there are more results to fetch.
   bool next = 2;
 }
 
 // SearchVariablesRequest defines parameters
 // for searching thread variables.
 message SearchVariablesRequest {
-
-    // Number of results to return per page.
+  // Number of results to return per page.
   int32 size = 1;
 
-    // Page number (1-based).
+  // Page number (1-based).
   int32 page = 2;
 
-    // List of fields to include in the response.
+  // List of fields to include in the response.
   repeated string fields = 3;
 
-    // List of thread IDs to filter by.
+  // List of thread IDs to filter by.
   repeated string thread_ids = 4;
 }
 
 // LocateVariablesRequest defines parameters
 // for locating thread variables by thread ID.
 message LocateVariablesRequest {
-
-    // Unique identifier for the thread.
-  string thread_id = 1 [
-    (buf.validate.field).string.uuid = true
-  ];
+  // Unique identifier for the thread.
+  string thread_id = 1 [(buf.validate.field).string.uuid = true];
 }
 
 // FlushVariablesRequest defines parameters
 // for flushing thread variables by thread ID.
 message FlushVariablesRequest {
+  // Unique identifier for the thread.
+  string thread_id = 1 [(buf.validate.field).string.uuid = true];
 
-    // Unique identifier for the thread.
-  string thread_id = 1 [
-    (buf.validate.field).string.uuid = true
-  ];
-
-    // List of variable keys to flush.
+  // List of variable keys to flush.
   repeated string keys = 2;
 }
 
