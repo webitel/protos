@@ -19,7 +19,7 @@ service ThreadManagement {
   }
 
   // Search threads that the caller has left from
-  rpc ListLeftChats(ListLeftChatsRequest) returns (ListLeftChatsResponse) {
+  rpc SearchLeft(SearchLeftRequest) returns (SearchLeftResponse) {
     option (google.api.http) = {
       get: "/v1/threads/left"
     };
@@ -177,7 +177,8 @@ message SearchThreadResponse {
   bool next = 2;
 }
 
-message ListLeftChatsRequest {
+message SearchLeftRequest {
+  // Contact identity of the caller
   PeerIdentity from = 1;
 
   // List of fields that should be returned in the response.
@@ -185,6 +186,7 @@ message ListLeftChatsRequest {
   // Used for response optimization.
   repeated string fields = 2;
 
+  // Filter threads from which the caller has left by contact ID
   string contact_id = 3 [
     (buf.validate.field).string.uuid = true,
     (buf.validate.field).required = true
@@ -220,7 +222,7 @@ message ListLeftChatsRequest {
   ];
 }
 
-message ListLeftChatsResponse {
+message SearchLeftResponse {
   // Threads in which the caller was previously a member, but has left.
   repeated Thread items = 1;
 
