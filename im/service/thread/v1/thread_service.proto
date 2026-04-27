@@ -19,6 +19,9 @@ service ThreadManagement {
     // and pagination parameters.
   rpc Search(ThreadSearchRequest) returns (SearchThreadResponse);
 
+    // Returns a single thread by its identifier.
+  rpc Get(GetThreadRequest) returns (Thread);
+
     // Creates a new group thread.
     // The creator becomes the owner of the thread.
   rpc CreateGroup(CreateGroupRequest) returns (Thread);
@@ -157,6 +160,25 @@ message ThreadSearchRequest {
     (buf.validate.field).int32.gte = 1,
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
+}
+
+// GetThreadRequest defines parameters for retrieving a single thread.
+message GetThreadRequest {
+
+    // Unique thread identifier.
+  string id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+    // Domain identifier to filter by.
+  int32 domain_id = 2 [
+    (buf.validate.field).int32.gt = 0,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+
+    // List of fields to include in the response.
+  repeated string fields = 3;
 }
 
 // SearchThreadResponse contains the list of threads

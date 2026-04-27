@@ -17,6 +17,11 @@ service ThreadManagement {
   rpc Search(ThreadSearchRequest) returns (SearchThreadResponse) {
     option (google.api.http) = {get: "/v1/threads"};
   }
+
+  // Returns a single thread by its identifier.
+  rpc Get(GetThreadRequest) returns (Thread) {
+    option (google.api.http) = {get: "/v1/threads/{id}"};
+  }
   // Add member to the thread.
   rpc AddMember(AddMemberRequest) returns (AddMemberResponse) {
     option (google.api.http) = {
@@ -157,6 +162,18 @@ message ThreadSearchRequest {
 
   // Page number (1-based).
   int32 page = 8;
+}
+
+// GetThreadRequest defines parameters for retrieving a single thread by ID.
+message GetThreadRequest {
+  // Unique thread identifier.
+  string id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  // List of fields to include in the response.
+  repeated string fields = 2;
 }
 
 // SearchThreadResponse contains the list of threads
