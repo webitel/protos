@@ -7,6 +7,13 @@ import "service/provider/v1/entities.proto";
 
 option go_package = "github.com/webitel/im-provider-service/gen/go/api/v1;impb";
 
+
+
+message Peer {
+  string sub = 1; 
+  string iss = 2;
+}
+
 // --- Meta Application Management ---
 
 /// ProviderCreateMetaAppRequest is used to register a new Meta Developer Application.
@@ -17,6 +24,7 @@ message ProviderCreateMetaAppRequest {
   string app_secret = 3; // Meta App Secret (should be handled as sensitive data)
   string oauth_redirect_uri = 4; // The pre-authorized callback URL for OAuth flow
   repeated string scopes = 5; // List of requested permissions (e.g., pages_messaging)
+  string uri = 6;
 }
 
 /// ProviderCreateMetaAppResponse returns the successfully registered Meta application.
@@ -99,7 +107,7 @@ message ProviderMetaLinkedPage {
 message ProviderCreateFacebookGateRequest {
   string name = 1; // Name of the gateway in Webitel
   string meta_app_id = 2; // Reference to the parent MetaApp
-  string contact_id = 3; // Reference to the internal Webitel contact or schema recipient
+  Peer peer = 3; // Identity details (sub and iss)
   string page_id = 4; // The Facebook Page ID
   string page_token = 5; // Long-lived Page Access Token
   bool enabled = 6;
@@ -118,7 +126,7 @@ message ProviderGetFacebookGateResponse { webitel.im.provider.v1.ProviderFaceboo
 message ProviderUpdateFacebookGateRequest {
   string id = 1;
   string name = 2;
-  string contact_id = 3; // Updated reference to the contact or schema
+  Peer peer = 3; // Identity details (sub and iss)
   string page_token = 4; // Used for refreshing the access token
   bool enabled = 5;
 }
