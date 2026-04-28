@@ -39166,6 +39166,45 @@
         }
       }
     },
+    "/v1/threads/{thread_id}/transfer": {
+      "post": {
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadManagement"
+        ],
+        "summary": "Transfer unites add member and remove member.\nIt adds a new member to the thread and removes the initiator from the thread.",
+        "operationId": "ThreadManagement_Transfer",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "thread_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadManagement.TransferBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.TransferResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/v1/threads/{thread_id}/variables": {
       "get": {
         "tags": [
@@ -65521,6 +65560,17 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.ThreadManagement.TransferBody": {
+      "type": "object",
+      "properties": {
+        "new_member_contact_id": {
+          "type": "string"
+        },
+        "role": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadRole"
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.ThreadMember": {
       "description": "ThreadMember represents a thread participant\nwith optional type-specific settings.",
       "type": "object",
@@ -65664,6 +65714,14 @@
         "state": {
           "type": "string",
           "title": "RECOMMENDED. An opaque value used by the client to maintain\nstate between the request and callback.  The authorization\nserver includes this value when redirecting the user-agent back\nto the client.  The parameter SHOULD be used for preventing\ncross-site request forgery"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.TransferResponse": {
+      "type": "object",
+      "properties": {
+        "member": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadMember"
         }
       }
     },
@@ -65812,6 +65870,10 @@
         "page_token": {
           "type": "string",
           "title": "Used for refreshing the access token"
+        },
+        "peer": {
+          "title": "Identity details (sub and iss)",
+          "$ref": "#/definitions/webitel.im.provider.v1.Peer"
         }
       }
     },
@@ -65867,6 +65929,17 @@
         }
       }
     },
+    "webitel.im.provider.v1.Peer": {
+      "type": "object",
+      "properties": {
+        "iss": {
+          "type": "string"
+        },
+        "sub": {
+          "type": "string"
+        }
+      }
+    },
     "webitel.im.provider.v1.ProviderCreateFacebookGateRequest": {
       "description": "/ ProviderCreateFacebookGateRequest links a specific Facebook Page as a messaging gateway.",
       "type": "object",
@@ -65889,6 +65962,10 @@
         "page_token": {
           "type": "string",
           "title": "Long-lived Page Access Token"
+        },
+        "peer": {
+          "title": "Identity details (sub and iss)",
+          "$ref": "#/definitions/webitel.im.provider.v1.Peer"
         }
       }
     },
@@ -65927,6 +66004,9 @@
           "items": {
             "type": "string"
           }
+        },
+        "uri": {
+          "type": "string"
         }
       }
     },
@@ -66030,9 +66110,6 @@
           "type": "string",
           "format": "int64",
           "title": "Unix timestamp in milliseconds"
-        },
-        "webhook": {
-          "type": "string"
         }
       }
     },
