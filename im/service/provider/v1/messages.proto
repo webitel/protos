@@ -10,7 +10,7 @@ option go_package = "github.com/webitel/im-provider-service/gen/go/api/v1;impb";
 
 
 message Peer {
-  string sub = 1; 
+  string sub = 1;
   string iss = 2;
 }
 
@@ -105,6 +105,52 @@ message ProviderMetaLinkedPage {
 
 // --- Platform Specific Provider Gates (CRUD) ---
 
+message CreateGateRequest {
+    string name = 1;
+    bool enabled = 2;
+    Peer bot = 3;
+    oneof gate {
+        CreateWABAGateRequest waba = 4;
+        ProviderCreateFacebookGateRequest fb = 5;
+    }
+}
+
+message CreateWABAGateRequest {
+    string meta_app_id = 1;
+    string phone_number =2;
+    string phone_number_id = 3;
+    string access_token = 4;
+    string business_id = 5;
+}
+
+message GateResponse {
+    string id = 1;
+    string name = 2;
+    string type = 3;
+    bool enabled = 4;
+
+    int64 created_at = 5;
+    int64 created_by = 6;
+    int64 updated_at = 7;
+    int64 updated_by = 8;
+    Peer bot = 9;
+
+    oneof gate {
+        WhatsAppBusinessAccount waba = 10;
+    }
+}
+
+message WhatsAppBusinessAccount {
+    string id = 1;
+    string meta_app_id = 2;
+    string phone_number = 3;
+    string phone_number_id = 4;
+    string access_token = 5;
+    optional int64 access_token_expires_at = 6;
+    string business_id = 7;
+}
+
+
 /// ProviderCreateFacebookGateRequest links a specific Facebook Page as a messaging gateway.
 message ProviderCreateFacebookGateRequest {
   string name = 1; // Name of the gateway in Webitel
@@ -149,6 +195,7 @@ message ProviderCreateWhatsAppGateRequest {
   string phone_number_id = 4; // Unique ID for the phone number
   string access_token = 5; // Permanent WABA access token
 }
+
 
 /// ProviderCreateWhatsAppGateResponse returns the registered WhatsApp provider.
 message ProviderCreateWhatsAppGateResponse {
