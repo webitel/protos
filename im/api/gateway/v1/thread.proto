@@ -183,14 +183,8 @@ message SearchLeftRequest {
   // Used for response optimization.
   repeated string fields = 1;
 
-  // Filter threads from which the caller has left by contact ID
-  string member_id = 2 [
-    (buf.validate.field).string.uuid = true,
-    (buf.validate.field).required = true
-  ];
-
   // Filter threads by their kinds
-  repeated ThreadKind types = 3 [
+  repeated ThreadKind types = 2 [
     (buf.validate.field).repeated.items.enum = {
       defined_only: true
       not_in: 0
@@ -200,20 +194,20 @@ message SearchLeftRequest {
   // Sorting field.
   // Optional "+" or "-" prefix indicates ascending or descending order.
   // Example: "-created_at", "subject"
-  string sort = 4 [
+  string sort = 3 [
     (buf.validate.field).string.pattern = "^[+-]?[a-z_]+$",
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
 
   // Maximum number of threads to return per page.
   // Must be greater than 0 and less than or equal to 100.
-  int32 size = 5 [
+  int32 size = 4 [
     (buf.validate.field).int32 = {gt: 0, lte: 100},
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
 
   // Page number (1-based).
-  int32 page = 6 [
+  int32 page = 5 [
     (buf.validate.field).int32.gte = 1,
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
