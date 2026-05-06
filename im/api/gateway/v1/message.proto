@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package webitel.im.api.gateway.v1;
 
-import "api/gateway/v1/message_history.proto";
 import "api/gateway/v1/peer.proto";
 import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
@@ -75,12 +74,7 @@ service Message {
     };
   }
 
-  rpc SendSystemMessage(SendSystemMessageRequest) returns (SendMessageResponse) {
-    option (google.api.http) = {
-      post: "/v1/messages/system"
-      body: "*"
-    };
-  }
+  rpc SendSystemMessage(SendSystemMessageRequest) returns (SendMessageResponse);
 }
 
 message ReadMessageRequest {
@@ -230,6 +224,11 @@ message SendInteractiveMessageRequest {
 
   // Arbitrary metadata.
   google.protobuf.Struct metadata = 6;
+}
+
+message SystemMessage {
+    string type = 1;
+    google.protobuf.Struct metadata = 2;
 }
 
 message SendSystemMessageRequest {
@@ -396,20 +395,17 @@ message KeyboardButtonRequest {
 
 // Client sends callback event when user clicks a button.
 message InteractiveCallbackRequest {
-  // User who clicked the button.
-  Peer reacted_by = 1 [(buf.validate.field).required = true];
-
   // Original message ID.
-  string in_reply_to = 2 [
+  string in_reply_to = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
 
   // Button identifier.
-  string button_code = 3;
+  string button_code = 2;
 
   // Optional callback payload.
-  string callback_data = 4;
+  string callback_data = 3;
 }
 
 // Response sent back to the client after a button click.
