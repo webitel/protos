@@ -34,6 +34,15 @@ service ThreadManagement {
     option (google.api.http) = {delete: "/v1/threads/{thread_id}/members/{member_id}"};
   }
 
+  // Transfer unites add member and remove member.
+  // It adds a new member to the thread and removes the initiator from the thread.
+  rpc Transfer(TransferRequest) returns (TransferResponse) {
+    option (google.api.http) = {
+      post: "/v1/threads/{thread_id}/transfer"
+      body: "*"
+    };
+  }
+
   // Sets or updates variables for a specific thread.
   // Existing variables with the same keys will be overwritten if were setted by the caller.
   // New variables will be created if they do not exist.
@@ -61,7 +70,7 @@ service ThreadManagement {
   rpc FlushVariables(FlushVariablesRequest) returns (ThreadVariables) {
     option (google.api.http) = {
       delete: "/v1/threads/{thread_id}/variables/flush"
-      body: "*"
+      body  : "*"
     };
   }
 }
@@ -232,6 +241,24 @@ message RemoveMemberRequest {
 }
 
 message RemoveMemberResponse {}
+
+message TransferRequest{
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  PeerIdentity contact = 2 [(buf.validate.field).required = true];
+
+  ThreadRole role = 3 [
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).required = true
+  ];
+}
+
+message TransferResponse {
+  ThreadMember member = 1;
+}
 
 // #region Thread Variables
 

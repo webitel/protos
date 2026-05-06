@@ -1738,6 +1738,45 @@
         ]
       }
     },
+    "/v1/threads/{thread_id}/transfer": {
+      "post": {
+        "summary": "Transfer unites add member and remove member.\nIt adds a new member to the thread and removes the initiator from the thread.",
+        "operationId": "ThreadManagement_Transfer",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.TransferResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadManagement.TransferBody"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadManagement"
+        ]
+      }
+    },
     "/v1/threads/{thread_id}/variables": {
       "get": {
         "summary": "Retrieves all variables for a specific thread.",
@@ -3476,6 +3515,17 @@
       },
       "description": "SetVariablesRequest defines parameters\nfor setting or updating thread variables."
     },
+    "webitel.im.api.gateway.v1.ThreadManagement.TransferBody": {
+      "type": "object",
+      "properties": {
+        "contact": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.PeerIdentity"
+        },
+        "role": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadRole"
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.ThreadMember": {
       "type": "object",
       "properties": {
@@ -3622,6 +3672,14 @@
       },
       "title": "Access Token Request"
     },
+    "webitel.im.api.gateway.v1.TransferResponse": {
+      "type": "object",
+      "properties": {
+        "member": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadMember"
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.UnregisterDeviceResponse": {
       "type": "object",
       "title": "No Reply ; Error status if failed"
@@ -3760,6 +3818,10 @@
         "name": {
           "type": "string"
         },
+        "peer": {
+          "$ref": "#/definitions/webitel.im.provider.v1.Peer",
+          "title": "Identity details (sub and iss)"
+        },
         "page_token": {
           "type": "string",
           "title": "Used for refreshing the access token"
@@ -3822,6 +3884,17 @@
       },
       "description": "/ ProviderMetaOAuthStartRequest initiates the handshake with Meta."
     },
+    "webitel.im.provider.v1.Peer": {
+      "type": "object",
+      "properties": {
+        "sub": {
+          "type": "string"
+        },
+        "iss": {
+          "type": "string"
+        }
+      }
+    },
     "webitel.im.provider.v1.ProviderCreateFacebookGateRequest": {
       "type": "object",
       "properties": {
@@ -3832,6 +3905,10 @@
         "meta_app_id": {
           "type": "string",
           "title": "Reference to the parent MetaApp"
+        },
+        "peer": {
+          "$ref": "#/definitions/webitel.im.provider.v1.Peer",
+          "title": "Identity details (sub and iss)"
         },
         "page_id": {
           "type": "string",
@@ -3881,6 +3958,9 @@
             "type": "string"
           },
           "title": "List of requested permissions (e.g., pages_messaging)"
+        },
+        "uri": {
+          "type": "string"
         }
       },
       "description": "/ ProviderCreateMetaAppRequest is used to register a new Meta Developer Application.\n/ This configuration is the foundation for all subsequent OAuth-based integrations."
@@ -3968,9 +4048,6 @@
           "type": "string"
         },
         "page_name": {
-          "type": "string"
-        },
-        "webhook": {
           "type": "string"
         },
         "status": {
