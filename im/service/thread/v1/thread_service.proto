@@ -100,6 +100,8 @@ message Thread {
 
 //#endregion
 
+//#region Search
+
 // ThreadSearchRequest defines requested fields, filters, sorting and pagination
 // options for searching thread.
 message ThreadSearchRequest {
@@ -216,6 +218,36 @@ message ThreadSettings {
   string title = 5;
 }
 
+//#endregion
+
+//#region Create Group
+
+// CreateGroupRequest defines parameters
+// required to create a new group thread.
+message CreateGroupRequest {
+
+  // Subject (title) of the group thread.
+  // Must be non-empty.
+  string subject = 1[
+    (buf.validate.field).string = {min_len: 1, max_len: 255}
+  ];
+
+  // Optional description of the group thread.
+  string description = 2[
+    (buf.validate.field).string.max_len = 1024
+  ];
+
+  // List of user IDs to be added as initial members
+  // of the group thread.
+  repeated string member_ids = 3[
+    (buf.validate.field).repeated.items.string.uuid = true
+  ];
+}
+
+//#endregion
+
+// AddMemberRequest defines parameters
+// for adding a user to an existing thread.
 message AddMemberRequest {
   string thread_id = 1 [
     (buf.validate.field).string.uuid = true,
