@@ -71,7 +71,7 @@
         ]
       }
     },
-    "/v1/auth/devices/{push.token}": {
+    "/v1/auth/devices/{token}": {
       "delete": {
         "summary": "Deletes a device by its token, stops sending PUSH-notifications to it.",
         "operationId": "Account_UnregisterDevice",
@@ -91,19 +91,11 @@
         },
         "parameters": [
           {
-            "name": "push.token",
-            "description": "Device push token (FCM, APNS, or web push endpoint)",
+            "name": "token",
+            "description": "Device push token to unregister",
             "in": "path",
             "required": true,
             "type": "string"
-          },
-          {
-            "name": "push.secret",
-            "description": "For FCM and APNS VoIP, optional encryption key used to encrypt push notifications",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "byte"
           }
         ],
         "tags": [
@@ -2313,9 +2305,17 @@
     "webitel.im.api.gateway.v1.PUSHSubscription": {
       "type": "object",
       "properties": {
-        "token": {
+        "fcm": {
           "type": "string",
-          "title": "Device push token (FCM, APNS, or web push endpoint)"
+          "title": "[F]irebase [C]loud [M]essaging Service (firebase token for google firebase)"
+        },
+        "apn": {
+          "type": "string",
+          "title": "[A]pple [P]ush [N]otification Service (device token for apple push)"
+        },
+        "web": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.WebPushSubscription",
+          "title": "For web push: endpoint + keys (P-256 ECDH)"
         },
         "secret": {
           "type": "string",
@@ -2997,6 +2997,36 @@
         }
       },
       "description": "VariableEntryRequest represents a variable update operation."
+    },
+    "webitel.im.api.gateway.v1.WebPushSubscription": {
+      "type": "object",
+      "properties": {
+        "endpoint": {
+          "type": "string",
+          "title": "endpoint: Absolute URL exposed by the push service where the application server can send push messages"
+        },
+        "key": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.WebPushSubscription.Key",
+          "title": "P-256 elliptic curve Diffie-Hellman parameters"
+        }
+      },
+      "title": "WebPUSH subscription"
+    },
+    "webitel.im.api.gateway.v1.WebPushSubscription.Key": {
+      "type": "object",
+      "properties": {
+        "auth": {
+          "type": "string",
+          "format": "byte",
+          "title": "auth: Base64url-encoded authentication secret"
+        },
+        "p256dh": {
+          "type": "string",
+          "format": "byte",
+          "title": "p256dh: Base64url-encoded P-256 elliptic curve Diffie-Hellman public key"
+        }
+      },
+      "title": "keys: P-256 elliptic curve Diffie-Hellman parameters in the following object\np256dh: Base64url-encoded P-256 elliptic curve Diffie-Hellman public key\nauth: Base64url-encoded authentication secret"
     }
   }
 }

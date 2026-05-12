@@ -12,8 +12,15 @@ option go_package = "github.com/webitel/im-gateway-service/gen/api/gateway/v1;ga
 // https://core.telegram.org/api/push-updates#subscribing-to-notifications
 message PUSHSubscription {
 
-  // Device push token (FCM, APNS, or web push endpoint)
-  string token = 1;
+  // Kind of PUSHSubscription device token
+  oneof token {
+    // [F]irebase [C]loud [M]essaging Service (firebase token for google firebase)
+    string fcm = 1;
+    // [A]pple [P]ush [N]otification Service (device token for apple push)
+    string apn = 2;
+    // For web push: endpoint + keys (P-256 ECDH)
+    WebPushSubscription web = 3;
+  }
 
   // For FCM and APNS VoIP, optional encryption key used to encrypt push notifications
   bytes secret = 4;
