@@ -20,6 +20,8 @@ service MessageHistory {
       get: "/v1/{thread_id}/messages"
     };
   }
+
+  rpc SearchDialogsMessageHistory(SearchDialogsMessageHistoryRequest) returns (SearchDialogsMessageHistoryResponse);
 }
 
 message HistoryMessageCursorResponse {
@@ -116,4 +118,48 @@ message SearchMessageHistoryResponse {
 
   HistoryMessageCursorResponse        next_cursor   = 3;
   HistoryMessageCursorResponse        prev_cursor   = 4;
+}
+
+// Retrieves message history grouped by the user's closed membership periods
+// ("dialogs") within a thread. Active memberships are excluded — their
+// messages are available via SearchThreadMessagesHistory.
+message SearchDialogsMessageHistoryRequest {
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  int32 domain_id = 2;
+
+  repeated string sender_ids = 4;
+  repeated int32 types = 5;
+
+  // Inclusive bounds on the dialog interval (epoch ms). Zero means unbounded.
+  int64 period_from = 6;
+  int64 period_to = 7;
+
+  repeated string fields = 8;
+
+  optional HistoryMessageCursorRequest cursor = 9;
+
+  uint32 size = 10 [
+    (buf.validate.field).uint32 = {lte: 100},
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+}
+
+message SearchDialogsMessageHistoryResponse {
+  repeated SessionMessageHistory  items = 1;
+  repeated ThreadMember    from  = 2;
+
+  string next_cursor = 4;
+  string prev_cursor = 5;
+}
+
+message SessionMessageHistory {
+  string member_id = 1;
+  string invited_by = 2;
+  ThreadRole thread_role = 3;
+  string leave_reason = 4;
+  repeated HistoryMessage messages = 5;
 }

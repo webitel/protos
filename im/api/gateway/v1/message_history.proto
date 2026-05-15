@@ -21,6 +21,15 @@ service MessageHistory {
       get: "/v1/{thread_id}/messages"
     };
   }
+
+  // Searches messages grouped by the user's closed membership periods
+  // ("dialogs") within a thread. Active memberships are excluded — their
+  // messages are available via SearchThreadMessagesHistory.
+  rpc SearchDialogsMessagesHistory(SearchDialogsMessageHistoryRequest) returns (SearchDialogsMessageHistoryResponse) {
+    option (google.api.http) = {
+      get: "/v1/{thread_id}/dialogs/messages"
+    };
+  }
 }
 
 // HistoryMessageCursorResponse defines next/prev id for keyset-pagination.
@@ -229,6 +238,95 @@ message SearchMessageHistoryResponse {
 
   // Cursor that represents position to get newest messages (used with 'before' param).
   HistoryMessageCursorResponse prev_cursor = 3;
+}
+
+// SearchDialogsMessageHistoryRequest defines filtering,
+// pagination and projection options for searching message
+// history grouped by the user's closed membership periods
+// ("dialogs") within a thread.
+message SearchDialogsMessageHistoryRequest {
+
+  // List of message fields to be returned.
+  // Used to reduce payload size.
+  repeated string fields = 1;
+
+  // Filter by thread ID.
+  string thread_id = 2 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  // Filter messages by sender user IDs.
+  repeated string sender_ids = 3 [
+    (buf.validate.field).repeated.items.string.uuid = true,
+    (buf.validate.field).repeated.max_items = 50
+  ];
+
+  // Filter messages by message types.
+  repeated int32 types = 4 [
+    (buf.validate.field).repeated.items.int32.gte = 1,
+    (buf.validate.field).repeated.items.int32.lte = 4,
+    (buf.validate.field).repeated.max_items = 4
+  ];
+
+  // Inclusive lower bound on the dialog interval (Unix time, milliseconds).
+  // Zero means unbounded.
+  int64 period_from = 5;
+
+  // Inclusive upper bound on the dialog interval (Unix time, milliseconds).
+  // Zero means unbounded.
+  int64 period_to = 6;
+
+  // Cursor for cursor-based pagination.
+  // If omitted, search starts from the most recent dialog.
+  optional HistoryMessageCursorRequest cursor = 7;
+
+  // Maximum number of messages to return.
+  uint32 size = 8 [
+    (buf.validate.field).uint32 = {
+      gte: 1,
+      lte: 100
+    },
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+}
+
+// SearchDialogsMessageHistoryResponse contains
+// dialog-grouped message history search results
+// and pagination metadata.
+message SearchDialogsMessageHistoryResponse {
+
+  // Dialogs (closed membership periods) matching the search criteria,
+  // each containing its messages.
+  repeated SessionMessageHistory items = 1;
+
+  // Cursor that represents position to get older dialogs (used without 'before' param).
+  HistoryMessageCursorResponse next_cursor = 2;
+
+  // Cursor that represents position to get newest dialogs (used with 'before' param).
+  HistoryMessageCursorResponse prev_cursor = 3;
+}
+
+// SessionMessageHistory represents a single closed membership
+// period ("dialog") of a user within a thread, together with
+// the messages exchanged during that period.
+message SessionMessageHistory {
+
+  // Membership identifier of the closed dialog.
+  string member_id = 1;
+
+  // Identifier of the user who invited the member into the thread.
+  string invited_by = 2;
+
+  // Role the member held within the thread during this dialog.
+  ThreadRole thread_role = 3;
+
+  // Reason the member left the thread (closing the dialog).
+  string leave_reason = 4;
+
+  // Messages exchanged during this dialog, ordered consistently
+  // with the surrounding pagination.
+  repeated HistoryMessage messages = 5;
 }
 
 message MessageContact {
