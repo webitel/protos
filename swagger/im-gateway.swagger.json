@@ -31,6 +31,24 @@
     },
     {
       "name": "webitel.im.api.gateway.v1.ThreadManagement"
+    },
+    {
+      "name": "webitel.im.api.provider.v1.FacebookService"
+    },
+    {
+      "name": "webitel.im.api.provider.v1.GateService"
+    },
+    {
+      "name": "webitel.im.api.provider.v1.ProviderMessageService"
+    },
+    {
+      "name": "webitel.im.api.provider.v1.MetaAppService"
+    },
+    {
+      "name": "webitel.im.api.provider.v1.MetaOAuthService"
+    },
+    {
+      "name": "webitel.im.api.provider.v1.WhatsAppService"
     }
   ],
   "consumes": [
@@ -40,6 +58,633 @@
     "application/json"
   ],
   "paths": {
+    "/im/gates": {
+      "get": {
+        "operationId": "GateService_ListGates",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderListGatesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "types",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "PROVIDER_TYPE_UNSPECIFIED",
+                "PROVIDER_TYPE_VIBER",
+                "PROVIDER_TYPE_TELEGRAM_BOT",
+                "PROVIDER_TYPE_TELEGRAM_APP",
+                "PROVIDER_TYPE_META_APP",
+                "PROVIDER_TYPE_FACEBOOK",
+                "PROVIDER_TYPE_INSTAGRAM",
+                "PROVIDER_TYPE_WHATSAPP"
+              ]
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "PROVIDER_STATUS_UNSPECIFIED",
+              "PROVIDER_STATUS_ACTIVE",
+              "PROVIDER_STATUS_INACTIVE",
+              "PROVIDER_STATUS_ERROR"
+            ],
+            "default": "PROVIDER_STATUS_UNSPECIFIED"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.provider.v1.GateService"
+        ]
+      }
+    },
+    "/im/gates/facebook": {
+      "post": {
+        "operationId": "FacebookService_CreateFacebookGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderCreateFacebookGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderCreateFacebookGateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.provider.v1.FacebookService"
+        ]
+      }
+    },
+    "/im/gates/facebook/{id}": {
+      "get": {
+        "operationId": "FacebookService_GetFacebookGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderGetFacebookGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.provider.v1.FacebookService"
+        ]
+      },
+      "delete": {
+        "operationId": "FacebookService_DeleteFacebookGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderDeleteFacebookGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.provider.v1.FacebookService"
+        ]
+      },
+      "patch": {
+        "operationId": "FacebookService_UpdateFacebookGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderUpdateFacebookGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.FacebookService.UpdateFacebookGateBody"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.provider.v1.FacebookService"
+        ]
+      }
+    },
+    "/im/gates/whatsapp": {
+      "post": {
+        "operationId": "WhatsAppService_CreateWhatsAppGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderCreateWhatsAppGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderCreateWhatsAppGateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.provider.v1.WhatsAppService"
+        ]
+      }
+    },
+    "/im/gates/whatsapp/{id}": {
+      "get": {
+        "operationId": "WhatsAppService_GetWhatsAppGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderGetWhatsAppGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.provider.v1.WhatsAppService"
+        ]
+      },
+      "delete": {
+        "operationId": "WhatsAppService_DeleteWhatsAppGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderDeleteWhatsAppGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.provider.v1.WhatsAppService"
+        ]
+      },
+      "patch": {
+        "operationId": "WhatsAppService_UpdateWhatsAppGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderUpdateWhatsAppGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.WhatsAppService.UpdateWhatsAppGateBody"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.provider.v1.WhatsAppService"
+        ]
+      }
+    },
+    "/im/meta-apps": {
+      "post": {
+        "operationId": "MetaAppService_CreateMetaApp",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderCreateMetaAppResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderCreateMetaAppRequest"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.provider.v1.MetaAppService"
+        ]
+      }
+    },
+    "/im/meta-apps/{id}": {
+      "get": {
+        "operationId": "MetaAppService_GetMetaApp",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderGetMetaAppResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.provider.v1.MetaAppService"
+        ]
+      },
+      "delete": {
+        "operationId": "MetaAppService_DeleteMetaApp",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderDeleteMetaAppResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.provider.v1.MetaAppService"
+        ]
+      },
+      "patch": {
+        "operationId": "MetaAppService_UpdateMetaApp",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderUpdateMetaAppResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.MetaAppService.UpdateMetaAppBody"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.provider.v1.MetaAppService"
+        ]
+      }
+    },
+    "/im/meta-apps/{meta_app_id}/oauth/callback": {
+      "post": {
+        "operationId": "MetaOAuthService_MetaOAuthCallback",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderMetaOAuthCallbackResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "meta_app_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.MetaOAuthService.MetaOAuthCallbackBody"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.provider.v1.MetaOAuthService"
+        ]
+      }
+    },
+    "/im/meta-apps/{meta_app_id}/oauth/start": {
+      "post": {
+        "operationId": "MetaOAuthService_StartMetaOAuth",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderMetaOAuthStartResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "meta_app_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.MetaOAuthService.StartMetaOAuthBody"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.provider.v1.MetaOAuthService"
+        ]
+      }
+    },
+    "/im/provider/send/document": {
+      "post": {
+        "operationId": "ProviderMessageService_SendDocument",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderSendMessageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderSendDocumentRequest"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.provider.v1.ProviderMessageService"
+        ]
+      }
+    },
+    "/im/provider/send/image": {
+      "post": {
+        "operationId": "ProviderMessageService_SendImage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderSendMessageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderSendImageRequest"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.provider.v1.ProviderMessageService"
+        ]
+      }
+    },
+    "/im/provider/send/text": {
+      "post": {
+        "operationId": "ProviderMessageService_SendText",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderSendMessageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderSendTextRequest"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.provider.v1.ProviderMessageService"
+        ]
+      }
+    },
     "/v1/auth/devices": {
       "post": {
         "summary": "Register device to receive PUSH notifications",
@@ -820,6 +1465,17 @@
             "required": false,
             "type": "integer",
             "format": "int32"
+          },
+          {
+            "name": "contact_ids",
+            "description": "Filter threads by participant contact IDs.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -3070,6 +3726,582 @@
         }
       },
       "title": "keys: P-256 elliptic curve Diffie-Hellman parameters in the following object\np256dh: Base64url-encoded P-256 elliptic curve Diffie-Hellman public key\nauth: Base64url-encoded authentication secret"
+    },
+    "webitel.im.api.provider.v1.FacebookService.UpdateFacebookGateBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "peer": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.Peer"
+        },
+        "page_token": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.MetaAppService.UpdateMetaAppBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "app_secret": {
+          "type": "string"
+        },
+        "oauth_redirect_uri": {
+          "type": "string"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "verify_token": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.MetaOAuthService.MetaOAuthCallbackBody": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.MetaOAuthService.StartMetaOAuthBody": {
+      "type": "object",
+      "properties": {
+        "extra_scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.Peer": {
+      "type": "object",
+      "properties": {
+        "sub": {
+          "type": "string"
+        },
+        "iss": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderCreateFacebookGateRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "meta_app_id": {
+          "type": "string"
+        },
+        "peer": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.Peer"
+        },
+        "page_id": {
+          "type": "string"
+        },
+        "page_token": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderCreateFacebookGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderFacebookGate"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderCreateMetaAppRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "app_id": {
+          "type": "string"
+        },
+        "app_secret": {
+          "type": "string"
+        },
+        "oauth_redirect_uri": {
+          "type": "string"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "uri": {
+          "type": "string"
+        },
+        "verify_token": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderCreateMetaAppResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderMetaApp"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderCreateWhatsAppGateRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "meta_app_id": {
+          "type": "string"
+        },
+        "waba_id": {
+          "type": "string"
+        },
+        "phone_number_id": {
+          "type": "string"
+        },
+        "access_token": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderCreateWhatsAppGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderWhatsAppGate"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderDeleteFacebookGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderFacebookGate"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderDeleteMetaAppResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderMetaApp"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderDeleteWhatsAppGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderWhatsAppGate"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderFacebookGate": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "meta_app_id": {
+          "type": "string"
+        },
+        "page_id": {
+          "type": "string"
+        },
+        "page_name": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderStatus"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderFile": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "mime_type": {
+          "type": "string"
+        },
+        "size": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderGetFacebookGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderFacebookGate"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderGetMetaAppResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderMetaApp"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderGetWhatsAppGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderWhatsAppGate"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderListGatesResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderSummary"
+          }
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "next": {
+          "type": "boolean"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderMetaApp": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "app_id": {
+          "type": "string"
+        },
+        "verify_token": {
+          "type": "string"
+        },
+        "oauth_redirect_uri": {
+          "type": "string"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderMetaLinkedPage": {
+      "type": "object",
+      "properties": {
+        "page_id": {
+          "type": "string"
+        },
+        "page_name": {
+          "type": "string"
+        },
+        "access_token": {
+          "type": "string"
+        },
+        "platform": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderMetaOAuthCallbackResponse": {
+      "type": "object",
+      "properties": {
+        "user_access_token": {
+          "type": "string"
+        },
+        "pages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderMetaLinkedPage"
+          }
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderMetaOAuthStartResponse": {
+      "type": "object",
+      "properties": {
+        "auth_url": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderSendDocumentRequest": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderType"
+        },
+        "gate_id": {
+          "type": "string"
+        },
+        "external_user_id": {
+          "type": "string"
+        },
+        "document": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderFile"
+        },
+        "caption": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderSendImageRequest": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderType"
+        },
+        "gate_id": {
+          "type": "string"
+        },
+        "external_user_id": {
+          "type": "string"
+        },
+        "image": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderFile"
+        },
+        "caption": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderSendMessageResponse": {
+      "type": "object",
+      "properties": {
+        "external_id": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderSendTextRequest": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderType"
+        },
+        "gate_id": {
+          "type": "string"
+        },
+        "external_user_id": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderStatus": {
+      "type": "string",
+      "enum": [
+        "PROVIDER_STATUS_UNSPECIFIED",
+        "PROVIDER_STATUS_ACTIVE",
+        "PROVIDER_STATUS_INACTIVE",
+        "PROVIDER_STATUS_ERROR"
+      ],
+      "default": "PROVIDER_STATUS_UNSPECIFIED",
+      "description": "/ ProviderStatus represents the operational state of a provider gateway."
+    },
+    "webitel.im.api.provider.v1.ProviderSummary": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderType"
+        },
+        "status": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderStatus"
+        },
+        "webhook_url": {
+          "type": "string"
+        },
+        "contact": {
+          "type": "string"
+        },
+        "provider_app_id": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderType": {
+      "type": "string",
+      "enum": [
+        "PROVIDER_TYPE_UNSPECIFIED",
+        "PROVIDER_TYPE_VIBER",
+        "PROVIDER_TYPE_TELEGRAM_BOT",
+        "PROVIDER_TYPE_TELEGRAM_APP",
+        "PROVIDER_TYPE_META_APP",
+        "PROVIDER_TYPE_FACEBOOK",
+        "PROVIDER_TYPE_INSTAGRAM",
+        "PROVIDER_TYPE_WHATSAPP"
+      ],
+      "default": "PROVIDER_TYPE_UNSPECIFIED",
+      "description": "/ ProviderType defines the specific provider or protocol used for messaging."
+    },
+    "webitel.im.api.provider.v1.ProviderUpdateFacebookGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderFacebookGate"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderUpdateMetaAppResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderMetaApp"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderUpdateWhatsAppGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderWhatsAppGate"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderWhatsAppGate": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "meta_app_id": {
+          "type": "string"
+        },
+        "waba_id": {
+          "type": "string"
+        },
+        "phone_number_id": {
+          "type": "string"
+        },
+        "phone_display": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderStatus"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.WhatsAppService.UpdateWhatsAppGateBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "access_token": {
+          "type": "string"
+        }
+      }
     }
   }
 }
