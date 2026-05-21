@@ -1704,6 +1704,105 @@
         ]
       }
     },
+    "/v1/threads/{thread_id}/messages": {
+      "get": {
+        "summary": "Searches messages within a specific thread.\nSupports cursor-based pagination and field selection.",
+        "operationId": "MessageHistory_SearchThreadMessagesHistory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SearchMessageHistoryResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "thread_id",
+            "description": "Filter by thread IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "description": "List of message fields to be returned.\nUsed to reduce payload size.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "ids",
+            "description": "Filter by specific message IDs.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "sender_ids",
+            "description": "Filter messages by sender user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "types",
+            "description": "Filter messages by message types.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "cursor.id",
+            "description": "Cursor identifier.\nMust be a valid UUID referencing an existing message.\nDefines the starting point for pagination.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "cursor.before",
+            "description": "Pagination direction flag.\n\ntrue  -\u003e fetch newer messages (back before history)\nfalse -\u003e fetch older messages (back to older history)",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "size",
+            "description": "Maximum number of messages to return.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.MessageHistory"
+        ]
+      }
+    },
     "/v1/threads/{thread_id}/transfer": {
       "post": {
         "summary": "Transfer unites add member and remove member.\nIt adds a new member to the thread and removes the initiator from the thread.",
@@ -1913,105 +2012,6 @@
         ],
         "tags": [
           "webitel.im.api.gateway.v1.ThreadManagement"
-        ]
-      }
-    },
-    "/v1/{thread_id}/messages": {
-      "get": {
-        "summary": "Searches messages within a specific thread.\nSupports cursor-based pagination and field selection.",
-        "operationId": "MessageHistory_SearchThreadMessagesHistory",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.im.api.gateway.v1.SearchMessageHistoryResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/google.rpc.Status"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "thread_id",
-            "description": "Filter by thread IDs.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "fields",
-            "description": "List of message fields to be returned.\nUsed to reduce payload size.",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          },
-          {
-            "name": "ids",
-            "description": "Filter by specific message IDs.",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          },
-          {
-            "name": "sender_ids",
-            "description": "Filter messages by sender user IDs.",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          },
-          {
-            "name": "types",
-            "description": "Filter messages by message types.",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "collectionFormat": "multi"
-          },
-          {
-            "name": "cursor.id",
-            "description": "Cursor identifier.\nMust be a valid UUID referencing an existing message.\nDefines the starting point for pagination.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "cursor.before",
-            "description": "Pagination direction flag.\n\ntrue  -\u003e fetch newer messages (back before history)\nfalse -\u003e fetch older messages (back to older history)",
-            "in": "query",
-            "required": false,
-            "type": "boolean"
-          },
-          {
-            "name": "size",
-            "description": "Maximum number of messages to return.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          }
-        ],
-        "tags": [
-          "webitel.im.api.gateway.v1.MessageHistory"
         ]
       }
     }
@@ -3025,6 +3025,9 @@
           "type": "string"
         },
         "iss": {
+          "type": "string"
+        },
+        "via": {
           "type": "string"
         }
       }
@@ -4111,8 +4114,12 @@
         "external_user_id": {
           "type": "string"
         },
-        "document": {
-          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderFile"
+        "documents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderFile"
+          }
         },
         "caption": {
           "type": "string"
@@ -4131,8 +4138,12 @@
         "external_user_id": {
           "type": "string"
         },
-        "image": {
-          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderFile"
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderFile"
+          }
         },
         "caption": {
           "type": "string"
