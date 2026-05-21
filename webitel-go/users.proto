@@ -11,7 +11,6 @@ import "permission.proto";
 import "auth.proto";
 import "warnings.proto";
 import "google/api/annotations.proto";
-import "protoc-gen-openapiv2/options/annotations.proto";
 
 service Users {
 
@@ -25,11 +24,11 @@ service Users {
     }
     rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
         option (google.api.http) = {
-            put: "/users/{user.id}"
+            put: "/users/{id}"
             body: "user"
             response_body: "updated"
             additional_bindings {
-                patch: "/users/{user.id}"
+                patch: "/users/{id}"
                 body: "user"
                 response_body: "updated"
             }
@@ -99,9 +98,7 @@ message UserId {
 // User profile.
 message User {
 
-    int64  id = 1 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = { read_only: true }
-    ]; // Object ID
+    int64  id = 1; // Object ID
     string name = 2; // Caller-ID-Name: Display Name
 
     string email = 3;
@@ -138,24 +135,12 @@ message User {
     // repeated Registration reged = 13; // order by register_last
     ObjectId contact = 18; // [optional] contact connected to this user
 
-    int64  created_at = 20 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = { read_only: true }
-    ]; // unix
-    UserId created_by = 21 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = { read_only: true }
-    ]; // user
-    int64  updated_at = 22 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = { read_only: true }
-    ]; // unix
-    UserId updated_by = 23 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = { read_only: true }
-    ]; // user
-    int64  deleted_at = 24 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = { read_only: true }
-    ]; // unix
-    UserId deleted_by = 25 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = { read_only: true }
-    ]; // user
+    int64  created_at = 20; // unix
+    UserId created_by = 21; // user
+    int64  updated_at = 22; // unix
+    UserId updated_by = 23; // user
+    int64  deleted_at = 24; // unix
+    UserId deleted_by = 25; // user
 
     // The "chat_name" field is used to store the name displayed externally on the platform.
     // For example, "chat_name" is shown when an agent connects to chats with clients.
@@ -166,14 +151,46 @@ message User {
 
 }
 
+// Input of the User profile for Create/Update operations.
+// Mirrors `User` field numbers 1:1 (wire-compatible), but excludes
+// system-managed read-only fields (id, audit metadata).
+message InputUser {
+    string name = 2; // Caller-ID-Name: Display Name
+
+    string email = 3;
+
+    string username = 4; // alphanumeric username (login)
+    string password = 5;
+
+    string extension = 6; // Caller-ID-Number:
+
+    UserPresence presence = 8;
+
+    ObjectId device = 10; // [optional] default device assigned
+    repeated ObjectId devices = 11; // [editable] list of unique `regular` devices, attached to this user
+    repeated ObjectId hotdesks = 12; // [readonly] list of unique `hotdesk` devices, assigned to this user
+
+    map<string,string> profile = 13; // list of variables, assigned to this user as an environment unit
+    repeated Permission permissions = 14; // set of operational permission grants
+    repeated LicenseUser license = 15; // list of unique licenses, granted to this user
+    repeated ObjectId roles = 16; // roles, member of which is this user
+
+    string totp_url = 17; // [readonly][optional] one time password if setting (2fa) is enabled
+
+    ObjectId contact = 18; // [optional] contact connected to this user
+
+    // The "chat_name" field is used to store the name displayed externally on the platform.
+    // For example, "chat_name" is shown when an agent connects to chats with clients.
+    string chat_name = 26;
+
+    // When set to true, the user will be required to change their password on next login.
+    bool force_password_change = 27;
+}
+
 message CreateUserRequest {
-    User   user = 1; // user entity to be created
-    string user_password = 2 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = { read_only: true }
-    ];
-    string confirm_password = 3 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = { read_only: true }
-    ];
+    InputUser user = 1; // user entity to be created
+    string user_password = 2;
+    string confirm_password = 3;
 }
 
 message CreateUserResponse {
@@ -190,8 +207,9 @@ message ReadUserResponse {
 }
 
 message UpdateUserRequest {
-    User user = 1; // body: modifications/changes
-    repeated string fields = 2; // PATCH: partial update
+    int64 id = 1; // path: /users/{id}
+    InputUser user = 2; // body: modifications/changes
+    repeated string fields = 3; // PATCH: partial update
 }
 
 message UpdateUserResponse {
