@@ -36991,6 +36991,38 @@
         }
       }
     },
+    "/users/logout": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "LogoutUser2",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiLogoutUserRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiLogoutUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        }
+      }
+    },
     "/users/password": {
       "put": {
         "tags": [
@@ -37213,6 +37245,7 @@
           {
             "type": "string",
             "format": "int64",
+            "description": "ONE  /users/{id}/logout",
             "name": "id",
             "in": "path",
             "required": true
@@ -42586,7 +42619,17 @@
       }
     },
     "UsersLogoutUserBody": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "selection": {
+          "type": "array",
+          "title": "MANY /users/logout .selection=[id,...]",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        }
+      }
     },
     "apiAccessRule": {
       "type": "object",
@@ -43788,6 +43831,24 @@
       "properties": {
         "authorization": {
           "$ref": "#/definitions/apiAccessToken"
+        }
+      }
+    },
+    "apiLogoutUserRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "title": "ONE  /users/{id}/logout"
+        },
+        "selection": {
+          "type": "array",
+          "title": "MANY /users/logout .selection=[id,...]",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
         }
       }
     },
