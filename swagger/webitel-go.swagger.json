@@ -13823,6 +13823,38 @@
         ]
       }
     },
+    "/users/logout": {
+      "post": {
+        "operationId": "LogoutUser2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiLogoutUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiLogoutUserRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      }
+    },
     "/users/password": {
       "put": {
         "operationId": "UpdatePassword",
@@ -14061,6 +14093,7 @@
         "parameters": [
           {
             "name": "id",
+            "description": "ONE  /users/{id}/logout",
             "in": "path",
             "required": true,
             "type": "string",
@@ -16424,7 +16457,17 @@
       "title": "simplified presence filter params"
     },
     "UsersLogoutUserBody": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "selection": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          },
+          "title": "MANY /users/logout .selection=[id,...]"
+        }
+      }
     },
     "apiAccessRule": {
       "type": "object",
@@ -17626,6 +17669,24 @@
       "properties": {
         "authorization": {
           "$ref": "#/definitions/apiAccessToken"
+        }
+      }
+    },
+    "apiLogoutUserRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "title": "ONE  /users/{id}/logout"
+        },
+        "selection": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          },
+          "title": "MANY /users/logout .selection=[id,...]"
         }
       }
     },

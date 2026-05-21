@@ -76,6 +76,10 @@ service Users {
         option (google.api.http) = {
             post: "/users/{id}/logout"
             body: "*"
+            additional_bindings {
+                post: "/users/logout"
+                body: "*"
+            }
         };
     }
 
@@ -266,7 +270,8 @@ message GetPasswordSettingsResponse {
 
 
 message LogoutUserRequest {
-    int64 id = 1;
+    int64 id = 1;                  // ONE  /users/{id}/logout
+    repeated int64 selection = 2;  // MANY /users/logout .selection=[id,...]
 }
 
 message LogoutUserResponse {
