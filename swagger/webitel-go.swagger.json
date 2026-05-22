@@ -13823,6 +13823,38 @@
         ]
       }
     },
+    "/users/logout": {
+      "post": {
+        "operationId": "LogoutUser2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiLogoutUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiLogoutUserRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      }
+    },
     "/users/password": {
       "put": {
         "operationId": "UpdatePassword",
@@ -14061,6 +14093,7 @@
         "parameters": [
           {
             "name": "id",
+            "description": "ONE  /users/{id}/logout",
             "in": "path",
             "required": true,
             "type": "string",
@@ -14561,29 +14594,35 @@
                 "created_at": {
                   "type": "string",
                   "format": "int64",
-                  "title": "unix"
+                  "title": "unix",
+                  "readOnly": true
                 },
                 "created_by": {
                   "$ref": "#/definitions/apiUserId",
-                  "title": "user"
+                  "title": "user",
+                  "readOnly": true
                 },
                 "updated_at": {
                   "type": "string",
                   "format": "int64",
-                  "title": "unix"
+                  "title": "unix",
+                  "readOnly": true
                 },
                 "updated_by": {
                   "$ref": "#/definitions/apiUserId",
-                  "title": "user"
+                  "title": "user",
+                  "readOnly": true
                 },
                 "deleted_at": {
                   "type": "string",
                   "format": "int64",
-                  "title": "unix"
+                  "title": "unix",
+                  "readOnly": true
                 },
                 "deleted_by": {
                   "$ref": "#/definitions/apiUserId",
-                  "title": "user"
+                  "title": "user",
+                  "readOnly": true
                 },
                 "chat_name": {
                   "type": "string",
@@ -14733,29 +14772,35 @@
                 "created_at": {
                   "type": "string",
                   "format": "int64",
-                  "title": "unix"
+                  "title": "unix",
+                  "readOnly": true
                 },
                 "created_by": {
                   "$ref": "#/definitions/apiUserId",
-                  "title": "user"
+                  "title": "user",
+                  "readOnly": true
                 },
                 "updated_at": {
                   "type": "string",
                   "format": "int64",
-                  "title": "unix"
+                  "title": "unix",
+                  "readOnly": true
                 },
                 "updated_by": {
                   "$ref": "#/definitions/apiUserId",
-                  "title": "user"
+                  "title": "user",
+                  "readOnly": true
                 },
                 "deleted_at": {
                   "type": "string",
                   "format": "int64",
-                  "title": "unix"
+                  "title": "unix",
+                  "readOnly": true
                 },
                 "deleted_by": {
                   "$ref": "#/definitions/apiUserId",
-                  "title": "user"
+                  "title": "user",
+                  "readOnly": true
                 },
                 "chat_name": {
                   "type": "string",
@@ -16412,7 +16457,17 @@
       "title": "simplified presence filter params"
     },
     "UsersLogoutUserBody": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "selection": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          },
+          "title": "MANY /users/logout .selection=[id,...]"
+        }
+      }
     },
     "apiAccessRule": {
       "type": "object",
@@ -16528,11 +16583,11 @@
         },
         "user_password": {
           "type": "string",
-          "title": "cleartext passphrase"
+          "readOnly": true
         },
         "confirm_password": {
           "type": "string",
-          "title": "cleartext passphrase"
+          "readOnly": true
         }
       }
     },
@@ -17470,6 +17525,10 @@
           "type": "string",
           "format": "int64",
           "title": "not after"
+        },
+        "name": {
+          "type": "string",
+          "title": "license.name"
         }
       },
       "title": "USAGE details"
@@ -17610,6 +17669,24 @@
       "properties": {
         "authorization": {
           "$ref": "#/definitions/apiAccessToken"
+        }
+      }
+    },
+    "apiLogoutUserRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "title": "ONE  /users/{id}/logout"
+        },
+        "selection": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          },
+          "title": "MANY /users/logout .selection=[id,...]"
         }
       }
     },
@@ -18605,7 +18682,8 @@
         "id": {
           "type": "string",
           "format": "int64",
-          "title": "Object ID"
+          "title": "Object ID",
+          "readOnly": true
         },
         "name": {
           "type": "string",
@@ -18694,29 +18772,35 @@
         "created_at": {
           "type": "string",
           "format": "int64",
-          "title": "unix"
+          "title": "unix",
+          "readOnly": true
         },
         "created_by": {
           "$ref": "#/definitions/apiUserId",
-          "title": "user"
+          "title": "user",
+          "readOnly": true
         },
         "updated_at": {
           "type": "string",
           "format": "int64",
-          "title": "unix"
+          "title": "unix",
+          "readOnly": true
         },
         "updated_by": {
           "$ref": "#/definitions/apiUserId",
-          "title": "user"
+          "title": "user",
+          "readOnly": true
         },
         "deleted_at": {
           "type": "string",
           "format": "int64",
-          "title": "unix"
+          "title": "unix",
+          "readOnly": true
         },
         "deleted_by": {
           "$ref": "#/definitions/apiUserId",
-          "title": "user"
+          "title": "user",
+          "readOnly": true
         },
         "chat_name": {
           "type": "string",

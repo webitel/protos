@@ -11,6 +11,7 @@ import "permission.proto";
 import "auth.proto";
 import "warnings.proto";
 import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 service Users {
 
@@ -75,6 +76,10 @@ service Users {
         option (google.api.http) = {
             post: "/users/{id}/logout"
             body: "*"
+            additional_bindings {
+                post: "/users/logout"
+                body: "*"
+            }
         };
     }
 
@@ -94,7 +99,9 @@ message UserId {
 // User profile.
 message User {
 
-    int64  id = 1;   // Object ID
+    int64  id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = { read_only: true }
+    ]; // Object ID
     string name = 2; // Caller-ID-Name: Display Name
 
     string email = 3;
@@ -131,12 +138,24 @@ message User {
     // repeated Registration reged = 13; // order by register_last
     ObjectId contact = 18; // [optional] contact connected to this user
 
-    int64  created_at = 20; // unix
-    UserId created_by = 21; // user
-    int64  updated_at = 22; // unix
-    UserId updated_by = 23; // user
-    int64  deleted_at = 24; // unix
-    UserId deleted_by = 25; // user
+    int64  created_at = 20 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = { read_only: true }
+    ]; // unix
+    UserId created_by = 21 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = { read_only: true }
+    ]; // user
+    int64  updated_at = 22 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = { read_only: true }
+    ]; // unix
+    UserId updated_by = 23 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = { read_only: true }
+    ]; // user
+    int64  deleted_at = 24 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = { read_only: true }
+    ]; // unix
+    UserId deleted_by = 25 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = { read_only: true }
+    ]; // user
 
     // The "chat_name" field is used to store the name displayed externally on the platform.
     // For example, "chat_name" is shown when an agent connects to chats with clients.
@@ -148,9 +167,13 @@ message User {
 }
 
 message CreateUserRequest {
-    User   user = 1;       // user entity to be created
-    string user_password = 2; // cleartext passphrase
-    string confirm_password = 3; // cleartext passphrase
+    User   user = 1; // user entity to be created
+    string user_password = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = { read_only: true }
+    ];
+    string confirm_password = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = { read_only: true }
+    ];
 }
 
 message CreateUserResponse {
@@ -247,7 +270,8 @@ message GetPasswordSettingsResponse {
 
 
 message LogoutUserRequest {
-    int64 id = 1;
+    int64 id = 1;                  // ONE  /users/{id}/logout
+    repeated int64 selection = 2;  // MANY /users/logout .selection=[id,...]
 }
 
 message LogoutUserResponse {

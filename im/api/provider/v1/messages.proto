@@ -1,0 +1,168 @@
+syntax = "proto3";
+
+package webitel.im.api.provider.v1;
+
+import "api/provider/v1/enums.proto";
+import "api/provider/v1/entities.proto";
+
+option go_package = "github.com/webitel/im-provider-service/gen/api/provider/v1;provider";
+
+message Peer {
+  string sub = 1;
+  string iss = 2;
+}
+
+// --- Meta Application ---
+
+message ProviderCreateMetaAppRequest {
+  string name = 1;
+  string app_id = 2;
+  string app_secret = 3;
+  string oauth_redirect_uri = 4;
+  repeated string scopes = 5;
+  string uri = 6;
+  string verify_token = 7;
+}
+
+message ProviderCreateMetaAppResponse {
+  webitel.im.api.provider.v1.ProviderMetaApp item = 1;
+}
+
+message ProviderGetMetaAppRequest {
+  string id = 1;
+}
+
+message ProviderGetMetaAppResponse {
+  webitel.im.api.provider.v1.ProviderMetaApp item = 1;
+}
+
+message ProviderUpdateMetaAppRequest {
+  string id = 1;
+  string name = 2;
+  string app_secret = 3;
+  string oauth_redirect_uri = 4;
+  repeated string scopes = 5;
+  string verify_token = 6;
+}
+
+message ProviderUpdateMetaAppResponse {
+  webitel.im.api.provider.v1.ProviderMetaApp item = 1;
+}
+
+message ProviderDeleteMetaAppRequest {
+  string id = 1;
+}
+
+message ProviderDeleteMetaAppResponse {
+  webitel.im.api.provider.v1.ProviderMetaApp item = 1;
+}
+
+// --- Meta OAuth ---
+
+message ProviderMetaOAuthStartRequest {
+  string meta_app_id = 1;
+  repeated string extra_scopes = 2;
+}
+
+message ProviderMetaOAuthStartResponse {
+  string auth_url = 1;
+  string state = 2;
+}
+
+message ProviderMetaOAuthCallbackRequest {
+  string meta_app_id = 1;
+  string code = 2;
+  string state = 3;
+}
+
+message ProviderMetaOAuthCallbackResponse {
+  string user_access_token = 1;
+  repeated ProviderMetaLinkedPage pages = 2;
+}
+
+message ProviderMetaLinkedPage {
+  string page_id = 1;
+  string page_name = 2;
+  string access_token = 3;
+  string platform = 4;
+}
+
+// --- Facebook Gate ---
+
+message ProviderCreateFacebookGateRequest {
+  string name = 1;
+  string meta_app_id = 2;
+  Peer peer = 3;
+  string page_id = 4;
+  string page_token = 5;
+  bool enabled = 6;
+}
+
+message ProviderCreateFacebookGateResponse {
+  webitel.im.api.provider.v1.ProviderFacebookGate item = 1;
+}
+
+message ProviderGetFacebookGateRequest { string id = 1; }
+message ProviderGetFacebookGateResponse { webitel.im.api.provider.v1.ProviderFacebookGate item = 1; }
+
+message ProviderUpdateFacebookGateRequest {
+  string id = 1;
+  string name = 2;
+  Peer peer = 3;
+  string page_token = 4;
+  bool enabled = 5;
+}
+
+message ProviderUpdateFacebookGateResponse {
+  webitel.im.api.provider.v1.ProviderFacebookGate item = 1;
+}
+
+message ProviderDeleteFacebookGateRequest { string id = 1; }
+message ProviderDeleteFacebookGateResponse { webitel.im.api.provider.v1.ProviderFacebookGate item = 1; }
+
+// --- WhatsApp Gate ---
+
+message ProviderCreateWhatsAppGateRequest {
+  string name = 1;
+  string meta_app_id = 2;
+  string waba_id = 3;
+  string phone_number_id = 4;
+  string access_token = 5;
+}
+
+message ProviderCreateWhatsAppGateResponse {
+  webitel.im.api.provider.v1.ProviderWhatsAppGate item = 1;
+}
+
+message ProviderGetWhatsAppGateRequest { string id = 1; }
+message ProviderGetWhatsAppGateResponse { webitel.im.api.provider.v1.ProviderWhatsAppGate item = 1; }
+
+message ProviderUpdateWhatsAppGateRequest {
+  string id = 1;
+  string name = 2;
+  string access_token = 3;
+}
+
+message ProviderUpdateWhatsAppGateResponse {
+  webitel.im.api.provider.v1.ProviderWhatsAppGate item = 1;
+}
+
+message ProviderDeleteWhatsAppGateRequest { string id = 1; }
+message ProviderDeleteWhatsAppGateResponse { webitel.im.api.provider.v1.ProviderWhatsAppGate item = 1; }
+
+// --- Gate List ---
+
+message ProviderListGatesRequest {
+  int32 page = 1;
+  int32 size = 2;
+  repeated webitel.im.api.provider.v1.ProviderType types = 3;
+  webitel.im.api.provider.v1.ProviderStatus status = 4;
+  string q = 5;
+}
+
+message ProviderListGatesResponse {
+  repeated webitel.im.api.provider.v1.ProviderSummary items = 1;
+  int32 page = 2;
+  int32 size = 3;
+  bool next = 4;
+}

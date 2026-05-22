@@ -4,6 +4,7 @@ package webitel.im.api.gateway.v1;
 
 // Import for HTTP annotations
 import "google/api/annotations.proto";
+import "api/gateway/v1/via.proto";
 
 // Use a descriptive alias for the Go package to avoid naming collisions
 option go_package = "github.com/webitel/im-gateway-service/gen/api/gateway/v1;gateway";
@@ -17,6 +18,9 @@ service Contacts {
       get: "/v1/contacts"
     };
   }
+
+  // Create new contact ; ONLY for im-provider service ; NOT for external API
+  rpc Create(CreateContactRequest) returns (Contact) {}
 }
 // SearchRequest defines filters and pagination parameters for the contact lookup.
 message SearchContactRequest {
@@ -41,6 +45,23 @@ message SearchContactRequest {
   repeated string subjects = 10;
 
   optional bool only_bots = 11;
+}
+
+message CreateContactRequest {
+  // Issuer of the Contact
+  string iss_id = 1;
+  string app_id = 2;
+  // Type of the Contact
+  string type = 3;
+  // Display name
+  string name = 4;
+  // Username unique inside issuer
+  string username = 5;
+  // Optional metadata
+  map<string, string> metadata = 6;
+  string subject = 7;
+  int32 domain_id = 8;
+  bool is_bot = 9;
 }
 
 // SearchList represents a paginated collection of Contact entities.
@@ -87,4 +108,6 @@ string sub = 9;
 
 // Represents if usere is real person or automatic script.
 bool is_bot = 10;
+
+repeated webitel.im.api.gateway.v1.Via vias = 11;
 }

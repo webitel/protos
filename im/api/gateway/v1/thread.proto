@@ -25,6 +25,10 @@ service ThreadManagement {
     };
   };
 
+  // Returns a single thread by its identifier.
+  rpc Get(GetThreadRequest) returns (Thread) {
+    option (google.api.http) = {get: "/v1/threads/{id}"};
+  }
   // Add member to the thread.
   rpc AddMember(AddMemberRequest) returns (AddMemberResponse) {
     option (google.api.http) = {
@@ -35,6 +39,15 @@ service ThreadManagement {
   // Remove member from the thread.
   rpc RemoveMember(RemoveMemberRequest) returns (RemoveMemberResponse) {
     option (google.api.http) = {delete: "/v1/threads/{thread_id}/members/{member_id}"};
+  }
+
+  // Transfer unites add member and remove member.
+  // It adds a new member to the thread and removes the initiator from the thread.
+  rpc Transfer(TransferRequest) returns (TransferResponse) {
+    option (google.api.http) = {
+      post: "/v1/threads/{thread_id}/transfer"
+      body: "*"
+    };
   }
 
   // Sets or updates variables for a specific thread.
@@ -64,7 +77,7 @@ service ThreadManagement {
   rpc FlushVariables(FlushVariablesRequest) returns (ThreadVariables) {
     option (google.api.http) = {
       delete: "/v1/threads/{thread_id}/variables/flush"
-      body: "*"
+      body  : "*"
     };
   }
 }
@@ -165,6 +178,21 @@ message ThreadSearchRequest {
 
   // Page number (1-based).
   int32 page = 8;
+
+  // Filter threads by participant contact IDs.
+  repeated string contact_ids = 9 [(buf.validate.field).repeated.items.string.uuid = true];
+}
+
+// GetThreadRequest defines parameters for retrieving a single thread by ID.
+message GetThreadRequest {
+  // Unique thread identifier.
+  string id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  // List of fields to include in the response.
+  repeated string fields = 2;
 }
 
 // SearchThreadResponse contains the list of threads
@@ -267,6 +295,24 @@ message RemoveMemberRequest {
 }
 
 message RemoveMemberResponse {}
+
+message TransferRequest{
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  PeerIdentity contact = 2 [(buf.validate.field).required = true];
+
+  ThreadRole role = 3 [
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).required = true
+  ];
+}
+
+message TransferResponse {
+  ThreadMember member = 1;
+}
 
 // #region Thread Variables
 

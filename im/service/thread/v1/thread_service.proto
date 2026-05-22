@@ -24,10 +24,19 @@ service ThreadManagement {
 
   // Creates a new group thread.
   // The creator becomes the owner of the thread.
+    // Returns a single thread by its identifier.
+  rpc Get(GetThreadRequest) returns (Thread);
+
+    // Creates a new group thread.
+    // The creator becomes the owner of the thread.
   rpc CreateGroup(CreateGroupRequest) returns (Thread);
 
   // Adds a new member to an existing thread.
   rpc AddMember(AddMemberRequest) returns (AddMemberResponse);
+
+  // Transfer unites add member and remove member.
+  // It adds a new member to the thread and removes the initiator from the thread in one atomic operation.
+  rpc Transfer(TransferRequest) returns (TransferResponse);
 
   // Removes a member from a thread.
   rpc RemoveMember(RemoveMemberRequest) returns (RemoveMemberResponse);
@@ -162,6 +171,25 @@ message ThreadSearchRequest {
   ];
 }
 
+// GetThreadRequest defines parameters for retrieving a single thread.
+message GetThreadRequest {
+
+    // Unique thread identifier.
+  string id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+    // Domain identifier to filter by.
+  int32 domain_id = 2 [
+    (buf.validate.field).int32.gt = 0,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+
+    // List of fields to include in the response.
+  repeated string fields = 3;
+}
+
 // SearchThreadResponse contains the list of threads
 // and pagination metadata.
 message SearchThreadResponse {
@@ -254,19 +282,19 @@ message ThreadSettings {
 // required to create a new group thread.
 message CreateGroupRequest {
 
-    // Subject (title) of the group thread.
-    // Must be non-empty.
+  // Subject (title) of the group thread.
+  // Must be non-empty.
   string subject = 1[
     (buf.validate.field).string = {min_len: 1, max_len: 255}
   ];
 
-    // Optional description of the group thread.
+  // Optional description of the group thread.
   string description = 2[
     (buf.validate.field).string.max_len = 1024
   ];
 
-    // List of user IDs to be added as initial members
-    // of the group thread.
+  // List of user IDs to be added as initial members
+  // of the group thread.
   repeated string member_ids = 3[
     (buf.validate.field).repeated.items.string.uuid = true
   ];
@@ -313,7 +341,33 @@ message RemoveMemberRequest {
 
 message RemoveMemberResponse {
 }
-//#endregion
+
+message TransferRequest{
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  string initiator_contact_id = 2 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  string new_member_contact_id= 3 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+
+  ];
+
+  ThreadRole role = 4 [
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).required = true
+  ];
+}
+
+message TransferResponse {
+  ThreadMember member = 1;
+}
 
 // #region Thread Variables
 

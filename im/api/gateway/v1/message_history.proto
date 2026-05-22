@@ -6,6 +6,7 @@ import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/struct.proto";
 import "api/gateway/v1/thread_member.proto";
+import "api/gateway/v1/message.proto";
 
 option go_package = "github.com/webitel/im-gateway-service/gen/api/gateway/v1;gateway";
 
@@ -17,7 +18,7 @@ service MessageHistory {
   // Supports cursor-based pagination and field selection.
   rpc SearchThreadMessagesHistory(SearchMessageHistoryRequest) returns (SearchMessageHistoryResponse) {
     option (google.api.http) = {
-      get: "/v1/{thread_id}/messages"
+      get: "/v1/threads/{thread_id}/messages"
     };
   }
 }
@@ -210,6 +211,10 @@ message HistoryMessage {
 
   // List of image attachments.
   repeated Image images = 10;
+
+  MessageContact contact = 11;
+  MessageLocation location = 12;
+  Interactive interactive =13;
 }
 
 // SearchMessageHistoryResponse contains
@@ -224,4 +229,17 @@ message SearchMessageHistoryResponse {
 
   // Cursor that represents position to get newest messages (used with 'before' param).
   HistoryMessageCursorResponse prev_cursor = 3;
+}
+
+message MessageContact {
+    optional string name =1;
+    optional string email = 2;
+    optional string phone = 3;
+}
+
+message MessageLocation {
+    double longitude = 1;
+   double latitude = 2;
+  optional string address = 3;
+ optional string name =4;
 }
