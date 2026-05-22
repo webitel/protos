@@ -18,6 +18,13 @@ service ThreadManagement {
     option (google.api.http) = {get: "/v1/threads"};
   }
 
+  // Search threads that the caller has left from
+  rpc SearchLeft(SearchLeftRequest) returns (SearchLeftResponse) {
+    option (google.api.http) = {
+      get: "/v1/threads/left"
+    };
+  };
+
   // Returns a single thread by its identifier.
   rpc Get(GetThreadRequest) returns (Thread) {
     option (google.api.http) = {get: "/v1/threads/{id}"};
@@ -192,6 +199,50 @@ message GetThreadRequest {
 // and pagination metadata.
 message SearchThreadResponse {
   // List of threads matching the search criteria.
+  repeated Thread items = 1;
+
+  // Indicates whether there is a next page available.
+  bool next = 2;
+}
+
+message SearchLeftRequest {
+  // List of fields that should be returned in the response.
+  // If empty, a default set of fields is returned.
+  // Used for response optimization.
+  repeated string fields = 1;
+
+  // Filter threads by their kinds
+  repeated ThreadKind types = 2 [
+    (buf.validate.field).repeated.items.enum = {
+      defined_only: true
+      not_in: 0
+    }
+  ];
+
+  // Sorting field.
+  // Optional "+" or "-" prefix indicates ascending or descending order.
+  // Example: "-created_at", "subject"
+  string sort = 3 [
+    (buf.validate.field).string.pattern = "^[+-]?[a-z_]+$",
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+
+  // Maximum number of threads to return per page.
+  // Must be greater than 0 and less than or equal to 100.
+  int32 size = 4 [
+    (buf.validate.field).int32 = {gt: 0, lte: 100},
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+
+  // Page number (1-based).
+  int32 page = 5 [
+    (buf.validate.field).int32.gte = 1,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+}
+
+message SearchLeftResponse {
+  // Threads in which the caller was previously a member, but has left.
   repeated Thread items = 1;
 
   // Indicates whether there is a next page available.
