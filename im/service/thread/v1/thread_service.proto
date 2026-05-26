@@ -144,14 +144,20 @@ message ThreadSearchRequest {
     (buf.validate.field).string = {min_len: 0, max_len: 256}
   ];
 
-    // Filter threads where specified users are members.
-  repeated string member_ids = 7 [
+  // ID of the caller
+  string self_id = 7 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+
+  // Filter threads where specified users are members.
+  repeated string member_ids = 8 [
     (buf.validate.field).repeated.items.string.uuid = true
   ];
 
     // Maximum number of threads to return per page.
     // Must be greater than 0 and less than or equal to 100.
-  int32 size = 8 [
+  int32 size = 9 [
     (buf.validate.field).int32 = {gt: 0, lte: 100},
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
@@ -159,13 +165,13 @@ message ThreadSearchRequest {
     // Sorting field.
     // Optional "+" or "-" prefix indicates ascending or descending order.
     // Example: "-created_at", "subject"
-  string sort = 9 [
+  string sort = 10 [
     (buf.validate.field).string.pattern = "^[+-]?[a-z_]+$",
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
 
     // Page number (1-based).
-  int32 page = 10 [
+  int32 page = 11 [
     (buf.validate.field).int32.gte = 1,
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
