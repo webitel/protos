@@ -9,6 +9,7 @@ import "google/protobuf/wrappers.proto";
 
 import "google/api/visibility.proto";
 import "google/api/annotations.proto";
+import "google/rpc/status.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
 // message FieldQ {
@@ -73,6 +74,14 @@ service Contacts {
   rpc CreateContact(InputContactRequest) returns (Contact) {
     option (google.api.http) = {
       post: "/contacts"
+      body: "input"
+    };
+  }
+
+  // Bulk create of Contacts.
+  rpc CreateContacts(CreateContactsRequest) returns (CreateContactsBulkResponse) {
+    option (google.api.http) = {
+      post: "/contacts/bulk"
       body: "input"
     };
   }
@@ -401,6 +410,33 @@ message CreateContactsRequest {
     min_items: 1
     unique_items: true
   }];
+
+}
+
+// Bulk Create result: successfully created Contacts plus per-item failures.
+message CreateContactsBulkResponse {
+
+  // Successfully created Contacts. Position matches the corresponding
+  // InputContact position in CreateContactsRequest.input, skipping
+  // failures.
+  repeated Contact data = 1;
+
+  // Per-item failures with original index and error details.
+  repeated CreateContactError failures = 2;
+
+}
+
+// Per-item failure of a bulk Contact create.
+message CreateContactError {
+
+  // 0-based position in CreateContactsRequest.input.
+  int32 index = 1;
+
+  // The InputContact that failed.
+  InputContact input = 2;
+
+  // Standardized error (code, message, details).
+  google.rpc.Status error = 3;
 
 }
 

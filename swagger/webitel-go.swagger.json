@@ -541,6 +541,55 @@
         ]
       }
     },
+    "/contacts/bulk": {
+      "post": {
+        "summary": "Bulk create of Contacts.",
+        "operationId": "CreateContacts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/contactsCreateContactsBulkResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "input",
+            "description": "Data is a set of Contacts to be created.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/contactsInputContact"
+              }
+            }
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved into result of changes.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Contacts"
+        ]
+      }
+    },
     "/contacts/groups": {
       "get": {
         "summary": "Retrieve a list of groups or search groups",
@@ -19326,6 +19375,47 @@
         }
       },
       "description": "Contact dataset."
+    },
+    "contactsCreateContactError": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "format": "int32",
+          "description": "0-based position in CreateContactsRequest.input."
+        },
+        "input": {
+          "$ref": "#/definitions/contactsInputContact",
+          "description": "The InputContact that failed."
+        },
+        "error": {
+          "$ref": "#/definitions/rpcStatus",
+          "description": "Standardized error (code, message, details)."
+        }
+      },
+      "description": "Per-item failure of a bulk Contact create."
+    },
+    "contactsCreateContactsBulkResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitelContactsContact"
+          },
+          "description": "Successfully created Contacts. Position matches the corresponding\nInputContact position in CreateContactsRequest.input, skipping\nfailures."
+        },
+        "failures": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/contactsCreateContactError"
+          },
+          "description": "Per-item failures with original index and error details."
+        }
+      },
+      "description": "Bulk Create result: successfully created Contacts plus per-item failures."
     },
     "contactsCreateDynamicGroupRequest": {
       "type": "object",
