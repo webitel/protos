@@ -16788,6 +16788,54 @@
         }
       }
     },
+    "/contacts/bulk": {
+      "post": {
+        "tags": [
+          "Contacts"
+        ],
+        "summary": "Bulk create of Contacts.",
+        "operationId": "CreateContacts",
+        "parameters": [
+          {
+            "description": "Data is a set of Contacts to be created.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/contactsInputContact"
+              }
+            }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved into result of changes.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/contactsCreateContactsBulkResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        }
+      }
+    },
     "/contacts/groups": {
       "get": {
         "tags": [
@@ -45946,6 +45994,47 @@
           "description": "The page number of the partial result.",
           "type": "integer",
           "format": "int32"
+        }
+      }
+    },
+    "contactsCreateContactError": {
+      "description": "Per-item failure of a bulk Contact create.",
+      "type": "object",
+      "properties": {
+        "error": {
+          "description": "Standardized error (code, message, details).",
+          "$ref": "#/definitions/rpcStatus"
+        },
+        "index": {
+          "description": "0-based position in CreateContactsRequest.input.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "input": {
+          "description": "The InputContact that failed.",
+          "$ref": "#/definitions/contactsInputContact"
+        }
+      }
+    },
+    "contactsCreateContactsBulkResponse": {
+      "description": "Bulk Create result: successfully created Contacts plus per-item failures.",
+      "type": "object",
+      "properties": {
+        "data": {
+          "description": "Successfully created Contacts. Position matches the corresponding\nInputContact position in CreateContactsRequest.input, skipping\nfailures.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitelContactsContact"
+          }
+        },
+        "failures": {
+          "description": "Per-item failures with original index and error details.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/contactsCreateContactError"
+          }
         }
       }
     },
