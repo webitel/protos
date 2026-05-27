@@ -3,13 +3,13 @@ syntax = "proto3";
 package webitel.im.provider.v1;
 
 import "google/api/annotations.proto";
-import "service/provider/v1/enums.proto"; 
+import "service/provider/v1/enums.proto";
 
 option go_package = "github.com/webitel/im-provider-service/gen/go/api/v1;impb";
 
 // InboundMessageService handles incoming messages from external platforms.
 service ProviderMessageService {
-  
+
   // SendText delivers a plain text message to the external chat partner.
   rpc SendText(ProviderSendTextRequest) returns (ProviderSendMessageResponse) {
     option (google.api.http) = {
@@ -17,7 +17,7 @@ service ProviderMessageService {
       body: "*"
     };
   }
-  
+
   // SendDocument delivers file attachments to the external chat partner.
   rpc SendDocument(ProviderSendDocumentRequest) returns (ProviderSendMessageResponse) {
     option (google.api.http) = {
@@ -60,7 +60,8 @@ message ProviderSendTextRequest {
   string gate_id = 2; // Internal ID of the specific configured gateway
   string external_user_id = 3; // Recipient's platform-specific identifier
   string text = 4; // The textual content of the message
-  
+  int32 domain_id = 5;
+
   map<string, string> metadata = 10; // Optional platform-specific parameters
 }
 
@@ -71,6 +72,7 @@ message ProviderSendDocumentRequest {
   string external_user_id = 3;
   repeated ProviderFile documents = 4;
   string caption = 5; // Optional text accompanying the file
+  int32 domain_id = 6;
 }
 
 // ProviderSendImageRequest sends an image with an optional caption.
@@ -80,4 +82,5 @@ message ProviderSendImageRequest {
   string external_user_id = 3;
   repeated ProviderFile images = 4;
   string caption = 5;
+  int32 domain_id = 6;
 }
