@@ -23,12 +23,6 @@
       "name": "Permissions"
     },
     {
-      "name": "OAuth2"
-    },
-    {
-      "name": "SA"
-    },
-    {
       "name": "Users"
     },
     {
@@ -39,6 +33,12 @@
     },
     {
       "name": "AccessStore"
+    },
+    {
+      "name": "OAuth2"
+    },
+    {
+      "name": "SA"
     },
     {
       "name": "Auth"
@@ -11635,6 +11635,13 @@
             "type": "string"
           },
           {
+            "name": "extension",
+            "description": "OPTIONAL. SIP (phone) number i.e. extension.\nSIP Device will be auto-assigned ONLY if [number] specified.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "scope",
             "description": "scope request control",
             "in": "query",
@@ -16373,12 +16380,18 @@
           "title": "user entity to be created"
         },
         "user_password": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         },
         "confirm_password": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
+        },
+        "generate_device": {
+          "type": "boolean",
+          "title": "Generate credentials \u0026 assign SIP [device] for NEW [user]"
+        },
+        "device": {
+          "$ref": "#/definitions/apiInputUserDevice",
+          "title": "SIP Device template options"
         }
       }
     },
@@ -16868,6 +16881,28 @@
         }
       },
       "description": "Input of the User profile for Create/Update operations.\nMirrors `User` field numbers 1:1 (wire-compatible), but excludes\nsystem-managed read-only fields (id, audit metadata)."
+    },
+    "apiInputUserDevice": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "SIP display name"
+        },
+        "account": {
+          "type": "string",
+          "title": "SIP auth-id"
+        },
+        "password": {
+          "type": "string",
+          "title": "SIP password"
+        },
+        "generate_password": {
+          "type": "boolean",
+          "title": "[re]generate SIP password ?"
+        }
+      },
+      "title": "InputUserDevice options to generate SIP device for NEW user"
     },
     "apiLDAPCatalog": {
       "type": "object",
