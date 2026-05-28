@@ -8,7 +8,7 @@ import "oid.proto";
 import "presence.proto";
 import "customers.proto";
 import "permission.proto";
-import "auth.proto";
+// import "auth.proto";
 import "warnings.proto";
 import "google/api/annotations.proto";
 
@@ -187,10 +187,22 @@ message InputUser {
     bool force_password_change = 27;
 }
 
+// InputUserDevice options to generate SIP device for NEW user
+message InputUserDevice {
+  string name = 1;            // SIP display name
+  string account = 2;         // SIP auth-id
+  string password = 3;        // SIP password
+  bool generate_password = 4; // [re]generate SIP password ?
+}
+
 message CreateUserRequest {
     InputUser user = 1; // user entity to be created
     string user_password = 2;
     string confirm_password = 3;
+    // Generate credentials & assign SIP [device] for NEW [user]
+    bool generate_device = 4;
+    // SIP Device template options
+    InputUserDevice device = 5;
 }
 
 message CreateUserResponse {
