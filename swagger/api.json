@@ -12175,7 +12175,7 @@
           "CaseComments"
         ],
         "summary": "Delete a specific comment by its etag",
-        "operationId": "DeleteCommentMixin5",
+        "operationId": "DeleteComment",
         "parameters": [
           {
             "type": "string",
@@ -12217,7 +12217,7 @@
           "CaseComments"
         ],
         "summary": "Update a specific comment by its etag",
-        "operationId": "UpdateCommentMixin5",
+        "operationId": "UpdateComment",
         "parameters": [
           {
             "type": "string",
@@ -12416,6 +12416,11 @@
           {
             "type": "string",
             "name": "format",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "separator",
             "in": "query"
           }
         ],
@@ -13989,7 +13994,7 @@
           "CaseComments"
         ],
         "summary": "Publish comment into a specific case",
-        "operationId": "PublishCommentMixin5",
+        "operationId": "PublishComment",
         "parameters": [
           {
             "type": "string",
@@ -14755,7 +14760,7 @@
         "tags": [
           "CaseTimeline"
         ],
-        "operationId": "GetTimelineMixin5",
+        "operationId": "GetTimeline",
         "parameters": [
           {
             "type": "string",
@@ -14851,7 +14856,7 @@
         "tags": [
           "CaseTimeline"
         ],
-        "operationId": "GetTimelineCounterMixin5",
+        "operationId": "GetTimelineCounter",
         "parameters": [
           {
             "type": "string",
@@ -16783,6 +16788,54 @@
         }
       }
     },
+    "/contacts/bulk": {
+      "post": {
+        "tags": [
+          "Contacts"
+        ],
+        "summary": "Bulk create of Contacts.",
+        "operationId": "CreateContacts",
+        "parameters": [
+          {
+            "description": "Data is a set of Contacts to be created.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/contactsInputContact"
+              }
+            }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Fields to be retrieved into result of changes.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/contactsCreateContactsBulkResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        }
+      }
+    },
     "/contacts/groups": {
       "get": {
         "tags": [
@@ -18148,7 +18201,7 @@
           "Comments"
         ],
         "summary": "Publish comment for a Contact.",
-        "operationId": "PublishComment",
+        "operationId": "PublishComment_Comments",
         "parameters": [
           {
             "type": "string",
@@ -18199,7 +18252,7 @@
           "Comments"
         ],
         "summary": "Update (edit) specific Comment text owned",
-        "operationId": "UpdateComment",
+        "operationId": "UpdateComment_Comments",
         "parameters": [
           {
             "type": "string",
@@ -18276,7 +18329,7 @@
           "Comments"
         ],
         "summary": "Delete Comment(s) for Contact ...",
-        "operationId": "DeleteComment",
+        "operationId": "DeleteComment_Comments",
         "parameters": [
           {
             "type": "string",
@@ -21661,7 +21714,7 @@
         "tags": [
           "Timeline"
         ],
-        "operationId": "GetTimeline",
+        "operationId": "GetTimeline_Timeline",
         "parameters": [
           {
             "type": "string",
@@ -21757,7 +21810,7 @@
         "tags": [
           "Timeline"
         ],
-        "operationId": "GetTimelineCounter",
+        "operationId": "GetTimelineCounter_Timeline",
         "parameters": [
           {
             "type": "string",
@@ -25501,7 +25554,7 @@
         }
       }
     },
-    "/im/gates/facebook/{id}": {
+    "/im/gates/facebook/{id_1}": {
       "get": {
         "tags": [
           "webitel.im.provider.v1.FacebookService"
@@ -25511,7 +25564,7 @@
         "parameters": [
           {
             "type": "string",
-            "name": "id",
+            "name": "id_1",
             "in": "path",
             "required": true
           }
@@ -25540,7 +25593,7 @@
         "parameters": [
           {
             "type": "string",
-            "name": "id",
+            "name": "id_1",
             "in": "path",
             "required": true
           }
@@ -25569,7 +25622,7 @@
         "parameters": [
           {
             "type": "string",
-            "name": "id",
+            "name": "id_1",
             "in": "path",
             "required": true
           },
@@ -25587,6 +25640,100 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/webitel.im.provider.v1.ProviderUpdateFacebookGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/im/gates/facebook/{id}": {
+      "get": {
+        "tags": [
+          "webitel.im.api.provider.v1.FacebookService"
+        ],
+        "operationId": "FacebookService_GetFacebookGate_webitel.im.api.provider.v1.FacebookService",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderGetFacebookGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "webitel.im.api.provider.v1.FacebookService"
+        ],
+        "operationId": "FacebookService_DeleteFacebookGate_webitel.im.api.provider.v1.FacebookService",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderDeleteFacebookGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "webitel.im.api.provider.v1.FacebookService"
+        ],
+        "operationId": "FacebookService_UpdateFacebookGate_webitel.im.api.provider.v1.FacebookService",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.FacebookService.UpdateFacebookGateBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderUpdateFacebookGateResponse"
             }
           },
           "default": {
@@ -25632,7 +25779,7 @@
         }
       }
     },
-    "/im/gates/whatsapp/{id}": {
+    "/im/gates/whatsapp/{id_1}": {
       "get": {
         "tags": [
           "webitel.im.provider.v1.WhatsAppService"
@@ -25642,7 +25789,7 @@
         "parameters": [
           {
             "type": "string",
-            "name": "id",
+            "name": "id_1",
             "in": "path",
             "required": true
           }
@@ -25671,7 +25818,7 @@
         "parameters": [
           {
             "type": "string",
-            "name": "id",
+            "name": "id_1",
             "in": "path",
             "required": true
           }
@@ -25700,7 +25847,7 @@
         "parameters": [
           {
             "type": "string",
-            "name": "id",
+            "name": "id_1",
             "in": "path",
             "required": true
           },
@@ -25718,6 +25865,100 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/webitel.im.provider.v1.ProviderUpdateWhatsAppGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/im/gates/whatsapp/{id}": {
+      "get": {
+        "tags": [
+          "webitel.im.api.provider.v1.WhatsAppService"
+        ],
+        "operationId": "WhatsAppService_GetWhatsAppGate_webitel.im.api.provider.v1.WhatsAppService",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderGetWhatsAppGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "webitel.im.api.provider.v1.WhatsAppService"
+        ],
+        "operationId": "WhatsAppService_DeleteWhatsAppGate_webitel.im.api.provider.v1.WhatsAppService",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderDeleteWhatsAppGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "webitel.im.api.provider.v1.WhatsAppService"
+        ],
+        "operationId": "WhatsAppService_UpdateWhatsAppGate_webitel.im.api.provider.v1.WhatsAppService",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.WhatsAppService.UpdateWhatsAppGateBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderUpdateWhatsAppGateResponse"
             }
           },
           "default": {
@@ -25763,7 +26004,7 @@
         }
       }
     },
-    "/im/meta-apps/{id}": {
+    "/im/meta-apps/{id_1}": {
       "get": {
         "tags": [
           "webitel.im.provider.v1.MetaAppService"
@@ -25773,7 +26014,7 @@
         "parameters": [
           {
             "type": "string",
-            "name": "id",
+            "name": "id_1",
             "in": "path",
             "required": true
           }
@@ -25802,7 +26043,7 @@
         "parameters": [
           {
             "type": "string",
-            "name": "id",
+            "name": "id_1",
             "in": "path",
             "required": true
           }
@@ -25832,7 +26073,7 @@
           {
             "type": "string",
             "description": "The internal ID of the MetaApp record",
-            "name": "id",
+            "name": "id_1",
             "in": "path",
             "required": true
           },
@@ -25861,7 +26102,101 @@
         }
       }
     },
-    "/im/meta-apps/{meta_app_id}/oauth/callback": {
+    "/im/meta-apps/{id}": {
+      "get": {
+        "tags": [
+          "webitel.im.api.provider.v1.MetaAppService"
+        ],
+        "operationId": "MetaAppService_GetMetaApp_webitel.im.api.provider.v1.MetaAppService",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderGetMetaAppResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "webitel.im.api.provider.v1.MetaAppService"
+        ],
+        "operationId": "MetaAppService_DeleteMetaApp_webitel.im.api.provider.v1.MetaAppService",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderDeleteMetaAppResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "webitel.im.api.provider.v1.MetaAppService"
+        ],
+        "operationId": "MetaAppService_UpdateMetaApp_webitel.im.api.provider.v1.MetaAppService",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.MetaAppService.UpdateMetaAppBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderUpdateMetaAppResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/im/meta-apps/{meta_app_id_1}/oauth/callback": {
       "post": {
         "tags": [
           "webitel.im.provider.v1.MetaOAuthService"
@@ -25871,7 +26206,7 @@
         "parameters": [
           {
             "type": "string",
-            "name": "meta_app_id",
+            "name": "meta_app_id_1",
             "in": "path",
             "required": true
           },
@@ -25900,7 +26235,7 @@
         }
       }
     },
-    "/im/meta-apps/{meta_app_id}/oauth/start": {
+    "/im/meta-apps/{meta_app_id_1}/oauth/start": {
       "post": {
         "tags": [
           "webitel.im.provider.v1.MetaOAuthService"
@@ -25911,7 +26246,7 @@
           {
             "type": "string",
             "description": "Internal ID of the MetaApp to use for this flow",
-            "name": "meta_app_id",
+            "name": "meta_app_id_1",
             "in": "path",
             "required": true
           },
@@ -25929,6 +26264,82 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/webitel.im.provider.v1.ProviderMetaOAuthStartResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/im/meta-apps/{meta_app_id}/oauth/callback": {
+      "post": {
+        "tags": [
+          "webitel.im.api.provider.v1.MetaOAuthService"
+        ],
+        "operationId": "MetaOAuthService_MetaOAuthCallback_webitel.im.api.provider.v1.MetaOAuthService",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "meta_app_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.MetaOAuthService.MetaOAuthCallbackBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderMetaOAuthCallbackResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/im/meta-apps/{meta_app_id}/oauth/start": {
+      "post": {
+        "tags": [
+          "webitel.im.api.provider.v1.MetaOAuthService"
+        ],
+        "operationId": "MetaOAuthService_StartMetaOAuth_webitel.im.api.provider.v1.MetaOAuthService",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "meta_app_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.MetaOAuthService.StartMetaOAuthBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderMetaOAuthStartResponse"
             }
           },
           "default": {
@@ -31341,7 +31752,7 @@
         "tags": [
           "FTSService"
         ],
-        "operationId": "SearchMixin6",
+        "operationId": "Search",
         "parameters": [
           {
             "type": "integer",
@@ -31745,6 +32156,12 @@
             "type": "string",
             "description": "user password",
             "name": "password",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "OPTIONAL. SIP (phone) number i.e. extension.\nSIP Device will be auto-assigned ONLY if [number] specified.",
+            "name": "extension",
             "in": "query"
           },
           {
@@ -35785,7 +36202,7 @@
           "Types"
         ],
         "summary": "Lookup data types registry.",
-        "operationId": "SearchMixin3",
+        "operationId": "Search_Types",
         "parameters": [
           {
             "type": "string",
@@ -36079,7 +36496,7 @@
           "Dictionaries"
         ],
         "summary": "Locate the dictionary type.",
-        "operationId": "LocateTypeMixin3",
+        "operationId": "LocateType",
         "parameters": [
           {
             "type": "string",
@@ -36110,7 +36527,7 @@
           "Dictionaries"
         ],
         "summary": "Update custom dictionary.",
-        "operationId": "UpdateTypeMixin3",
+        "operationId": "UpdateType",
         "parameters": [
           {
             "type": "string",
@@ -36160,7 +36577,7 @@
           "Dictionaries"
         ],
         "summary": "Create custom dictionary.",
-        "operationId": "CreateTypeMixin3",
+        "operationId": "CreateType",
         "parameters": [
           {
             "type": "string",
@@ -36202,7 +36619,7 @@
           "Extensions"
         ],
         "summary": "Search for type extensions.",
-        "operationId": "SearchTypeMixin3",
+        "operationId": "SearchType_Extensions",
         "parameters": [
           {
             "type": "integer",
@@ -36326,7 +36743,7 @@
           "Extensions"
         ],
         "summary": "Type extension details.",
-        "operationId": "LocateType",
+        "operationId": "LocateType_Extensions",
         "parameters": [
           {
             "type": "string",
@@ -36357,7 +36774,7 @@
           "Extensions"
         ],
         "summary": "Update type extension.",
-        "operationId": "UpdateType",
+        "operationId": "UpdateType_Extensions",
         "parameters": [
           {
             "type": "string",
@@ -36396,7 +36813,7 @@
           "Extensions"
         ],
         "summary": "Create type extension.",
-        "operationId": "CreateType",
+        "operationId": "CreateType_Extensions",
         "parameters": [
           {
             "type": "string",
@@ -36436,7 +36853,7 @@
           "Extensions"
         ],
         "summary": "Delete extension for types.",
-        "operationId": "DeleteTypeMixin3",
+        "operationId": "DeleteType_Extensions",
         "parameters": [
           {
             "minItems": 1,
@@ -36946,19 +37363,60 @@
         "operationId": "CreateUser",
         "parameters": [
           {
-            "name": "body",
+            "description": "user entity to be created",
+            "name": "user",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/apiCreateUserRequest"
+              "$ref": "#/definitions/apiInputUser"
             }
+          },
+          {
+            "type": "string",
+            "name": "user_password",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "confirm_password",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Generate credentials \u0026 assign SIP [device] for NEW [user]",
+            "name": "generate_device",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "SIP display name",
+            "name": "device.name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "SIP auth-id",
+            "name": "device.account",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "SIP password",
+            "name": "device.password",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "[re]generate SIP password ?",
+            "name": "device.generate_password",
+            "in": "query"
           }
         ],
         "responses": {
           "200": {
-            "description": "A successful response.",
+            "description": "(empty)",
             "schema": {
-              "$ref": "#/definitions/apiCreateUserResponse"
+              "$ref": "#/definitions/apiUser"
             }
           },
           "default": {
@@ -37006,6 +37464,38 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/apiDeleteUsersResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        }
+      }
+    },
+    "/users/logout": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "LogoutUser2",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiLogoutUserRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiLogoutUserResponse"
             }
           },
           "default": {
@@ -37182,6 +37672,55 @@
           }
         }
       },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "UpdateUser",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "path: /users/{id}",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "body: modifications/changes",
+            "name": "user",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiInputUser"
+            }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "PATCH: partial update",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "(empty)",
+            "schema": {
+              "$ref": "#/definitions/apiUser"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        }
+      },
       "delete": {
         "tags": [
           "Users"
@@ -37227,6 +37766,55 @@
             }
           }
         }
+      },
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "UpdateUser2",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "path: /users/{id}",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "body: modifications/changes",
+            "name": "user",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiInputUser"
+            }
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "PATCH: partial update",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "(empty)",
+            "schema": {
+              "$ref": "#/definitions/apiUser"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        }
       }
     },
     "/users/{id}/logout": {
@@ -37239,6 +37827,7 @@
           {
             "type": "string",
             "format": "int64",
+            "description": "ONE  /users/{id}/logout",
             "name": "id",
             "in": "path",
             "required": true
@@ -37612,362 +38201,6 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/apiUserAccessToken"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        }
-      }
-    },
-    "/users/{user.id}": {
-      "put": {
-        "tags": [
-          "Users"
-        ],
-        "operationId": "UpdateUser",
-        "parameters": [
-          {
-            "type": "string",
-            "format": "int64",
-            "description": "Object ID",
-            "name": "user.id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "description": "body: modifications/changes",
-            "name": "user",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "title": "body: modifications/changes",
-              "properties": {
-                "chat_name": {
-                  "description": "The \"chat_name\" field is used to store the name displayed externally on the platform.\nFor example, \"chat_name\" is shown when an agent connects to chats with clients.",
-                  "type": "string"
-                },
-                "contact": {
-                  "description": "[optional] contact connected to this user",
-                  "title": "repeated Call calls = 13; // order by created_at\nrepeated Registration reged = 13; // order by register_last",
-                  "$ref": "#/definitions/apiObjectId"
-                },
-                "created_at": {
-                  "type": "string",
-                  "format": "int64",
-                  "title": "unix",
-                  "readOnly": true
-                },
-                "created_by": {
-                  "title": "user",
-                  "$ref": "#/definitions/apiUserId",
-                  "readOnly": true
-                },
-                "deleted_at": {
-                  "type": "string",
-                  "format": "int64",
-                  "title": "unix",
-                  "readOnly": true
-                },
-                "deleted_by": {
-                  "title": "user",
-                  "$ref": "#/definitions/apiUserId",
-                  "readOnly": true
-                },
-                "device": {
-                  "title": "[optional] default device assigned ? WebRTC register ?",
-                  "$ref": "#/definitions/apiObjectId"
-                },
-                "devices": {
-                  "description": "[editable] list of unique `regular` devices, attached to this user",
-                  "type": "array",
-                  "title": "map\u003cint64, string\u003e devices = 13;",
-                  "items": {
-                    "type": "object",
-                    "$ref": "#/definitions/apiObjectId"
-                  }
-                },
-                "email": {
-                  "type": "string"
-                },
-                "extension": {
-                  "type": "string",
-                  "title": "Caller-ID-Number:"
-                },
-                "force_password_change": {
-                  "description": "When set to true, the user will be required to change their password on next login.",
-                  "type": "boolean"
-                },
-                "hotdesks": {
-                  "type": "array",
-                  "title": "[readonly] list of unique `hotdesk` devices, assigned to this user",
-                  "items": {
-                    "type": "object",
-                    "$ref": "#/definitions/apiObjectId"
-                  }
-                },
-                "license": {
-                  "type": "array",
-                  "title": "list of unique licenses, granted to this user",
-                  "items": {
-                    "type": "object",
-                    "$ref": "#/definitions/apiLicenseUser"
-                  }
-                },
-                "name": {
-                  "type": "string",
-                  "title": "Caller-ID-Name: Display Name"
-                },
-                "password": {
-                  "type": "string"
-                },
-                "permissions": {
-                  "type": "array",
-                  "title": "set of operational permission grants",
-                  "items": {
-                    "type": "object",
-                    "$ref": "#/definitions/apiPermission"
-                  }
-                },
-                "presence": {
-                  "description": "string presence = 7; // unique set of \u003cuser\u003e presentity \u003cstatus:basic\u003e tuples open[ed]\n string status = 8; // short display status (short description)",
-                  "title": "CallerId caller = 5; // extension\nPresenceStatus presence = 8;",
-                  "$ref": "#/definitions/apiUserPresence"
-                },
-                "profile": {
-                  "type": "object",
-                  "title": "list of variables, assigned to this user as an environment unit",
-                  "additionalProperties": {
-                    "type": "string"
-                  }
-                },
-                "roles": {
-                  "type": "array",
-                  "title": "roles, member of which is this user",
-                  "items": {
-                    "type": "object",
-                    "$ref": "#/definitions/apiObjectId"
-                  }
-                },
-                "totp_url": {
-                  "type": "string",
-                  "title": "[readonly][optional] one time password if setting (2fa) is enabled"
-                },
-                "updated_at": {
-                  "type": "string",
-                  "format": "int64",
-                  "title": "unix",
-                  "readOnly": true
-                },
-                "updated_by": {
-                  "title": "user",
-                  "$ref": "#/definitions/apiUserId",
-                  "readOnly": true
-                },
-                "username": {
-                  "type": "string",
-                  "title": "alphanumeric username (login)"
-                }
-              }
-            }
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
-            "description": "PATCH: partial update",
-            "name": "fields",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "(empty)",
-            "schema": {
-              "$ref": "#/definitions/apiUser"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        }
-      },
-      "patch": {
-        "tags": [
-          "Users"
-        ],
-        "operationId": "UpdateUser2",
-        "parameters": [
-          {
-            "type": "string",
-            "format": "int64",
-            "description": "Object ID",
-            "name": "user.id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "description": "body: modifications/changes",
-            "name": "user",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "title": "body: modifications/changes",
-              "properties": {
-                "chat_name": {
-                  "description": "The \"chat_name\" field is used to store the name displayed externally on the platform.\nFor example, \"chat_name\" is shown when an agent connects to chats with clients.",
-                  "type": "string"
-                },
-                "contact": {
-                  "description": "[optional] contact connected to this user",
-                  "title": "repeated Call calls = 13; // order by created_at\nrepeated Registration reged = 13; // order by register_last",
-                  "$ref": "#/definitions/apiObjectId"
-                },
-                "created_at": {
-                  "type": "string",
-                  "format": "int64",
-                  "title": "unix",
-                  "readOnly": true
-                },
-                "created_by": {
-                  "title": "user",
-                  "$ref": "#/definitions/apiUserId",
-                  "readOnly": true
-                },
-                "deleted_at": {
-                  "type": "string",
-                  "format": "int64",
-                  "title": "unix",
-                  "readOnly": true
-                },
-                "deleted_by": {
-                  "title": "user",
-                  "$ref": "#/definitions/apiUserId",
-                  "readOnly": true
-                },
-                "device": {
-                  "title": "[optional] default device assigned ? WebRTC register ?",
-                  "$ref": "#/definitions/apiObjectId"
-                },
-                "devices": {
-                  "description": "[editable] list of unique `regular` devices, attached to this user",
-                  "type": "array",
-                  "title": "map\u003cint64, string\u003e devices = 13;",
-                  "items": {
-                    "type": "object",
-                    "$ref": "#/definitions/apiObjectId"
-                  }
-                },
-                "email": {
-                  "type": "string"
-                },
-                "extension": {
-                  "type": "string",
-                  "title": "Caller-ID-Number:"
-                },
-                "force_password_change": {
-                  "description": "When set to true, the user will be required to change their password on next login.",
-                  "type": "boolean"
-                },
-                "hotdesks": {
-                  "type": "array",
-                  "title": "[readonly] list of unique `hotdesk` devices, assigned to this user",
-                  "items": {
-                    "type": "object",
-                    "$ref": "#/definitions/apiObjectId"
-                  }
-                },
-                "license": {
-                  "type": "array",
-                  "title": "list of unique licenses, granted to this user",
-                  "items": {
-                    "type": "object",
-                    "$ref": "#/definitions/apiLicenseUser"
-                  }
-                },
-                "name": {
-                  "type": "string",
-                  "title": "Caller-ID-Name: Display Name"
-                },
-                "password": {
-                  "type": "string"
-                },
-                "permissions": {
-                  "type": "array",
-                  "title": "set of operational permission grants",
-                  "items": {
-                    "type": "object",
-                    "$ref": "#/definitions/apiPermission"
-                  }
-                },
-                "presence": {
-                  "description": "string presence = 7; // unique set of \u003cuser\u003e presentity \u003cstatus:basic\u003e tuples open[ed]\n string status = 8; // short display status (short description)",
-                  "title": "CallerId caller = 5; // extension\nPresenceStatus presence = 8;",
-                  "$ref": "#/definitions/apiUserPresence"
-                },
-                "profile": {
-                  "type": "object",
-                  "title": "list of variables, assigned to this user as an environment unit",
-                  "additionalProperties": {
-                    "type": "string"
-                  }
-                },
-                "roles": {
-                  "type": "array",
-                  "title": "roles, member of which is this user",
-                  "items": {
-                    "type": "object",
-                    "$ref": "#/definitions/apiObjectId"
-                  }
-                },
-                "totp_url": {
-                  "type": "string",
-                  "title": "[readonly][optional] one time password if setting (2fa) is enabled"
-                },
-                "updated_at": {
-                  "type": "string",
-                  "format": "int64",
-                  "title": "unix",
-                  "readOnly": true
-                },
-                "updated_by": {
-                  "title": "user",
-                  "$ref": "#/definitions/apiUserId",
-                  "readOnly": true
-                },
-                "username": {
-                  "type": "string",
-                  "title": "alphanumeric username (login)"
-                }
-              }
-            }
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
-            "description": "PATCH: partial update",
-            "name": "fields",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "(empty)",
-            "schema": {
-              "$ref": "#/definitions/apiUser"
             }
           },
           "default": {
@@ -38957,6 +39190,16 @@
             "description": "Page number (1-based).",
             "name": "page",
             "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Filter threads by participant contact IDs.",
+            "name": "contact_ids",
+            "in": "query"
           }
         ],
         "responses": {
@@ -38964,6 +39207,77 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/webitel.im.api.gateway.v1.SearchThreadResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/threads/left": {
+      "get": {
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadManagement"
+        ],
+        "summary": "Search threads that the caller has left from",
+        "operationId": "ThreadManagement_SearchLeft",
+        "parameters": [
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "List of fields that should be returned in the response.\nIf empty, a default set of fields is returned.\nUsed for response optimization.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "enum": [
+                "UNKNOWN",
+                "DIRECT",
+                "GROUP",
+                "CHANNEL"
+              ],
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Filter threads by their kinds\n\n - UNKNOWN: Unknown or unspecified thread type.\nMust not be used in valid requests.\n - DIRECT: One-to-one private thread between two users.\n - GROUP: Group thread with multiple members.\n - CHANNEL: Channel-style thread (broadcast or topic based communication).",
+            "name": "types",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Sorting field.\nOptional \"+\" or \"-\" prefix indicates ascending or descending order.\nExample: \"-created_at\", \"subject\"",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Maximum number of threads to return per page.\nMust be greater than 0 and less than or equal to 100.",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page number (1-based).",
+            "name": "page",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SearchLeftResponse"
             }
           },
           "default": {
@@ -39190,6 +39504,98 @@
         }
       }
     },
+    "/v1/threads/{thread_id}/messages": {
+      "get": {
+        "tags": [
+          "webitel.im.api.gateway.v1.MessageHistory"
+        ],
+        "summary": "Searches messages within a specific thread.\nSupports cursor-based pagination and field selection.",
+        "operationId": "MessageHistory_SearchThreadMessagesHistory",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Filter by thread IDs.",
+            "name": "thread_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "List of message fields to be returned.\nUsed to reduce payload size.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Filter by specific message IDs.",
+            "name": "ids",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Filter messages by sender user IDs.",
+            "name": "sender_ids",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "collectionFormat": "multi",
+            "description": "Filter messages by message types.",
+            "name": "types",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Cursor identifier.\nMust be a valid UUID referencing an existing message.\nDefines the starting point for pagination.",
+            "name": "cursor.id",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Pagination direction flag.\n\ntrue  -\u003e fetch newer messages (back before history)\nfalse -\u003e fetch older messages (back to older history)",
+            "name": "cursor.before",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "description": "Maximum number of messages to return.",
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SearchMessageHistoryResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/v1/threads/{thread_id}/transfer": {
       "post": {
         "tags": [
@@ -39398,291 +39804,13 @@
         }
       }
     },
-    "/v1/{thread_id_1}/messages": {
-      "get": {
-        "tags": [
-          "webitel.im.service.thread.v1.MessageHistory"
-        ],
-        "summary": "Search for messages in a thread.",
-        "operationId": "MessageHistory_SearchThreadMessagesHistory",
-        "parameters": [
-          {
-            "type": "string",
-            "name": "thread_id_1",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
-            "name": "fields",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
-            "name": "ids",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
-            "name": "sender_ids",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "collectionFormat": "multi",
-            "name": "types",
-            "in": "query"
-          },
-          {
-            "type": "integer",
-            "format": "int32",
-            "name": "domain_id",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "name": "cursor.id",
-            "in": "query"
-          },
-          {
-            "type": "boolean",
-            "name": "cursor.before",
-            "in": "query"
-          },
-          {
-            "type": "integer",
-            "format": "int64",
-            "name": "size",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.im.service.thread.v1.SearchMessageHistoryResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/google.rpc.Status"
-            }
-          }
-        }
-      }
-    },
-    "/v1/{thread_id}/dialogs/messages": {
-      "get": {
-        "tags": [
-          "webitel.im.api.gateway.v1.MessageHistory"
-        ],
-        "summary": "Searches messages grouped by the user's closed membership periods\n(\"dialogs\") within a thread. Active memberships are excluded — their\nmessages are available via SearchThreadMessagesHistory.",
-        "operationId": "MessageHistory_SearchDialogsMessagesHistory",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "Filter by thread ID.",
-            "name": "thread_id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
-            "description": "List of message fields to be returned.\nUsed to reduce payload size.",
-            "name": "fields",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
-            "description": "Filter messages by sender user IDs.",
-            "name": "sender_ids",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "collectionFormat": "multi",
-            "description": "Filter messages by message types.",
-            "name": "types",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "format": "int64",
-            "description": "Inclusive lower bound on the dialog interval (Unix time, milliseconds).\nZero means unbounded.",
-            "name": "period_from",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "format": "int64",
-            "description": "Inclusive upper bound on the dialog interval (Unix time, milliseconds).\nZero means unbounded.",
-            "name": "period_to",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "description": "Cursor identifier.\nMust be a valid UUID referencing an existing message.\nDefines the starting point for pagination.",
-            "name": "cursor.id",
-            "in": "query"
-          },
-          {
-            "type": "boolean",
-            "description": "Pagination direction flag.\n\ntrue  -\u003e fetch newer messages (back before history)\nfalse -\u003e fetch older messages (back to older history)",
-            "name": "cursor.before",
-            "in": "query"
-          },
-          {
-            "type": "integer",
-            "format": "int64",
-            "description": "Maximum number of messages to return.",
-            "name": "size",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.im.api.gateway.v1.SearchDialogsMessageHistoryResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/google.rpc.Status"
-            }
-          }
-        }
-      }
-    },
-    "/v1/{thread_id}/messages": {
-      "get": {
-        "tags": [
-          "webitel.im.api.gateway.v1.MessageHistory"
-        ],
-        "summary": "Searches messages within a specific thread.\nSupports cursor-based pagination and field selection.",
-        "operationId": "MessageHistory_SearchThreadMessagesHistoryMixin9",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "Filter by thread IDs.",
-            "name": "thread_id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
-            "description": "List of message fields to be returned.\nUsed to reduce payload size.",
-            "name": "fields",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
-            "description": "Filter by specific message IDs.",
-            "name": "ids",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
-            "description": "Filter messages by sender user IDs.",
-            "name": "sender_ids",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "collectionFormat": "multi",
-            "description": "Filter messages by message types.",
-            "name": "types",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "description": "Cursor identifier.\nMust be a valid UUID referencing an existing message.\nDefines the starting point for pagination.",
-            "name": "cursor.id",
-            "in": "query"
-          },
-          {
-            "type": "boolean",
-            "description": "Pagination direction flag.\n\ntrue  -\u003e fetch newer messages (back before history)\nfalse -\u003e fetch older messages (back to older history)",
-            "name": "cursor.before",
-            "in": "query"
-          },
-          {
-            "type": "integer",
-            "format": "int64",
-            "description": "Maximum number of messages to return.",
-            "name": "size",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.im.api.gateway.v1.SearchMessageHistoryResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/google.rpc.Status"
-            }
-          }
-        }
-      }
-    },
     "/v2/dataset/{repo}": {
       "get": {
         "tags": [
           "Records"
         ],
         "summary": "Search dataset records",
-        "operationId": "Search",
+        "operationId": "Search_Records",
         "parameters": [
           {
             "type": "string",
@@ -39867,7 +39995,7 @@
           "Records"
         ],
         "summary": "Locate dataset record",
-        "operationId": "LocateMixin3",
+        "operationId": "Locate_Records",
         "parameters": [
           {
             "type": "string",
@@ -42788,7 +42916,17 @@
       }
     },
     "UsersLogoutUserBody": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "selection": {
+          "type": "array",
+          "title": "MANY /users/logout .selection=[id,...]",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        }
+      }
     },
     "apiAccessRule": {
       "type": "object",
@@ -42892,23 +43030,6 @@
         "created": {
           "title": "entity to be created",
           "$ref": "#/definitions/apiRole"
-        }
-      }
-    },
-    "apiCreateUserRequest": {
-      "type": "object",
-      "properties": {
-        "confirm_password": {
-          "type": "string",
-          "readOnly": true
-        },
-        "user": {
-          "title": "user entity to be created",
-          "$ref": "#/definitions/apiUser"
-        },
-        "user_password": {
-          "type": "string",
-          "readOnly": true
         }
       }
     },
@@ -43302,6 +43423,122 @@
         "object": {
           "title": "string class = 2;\nint64 object = 3; // class.object.id",
           "$ref": "#/definitions/apiObjectId"
+        }
+      }
+    },
+    "apiInputUser": {
+      "description": "Input of the User profile for Create/Update operations.\nMirrors `User` field numbers 1:1 (wire-compatible), but excludes\nsystem-managed read-only fields (id, audit metadata).",
+      "type": "object",
+      "properties": {
+        "chat_name": {
+          "description": "The \"chat_name\" field is used to store the name displayed externally on the platform.\nFor example, \"chat_name\" is shown when an agent connects to chats with clients.",
+          "type": "string"
+        },
+        "contact": {
+          "title": "[optional] contact connected to this user",
+          "$ref": "#/definitions/apiObjectId"
+        },
+        "device": {
+          "title": "[optional] default device assigned",
+          "$ref": "#/definitions/apiObjectId"
+        },
+        "devices": {
+          "type": "array",
+          "title": "[editable] list of unique `regular` devices, attached to this user",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/apiObjectId"
+          }
+        },
+        "email": {
+          "type": "string"
+        },
+        "extension": {
+          "type": "string",
+          "title": "Caller-ID-Number:"
+        },
+        "force_password_change": {
+          "description": "When set to true, the user will be required to change their password on next login.",
+          "type": "boolean"
+        },
+        "hotdesks": {
+          "type": "array",
+          "title": "[readonly] list of unique `hotdesk` devices, assigned to this user",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/apiObjectId"
+          }
+        },
+        "license": {
+          "type": "array",
+          "title": "list of unique licenses, granted to this user",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/apiLicenseUser"
+          }
+        },
+        "name": {
+          "type": "string",
+          "title": "Caller-ID-Name: Display Name"
+        },
+        "password": {
+          "type": "string"
+        },
+        "permissions": {
+          "type": "array",
+          "title": "set of operational permission grants",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/apiPermission"
+          }
+        },
+        "presence": {
+          "$ref": "#/definitions/apiUserPresence"
+        },
+        "profile": {
+          "type": "object",
+          "title": "list of variables, assigned to this user as an environment unit",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "roles": {
+          "type": "array",
+          "title": "roles, member of which is this user",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/apiObjectId"
+          }
+        },
+        "totp_url": {
+          "type": "string",
+          "title": "[readonly][optional] one time password if setting (2fa) is enabled"
+        },
+        "username": {
+          "type": "string",
+          "title": "alphanumeric username (login)"
+        }
+      }
+    },
+    "apiInputUserDevice": {
+      "type": "object",
+      "title": "InputUserDevice options to generate SIP device for NEW user",
+      "properties": {
+        "account": {
+          "type": "string",
+          "title": "SIP auth-id"
+        },
+        "generate_password": {
+          "type": "boolean",
+          "title": "[re]generate SIP password ?"
+        },
+        "name": {
+          "type": "string",
+          "title": "SIP display name"
+        },
+        "password": {
+          "type": "string",
+          "title": "SIP password"
         }
       }
     },
@@ -43990,6 +44227,24 @@
       "properties": {
         "authorization": {
           "$ref": "#/definitions/apiAccessToken"
+        }
+      }
+    },
+    "apiLogoutUserRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "title": "ONE  /users/{id}/logout"
+        },
+        "selection": {
+          "type": "array",
+          "title": "MANY /users/logout .selection=[id,...]",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
         }
       }
     },
@@ -44995,24 +45250,20 @@
         "created_at": {
           "type": "string",
           "format": "int64",
-          "title": "unix",
-          "readOnly": true
+          "title": "unix"
         },
         "created_by": {
           "title": "user",
-          "$ref": "#/definitions/apiUserId",
-          "readOnly": true
+          "$ref": "#/definitions/apiUserId"
         },
         "deleted_at": {
           "type": "string",
           "format": "int64",
-          "title": "unix",
-          "readOnly": true
+          "title": "unix"
         },
         "deleted_by": {
           "title": "user",
-          "$ref": "#/definitions/apiUserId",
-          "readOnly": true
+          "$ref": "#/definitions/apiUserId"
         },
         "device": {
           "title": "[optional] default device assigned ? WebRTC register ?",
@@ -45049,8 +45300,7 @@
         "id": {
           "type": "string",
           "format": "int64",
-          "title": "Object ID",
-          "readOnly": true
+          "title": "Object ID"
         },
         "license": {
           "type": "array",
@@ -45102,13 +45352,11 @@
         "updated_at": {
           "type": "string",
           "format": "int64",
-          "title": "unix",
-          "readOnly": true
+          "title": "unix"
         },
         "updated_by": {
           "title": "user",
-          "$ref": "#/definitions/apiUserId",
-          "readOnly": true
+          "$ref": "#/definitions/apiUserId"
         },
         "username": {
           "type": "string",
@@ -45267,6 +45515,9 @@
       "type": "object",
       "title": "https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims",
       "properties": {
+        "chat_name": {
+          "type": "string"
+        },
         "dc": {
           "type": "string",
           "format": "int64",
@@ -45798,6 +46049,47 @@
           "description": "The page number of the partial result.",
           "type": "integer",
           "format": "int32"
+        }
+      }
+    },
+    "contactsCreateContactError": {
+      "description": "Per-item failure of a bulk Contact create.",
+      "type": "object",
+      "properties": {
+        "error": {
+          "description": "Standardized error (code, message, details).",
+          "$ref": "#/definitions/rpcStatus"
+        },
+        "index": {
+          "description": "0-based position in CreateContactsRequest.input.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "input": {
+          "description": "The InputContact that failed.",
+          "$ref": "#/definitions/contactsInputContact"
+        }
+      }
+    },
+    "contactsCreateContactsBulkResponse": {
+      "description": "Bulk Create result: successfully created Contacts plus per-item failures.",
+      "type": "object",
+      "properties": {
+        "data": {
+          "description": "Successfully created Contacts. Position matches the corresponding\nInputContact position in CreateContactsRequest.input, skipping\nfailures.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitelContactsContact"
+          }
+        },
+        "failures": {
+          "description": "Per-item failures with original index and error details.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/contactsCreateContactError"
+          }
         }
       }
     },
@@ -50338,6 +50630,10 @@
           "type": "integer",
           "format": "int32"
         },
+        "file_id": {
+          "type": "string",
+          "format": "int64"
+        },
         "id": {
           "type": "string",
           "format": "int64"
@@ -50444,6 +50740,10 @@
         "end_sec": {
           "type": "integer",
           "format": "int32"
+        },
+        "file_id": {
+          "type": "string",
+          "format": "int64"
         },
         "note": {
           "type": "string"
@@ -52377,6 +52677,9 @@
         "parent_id": {
           "type": "string"
         },
+        "quality_metrics": {
+          "$ref": "#/definitions/engine.HistoryCall.QualityMetrics"
+        },
         "queue": {
           "$ref": "#/definitions/engine.Lookup"
         },
@@ -52511,6 +52814,99 @@
         "reporting_at": {
           "type": "string",
           "format": "int64"
+        }
+      }
+    },
+    "engine.HistoryCall.QualityMetrics": {
+      "type": "object",
+      "properties": {
+        "jitter_avg": {
+          "type": "number",
+          "format": "float",
+          "title": "Jitter - показник коливання затримки пакетів"
+        },
+        "jitter_max": {
+          "type": "number",
+          "format": "float"
+        },
+        "jitter_max_at": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "jitter_min": {
+          "type": "number",
+          "format": "float"
+        },
+        "jitter_min_at": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "mos_avg": {
+          "type": "number",
+          "format": "float",
+          "title": "Mean Opinion Score (MOS) - оцінка якості передачі голосу"
+        },
+        "mos_max": {
+          "type": "number",
+          "format": "float"
+        },
+        "mos_max_at": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "mos_min": {
+          "type": "number",
+          "format": "float"
+        },
+        "mos_min_at": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "packetloss_avg": {
+          "type": "number",
+          "format": "float",
+          "title": "Packet Loss - відсоток втрачених пакетів"
+        },
+        "packetloss_max": {
+          "type": "number",
+          "format": "float"
+        },
+        "packetloss_max_at": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "packetloss_min": {
+          "type": "number",
+          "format": "float"
+        },
+        "packetloss_min_at": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "roundtrip_avg": {
+          "type": "number",
+          "format": "float",
+          "title": "Round Trip Time (RTT) - час проходження сигналу в обидва боки (мс)"
+        },
+        "roundtrip_max": {
+          "type": "number",
+          "format": "float"
+        },
+        "roundtrip_max_at": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "roundtrip_min": {
+          "type": "number",
+          "format": "float"
+        },
+        "roundtrip_min_at": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "sip_id": {
+          "type": "string",
+          "title": "Унікальний ідентифікатор сесії"
         }
       }
     },
@@ -61799,7 +62195,6 @@
       "description": "The data structure representing a source",
       "type": "object",
       "title": "Input structure representing a new Source entity",
-      "default": "{ \"name\": \"Default Source\", \"type\": \"CALL\" }",
       "maxProperties": 5,
       "minProperties": 2,
       "required": [
@@ -61817,14 +62212,13 @@
           "description": "The name of the source",
           "type": "string",
           "title": "Display name for the source",
-          "default": "New Source",
           "maxLength": 100,
           "minLength": 2
         },
         "type": {
           "description": "The type of the source",
           "title": "Type of the source; restrictable to a fixed set of allowed values",
-          "default": "\"CALL\"",
+          "default": "CALL",
           "$ref": "#/definitions/webitel.cases.SourceType"
         }
       }
@@ -62475,7 +62869,6 @@
         },
         "type": {
           "description": "The type of data source represented by this entry.",
-          "default": "TYPE_UNSPECIFIED",
           "$ref": "#/definitions/webitel.cases.SourceType"
         },
         "updated_at": {
@@ -64490,6 +64883,9 @@
           "description": "REQUIRED. Subject Identifier.\nA locally unique and never reassigned identifier within the Issuer for the End-User,\nwhich is intended to be consumed by the Client, e.g., 24400320 or AItOawmwtWwcT0k51BayewNvutrJUqsvl6qs7A4.\nIt MUST NOT exceed 255 ASCII characters in length.\nThe sub value is a case sensitive string.",
           "type": "string"
         },
+        "type": {
+          "type": "string"
+        },
         "updated_at": {
           "type": "string",
           "format": "int64"
@@ -64633,6 +65029,13 @@
         "username": {
           "description": "Technical username or handle.",
           "type": "string"
+        },
+        "vias": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.Via"
+          }
         }
       }
     },
@@ -65328,6 +65731,9 @@
         },
         "sub": {
           "type": "string"
+        },
+        "via": {
+          "type": "string"
         }
       }
     },
@@ -65341,25 +65747,20 @@
     "webitel.im.api.gateway.v1.RemoveMemberResponse": {
       "type": "object"
     },
-    "webitel.im.api.gateway.v1.SearchDialogsMessageHistoryResponse": {
-      "description": "SearchDialogsMessageHistoryResponse contains\ndialog-grouped message history search results\nand pagination metadata.",
+    "webitel.im.api.gateway.v1.SearchLeftResponse": {
       "type": "object",
       "properties": {
         "items": {
-          "description": "Dialogs (closed membership periods) matching the search criteria,\neach containing its messages.",
+          "description": "Threads in which the caller was previously a member, but has left.",
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/webitel.im.api.gateway.v1.SessionMessageHistory"
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.Thread"
           }
         },
-        "next_cursor": {
-          "description": "Cursor that represents position to get older dialogs (used without 'before' param).",
-          "$ref": "#/definitions/webitel.im.api.gateway.v1.HistoryMessageCursorResponse"
-        },
-        "prev_cursor": {
-          "description": "Cursor that represents position to get newest dialogs (used with 'before' param).",
-          "$ref": "#/definitions/webitel.im.api.gateway.v1.HistoryMessageCursorResponse"
+        "next": {
+          "description": "Indicates whether there is a next page available.",
+          "type": "boolean"
         }
       }
     },
@@ -65622,36 +66023,6 @@
         },
         "to": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.Peer"
-        }
-      }
-    },
-    "webitel.im.api.gateway.v1.SessionMessageHistory": {
-      "description": "SessionMessageHistory represents a single closed membership\nperiod (\"dialog\") of a user within a thread, together with\nthe messages exchanged during that period.",
-      "type": "object",
-      "properties": {
-        "invited_by": {
-          "description": "Identifier of the user who invited the member into the thread.",
-          "type": "string"
-        },
-        "leave_reason": {
-          "description": "Reason the member left the thread (closing the dialog).",
-          "type": "string"
-        },
-        "member_id": {
-          "description": "Membership identifier of the closed dialog.",
-          "type": "string"
-        },
-        "messages": {
-          "description": "Messages exchanged during this dialog, ordered consistently\nwith the surrounding pagination.",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.im.api.gateway.v1.HistoryMessage"
-          }
-        },
-        "thread_role": {
-          "description": "Role the member held within the thread during this dialog.",
-          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadRole"
         }
       }
     },
@@ -66023,6 +66394,34 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.Via": {
+      "type": "object",
+      "properties": {
+        "contact_id": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "disable": {
+          "type": "boolean"
+        },
+        "disable_reason": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "via": {
+          "type": "string"
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.WebPushSubscription": {
       "type": "object",
       "title": "WebPUSH subscription",
@@ -66050,6 +66449,590 @@
           "type": "string",
           "format": "byte",
           "title": "p256dh: Base64url-encoded P-256 elliptic curve Diffie-Hellman public key"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.FacebookService.UpdateFacebookGateBody": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "page_token": {
+          "type": "string"
+        },
+        "peer": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.Peer"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.MetaAppService.UpdateMetaAppBody": {
+      "type": "object",
+      "properties": {
+        "app_secret": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "oauth_redirect_uri": {
+          "type": "string"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "verify_token": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.MetaOAuthService.MetaOAuthCallbackBody": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.MetaOAuthService.StartMetaOAuthBody": {
+      "type": "object",
+      "properties": {
+        "extra_scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.Peer": {
+      "type": "object",
+      "properties": {
+        "iss": {
+          "type": "string"
+        },
+        "sub": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderCreateFacebookGateRequest": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "meta_app_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "page_id": {
+          "type": "string"
+        },
+        "page_token": {
+          "type": "string"
+        },
+        "peer": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.Peer"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderCreateFacebookGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderFacebookGate"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderCreateMetaAppRequest": {
+      "type": "object",
+      "properties": {
+        "app_id": {
+          "type": "string"
+        },
+        "app_secret": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "oauth_redirect_uri": {
+          "type": "string"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "uri": {
+          "type": "string"
+        },
+        "verify_token": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderCreateMetaAppResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderMetaApp"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderCreateWhatsAppGateRequest": {
+      "type": "object",
+      "properties": {
+        "access_token": {
+          "type": "string"
+        },
+        "meta_app_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "phone_number_id": {
+          "type": "string"
+        },
+        "waba_id": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderCreateWhatsAppGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderWhatsAppGate"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderDeleteFacebookGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderFacebookGate"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderDeleteMetaAppResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderMetaApp"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderDeleteWhatsAppGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderWhatsAppGate"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderFacebookGate": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string"
+        },
+        "meta_app_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "page_id": {
+          "type": "string"
+        },
+        "page_name": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderStatus"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderFile": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "mime_type": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "size": {
+          "type": "string",
+          "format": "int64"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderGetFacebookGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderFacebookGate"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderGetMetaAppResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderMetaApp"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderGetWhatsAppGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderWhatsAppGate"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderListGatesResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderSummary"
+          }
+        },
+        "next": {
+          "type": "boolean"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderMetaApp": {
+      "type": "object",
+      "properties": {
+        "app_id": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "oauth_redirect_uri": {
+          "type": "string"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "verify_token": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderMetaLinkedPage": {
+      "type": "object",
+      "properties": {
+        "access_token": {
+          "type": "string"
+        },
+        "page_id": {
+          "type": "string"
+        },
+        "page_name": {
+          "type": "string"
+        },
+        "platform": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderMetaOAuthCallbackResponse": {
+      "type": "object",
+      "properties": {
+        "pages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderMetaLinkedPage"
+          }
+        },
+        "user_access_token": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderMetaOAuthStartResponse": {
+      "type": "object",
+      "properties": {
+        "auth_url": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderSendDocumentRequest": {
+      "type": "object",
+      "properties": {
+        "caption": {
+          "type": "string"
+        },
+        "documents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderFile"
+          }
+        },
+        "external_user_id": {
+          "type": "string"
+        },
+        "gate_id": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderType"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderSendImageRequest": {
+      "type": "object",
+      "properties": {
+        "caption": {
+          "type": "string"
+        },
+        "external_user_id": {
+          "type": "string"
+        },
+        "gate_id": {
+          "type": "string"
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderFile"
+          }
+        },
+        "type": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderType"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderSendMessageResponse": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "external_id": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderSendTextRequest": {
+      "type": "object",
+      "properties": {
+        "external_user_id": {
+          "type": "string"
+        },
+        "gate_id": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "text": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderType"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderStatus": {
+      "description": "/ ProviderStatus represents the operational state of a provider gateway.",
+      "type": "string",
+      "default": "PROVIDER_STATUS_UNSPECIFIED",
+      "enum": [
+        "PROVIDER_STATUS_UNSPECIFIED",
+        "PROVIDER_STATUS_ACTIVE",
+        "PROVIDER_STATUS_INACTIVE",
+        "PROVIDER_STATUS_ERROR"
+      ]
+    },
+    "webitel.im.api.provider.v1.ProviderSummary": {
+      "type": "object",
+      "properties": {
+        "contact": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "provider_app_id": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderStatus"
+        },
+        "type": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderType"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "webhook_url": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderType": {
+      "description": "/ ProviderType defines the specific provider or protocol used for messaging.",
+      "type": "string",
+      "default": "PROVIDER_TYPE_UNSPECIFIED",
+      "enum": [
+        "PROVIDER_TYPE_UNSPECIFIED",
+        "PROVIDER_TYPE_VIBER",
+        "PROVIDER_TYPE_TELEGRAM_BOT",
+        "PROVIDER_TYPE_TELEGRAM_APP",
+        "PROVIDER_TYPE_META_APP",
+        "PROVIDER_TYPE_FACEBOOK",
+        "PROVIDER_TYPE_INSTAGRAM",
+        "PROVIDER_TYPE_WHATSAPP"
+      ]
+    },
+    "webitel.im.api.provider.v1.ProviderUpdateFacebookGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderFacebookGate"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderUpdateMetaAppResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderMetaApp"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderUpdateWhatsAppGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderWhatsAppGate"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderWhatsAppGate": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "id": {
+          "type": "string"
+        },
+        "meta_app_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "phone_display": {
+          "type": "string"
+        },
+        "phone_number_id": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderStatus"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "waba_id": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.WhatsAppService.UpdateWhatsAppGateBody": {
+      "type": "object",
+      "properties": {
+        "access_token": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
         }
       }
     },
@@ -66494,8 +67477,12 @@
           "type": "string",
           "title": "Optional text accompanying the file"
         },
-        "document": {
-          "$ref": "#/definitions/webitel.im.provider.v1.ProviderFile"
+        "documents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.provider.v1.ProviderFile"
+          }
         },
         "external_user_id": {
           "type": "string"
@@ -66521,8 +67508,12 @@
         "gate_id": {
           "type": "string"
         },
-        "image": {
-          "$ref": "#/definitions/webitel.im.provider.v1.ProviderFile"
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.provider.v1.ProviderFile"
+          }
         },
         "type": {
           "$ref": "#/definitions/webitel.im.provider.v1.ProviderType"
@@ -66709,514 +67700,6 @@
           "type": "string"
         }
       }
-    },
-    "webitel.im.service.thread.v1.Contact": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string"
-        },
-        "message_id": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "phone_number": {
-          "type": "string"
-        }
-      }
-    },
-    "webitel.im.service.thread.v1.Document": {
-      "type": "object",
-      "properties": {
-        "created_at": {
-          "type": "string",
-          "format": "int64"
-        },
-        "file_id": {
-          "type": "string",
-          "format": "int64"
-        },
-        "id": {
-          "type": "string"
-        },
-        "message_id": {
-          "type": "string"
-        },
-        "mime": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "size": {
-          "type": "string",
-          "format": "int64"
-        },
-        "url": {
-          "type": "string"
-        }
-      }
-    },
-    "webitel.im.service.thread.v1.DocumentInput": {
-      "description": "Represents `Document` message with necessary fields\nto process it into frequently used `document`\nentity in messaging systems.",
-      "type": "object",
-      "properties": {
-        "file_name": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        },
-        "mime_type": {
-          "type": "string"
-        },
-        "size_bytes": {
-          "type": "string",
-          "format": "int64"
-        },
-        "url": {
-          "type": "string"
-        }
-      }
-    },
-    "webitel.im.service.thread.v1.Documents": {
-      "description": "Media container for documents attachments.",
-      "type": "object",
-      "properties": {
-        "documents": {
-          "description": "Documents to be attached to the header of interactive message.\nMax allowed documents: 10.",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.im.service.thread.v1.DocumentInput"
-          }
-        }
-      }
-    },
-    "webitel.im.service.thread.v1.HistoryMessage": {
-      "type": "object",
-      "properties": {
-        "body": {
-          "type": "string"
-        },
-        "contact": {
-          "$ref": "#/definitions/webitel.im.service.thread.v1.Contact"
-        },
-        "created_at": {
-          "type": "string",
-          "format": "int64"
-        },
-        "documents": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.im.service.thread.v1.Document"
-          }
-        },
-        "id": {
-          "type": "string"
-        },
-        "images": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.im.service.thread.v1.Image"
-          }
-        },
-        "interactive": {
-          "$ref": "#/definitions/webitel.im.service.thread.v1.Interactive"
-        },
-        "location": {
-          "$ref": "#/definitions/webitel.im.service.thread.v1.Location"
-        },
-        "metadata": {
-          "type": "object"
-        },
-        "sender_id": {
-          "type": "string"
-        },
-        "system": {
-          "$ref": "#/definitions/webitel.im.service.thread.v1.System"
-        },
-        "thread_id": {
-          "type": "string"
-        },
-        "type": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "updated_at": {
-          "type": "string",
-          "format": "int64"
-        }
-      }
-    },
-    "webitel.im.service.thread.v1.HistoryMessageCursorRequest": {
-      "type": "object",
-      "properties": {
-        "before": {
-          "type": "boolean"
-        },
-        "id": {
-          "type": "string"
-        }
-      }
-    },
-    "webitel.im.service.thread.v1.HistoryMessageCursorResponse": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        }
-      }
-    },
-    "webitel.im.service.thread.v1.Image": {
-      "type": "object",
-      "properties": {
-        "created_at": {
-          "type": "string",
-          "format": "int64"
-        },
-        "file_id": {
-          "type": "string",
-          "format": "int64"
-        },
-        "height": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "id": {
-          "type": "string"
-        },
-        "message_id": {
-          "type": "string"
-        },
-        "mime": {
-          "type": "string"
-        },
-        "url": {
-          "type": "string"
-        },
-        "width": {
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "webitel.im.service.thread.v1.ImageInput": {
-      "description": "Represents `Image` entity with\nnecessary fields.",
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "link": {
-          "type": "string"
-        },
-        "mime_type": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        }
-      }
-    },
-    "webitel.im.service.thread.v1.Images": {
-      "description": "Media container for images attachments.",
-      "type": "object",
-      "properties": {
-        "images": {
-          "description": "Images to be attached to the header of interactive message.\nMax allowed images: 10.",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.im.service.thread.v1.ImageInput"
-          }
-        }
-      }
-    },
-    "webitel.im.service.thread.v1.Interactive": {
-      "description": "Interactive represents a rich message with UI elements.",
-      "type": "object",
-      "properties": {
-        "documents": {
-          "description": "Document attachments header.",
-          "$ref": "#/definitions/webitel.im.service.thread.v1.Documents"
-        },
-        "images": {
-          "description": "Images attachment header.",
-          "$ref": "#/definitions/webitel.im.service.thread.v1.Images"
-        },
-        "list_reply": {
-          "description": "List reply with main list button text and sections with buttons.",
-          "$ref": "#/definitions/webitel.im.service.thread.v1.KeyboardListReply"
-        },
-        "markup": {
-          "description": "Markup matrix with buttons.",
-          "$ref": "#/definitions/webitel.im.service.thread.v1.KeyboardMarkup"
-        },
-        "single_use": {
-          "description": "Force to block user keyboard.",
-          "type": "boolean"
-        }
-      }
-    },
-    "webitel.im.service.thread.v1.KeyboardButton": {
-      "description": "Defines a single interactive element within the keyboard.\nEach button must have a unique identifier and a specific action type.",
-      "type": "object",
-      "properties": {
-        "callback": {
-          "description": "Triggers a backend event (callback) with associated metadata.",
-          "$ref": "#/definitions/webitel.im.service.thread.v1.KeyboardButtonCallback"
-        },
-        "id": {
-          "description": "Unique idempotent identifier for the button.\nUsed by the frontend to track state and prevent duplicate interactions.",
-          "type": "string"
-        },
-        "label": {
-          "description": "The human-readable label displayed on the button.",
-          "type": "string"
-        },
-        "metadata": {
-          "description": "Extensible metadata for UI/UX styling (e.g., \"color\", \"theme\", \"size\").\nUsage: Allows for future-proofing without breaking schema changes.",
-          "type": "object"
-        },
-        "request": {
-          "description": "Requests sensitive information from the client (e.g., location or contact).",
-          "$ref": "#/definitions/webitel.im.service.thread.v1.KeyboardButtonRequest"
-        },
-        "url": {
-          "description": "Directs the user to an external web resource.",
-          "$ref": "#/definitions/webitel.im.service.thread.v1.KeyboardButtonURL"
-        }
-      }
-    },
-    "webitel.im.service.thread.v1.KeyboardButtonCallback": {
-      "description": "Action: Sends an asynchronous signal to the backend service.",
-      "type": "object",
-      "properties": {
-        "data": {
-          "description": "Opaque data payload passed back to the server upon interaction.",
-          "type": "string"
-        }
-      }
-    },
-    "webitel.im.service.thread.v1.KeyboardButtonRequest": {
-      "description": "Action: Prompts the client to share specific device data.",
-      "type": "object",
-      "properties": {
-        "action": {
-          "description": "The specific action to be performed by the client application.",
-          "type": "string"
-        }
-      }
-    },
-    "webitel.im.service.thread.v1.KeyboardButtonURL": {
-      "description": "Action: Navigates the user to a specific URI.",
-      "type": "object",
-      "properties": {
-        "url": {
-          "description": "Must be a valid absolute URI (e.g., https://example.com).",
-          "type": "string"
-        }
-      }
-    },
-    "webitel.im.service.thread.v1.KeyboardListReply": {
-      "description": "List-style interactive menu.",
-      "type": "object",
-      "properties": {
-        "main_button_title": {
-          "description": "Title of the main button, that on-click show up list.",
-          "type": "string"
-        },
-        "sections": {
-          "description": "List with sections with buttons.",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.im.service.thread.v1.KeyboardRowWithSection"
-          }
-        }
-      }
-    },
-    "webitel.im.service.thread.v1.KeyboardMarkup": {
-      "description": "Grid-style buttons.",
-      "type": "object",
-      "properties": {
-        "rows": {
-          "description": "Rows of buttons matrix.",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.im.service.thread.v1.KeyboardRow"
-          }
-        }
-      }
-    },
-    "webitel.im.service.thread.v1.KeyboardRow": {
-      "description": "A standard horizontal row of interactive buttons without a section header.",
-      "type": "object",
-      "properties": {
-        "buttons": {
-          "description": "Horizontal collection of buttons.\nCapped at 10 to ensure UI responsiveness and prevent overflow.",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.im.service.thread.v1.KeyboardButton"
-          }
-        }
-      }
-    },
-    "webitel.im.service.thread.v1.KeyboardRowWithSection": {
-      "description": "Represents a row of buttons grouped under a specific logical section header.\nUseful for creating categorized menus or structured interactive interfaces.",
-      "type": "object",
-      "properties": {
-        "buttons": {
-          "description": "Collection of buttons within this section.\nMinimum of 1 button is required to prevent empty sections.",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.im.service.thread.v1.KeyboardButton"
-          }
-        },
-        "section": {
-          "description": "The header text for this section. Must be concise and descriptive.",
-          "type": "string"
-        }
-      }
-    },
-    "webitel.im.service.thread.v1.Location": {
-      "type": "object",
-      "properties": {
-        "address": {
-          "type": "string"
-        },
-        "latitude": {
-          "type": "number",
-          "format": "double"
-        },
-        "longitude": {
-          "type": "number",
-          "format": "double"
-        },
-        "message_id": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        }
-      }
-    },
-    "webitel.im.service.thread.v1.SearchMessageHistoryResponse": {
-      "type": "object",
-      "properties": {
-        "from": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.im.service.thread.v1.ThreadMember"
-          }
-        },
-        "items": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.im.service.thread.v1.HistoryMessage"
-          }
-        },
-        "next_cursor": {
-          "$ref": "#/definitions/webitel.im.service.thread.v1.HistoryMessageCursorResponse"
-        },
-        "prev_cursor": {
-          "$ref": "#/definitions/webitel.im.service.thread.v1.HistoryMessageCursorResponse"
-        }
-      }
-    },
-    "webitel.im.service.thread.v1.System": {
-      "type": "object",
-      "properties": {
-        "message_id": {
-          "type": "string"
-        },
-        "metadata": {
-          "type": "object"
-        },
-        "type": {
-          "type": "string"
-        }
-      }
-    },
-    "webitel.im.service.thread.v1.ThreadMember": {
-      "description": "ThreadMember represents a thread participant\nwith optional type-specific settings.",
-      "type": "object",
-      "properties": {
-        "contact_id": {
-          "description": "Contact ID of the thread member.",
-          "type": "string"
-        },
-        "id": {
-          "type": "string",
-          "title": "Unique identifier of the thread member record. (thread_dialog_id)"
-        },
-        "permissions": {
-          "description": "User rights in the thread, determined by their role.",
-          "$ref": "#/definitions/webitel.im.service.thread.v1.ThreadPermissions"
-        },
-        "role": {
-          "description": "Role of the member in the thread, determining their permissions.",
-          "$ref": "#/definitions/webitel.im.service.thread.v1.ThreadRole"
-        }
-      }
-    },
-    "webitel.im.service.thread.v1.ThreadPermissions": {
-      "type": "object",
-      "properties": {
-        "can_add_members": {
-          "type": "boolean"
-        },
-        "can_change_members_permissions": {
-          "type": "boolean"
-        },
-        "can_change_thread_info": {
-          "type": "boolean"
-        },
-        "can_remove_members": {
-          "type": "boolean"
-        },
-        "can_send_messages": {
-          "type": "boolean"
-        },
-        "created_at": {
-          "type": "string",
-          "format": "int64"
-        },
-        "id": {
-          "type": "string"
-        },
-        "member_id": {
-          "type": "string"
-        },
-        "thread_id": {
-          "type": "string"
-        },
-        "updated_at": {
-          "type": "string",
-          "format": "int64"
-        }
-      }
-    },
-    "webitel.im.service.thread.v1.ThreadRole": {
-      "type": "string",
-      "default": "ROLE_UNSPECIFIED",
-      "enum": [
-        "ROLE_UNSPECIFIED",
-        "ROLE_MEMBER",
-        "ROLE_ADMIN",
-        "ROLE_OWNER",
-        "ROLE_SUPERVISOR"
-      ]
     },
     "webitelContactsAttachment": {
       "type": "object",
@@ -68786,6 +69269,367 @@
     },
     {
       "name": "WebHookService"
+    },
+    {
+      "name": "BackendProfileService"
+    },
+    {
+      "name": "CognitiveProfileService"
+    },
+    {
+      "name": "FileService"
+    },
+    {
+      "name": "FilePoliciesService"
+    },
+    {
+      "name": "FileTranscriptService"
+    },
+    {
+      "name": "ImportTemplateService"
+    },
+    {
+      "name": "MediaFileService"
+    },
+    {
+      "name": "ChatService"
+    },
+    {
+      "description": "**Messages** Service",
+      "name": "Messages"
+    },
+    {
+      "name": "AgentChatService"
+    },
+    {
+      "name": "CasesChatCatalog"
+    },
+    {
+      "name": "ContactLinkingService"
+    },
+    {
+      "name": "ContactsChatCatalog"
+    },
+    {
+      "name": "ConfigService"
+    },
+    {
+      "name": "LoggerService"
+    },
+    {
+      "name": "Presence"
+    },
+    {
+      "name": "Customers"
+    },
+    {
+      "name": "Permissions"
+    },
+    {
+      "name": "Users"
+    },
+    {
+      "name": "Roles"
+    },
+    {
+      "name": "AC"
+    },
+    {
+      "name": "AccessStore"
+    },
+    {
+      "name": "OAuth2"
+    },
+    {
+      "name": "SA"
+    },
+    {
+      "name": "Auth"
+    },
+    {
+      "name": "Devices"
+    },
+    {
+      "name": "CallManager"
+    },
+    {
+      "name": "CA"
+    },
+    {
+      "name": "Classes"
+    },
+    {
+      "name": "Comments"
+    },
+    {
+      "name": "Labels"
+    },
+    {
+      "name": "Emails"
+    },
+    {
+      "name": "Upload"
+    },
+    {
+      "name": "Photos"
+    },
+    {
+      "name": "Phones"
+    },
+    {
+      "name": "Managers"
+    },
+    {
+      "name": "Variables"
+    },
+    {
+      "name": "Languages"
+    },
+    {
+      "name": "Timezones"
+    },
+    {
+      "name": "IMClients"
+    },
+    {
+      "name": "ContactGroups"
+    },
+    {
+      "name": "Contacts"
+    },
+    {
+      "name": "DynamicConditions"
+    },
+    {
+      "name": "DynamicGroups"
+    },
+    {
+      "name": "Groups"
+    },
+    {
+      "name": "Timeline"
+    },
+    {
+      "name": "Records"
+    },
+    {
+      "name": "Types"
+    },
+    {
+      "name": "Dictionaries"
+    },
+    {
+      "name": "Extensions"
+    },
+    {
+      "name": "Domains"
+    },
+    {
+      "name": "Articles"
+    },
+    {
+      "name": "KnowledgebaseSearch"
+    },
+    {
+      "name": "Spaces"
+    },
+    {
+      "name": "Tags"
+    },
+    {
+      "name": "LDAP"
+    },
+    {
+      "name": "OAuth2Federation"
+    },
+    {
+      "name": "TwoFactorAuthentication"
+    },
+    {
+      "name": "UserAccessTokens"
+    },
+    {
+      "name": "UserSettings"
+    },
+    {
+      "name": "AgentAbsenceService"
+    },
+    {
+      "name": "AgentWorkingConditionsService"
+    },
+    {
+      "name": "AgentWorkingScheduleService"
+    },
+    {
+      "name": "ForecastCalculationService"
+    },
+    {
+      "name": "PauseTemplateService"
+    },
+    {
+      "name": "ShiftTemplateService"
+    },
+    {
+      "name": "WorkingConditionService"
+    },
+    {
+      "name": "WorkingScheduleService"
+    },
+    {
+      "name": "Priorities"
+    },
+    {
+      "name": "Services"
+    },
+    {
+      "name": "CaseComments"
+    },
+    {
+      "name": "RelatedCases"
+    },
+    {
+      "name": "CaseFiles"
+    },
+    {
+      "name": "CaseLinks"
+    },
+    {
+      "name": "StatusConditions"
+    },
+    {
+      "name": "Sources"
+    },
+    {
+      "name": "SLAConditions"
+    },
+    {
+      "name": "Cases"
+    },
+    {
+      "name": "CaseCommunications"
+    },
+    {
+      "name": "CaseTimeline"
+    },
+    {
+      "name": "Catalogs"
+    },
+    {
+      "name": "CloseReasons"
+    },
+    {
+      "name": "CloseReasonGroups"
+    },
+    {
+      "name": "SLAs"
+    },
+    {
+      "name": "Statuses"
+    },
+    {
+      "name": "FTSService"
+    },
+    {
+      "name": "PdfService"
+    },
+    {
+      "name": "MeetingService"
+    },
+    {
+      "name": "webitel.im.api.delivery.v1.Delivery"
+    },
+    {
+      "name": "webitel.im.api.gateway.v1.Bots"
+    },
+    {
+      "name": "webitel.im.api.gateway.v1.ViasService"
+    },
+    {
+      "name": "webitel.im.api.gateway.v1.Contacts"
+    },
+    {
+      "name": "webitel.im.api.gateway.v1.ContactSettingsManagement"
+    },
+    {
+      "name": "webitel.im.api.gateway.v1.Message"
+    },
+    {
+      "name": "webitel.im.api.gateway.v1.ThreadPermission"
+    },
+    {
+      "name": "webitel.im.api.gateway.v1.MessageHistory"
+    },
+    {
+      "name": "webitel.im.api.gateway.v1.Account"
+    },
+    {
+      "name": "webitel.im.api.gateway.v1.ThreadManagement"
+    },
+    {
+      "name": "webitel.im.api.provider.v1.FacebookService"
+    },
+    {
+      "name": "webitel.im.api.provider.v1.GateService"
+    },
+    {
+      "name": "webitel.im.api.provider.v1.ProviderMessageService"
+    },
+    {
+      "name": "webitel.im.api.provider.v1.MetaAppService"
+    },
+    {
+      "name": "webitel.im.api.provider.v1.MetaOAuthService"
+    },
+    {
+      "name": "webitel.im.api.provider.v1.WhatsAppService"
+    },
+    {
+      "name": "webitel.im.service.admin.v1.Applications"
+    },
+    {
+      "name": "webitel.im.service.auth.v1.Account"
+    },
+    {
+      "name": "webitel.im.service.contact.v1.ContactSettings"
+    },
+    {
+      "name": "webitel.im.service.contact.v1.Contacts"
+    },
+    {
+      "name": "webitel.im.service.contact.v1.ContactPrivacy"
+    },
+    {
+      "name": "webitel.im.service.contact.v1.Vias"
+    },
+    {
+      "name": "webitel.im.provider.v1.FacebookService"
+    },
+    {
+      "name": "webitel.im.provider.v1.GateService"
+    },
+    {
+      "name": "webitel.im.provider.v1.ProviderMessageService"
+    },
+    {
+      "name": "webitel.im.provider.v1.MetaAppService"
+    },
+    {
+      "name": "webitel.im.provider.v1.MetaOAuthService"
+    },
+    {
+      "name": "webitel.im.provider.v1.WhatsAppService"
+    },
+    {
+      "name": "webitel.im.service.thread.v1.ThreadPermissionManagement"
+    },
+    {
+      "name": "webitel.im.service.thread.v1.Message"
+    },
+    {
+      "name": "webitel.im.service.thread.v1.MessageHistory"
+    },
+    {
+      "name": "webitel.im.service.thread.v1.ThreadManagement"
     }
   ]
 }

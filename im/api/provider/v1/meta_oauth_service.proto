@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package webitel.im.api.provider.v1;
+
+import "google/api/annotations.proto";
+import "api/provider/v1/messages.proto";
+
+option go_package = "github.com/webitel/im-provider-service/gen/api/provider/v1;provider";
+
+// MetaOAuthService handles the OAuth flow with Facebook for Meta Applications.
+service MetaOAuthService {
+  rpc StartMetaOAuth(ProviderMetaOAuthStartRequest) returns (ProviderMetaOAuthStartResponse) {
+    option (google.api.http) = { post: "/im/meta-apps/{meta_app_id}/oauth/start", body: "*" };
+  }
+
+  rpc MetaOAuthCallback(ProviderMetaOAuthCallbackRequest) returns (ProviderMetaOAuthCallbackResponse) {
+    option (google.api.http) = { post: "/im/meta-apps/{meta_app_id}/oauth/callback", body: "*" };
+  }
+}

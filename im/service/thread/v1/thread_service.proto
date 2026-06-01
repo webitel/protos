@@ -15,10 +15,15 @@ option go_package = "github.com/webitel/im-thread-service/gen/go/api/v1;impb";
 // and interacting with threads.
 service ThreadManagement {
 
-    // Searches threads using filtering, sorting,
-    // and pagination parameters.
+  // Searches threads using filtering, sorting,
+  // and pagination parameters.
   rpc Search(ThreadSearchRequest) returns (SearchThreadResponse);
 
+  // Lists threads that a specific contact has left
+  rpc SearchLeft(SearchLeftRequest) returns (SearchLeftResponse);
+
+  // Creates a new group thread.
+  // The creator becomes the owner of the thread.
     // Returns a single thread by its identifier.
   rpc Get(GetThreadRequest) returns (Thread);
 
@@ -26,7 +31,7 @@ service ThreadManagement {
     // The creator becomes the owner of the thread.
   rpc CreateGroup(CreateGroupRequest) returns (Thread);
 
-    // Adds a new member to an existing thread.
+  // Adds a new member to an existing thread.
   rpc AddMember(AddMemberRequest) returns (AddMemberResponse);
 
   // Transfer unites add member and remove member.
@@ -196,6 +201,57 @@ message SearchThreadResponse {
   bool next = 2;
 }
 
+message SearchLeftRequest {
+  // List of fields that should be returned in the response.
+  // If empty, a default set of fields is returned.
+  repeated string fields = 1;
+
+  // Member that has left chats
+  string member_id = 2 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  // Filter threads by domain IDs.
+  int32 domain_id = 3;
+
+  // Filter threads by their kinds
+  repeated ThreadKind kinds = 4 [
+    (buf.validate.field).repeated.items.enum = {
+      defined_only: true
+      not_in: 0
+    }
+  ];
+
+  // Sorting field.
+  // Optional "+" or "-" prefix indicates ascending or descending order.
+  // Example: "-created_at", "subject"
+  string sort = 5 [
+    (buf.validate.field).string.pattern = "^[+-]?[a-z_]+$",
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+
+  // Maximum number of threads to return per page.
+  // Must be greater than 0 and less than or equal to 100.
+  int32 size = 6 [
+    (buf.validate.field).int32 = {gt: 0, lte: 100},
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+
+  // Page number (1-based).
+  int32 page = 7 [
+    (buf.validate.field).int32.gte = 1,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+}
+
+message SearchLeftResponse {
+  // Threads in which the contact was previously a member, sorted by left_at desc by default.
+  repeated Thread items = 1;
+
+  // Indicates whether there is a next page available.
+  bool next = 2;
+}
 
 // ThreadDirectSettings defines settings
 // specific to direct (one-to-one) threads.

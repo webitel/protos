@@ -3,10 +3,10 @@ syntax = "proto3";
 package webitel.im.service.admin.v1;
 
 import "service/admin/v1/account.proto";
+import "service/admin/v1/application_idp.proto";
 import "service/admin/v1/application_auth.proto";
 import "service/admin/v1/application_push.proto";
-import "service/admin/v1/application_rate.proto";
-import "service/admin/v1/application_idp.proto";
+import "service/admin/v1/application_limit.proto";
 // import "webitel/messaging/v1/media.proto";
 
 import "google/rpc/status.proto";
@@ -20,6 +20,9 @@ message Application {
 
   // Application [client_id] identifier
   string id = 2;
+
+  // // API Version, e.g: "v1"
+  // string api = 3;
   
   // // OPTIONAL. Icon image that references a logo for the Application.
   // webitel.im.internal.v1.Image logo = 3;
@@ -56,16 +59,16 @@ message AppService {
   // OPTIONAL. Application [client_secret] issued
   string secret = 1;
 
-  // API Rate-Limit(s) configuration
-  RateLimiter rate_limits = 2;
+  // PUSH Notification Service account(s) available
+  // Server-to-Client / User (Notification) communication.
+  PUSHServiceClient push_service = 2;
 
   // [Updates] Handler subscription.
   // Server-to-Server (Webhook) communication.
   EventSubscription send_update = 3;
 
-  // PUSH Notification Service account(s) available
-  // Server-to-Client / User (Notification) communication.
-  PUSHServiceClient push_service = 4;
+  // API Rate-Limit(s) restrictions
+  LimitService rate_limits = 4;
 
 }
 

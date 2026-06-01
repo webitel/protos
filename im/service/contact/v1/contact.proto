@@ -6,6 +6,7 @@ import "buf/validate/validate.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/struct.proto";
 import "service/contact/v1/contact_settings.proto";
+import "service/contact/v1/via.proto";
 
 option go_package = "github.com/webitel/im-contact-service/gen/go/api/v1;impb";
 
@@ -24,6 +25,7 @@ message SearchContactRequest {
   repeated string subjects = 10;
   int32 domain_id = 11;
   optional bool only_bots = 12;
+  string via = 13;
 }
 
 message CreateContactRequest {
@@ -50,7 +52,7 @@ message CreateContactRequest {
 
   int32 domain_id = 8;
   bool is_bot = 9;
-}
+  }
 
 message UpdateContactRequest {
   // Unique internal Contact ID
@@ -161,9 +163,19 @@ message Contact {
     (buf.validate.field).int32.gt = 0
   ];
   bool is_bot = 12;
+  repeated webitel.im.service.contact.v1.Via vias = 13;
 }
 
 enum UnableSendReason {
   UNDEFINED = 0;
   CONTACT_NOT_FOUND = 1;
+}
+
+message LocateContactRequest {
+    string id = 1;
+    int64 domain_id = 2;
+}
+
+message LocateContactResponse {
+    Contact item = 1;
 }

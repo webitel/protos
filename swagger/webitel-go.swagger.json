@@ -23,12 +23,6 @@
       "name": "Permissions"
     },
     {
-      "name": "OAuth2"
-    },
-    {
-      "name": "SA"
-    },
-    {
       "name": "Users"
     },
     {
@@ -39,6 +33,12 @@
     },
     {
       "name": "AccessStore"
+    },
+    {
+      "name": "OAuth2"
+    },
+    {
+      "name": "SA"
     },
     {
       "name": "Auth"
@@ -527,6 +527,55 @@
           {
             "name": "fields",
             "description": "Source Fields to return into result.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Contacts"
+        ]
+      }
+    },
+    "/contacts/bulk": {
+      "post": {
+        "summary": "Bulk create of Contacts.",
+        "operationId": "CreateContacts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/contactsCreateContactsBulkResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "input",
+            "description": "Data is a set of Contacts to be created.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/contactsInputContact"
+              }
+            }
+          },
+          {
+            "name": "fields",
+            "description": "Fields to be retrieved into result of changes.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -11586,6 +11635,13 @@
             "type": "string"
           },
           {
+            "name": "extension",
+            "description": "OPTIONAL. SIP (phone) number i.e. extension.\nSIP Device will be auto-assigned ONLY if [number] specified.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "scope",
             "description": "scope request control",
             "in": "query",
@@ -13796,9 +13852,89 @@
         "operationId": "CreateUser",
         "responses": {
           "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/apiUser"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user",
+            "description": "user entity to be created",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiInputUser"
+            }
+          },
+          {
+            "name": "user_password",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "confirm_password",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "generate_device",
+            "description": "Generate credentials \u0026 assign SIP [device] for NEW [user]",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "device.name",
+            "description": "SIP display name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "device.account",
+            "description": "SIP auth-id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "device.password",
+            "description": "SIP password",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "device.generate_password",
+            "description": "[re]generate SIP password ?",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/logout": {
+      "post": {
+        "operationId": "LogoutUser2",
+        "responses": {
+          "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/apiCreateUserResponse"
+              "$ref": "#/definitions/apiLogoutUserResponse"
             }
           },
           "default": {
@@ -13814,7 +13950,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/apiCreateUserRequest"
+              "$ref": "#/definitions/apiLogoutUserRequest"
             }
           }
         ],
@@ -14039,6 +14175,106 @@
         "tags": [
           "Users"
         ]
+      },
+      "put": {
+        "operationId": "UpdateUser",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/apiUser"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "path: /users/{id}",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "user",
+            "description": "body: modifications/changes",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiInputUser"
+            }
+          },
+          {
+            "name": "fields",
+            "description": "PATCH: partial update",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      },
+      "patch": {
+        "operationId": "UpdateUser2",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/apiUser"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "path: /users/{id}",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "user",
+            "description": "body: modifications/changes",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiInputUser"
+            }
+          },
+          {
+            "name": "fields",
+            "description": "PATCH: partial update",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
       }
     },
     "/users/{id}/logout": {
@@ -14061,6 +14297,7 @@
         "parameters": [
           {
             "name": "id",
+            "description": "ONE  /users/{id}/logout",
             "in": "path",
             "required": true,
             "type": "string",
@@ -14437,364 +14674,6 @@
         ],
         "tags": [
           "UserAccessTokens"
-        ]
-      }
-    },
-    "/users/{user.id}": {
-      "put": {
-        "operationId": "UpdateUser",
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/apiUser"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "user.id",
-            "description": "Object ID",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "format": "int64"
-          },
-          {
-            "name": "user",
-            "description": "body: modifications/changes",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "title": "Caller-ID-Name: Display Name"
-                },
-                "email": {
-                  "type": "string"
-                },
-                "username": {
-                  "type": "string",
-                  "title": "alphanumeric username (login)"
-                },
-                "password": {
-                  "type": "string"
-                },
-                "extension": {
-                  "type": "string",
-                  "title": "Caller-ID-Number:"
-                },
-                "presence": {
-                  "$ref": "#/definitions/apiUserPresence",
-                  "description": "string presence = 7; // unique set of \u003cuser\u003e presentity \u003cstatus:basic\u003e tuples open[ed]\n string status = 8; // short display status (short description)",
-                  "title": "CallerId caller = 5; // extension\nPresenceStatus presence = 8;"
-                },
-                "device": {
-                  "$ref": "#/definitions/apiObjectId",
-                  "title": "[optional] default device assigned ? WebRTC register ?"
-                },
-                "devices": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "$ref": "#/definitions/apiObjectId"
-                  },
-                  "description": "[editable] list of unique `regular` devices, attached to this user",
-                  "title": "map\u003cint64, string\u003e devices = 13;"
-                },
-                "hotdesks": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "$ref": "#/definitions/apiObjectId"
-                  },
-                  "title": "[readonly] list of unique `hotdesk` devices, assigned to this user"
-                },
-                "profile": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "string"
-                  },
-                  "title": "list of variables, assigned to this user as an environment unit"
-                },
-                "permissions": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "$ref": "#/definitions/apiPermission"
-                  },
-                  "title": "set of operational permission grants"
-                },
-                "license": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "$ref": "#/definitions/apiLicenseUser"
-                  },
-                  "title": "list of unique licenses, granted to this user"
-                },
-                "roles": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "$ref": "#/definitions/apiObjectId"
-                  },
-                  "title": "roles, member of which is this user"
-                },
-                "totp_url": {
-                  "type": "string",
-                  "title": "[readonly][optional] one time password if setting (2fa) is enabled"
-                },
-                "contact": {
-                  "$ref": "#/definitions/apiObjectId",
-                  "description": "[optional] contact connected to this user",
-                  "title": "repeated Call calls = 13; // order by created_at\nrepeated Registration reged = 13; // order by register_last"
-                },
-                "created_at": {
-                  "type": "string",
-                  "format": "int64",
-                  "title": "unix",
-                  "readOnly": true
-                },
-                "created_by": {
-                  "$ref": "#/definitions/apiUserId",
-                  "title": "user",
-                  "readOnly": true
-                },
-                "updated_at": {
-                  "type": "string",
-                  "format": "int64",
-                  "title": "unix",
-                  "readOnly": true
-                },
-                "updated_by": {
-                  "$ref": "#/definitions/apiUserId",
-                  "title": "user",
-                  "readOnly": true
-                },
-                "deleted_at": {
-                  "type": "string",
-                  "format": "int64",
-                  "title": "unix",
-                  "readOnly": true
-                },
-                "deleted_by": {
-                  "$ref": "#/definitions/apiUserId",
-                  "title": "user",
-                  "readOnly": true
-                },
-                "chat_name": {
-                  "type": "string",
-                  "description": "The \"chat_name\" field is used to store the name displayed externally on the platform.\nFor example, \"chat_name\" is shown when an agent connects to chats with clients."
-                },
-                "force_password_change": {
-                  "type": "boolean",
-                  "description": "When set to true, the user will be required to change their password on next login."
-                }
-              },
-              "title": "body: modifications/changes"
-            }
-          },
-          {
-            "name": "fields",
-            "description": "PATCH: partial update",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          }
-        ],
-        "tags": [
-          "Users"
-        ]
-      },
-      "patch": {
-        "operationId": "UpdateUser2",
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/apiUser"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "user.id",
-            "description": "Object ID",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "format": "int64"
-          },
-          {
-            "name": "user",
-            "description": "body: modifications/changes",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "title": "Caller-ID-Name: Display Name"
-                },
-                "email": {
-                  "type": "string"
-                },
-                "username": {
-                  "type": "string",
-                  "title": "alphanumeric username (login)"
-                },
-                "password": {
-                  "type": "string"
-                },
-                "extension": {
-                  "type": "string",
-                  "title": "Caller-ID-Number:"
-                },
-                "presence": {
-                  "$ref": "#/definitions/apiUserPresence",
-                  "description": "string presence = 7; // unique set of \u003cuser\u003e presentity \u003cstatus:basic\u003e tuples open[ed]\n string status = 8; // short display status (short description)",
-                  "title": "CallerId caller = 5; // extension\nPresenceStatus presence = 8;"
-                },
-                "device": {
-                  "$ref": "#/definitions/apiObjectId",
-                  "title": "[optional] default device assigned ? WebRTC register ?"
-                },
-                "devices": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "$ref": "#/definitions/apiObjectId"
-                  },
-                  "description": "[editable] list of unique `regular` devices, attached to this user",
-                  "title": "map\u003cint64, string\u003e devices = 13;"
-                },
-                "hotdesks": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "$ref": "#/definitions/apiObjectId"
-                  },
-                  "title": "[readonly] list of unique `hotdesk` devices, assigned to this user"
-                },
-                "profile": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "string"
-                  },
-                  "title": "list of variables, assigned to this user as an environment unit"
-                },
-                "permissions": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "$ref": "#/definitions/apiPermission"
-                  },
-                  "title": "set of operational permission grants"
-                },
-                "license": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "$ref": "#/definitions/apiLicenseUser"
-                  },
-                  "title": "list of unique licenses, granted to this user"
-                },
-                "roles": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "$ref": "#/definitions/apiObjectId"
-                  },
-                  "title": "roles, member of which is this user"
-                },
-                "totp_url": {
-                  "type": "string",
-                  "title": "[readonly][optional] one time password if setting (2fa) is enabled"
-                },
-                "contact": {
-                  "$ref": "#/definitions/apiObjectId",
-                  "description": "[optional] contact connected to this user",
-                  "title": "repeated Call calls = 13; // order by created_at\nrepeated Registration reged = 13; // order by register_last"
-                },
-                "created_at": {
-                  "type": "string",
-                  "format": "int64",
-                  "title": "unix",
-                  "readOnly": true
-                },
-                "created_by": {
-                  "$ref": "#/definitions/apiUserId",
-                  "title": "user",
-                  "readOnly": true
-                },
-                "updated_at": {
-                  "type": "string",
-                  "format": "int64",
-                  "title": "unix",
-                  "readOnly": true
-                },
-                "updated_by": {
-                  "$ref": "#/definitions/apiUserId",
-                  "title": "user",
-                  "readOnly": true
-                },
-                "deleted_at": {
-                  "type": "string",
-                  "format": "int64",
-                  "title": "unix",
-                  "readOnly": true
-                },
-                "deleted_by": {
-                  "$ref": "#/definitions/apiUserId",
-                  "title": "user",
-                  "readOnly": true
-                },
-                "chat_name": {
-                  "type": "string",
-                  "description": "The \"chat_name\" field is used to store the name displayed externally on the platform.\nFor example, \"chat_name\" is shown when an agent connects to chats with clients."
-                },
-                "force_password_change": {
-                  "type": "boolean",
-                  "description": "When set to true, the user will be required to change their password on next login."
-                }
-              },
-              "title": "body: modifications/changes"
-            }
-          },
-          {
-            "name": "fields",
-            "description": "PATCH: partial update",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          }
-        ],
-        "tags": [
-          "Users"
         ]
       }
     },
@@ -16424,7 +16303,17 @@
       "title": "simplified presence filter params"
     },
     "UsersLogoutUserBody": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "selection": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          },
+          "title": "MANY /users/logout .selection=[id,...]"
+        }
+      }
     },
     "apiAccessRule": {
       "type": "object",
@@ -16528,23 +16417,6 @@
         "created": {
           "$ref": "#/definitions/apiRole",
           "title": "entity to be created"
-        }
-      }
-    },
-    "apiCreateUserRequest": {
-      "type": "object",
-      "properties": {
-        "user": {
-          "$ref": "#/definitions/apiUser",
-          "title": "user entity to be created"
-        },
-        "user_password": {
-          "type": "string",
-          "readOnly": true
-        },
-        "confirm_password": {
-          "type": "string",
-          "readOnly": true
         }
       }
     },
@@ -16940,6 +16812,122 @@
           "title": "repeated string privileges = 5; // [\"SEARCH\",\"MODIFY\",\"DELETE\",\"CREATE\"]\nbool grantable = 6; // WITH GRANT OPTION"
         }
       }
+    },
+    "apiInputUser": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Caller-ID-Name: Display Name"
+        },
+        "email": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string",
+          "title": "alphanumeric username (login)"
+        },
+        "password": {
+          "type": "string"
+        },
+        "extension": {
+          "type": "string",
+          "title": "Caller-ID-Number:"
+        },
+        "presence": {
+          "$ref": "#/definitions/apiUserPresence"
+        },
+        "device": {
+          "$ref": "#/definitions/apiObjectId",
+          "title": "[optional] default device assigned"
+        },
+        "devices": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/apiObjectId"
+          },
+          "title": "[editable] list of unique `regular` devices, attached to this user"
+        },
+        "hotdesks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/apiObjectId"
+          },
+          "title": "[readonly] list of unique `hotdesk` devices, assigned to this user"
+        },
+        "profile": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "list of variables, assigned to this user as an environment unit"
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/apiPermission"
+          },
+          "title": "set of operational permission grants"
+        },
+        "license": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/apiLicenseUser"
+          },
+          "title": "list of unique licenses, granted to this user"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/apiObjectId"
+          },
+          "title": "roles, member of which is this user"
+        },
+        "totp_url": {
+          "type": "string",
+          "title": "[readonly][optional] one time password if setting (2fa) is enabled"
+        },
+        "contact": {
+          "$ref": "#/definitions/apiObjectId",
+          "title": "[optional] contact connected to this user"
+        },
+        "chat_name": {
+          "type": "string",
+          "description": "The \"chat_name\" field is used to store the name displayed externally on the platform.\nFor example, \"chat_name\" is shown when an agent connects to chats with clients."
+        },
+        "force_password_change": {
+          "type": "boolean",
+          "description": "When set to true, the user will be required to change their password on next login."
+        }
+      },
+      "description": "Input of the User profile for Create/Update operations.\nMirrors `User` field numbers 1:1 (wire-compatible), but excludes\nsystem-managed read-only fields (id, audit metadata)."
+    },
+    "apiInputUserDevice": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "SIP display name"
+        },
+        "account": {
+          "type": "string",
+          "title": "SIP auth-id"
+        },
+        "password": {
+          "type": "string",
+          "title": "SIP password"
+        },
+        "generate_password": {
+          "type": "boolean",
+          "title": "[re]generate SIP password ?"
+        }
+      },
+      "title": "InputUserDevice options to generate SIP device for NEW user"
     },
     "apiLDAPCatalog": {
       "type": "object",
@@ -17626,6 +17614,24 @@
       "properties": {
         "authorization": {
           "$ref": "#/definitions/apiAccessToken"
+        }
+      }
+    },
+    "apiLogoutUserRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "title": "ONE  /users/{id}/logout"
+        },
+        "selection": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          },
+          "title": "MANY /users/logout .selection=[id,...]"
         }
       }
     },
@@ -18621,8 +18627,7 @@
         "id": {
           "type": "string",
           "format": "int64",
-          "title": "Object ID",
-          "readOnly": true
+          "title": "Object ID"
         },
         "name": {
           "type": "string",
@@ -18711,35 +18716,29 @@
         "created_at": {
           "type": "string",
           "format": "int64",
-          "title": "unix",
-          "readOnly": true
+          "title": "unix"
         },
         "created_by": {
           "$ref": "#/definitions/apiUserId",
-          "title": "user",
-          "readOnly": true
+          "title": "user"
         },
         "updated_at": {
           "type": "string",
           "format": "int64",
-          "title": "unix",
-          "readOnly": true
+          "title": "unix"
         },
         "updated_by": {
           "$ref": "#/definitions/apiUserId",
-          "title": "user",
-          "readOnly": true
+          "title": "user"
         },
         "deleted_at": {
           "type": "string",
           "format": "int64",
-          "title": "unix",
-          "readOnly": true
+          "title": "unix"
         },
         "deleted_by": {
           "$ref": "#/definitions/apiUserId",
-          "title": "user",
-          "readOnly": true
+          "title": "user"
         },
         "chat_name": {
           "type": "string",
@@ -18928,6 +18927,9 @@
           "type": "string"
         },
         "extension": {
+          "type": "string"
+        },
+        "chat_name": {
           "type": "string"
         },
         "scope": {
@@ -19436,6 +19438,47 @@
         }
       },
       "description": "Contact dataset."
+    },
+    "contactsCreateContactError": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "format": "int32",
+          "description": "0-based position in CreateContactsRequest.input."
+        },
+        "input": {
+          "$ref": "#/definitions/contactsInputContact",
+          "description": "The InputContact that failed."
+        },
+        "error": {
+          "$ref": "#/definitions/rpcStatus",
+          "description": "Standardized error (code, message, details)."
+        }
+      },
+      "description": "Per-item failure of a bulk Contact create."
+    },
+    "contactsCreateContactsBulkResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitelContactsContact"
+          },
+          "description": "Successfully created Contacts. Position matches the corresponding\nInputContact position in CreateContactsRequest.input, skipping\nfailures."
+        },
+        "failures": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/contactsCreateContactError"
+          },
+          "description": "Per-item failures with original index and error details."
+        }
+      },
+      "description": "Bulk Create result: successfully created Contacts plus per-item failures."
     },
     "contactsCreateDynamicGroupRequest": {
       "type": "object",
