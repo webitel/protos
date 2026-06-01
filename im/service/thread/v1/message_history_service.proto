@@ -16,6 +16,8 @@ option go_package = "github.com/webitel/im-thread-service/gen/go/api/v1;impb";
 service MessageHistory {
   // Search for messages in a thread.
   rpc SearchThreadMessagesHistory(SearchMessageHistoryRequest) returns (SearchMessageHistoryResponse);
+
+  rpc SearchLeftThreadsMessageHistory(SearchLeftThreadsMessageHistoryRequest) returns (SearchMessageHistoryResponse);
 }
 
 message HistoryMessageCursorResponse {
@@ -113,4 +115,32 @@ message SearchMessageHistoryResponse {
 
   HistoryMessageCursorResponse        next_cursor   = 3;
   HistoryMessageCursorResponse        prev_cursor   = 4;
+}
+
+// Retrieves message history grouped by the user's closed membership periods
+// ("dialogs") within a thread. Active memberships are excluded — their
+// messages are available via SearchThreadMessagesHistory.
+message SearchLeftThreadsMessageHistoryRequest {
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  int32 domain_id = 2;
+
+  repeated string sender_ids = 4;
+  repeated int32 types = 5;
+
+  // Inclusive bounds on the dialog interval (epoch ms). Zero means unbounded.
+  int64 period_from = 6;
+  int64 period_to = 7;
+
+  repeated string fields = 8;
+
+  optional HistoryMessageCursorRequest cursor = 9;
+
+  uint32 size = 10 [
+    (buf.validate.field).uint32 = {lte: 100},
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
 }
