@@ -425,7 +425,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/webitel.im.provider.v1.ProviderCreateWhatsAppGateResponse"
+              "$ref": "#/definitions/webitel.im.provider.v1.GateResponse"
             }
           },
           "default": {
@@ -438,11 +438,10 @@
         "parameters": [
           {
             "name": "body",
-            "description": "/ ProviderCreateWhatsAppGateRequest connects a WhatsApp Business Account (WABA).",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/webitel.im.provider.v1.ProviderCreateWhatsAppGateRequest"
+              "$ref": "#/definitions/webitel.im.provider.v1.CreateGateRequest"
             }
           }
         ],
@@ -4851,6 +4850,46 @@
         }
       }
     },
+    "webitel.im.provider.v1.CreateGateRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "bot": {
+          "$ref": "#/definitions/webitel.im.provider.v1.Peer"
+        },
+        "waba": {
+          "$ref": "#/definitions/webitel.im.provider.v1.CreateWABAGateRequest"
+        },
+        "fb": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderCreateFacebookGateRequest"
+        }
+      }
+    },
+    "webitel.im.provider.v1.CreateWABAGateRequest": {
+      "type": "object",
+      "properties": {
+        "meta_app_id": {
+          "type": "string"
+        },
+        "phone_number": {
+          "type": "string"
+        },
+        "phone_number_id": {
+          "type": "string"
+        },
+        "access_token": {
+          "type": "string"
+        },
+        "business_id": {
+          "type": "string"
+        }
+      }
+    },
     "webitel.im.provider.v1.FacebookService.UpdateFacebookGateBody": {
       "type": "object",
       "properties": {
@@ -4870,6 +4909,45 @@
         }
       },
       "description": "/ ProviderUpdateFacebookGateRequest updates the operational settings of a Facebook provider."
+    },
+    "webitel.im.provider.v1.GateResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "created_by": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_by": {
+          "type": "string",
+          "format": "int64"
+        },
+        "bot": {
+          "$ref": "#/definitions/webitel.im.provider.v1.Peer"
+        },
+        "waba": {
+          "$ref": "#/definitions/webitel.im.provider.v1.WhatsAppBusinessAccount"
+        }
+      }
     },
     "webitel.im.provider.v1.MetaAppService.UpdateMetaAppBody": {
       "type": "object",
@@ -5020,39 +5098,6 @@
         }
       },
       "description": "/ ProviderCreateMetaAppResponse returns the successfully registered Meta application."
-    },
-    "webitel.im.provider.v1.ProviderCreateWhatsAppGateRequest": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "meta_app_id": {
-          "type": "string"
-        },
-        "waba_id": {
-          "type": "string",
-          "title": "WhatsApp Business Account ID"
-        },
-        "phone_number_id": {
-          "type": "string",
-          "title": "Unique ID for the phone number"
-        },
-        "access_token": {
-          "type": "string",
-          "title": "Permanent WABA access token"
-        }
-      },
-      "description": "/ ProviderCreateWhatsAppGateRequest connects a WhatsApp Business Account (WABA)."
-    },
-    "webitel.im.provider.v1.ProviderCreateWhatsAppGateResponse": {
-      "type": "object",
-      "properties": {
-        "item": {
-          "$ref": "#/definitions/webitel.im.provider.v1.ProviderWhatsAppGate"
-        }
-      },
-      "description": "/ ProviderCreateWhatsAppGateResponse returns the registered WhatsApp provider."
     },
     "webitel.im.provider.v1.ProviderDeleteFacebookGateResponse": {
       "type": "object",
@@ -5306,6 +5351,10 @@
         "caption": {
           "type": "string",
           "title": "Optional text accompanying the file"
+        },
+        "domain_id": {
+          "type": "integer",
+          "format": "int32"
         }
       },
       "description": "ProviderSendDocumentRequest sends a document with an optional caption."
@@ -5331,6 +5380,10 @@
         },
         "caption": {
           "type": "string"
+        },
+        "domain_id": {
+          "type": "integer",
+          "format": "int32"
         }
       },
       "description": "ProviderSendImageRequest sends an image with an optional caption."
@@ -5368,6 +5421,10 @@
         "text": {
           "type": "string",
           "title": "The textual content of the message"
+        },
+        "domain_id": {
+          "type": "integer",
+          "format": "int32"
         },
         "metadata": {
           "type": "object",
@@ -5501,6 +5558,33 @@
           "type": "string",
           "format": "int64",
           "title": "Unix timestamp in milliseconds"
+        }
+      }
+    },
+    "webitel.im.provider.v1.WhatsAppBusinessAccount": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "meta_app_id": {
+          "type": "string"
+        },
+        "phone_number": {
+          "type": "string"
+        },
+        "phone_number_id": {
+          "type": "string"
+        },
+        "access_token": {
+          "type": "string"
+        },
+        "access_token_expires_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "business_id": {
+          "type": "string"
         }
       }
     },
