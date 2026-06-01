@@ -2041,6 +2041,110 @@
         ]
       }
     },
+    "/v1/threads/{thread_id}/left_threads/messages": {
+      "get": {
+        "summary": "Searches messages grouped by the user's closed membership periods\nwithin a thread. Active memberships are excluded — their\nmessages are available via SearchThreadMessagesHistory.",
+        "operationId": "MessageHistory_SearchLeftThreadsMessagesHistory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SearchMessageHistoryResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "thread_id",
+            "description": "Filter by thread ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "description": "List of message fields to be returned.\nUsed to reduce payload size.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "sender_ids",
+            "description": "Filter messages by sender user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "types",
+            "description": "Filter messages by message types.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "period_from",
+            "description": "Inclusive lower bound on the dialog interval (Unix time, milliseconds).\nZero means unbounded.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "period_to",
+            "description": "Inclusive upper bound on the dialog interval (Unix time, milliseconds).\nZero means unbounded.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "cursor.id",
+            "description": "Cursor identifier.\nMust be a valid UUID referencing an existing message.\nDefines the starting point for pagination.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "cursor.before",
+            "description": "Pagination direction flag.\n\ntrue  -\u003e fetch newer messages (back before history)\nfalse -\u003e fetch older messages (back to older history)",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "size",
+            "description": "Maximum number of messages to return.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.MessageHistory"
+        ]
+      }
+    },
     "/v1/threads/{thread_id}/members": {
       "post": {
         "summary": "Add member to the thread.",
@@ -2938,6 +3042,7 @@
       "properties": {
         "id": {
           "type": "string",
+          "format": "int64",
           "description": "Document identifier."
         },
         "message_id": {
