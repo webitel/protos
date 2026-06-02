@@ -13991,6 +13991,38 @@
         ]
       }
     },
+    "/users/password/generate": {
+      "post": {
+        "operationId": "GeneratePassword",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiGeneratePasswordResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiGeneratePasswordRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      }
+    },
     "/users/password/settings": {
       "get": {
         "operationId": "ReadPasswordSettings",
@@ -16747,6 +16779,32 @@
         }
       },
       "title": "DeviceId lookup value"
+    },
+    "apiGeneratePasswordRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "title": "required to enforce password_contains_login policy"
+        },
+        "password": {
+          "type": "string",
+          "title": "current password, used to authenticate when no session exists"
+        },
+        "domain": {
+          "type": "string",
+          "title": "domain name, required to authenticate when no session exists"
+        }
+      }
+    },
+    "apiGeneratePasswordResponse": {
+      "type": "object",
+      "properties": {
+        "password": {
+          "type": "string",
+          "title": "generated password matching the configured policy"
+        }
+      }
     },
     "apiGenerateUserTfaKeyResponse": {
       "type": "object",

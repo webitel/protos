@@ -72,6 +72,13 @@ service Users {
         };
     }
 
+    rpc GeneratePassword(GeneratePasswordRequest) returns (GeneratePasswordResponse) {
+        option (google.api.http) = {
+            post: "/users/password/generate"  // Generate password matching configured policy
+            body: "*"
+        };
+    }
+
     rpc LogoutUser(LogoutUserRequest) returns (LogoutUserResponse) {
         option (google.api.http) = {
             post: "/users/{id}/logout"
@@ -297,6 +304,16 @@ message GetPasswordSettingsRequest {
 
 message GetPasswordSettingsResponse {
     map<string, string> settings = 1;
+}
+
+message GeneratePasswordRequest {
+    string username = 1; // required to enforce password_contains_login policy
+    string password = 2; // current password, used to authenticate when no session exists
+    string domain = 3;   // domain name, required to authenticate when no session exists
+}
+
+message GeneratePasswordResponse {
+    string password = 1; // generated password matching the configured policy
 }
 
 
