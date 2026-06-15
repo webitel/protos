@@ -41,6 +41,10 @@ service ThreadManagement {
   // Removes a member from a thread.
   rpc RemoveMember(RemoveMemberRequest) returns (RemoveMemberResponse);
 
+  // Called by flow_manager when a bot schema finishes execution.
+  // Releases bot control and returns it to the previous controller in the stack.
+  rpc CompleteBotControl(CompleteBotControlRequest) returns (CompleteBotControlResponse);
+
   rpc SetVariables(SetVariablesRequest) returns (ThreadVariables);
 
   rpc SearchVariables(SearchVariablesRequest) returns (SearchVariablesResponse);
@@ -101,6 +105,15 @@ message Thread {
 
   // Optional variables associated with the thread.
   ThreadVariables variables = 13;
+
+  // The thread_dialog.id of the currently active bot controller.
+  // Empty string if no bot is controlling the thread.
+  string bot_controller_member_id = 14;
+
+  // The thread_dialog.id of the owner bot (the bot the thread was originally created with).
+  // This bot is the default return point when all temporary bots complete.
+  // Empty string if no owner bot has been identified yet.
+  string owner_bot_member_id = 15;
 }
 
 //#endregion
@@ -328,6 +341,15 @@ message AddMemberRequest {
     (buf.validate.field).enum.defined_only = true,
     (buf.validate.field).required = true
   ];
+
+  int32 domain_id = 5 [
+    (buf.validate.field).int32.gt = 0,
+    (buf.validate.field).required = true
+  ];
+
+  // When adding a bot contact, controls whether it automatically leaves after its schema completes.
+  // Defaults to true if not set.
+  optional bool auto_leave = 6;
 }
 
 message AddMemberResponse {
@@ -369,11 +391,42 @@ message TransferRequest{
     (buf.validate.field).enum.defined_only = true,
     (buf.validate.field).required = true
   ];
+
+  // Whether the new member is a bot contact.
+  // When true, bot control protocol is activated for the new member.
+  bool target_is_bot = 5;
+
+  // When transferring to a bot, controls whether it automatically leaves after its schema completes.
+  // Defaults to true if not set.
+  optional bool auto_leave = 6;
 }
 
 message TransferResponse {
   ThreadMember member = 1;
 }
+
+message CompleteBotControlRequest {
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  // The thread_dialog.id of the bot member completing its schema.
+  string member_id = 2 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  int32 domain_id = 3 [
+    (buf.validate.field).int32.gt = 0
+  ];
+
+  // Fencing token received in bot.control.granted.v1.
+  // Must match the current control_epoch; stale or duplicate requests are rejected.
+  int64 control_epoch = 4;
+}
+
+message CompleteBotControlResponse {}
 
 // #region Thread Variables
 
