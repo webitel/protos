@@ -104,19 +104,27 @@ enum ThreadKind {
   CHANNEL = 3;
 }
 
+
+// ThreadManagementCreateRequest defines parameters for creating a specific thread type.
 message ThreadManagementCreateRequest {
-  oneof config {
+  // Polymorphic payload containing configuration specific to the chosen thread kind.
+  oneof type {
     option (buf.validate.oneof).required = true;
 
     DirectConfig direct = 1;
   }
 }
 
+
+// DirectConfig defines settings required to establish a 1:1 thread.
 message DirectConfig {
+  // IM contact that will be added to the created thread as second member.
   PeerIdentity member = 1;
 }
 
+// ThreadManagementCreateResponse represents information enabled after thread creation.
 message ThreadManagementCreateResponse {
+  // Represents main entity for thread.
   Thread thread = 1;
 }
 
