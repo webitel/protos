@@ -33,6 +33,14 @@ service ProviderMessageService {
       body: "*"
     };
   }
+
+  // SendInteractive delivers a message with interactive UI elements (buttons, menus).
+  rpc SendInteractive(ProviderSendInteractiveRequest) returns (ProviderSendMessageResponse) {
+    option (google.api.http) = {
+      post: "/im/provider/send/interactive"
+      body: "*"
+    };
+  }
 }
 
 // --- Shared Types ---
@@ -83,4 +91,83 @@ message ProviderSendImageRequest {
   repeated ProviderFile images = 4;
   string caption = 5;
   int32 domain_id = 6;
+}
+
+// ProviderSendInteractiveRequest sends a message with interactive UI elements.
+message ProviderSendInteractiveRequest {
+  string gate_id = 1;
+  string external_user_id = 2;
+  int32 domain_id = 3;
+
+  // Optional text body displayed above the interactive element.
+  optional string body = 4;
+
+  // Optional idempotency key to prevent duplicate delivery.
+  optional string send_id = 5;
+
+  // Interactive payload — exactly one kind must be set.
+  ProviderInteractive interactive = 6;
+}
+
+// ProviderInteractive carries the interactive UI definition.
+message ProviderInteractive {
+  // When true the keyboard is hidden after the user interacts once.
+  bool single_use = 1;
+
+  oneof kind {
+    ProviderKeyboardMarkup markup = 2;
+    ProviderKeyboardListReply list_reply = 3;
+  }
+}
+
+// ProviderKeyboardMarkup is a grid of button rows.
+message ProviderKeyboardMarkup {
+  repeated ProviderKeyboardRow rows = 1;
+}
+
+// ProviderKeyboardListReply is a dropdown-style menu with labeled sections.
+message ProviderKeyboardListReply {
+  // Label of the main button that expands the list.
+  string main_button_title = 1;
+  repeated ProviderKeyboardRowWithSection sections = 2;
+}
+
+// ProviderKeyboardRow is a horizontal row of buttons.
+message ProviderKeyboardRow {
+  repeated ProviderKeyboardButton buttons = 1;
+}
+
+// ProviderKeyboardRowWithSection is a titled group of buttons.
+message ProviderKeyboardRowWithSection {
+  string section = 1;
+  repeated ProviderKeyboardButton buttons = 2;
+}
+
+// ProviderKeyboardButton is a single interactive element.
+message ProviderKeyboardButton {
+  // Unique identifier returned in SendInteractiveCallback.
+  string id = 1;
+  // Display label on the button.
+  string label = 2;
+
+  oneof kind {
+    ProviderKeyboardButtonURL url = 3;
+    ProviderKeyboardButtonCallback callback = 4;
+    ProviderKeyboardButtonRequest request = 5;
+  }
+}
+
+// ProviderKeyboardButtonURL opens a web page when clicked.
+message ProviderKeyboardButtonURL {
+  string url = 1;
+}
+
+// ProviderKeyboardButtonCallback sends a backend event when clicked.
+message ProviderKeyboardButtonCallback {
+  string data = 1;
+}
+
+// ProviderKeyboardButtonRequest prompts the user for device data (location, phone, email).
+message ProviderKeyboardButtonRequest {
+  string action = 1;
 }

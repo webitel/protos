@@ -20,6 +20,11 @@ service ProviderMessageService {
   rpc SendImage(ProviderSendImageRequest) returns (ProviderSendMessageResponse) {
     option (google.api.http) = { post: "/im/provider/send/image", body: "*" };
   }
+
+  // SendInteractive delivers a message with interactive UI elements (buttons, menus).
+  rpc SendInteractive(ProviderSendInteractiveRequest) returns (ProviderSendMessageResponse) {
+    option (google.api.http) = { post: "/im/provider/send/interactive", body: "*" };
+  }
 }
 
 message ProviderSendMessageResponse {
@@ -57,4 +62,61 @@ message ProviderSendImageRequest {
   string external_user_id = 3;
   repeated ProviderFile images = 4;
   string caption = 5;
+}
+
+message ProviderSendInteractiveRequest {
+  string gate_id = 1;
+  string external_user_id = 2;
+  int32 domain_id = 3;
+  optional string body = 4;
+  optional string send_id = 5;
+  ProviderInteractive interactive = 6;
+}
+
+message ProviderInteractive {
+  bool single_use = 1;
+  oneof kind {
+    ProviderKeyboardMarkup markup = 2;
+    ProviderKeyboardListReply list_reply = 3;
+  }
+}
+
+message ProviderKeyboardMarkup {
+  repeated ProviderKeyboardRow rows = 1;
+}
+
+message ProviderKeyboardListReply {
+  string main_button_title = 1;
+  repeated ProviderKeyboardRowWithSection sections = 2;
+}
+
+message ProviderKeyboardRow {
+  repeated ProviderKeyboardButton buttons = 1;
+}
+
+message ProviderKeyboardRowWithSection {
+  string section = 1;
+  repeated ProviderKeyboardButton buttons = 2;
+}
+
+message ProviderKeyboardButton {
+  string id = 1;
+  string label = 2;
+  oneof kind {
+    ProviderKeyboardButtonURL url = 3;
+    ProviderKeyboardButtonCallback callback = 4;
+    ProviderKeyboardButtonRequest request = 5;
+  }
+}
+
+message ProviderKeyboardButtonURL {
+  string url = 1;
+}
+
+message ProviderKeyboardButtonCallback {
+  string data = 1;
+}
+
+message ProviderKeyboardButtonRequest {
+  string action = 1;
 }

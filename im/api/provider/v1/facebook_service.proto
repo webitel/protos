@@ -24,4 +24,56 @@ service FacebookService {
   rpc DeleteFacebookGate(ProviderDeleteFacebookGateRequest) returns (ProviderDeleteFacebookGateResponse) {
     option (google.api.http) = { delete: "/im/gates/facebook/{id}" };
   }
+
+  rpc SetPersistentMenu(ProviderSetPersistentMenuRequest) returns (ProviderSetPersistentMenuResponse) {
+    option (google.api.http) = { put: "/im/gates/facebook/{gate_id}/menu", body: "*" };
+  }
+
+  rpc DeletePersistentMenu(ProviderDeletePersistentMenuRequest) returns (ProviderDeletePersistentMenuResponse) {
+    option (google.api.http) = { delete: "/im/gates/facebook/{gate_id}/menu" };
+  }
+
+  rpc SetGetStarted(ProviderSetGetStartedRequest) returns (ProviderSetGetStartedResponse) {
+    option (google.api.http) = { put: "/im/gates/facebook/{gate_id}/get-started", body: "*" };
+  }
+
+  rpc DeleteGetStarted(ProviderDeleteGetStartedRequest) returns (ProviderDeleteGetStartedResponse) {
+    option (google.api.http) = { delete: "/im/gates/facebook/{gate_id}/get-started" };
+  }
+}
+
+message ProviderSetPersistentMenuRequest {
+  string gate_id = 1;
+  repeated ProviderMenuItem items = 2;
+  bool composer_input_disabled = 3;
+}
+message ProviderSetPersistentMenuResponse {}
+
+message ProviderDeletePersistentMenuRequest {
+  string gate_id = 1;
+}
+message ProviderDeletePersistentMenuResponse {}
+
+message ProviderSetGetStartedRequest {
+  string gate_id = 1;
+  string payload = 2;
+}
+message ProviderSetGetStartedResponse {}
+
+message ProviderDeleteGetStartedRequest {
+  string gate_id = 1;
+}
+message ProviderDeleteGetStartedResponse {}
+
+message ProviderMenuItem {
+  string title = 1;
+  oneof action {
+    string payload = 2;
+    string url = 3;
+    ProviderMenuNestedItems nested = 4;
+  }
+}
+
+message ProviderMenuNestedItems {
+  repeated ProviderMenuItem items = 1;
 }
