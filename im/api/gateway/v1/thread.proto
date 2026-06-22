@@ -20,10 +20,15 @@ service ThreadManagement {
 
   // Search threads that the caller has left from
   rpc SearchLeft(SearchLeftRequest) returns (SearchLeftResponse) {
+    option (google.api.http) = {get: "/v1/threads/left"};
+  }
+
+  rpc Create(ThreadManagementCreateRequest) returns (ThreadManagementCreateResponse) {
     option (google.api.http) = {
-      get: "/v1/threads/left"
+      post: "/v1/threads"
+      body: "*"
     };
-  };
+  }
 
   // Returns a single thread by its identifier.
   rpc Get(GetThreadRequest) returns (Thread) {
@@ -77,7 +82,7 @@ service ThreadManagement {
   rpc FlushVariables(FlushVariablesRequest) returns (ThreadVariables) {
     option (google.api.http) = {
       delete: "/v1/threads/{thread_id}/variables/flush"
-      body  : "*"
+      body: "*"
     };
   }
 }
@@ -97,6 +102,22 @@ enum ThreadKind {
 
   // Channel-style thread (broadcast or topic based communication).
   CHANNEL = 3;
+}
+
+message ThreadManagementCreateRequest {
+  oneof config {
+    option (buf.validate.oneof).required = true;
+
+    DirectConfig direct = 1;
+  }
+}
+
+message DirectConfig {
+  PeerIdentity member = 1;
+}
+
+message ThreadManagementCreateResponse {
+  Thread thread = 1;
 }
 
 // Thread represents a thread (aka chat or conversation) entity.
@@ -212,12 +233,10 @@ message SearchLeftRequest {
   repeated string fields = 1;
 
   // Filter threads by their kinds
-  repeated ThreadKind types = 2 [
-    (buf.validate.field).repeated.items.enum = {
-      defined_only: true
-      not_in: 0
-    }
-  ];
+  repeated ThreadKind types = 2 [(buf.validate.field).repeated.items.enum = {
+    defined_only: true
+    not_in: 0
+  }];
 
   // Sorting field.
   // Optional "+" or "-" prefix indicates ascending or descending order.
@@ -230,7 +249,10 @@ message SearchLeftRequest {
   // Maximum number of threads to return per page.
   // Must be greater than 0 and less than or equal to 100.
   int32 size = 4 [
-    (buf.validate.field).int32 = {gt: 0, lte: 100},
+    (buf.validate.field).int32 = {
+      gt: 0
+      lte: 100
+    },
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
 
@@ -296,7 +318,7 @@ message RemoveMemberRequest {
 
 message RemoveMemberResponse {}
 
-message TransferRequest{
+message TransferRequest {
   string thread_id = 1 [
     (buf.validate.field).string.uuid = true,
     (buf.validate.field).required = true
