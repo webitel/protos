@@ -29,4 +29,60 @@ service FacebookService {
   rpc DeleteFacebookGate (webitel.im.provider.v1.ProviderDeleteFacebookGateRequest) returns (webitel.im.provider.v1.ProviderDeleteFacebookGateResponse) {
     option (google.api.http) = { delete: "/im/gates/facebook/{id}" };
   }
+
+  /// SetPersistentMenu sets the Messenger persistent menu for a Facebook gate.
+  rpc SetPersistentMenu (webitel.im.provider.v1.ProviderSetPersistentMenuRequest) returns (webitel.im.provider.v1.ProviderSetPersistentMenuResponse) {
+    option (google.api.http) = { put: "/im/gates/facebook/{gate_id}/menu", body: "*" };
+  }
+
+  /// DeletePersistentMenu removes the Messenger persistent menu for a Facebook gate.
+  rpc DeletePersistentMenu (webitel.im.provider.v1.ProviderDeletePersistentMenuRequest) returns (webitel.im.provider.v1.ProviderDeletePersistentMenuResponse) {
+    option (google.api.http) = { delete: "/im/gates/facebook/{gate_id}/menu" };
+  }
+
+  /// SetGetStarted sets the Get Started button payload for a Facebook gate.
+  rpc SetGetStarted (webitel.im.provider.v1.ProviderSetGetStartedRequest) returns (webitel.im.provider.v1.ProviderSetGetStartedResponse) {
+    option (google.api.http) = { put: "/im/gates/facebook/{gate_id}/get-started", body: "*" };
+  }
+
+  /// DeleteGetStarted removes the Get Started button for a Facebook gate.
+  rpc DeleteGetStarted (webitel.im.provider.v1.ProviderDeleteGetStartedRequest) returns (webitel.im.provider.v1.ProviderDeleteGetStartedResponse) {
+    option (google.api.http) = { delete: "/im/gates/facebook/{gate_id}/get-started" };
+  }
+}
+
+message ProviderSetPersistentMenuRequest {
+  string gate_id = 1;
+  repeated ProviderMenuItem items = 2;
+  bool composer_input_disabled = 3;
+}
+message ProviderSetPersistentMenuResponse {}
+
+message ProviderDeletePersistentMenuRequest {
+  string gate_id = 1;
+}
+message ProviderDeletePersistentMenuResponse {}
+
+message ProviderSetGetStartedRequest {
+  string gate_id = 1;
+  string payload = 2;
+}
+message ProviderSetGetStartedResponse {}
+
+message ProviderDeleteGetStartedRequest {
+  string gate_id = 1;
+}
+message ProviderDeleteGetStartedResponse {}
+
+message ProviderMenuItem {
+  string title = 1;
+  oneof action {
+    string payload = 2;
+    string url = 3;
+    ProviderMenuNestedItems nested = 4;
+  }
+}
+
+message ProviderMenuNestedItems {
+  repeated ProviderMenuItem items = 1;
 }
