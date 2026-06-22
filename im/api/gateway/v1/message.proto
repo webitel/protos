@@ -28,13 +28,6 @@ service Message {
     };
   }
 
-  // SendImage delivers image-specific messages.
-  rpc SendImage(SendImageRequest) returns (SendImageResponse) {
-    option (google.api.http) = {
-      post: "/v1/messages/image"
-      body: "*"
-    };
-  }
   // Mark message as read by id.
   rpc Read(ReadMessageRequest) returns (ReadMessageResponse) {
     option (google.api.http) = {post: "/v1/messages/{id}/read"};
@@ -130,21 +123,6 @@ message ImageInput {
   string name = 2;
   string link = 3;
   string mime_type = 4;
-}
-
-// Represents a request to send an message with image.
-message SendImageRequest {
-  Peer to = 1;
-  repeated ImageInput images = 2;
-  string body = 3;
-  optional PeerIdentity send_as = 4;
-  string send_id = 20; // optional client-generated id for deduplication
-}
-
-// Represents a response to send message with image.
-message SendImageResponse {
-  Peer to = 1;
-  string id = 2;
 }
 
 // SendMessageResponse represents the result of a send operation.
