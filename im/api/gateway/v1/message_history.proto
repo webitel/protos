@@ -1,40 +1,34 @@
 syntax = "proto3";
 package webitel.im.api.gateway.v1;
 
-import "google/protobuf/any.proto";
+import "api/gateway/v1/message.proto";
+import "api/gateway/v1/thread_member.proto";
 import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
+import "google/protobuf/any.proto";
 import "google/protobuf/struct.proto";
-import "api/gateway/v1/thread_member.proto";
-import "api/gateway/v1/message.proto";
 
 option go_package = "github.com/webitel/im-gateway-service/gen/api/gateway/v1;gateway";
 
 // MessageHistory service provides read-only access
 // to message history within threads.
 service MessageHistory {
-
   // Searches messages within a specific thread.
   // Supports cursor-based pagination and field selection.
   rpc SearchThreadMessagesHistory(SearchMessageHistoryRequest) returns (SearchMessageHistoryResponse) {
-    option (google.api.http) = {
-      get: "/v1/threads/{thread_id}/messages"
-    };
+    option (google.api.http) = {get: "/v1/threads/{thread_id}/messages"};
   }
 
   // Searches messages grouped by the user's closed membership periods
   // within a thread. Active memberships are excluded — their
   // messages are available via SearchThreadMessagesHistory.
   rpc SearchLeftThreadsMessagesHistory(SearchLeftThreadsMessageHistoryRequest) returns (SearchMessageHistoryResponse) {
-    option (google.api.http) = {
-      get: "/v1/threads/{thread_id}/left_threads/messages"
-    };
+    option (google.api.http) = {get: "/v1/threads/{thread_id}/left_threads/messages"};
   }
 }
 
 // HistoryMessageCursorResponse defines next/prev id for keyset-pagination.
 message HistoryMessageCursorResponse {
-
   // Unique identifier last message where cursor stopped.
   string id = 1;
 }
@@ -70,9 +64,7 @@ message HistoryMessageCursorRequest {
   // Cursor identifier.
   // Must be a valid UUID referencing an existing message.
   // Defines the starting point for pagination.
-  string id = 1 [
-    (buf.validate.field).string.uuid = true
-  ];
+  string id = 1 [(buf.validate.field).string.uuid = true];
 
   // Pagination direction flag.
   //
@@ -85,7 +77,6 @@ message HistoryMessageCursorRequest {
 // pagination and projection options for searching
 // message history.
 message SearchMessageHistoryRequest {
-
   // List of message fields to be returned.
   // Used to reduce payload size.
   repeated string fields = 1;
@@ -97,9 +88,7 @@ message SearchMessageHistoryRequest {
   ];
 
   // Filter by thread IDs.
-  string thread_id= 3 [
-    (buf.validate.field).string.uuid = true
-  ];
+  string thread_id = 3 [(buf.validate.field).string.uuid = true];
 
   // Filter messages by sender user IDs.
   repeated string sender_ids = 4 [
@@ -119,10 +108,10 @@ message SearchMessageHistoryRequest {
   optional HistoryMessageCursorRequest cursor = 6;
 
   // Maximum number of messages to return.
-  uint32                        size   = 7 [
+  uint32 size = 7 [
     (buf.validate.field).uint32 = {
-    gte: 1,
-    lte: 100
+      gte: 1
+      lte: 100
     },
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
@@ -131,7 +120,6 @@ message SearchMessageHistoryRequest {
 // Document represents a file attachment
 // associated with a message.
 message Document {
-
   // Document identifier.
   int64 id = 1;
 
@@ -160,7 +148,6 @@ message Document {
 // Image represents an image attachment
 // associated with a message.
 message Image {
-
   // Image identifier.
   string id = 1;
 
@@ -189,7 +176,6 @@ message Image {
 // HistoryMessage represents a single message
 // in thread history.
 message HistoryMessage {
-
   // Unique message identifier.
   string id = 1;
 
@@ -223,13 +209,27 @@ message HistoryMessage {
 
   MessageContact contact = 11;
   MessageLocation location = 12;
-  Interactive interactive =13;
+  Interactive interactive = 13;
+
+  // System message content.
+  System system = 14;
+}
+
+// System represents domain structure for system event messages.
+message System {
+  // Represents type of the message.
+  string type = 1;
+
+  // Represents additional metadata binded into system  message.
+  google.protobuf.Struct metadata = 2;
+
+  // ID of message for which system messages is binded.
+  string message_id = 3;
 }
 
 // SearchMessageHistoryResponse contains
 // message history search results and pagination metadata.
 message SearchMessageHistoryResponse {
-
   // List of messages matching the search criteria.
   repeated HistoryMessage items = 1;
 
@@ -245,7 +245,6 @@ message SearchMessageHistoryResponse {
 // history grouped by the user's closed membership periods
 // ("dialogs") within a thread.
 message SearchLeftThreadsMessageHistoryRequest {
-
   // List of message fields to be returned.
   // Used to reduce payload size.
   repeated string fields = 1;
@@ -284,7 +283,7 @@ message SearchLeftThreadsMessageHistoryRequest {
   // Maximum number of messages to return.
   uint32 size = 8 [
     (buf.validate.field).uint32 = {
-      gte: 1,
+      gte: 1
       lte: 100
     },
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
@@ -292,14 +291,14 @@ message SearchLeftThreadsMessageHistoryRequest {
 }
 
 message MessageContact {
-    optional string name =1;
-    optional string email = 2;
-    optional string phone = 3;
+  optional string name = 1;
+  optional string email = 2;
+  optional string phone = 3;
 }
 
 message MessageLocation {
-    double longitude = 1;
-   double latitude = 2;
+  double longitude = 1;
+  double latitude = 2;
   optional string address = 3;
- optional string name =4;
+  optional string name = 4;
 }
