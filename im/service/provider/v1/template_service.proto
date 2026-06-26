@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package webitel.im.provider.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/webitel/im-provider-service/gen/go/api/v1;impb";
+
+// GateTemplateService manages per-gate overrides for system event messages.
+// When a template is set for a (gate_id, event_type) pair it takes precedence
+// over the built-in default text.  Deleting a template reverts to the default.
+service GateTemplateService {
+  /// SetGateTemplate creates or replaces the template for a specific event type on a gate.
+  rpc SetGateTemplate(ProviderSetGateTemplateRequest) returns (ProviderSetGateTemplateResponse) {
+    option (google.api.http) = { put: "/im/gates/{gate_id}/templates/{event_type}", body: "*" };
+  }
+
+  /// DeleteGateTemplate removes the override, reverting to the built-in default.
+  rpc DeleteGateTemplate(ProviderDeleteGateTemplateRequest) returns (ProviderDeleteGateTemplateResponse) {
+    option (google.api.http) = { delete: "/im/gates/{gate_id}/templates/{event_type}" };
+  }
+
+  /// ListGateTemplates returns all template overrides configured for a gate.
+  rpc ListGateTemplates(ProviderListGateTemplatesRequest) returns (ProviderListGateTemplatesResponse) {
+    option (google.api.http) = { get: "/im/gates/{gate_id}/templates" };
+  }
+}
+
+message ProviderGateTemplate {
+  string gate_id    = 1;
+  string event_type = 2;
+  string template   = 3;
+}
+
+message ProviderSetGateTemplateRequest {
+  string gate_id    = 1;
+  string event_type = 2;
+  // Go text/template string. Variables from im-thread-service are accessed
+  // as {{.var_name}}. Missing keys produce an empty string (missingkey=zero).
+  string template   = 3;
+}
+message ProviderSetGateTemplateResponse {
+  ProviderGateTemplate item = 1;
+}
+
+message ProviderDeleteGateTemplateRequest {
+  string gate_id    = 1;
+  string event_type = 2;
+}
+message ProviderDeleteGateTemplateResponse {}
+
+message ProviderListGateTemplatesRequest {
+  string gate_id = 1;
+}
+message ProviderListGateTemplatesResponse {
+  repeated ProviderGateTemplate items = 1;
+}
