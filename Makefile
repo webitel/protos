@@ -149,6 +149,7 @@ swagger_mix:
 		./swagger/storage.swagger.json ./swagger/messages.swagger.json \
 		./swagger/logger.swagger.json ./swagger/webitel-go.swagger.json \
 		./swagger/wfm.swagger.json ./swagger/cases.swagger.json \
+		./swagger/kb.swagger.json \
 		./swagger/fts.swagger.json ./swagger/media-exporter.swagger.json \
 		./swagger/meetings.swagger.json ./swagger/im-gateway.swagger.json \
 		> ./swagger/api.json || true
