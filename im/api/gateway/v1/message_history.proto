@@ -7,6 +7,7 @@ import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/any.proto";
 import "google/protobuf/struct.proto";
+import "api/gateway/v1/peer.proto";
 
 option go_package = "github.com/webitel/im-gateway-service/gen/api/gateway/v1;gateway";
 
@@ -213,6 +214,29 @@ message HistoryMessage {
 
   // System message content.
   System system = 14;
+
+  // Metadata for button reaction for interactive message.
+  InteractiveCallback reacted_metadata = 15;
+}
+
+message InteractiveCallback {
+  // User who clicked the button.
+  Peer reacted_by = 1 [(buf.validate.field).required = true];
+
+  // Original message ID.
+  string in_reply_to = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+
+  // Button identifier.
+  string button_code = 3;
+
+  // Optional callback payload.
+  string callback_data = 4;
+
+  // Unix time in milliseconds when callback button was clicked.
+  int64 reacted_at = 5;
 }
 
 // System represents domain structure for system event messages.
