@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package webitel.kb;
+
+option go_package = "github.com/webitel/webitel-kb/api/kb;kb";
+
+import "general.proto";
+import "google/api/annotations.proto";
+import "proto/webitel/option.proto";
+
+// Attachments lists and removes files bound to an article.
+service Attachments {
+  option (option.objclass) = "kb_articles";
+
+  // ListFiles returns the files attached to an article.
+  rpc ListFiles(ListFilesRequest) returns (FileList) {
+    option (google.api.http) = {
+      get: "/v1/kb/articles/{article_etag}/files"
+    };
+    option (option.access) = ACTION_READ;
+  }
+
+  // DeleteFile unbinds and removes a file from an article.
+  rpc DeleteFile(DeleteFileRequest) returns (File) {
+    option (google.api.http) = {
+      delete: "/v1/kb/articles/{article_etag}/files/{id}"
+    };
+    option (option.access) = ACTION_UPDATE;
+  }
+}
+
+// File is metadata of a stored file bound to an article.
+message File {
+  // Storage file id.
+  int64 id = 1;
+  // User who uploaded the file.
+  general.ExtendedLookup created_by = 2;
+  // CreatedAt timestamp (epoch ms).
+  int64 created_at = 3;
+  // File size in bytes.
+  int64 size = 4;
+  // MIME type.
+  string mime = 5;
+  // File name.
+  string name = 6;
+  // Download url.
+  string url = 7;
+  // Storage source.
+  string source = 8;
+}
+
+// FileList is a page of files.
+message FileList {
+  // Files on this page.
+  repeated File items = 1;
+  // Whether a next page exists.
+  bool next = 2;
+}
+
+// ListFilesRequest selects the article and pages its files.
+message ListFilesRequest {
+  // Concurrency token / locator of the owning article.
+  string article_etag = 1;
+  // Page number (1-based).
+  int32 page = 2;
+  // Page size.
+  int32 size = 3;
+  // Search term.
+  string q = 4;
+  // Set of fields to return.
+  repeated string fields = 5;
+  // Optional file ids to fetch.
+  repeated int64 ids = 6;
+  // Sorting criteria (e.g. field:asc).
+  string sort = 7;
+}
+
+// DeleteFileRequest selects a file to remove from an article.
+message DeleteFileRequest {
+  // File id.
+  int64 id = 1;
+  // Concurrency token / locator of the owning article.
+  string article_etag = 2;
+}

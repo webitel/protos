@@ -1,0 +1,102 @@
+syntax = "proto3";
+
+package webitel.kb;
+
+option go_package = "github.com/webitel/webitel-kb/api/kb;kb";
+
+import "general.proto";
+
+// Article kind.
+enum ArticleType {
+  ARTICLE_TYPE_UNSPECIFIED = 0;
+  ARTICLE = 1;
+  FAQ = 2;
+}
+
+// Article lifecycle state.
+enum ArticleState {
+  ARTICLE_STATE_UNSPECIFIED = 0;
+  DRAFT = 1;
+  ACTIVE = 2;
+  INACTIVE = 3;
+}
+
+// Article indexing state.
+enum IndexState {
+  INDEX_STATE_UNSPECIFIED = 0;
+  PENDING = 1;
+  INDEXING = 2;
+  INDEXED = 3;
+  FAILED = 4;
+}
+
+// ArticleSummary is a lightweight read model of an article, used by list,
+// search, resolve and menu responses (no body unless inlined for FAQ menu).
+message ArticleSummary {
+  // Unique identifier of the article.
+  int64 id = 1;
+  // Space the article belongs to.
+  int64 space_id = 2;
+  // Parent article id; 0 for a top-level article.
+  int64 parent_id = 3;
+  // Hierarchy depth (1..5).
+  int32 depth = 4;
+  // Article type.
+  ArticleType type = 5;
+  // Current subject (mirrors the published version).
+  string subject = 6;
+  // Short text excerpt for previews and search hits.
+  string snippet = 7;
+  // Article tags.
+  repeated string tags = 8;
+  // Lifecycle state.
+  ArticleState state = 9;
+  // FAQ body inlined for menu responses; empty otherwise.
+  string body = 10;
+  // CreatedAt timestamp (epoch ms).
+  int64 created_at = 20;
+  // UpdatedAt timestamp (epoch ms).
+  int64 updated_at = 21;
+}
+
+// Chunk is a contiguous slice of an article version, the unit returned by
+// semantic search and consumed by downstream RAG.
+message Chunk {
+  // Article the chunk originates from.
+  int64 article_id = 1;
+  // Article version the chunk was produced from.
+  int64 version_id = 2;
+  // Ordinal position of the chunk within the version.
+  int32 chunk_index = 3;
+  // Chunk text content.
+  string content = 4;
+  // Relevance score assigned by retrieval (higher is better).
+  double score = 5;
+}
+
+// Citation is a structured source reference returned alongside retrieval
+// results; rendering is up to the consumer (chips, spoken, or suppressed).
+message Citation {
+  // Source article id.
+  int64 article_id = 1;
+  // Source article title.
+  string title = 2;
+  // Quoted snippet supporting the answer.
+  string snippet = 3;
+  // Deep link to the source article.
+  string url = 4;
+}
+
+// TreeNode is a single node of an article hierarchy tree.
+message TreeNode {
+  // Article id.
+  int64 id = 1;
+  // Article subject.
+  string subject = 2;
+  // Article type.
+  ArticleType type = 3;
+  // Hierarchy depth (1..5).
+  int32 depth = 4;
+  // Child nodes.
+  repeated TreeNode children = 5;
+}

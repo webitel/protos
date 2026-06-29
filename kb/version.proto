@@ -1,0 +1,106 @@
+syntax = "proto3";
+
+package webitel.kb;
+
+option go_package = "github.com/webitel/webitel-kb/api/kb;kb";
+
+import "general.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
+import "proto/webitel/option.proto";
+
+// Versions exposes the immutable version history of an article and restore.
+service Versions {
+  option (option.objclass) = "kb_articles";
+
+  // ListVersions returns the version history of an article (newest first).
+  rpc ListVersions(ListVersionsRequest) returns (ArticleVersionList) {
+    option (google.api.http) = {
+      get: "/v1/kb/articles/{article_id}/versions"
+    };
+    option (option.access) = ACTION_READ;
+  }
+
+  // GetVersion returns a single version by number.
+  rpc GetVersion(GetVersionRequest) returns (ArticleVersion) {
+    option (google.api.http) = {
+      get: "/v1/kb/articles/{article_id}/versions/{version_number}"
+    };
+    option (option.access) = ACTION_READ;
+  }
+
+  // RestoreVersion creates a new version from a past one.
+  rpc RestoreVersion(RestoreVersionRequest) returns (ArticleVersion) {
+    option (google.api.http) = {
+      post: "/v1/kb/articles/{article_id}/versions/{version_number}/restore",
+      body: "*"
+    };
+    option (option.access) = ACTION_UPDATE;
+  }
+}
+
+// ArticleVersion is an immutable snapshot of article content.
+message ArticleVersion {
+  // Unique identifier of the version.
+  int64 id = 1;
+  // Owning article id.
+  int64 article_id = 2;
+  // Monotonic version number within the article.
+  int32 version_number = 3;
+  // Versioned subject.
+  string subject = 4;
+  // Editor document for this version.
+  google.protobuf.Struct body_rich_text = 5;
+  // Markdown serialization (chunking input).
+  string body_markdown = 6;
+  // Plaintext serialization (full-text source).
+  string body_plain = 7;
+  // Version this one was restored from; 0 if authored directly.
+  int64 restored_from = 8;
+  // Optional author notes.
+  string notes = 9;
+  // CreatedAt timestamp (epoch ms).
+  int64 created_at = 20;
+  // User who authored the version.
+  general.Lookup created_by = 22;
+}
+
+// ListVersionsRequest parameters.
+message ListVersionsRequest {
+  // Owning article id.
+  int64 article_id = 1;
+  // Page size.
+  int32 size = 2;
+  // Page number (1-based).
+  int32 page = 3;
+  // Sorting criteria (e.g. field:asc).
+  string sort = 4;
+  // Set of fields to return.
+  repeated string fields = 5;
+}
+
+// ArticleVersionList is a page of versions.
+message ArticleVersionList {
+  // Versions on this page.
+  repeated ArticleVersion items = 1;
+  // Whether a next page exists.
+  bool next = 2;
+}
+
+// GetVersionRequest selects a version by article and number.
+message GetVersionRequest {
+  // Owning article id.
+  int64 article_id = 1;
+  // Version number.
+  int32 version_number = 2;
+}
+
+// RestoreVersionRequest selects a version to restore.
+message RestoreVersionRequest {
+  // Owning article id.
+  int64 article_id = 1;
+  // Version number to restore.
+  int32 version_number = 2;
+  // Optional notes for the new version.
+  string notes = 3;
+}

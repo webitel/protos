@@ -1,0 +1,168 @@
+syntax = "proto3";
+
+package webitel.kb;
+
+option go_package = "github.com/webitel/webitel-kb/api/kb;kb";
+
+import "common.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "proto/webitel/option.proto";
+
+// Retrieval serves read-only search and lookup over the knowledge base for
+// operators (search/resolve/suggest) and bots (semantic_search/menu).
+// All endpoints return an empty list with HTTP 200 on no match, never an error.
+service Retrieval {
+  option (option.objclass) = "kb_articles";
+
+  // Search runs fast full-text search over title, tags and plaintext (no vector).
+  rpc Search(SearchRequest) returns (SearchResponse) {
+    option (google.api.http) = {
+      get: "/v1/kb/articles/search"
+    };
+    option (option.access) = ACTION_READ;
+  }
+
+  // Resolve returns article summaries for the given ids with RBAC applied
+  rpc Resolve(ResolveRequest) returns (ResolveResponse) {
+    option (google.api.http) = {
+      post: "/v1/kb/articles/resolve",
+      body: "*"
+    };
+    option (option.access) = ACTION_READ;
+  }
+
+  // SemanticSearch runs hybrid retrieval (vector + full-text, RRF) and returns
+  // chunks plus optional citations.
+  rpc SemanticSearch(SemanticSearchRequest) returns (SemanticSearchResponse) {
+    option (google.api.http) = {
+      post: "/v1/kb/articles/semantic_search",
+      body: "*"
+    };
+    option (option.access) = ACTION_READ;
+  }
+
+  // Suggest runs hybrid retrieval with cross-encoder rerank for operator assist.
+  rpc Suggest(SuggestRequest) returns (SuggestResponse) {
+    option (google.api.http) = {
+      post: "/v1/kb/articles/suggest",
+      body: "*"
+    };
+    option (option.access) = ACTION_READ;
+  }
+
+  // Menu lists child articles of a parent for bot menu buttons; FAQ children
+  // include their body inline.
+  rpc Menu(MenuRequest) returns (MenuResponse) {
+    option (google.api.http) = {
+      get: "/v1/kb/spaces/{space_id}/articles"
+    };
+    option (option.access) = ACTION_READ;
+  }
+}
+
+// Tag-filter combination mode.
+enum TagMatch {
+  // Default: match articles having ALL listed tags (AND).
+  TAG_MATCH_ALL = 0;
+  // Match articles having ANY listed tag (OR).
+  TAG_MATCH_ANY = 1;
+}
+
+// SearchRequest parameters for full-text search.
+message SearchRequest {
+  // Free-text query.
+  string query = 1;
+  // Spaces to search within.
+  repeated int64 space_ids = 2;
+  // Optional tag filter.
+  repeated string tags = 3;
+  // How to combine the tag filter.
+  TagMatch tag_match = 4;
+  // Page size.
+  int32 size = 5;
+  // Page number (1-based).
+  int32 page = 6;
+}
+
+// SearchResponse is a page of article summaries.
+message SearchResponse {
+  // Matched article summaries.
+  repeated ArticleSummary items = 1;
+  // Whether a next page exists.
+  bool next = 2;
+}
+
+// ResolveRequest selects articles by id within the given spaces.
+message ResolveRequest {
+  // Article ids to resolve.
+  repeated int64 ids = 1;
+  // Spaces the ids are expected in (RBAC scope).
+  repeated int64 space_ids = 2;
+}
+
+// ResolveResponse returns the resolved article summaries.
+message ResolveResponse {
+  // Resolved article summaries (RBAC filtered).
+  repeated ArticleSummary items = 1;
+}
+
+// SemanticSearchRequest parameters for hybrid retrieval.
+message SemanticSearchRequest {
+  // Natural-language query (e.g. STT transcript).
+  string query = 1;
+  // Spaces to search within (bot service scope).
+  repeated int64 space_ids = 2;
+  // Maximum number of chunks to return.
+  int32 top_k = 3;
+  // Whether to include structured citations.
+  bool include_citations = 4;
+  // Optional tag filter.
+  repeated string tags = 5;
+  // How to combine the tag filter.
+  TagMatch tag_match = 6;
+}
+
+// SemanticSearchResponse returns ranked chunks and optional citations.
+message SemanticSearchResponse {
+  // Top-K ranked chunks.
+  repeated Chunk chunks = 1;
+  // Structured citations (empty unless requested).
+  repeated Citation citations = 2;
+}
+
+// SuggestRequest parameters for operator assist.
+message SuggestRequest {
+  // Latest customer message used as the query.
+  string customer_message = 1;
+  // Spaces to search within.
+  repeated int64 space_ids = 2;
+  // Operator team id (team binding scope).
+  int64 team_id = 3;
+  // When true return chunks instead of article summaries.
+  bool return_chunks = 4;
+}
+
+// SuggestResponse returns reranked suggestions.
+message SuggestResponse {
+  // Suggested article summaries.
+  repeated ArticleSummary articles = 1;
+  // Suggested chunks for draft generation.
+  repeated Chunk chunks = 2;
+}
+
+// MenuRequest parameters for bot menus.
+message MenuRequest {
+  // Space to read from.
+  int64 space_id = 1;
+  // Parent article id; 0 for top level.
+  int64 parent_id = 2;
+  // Maximum hierarchy depth to return.
+  int32 depth_limit = 3;
+}
+
+// MenuResponse returns child articles for menu rendering.
+message MenuResponse {
+  // Child article summaries (FAQ children include body inline).
+  repeated ArticleSummary items = 1;
+}

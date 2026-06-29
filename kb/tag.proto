@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package webitel.kb;
+
+option go_package = "github.com/webitel/webitel-kb/api/kb;kb";
+
+import "google/api/annotations.proto";
+import "proto/webitel/option.proto";
+
+// Tags provides tag auto-completion within a space.
+service Tags {
+  option (option.objclass) = "kb_articles";
+
+  // SuggestTags returns existing tags in a space matching a prefix.
+  rpc SuggestTags(SuggestTagsRequest) returns (SuggestTagsResponse) {
+    option (google.api.http) = {
+      get: "/v1/kb/spaces/{space_id}/tags"
+    };
+    option (option.access) = ACTION_READ;
+  }
+}
+
+// SuggestTagsRequest parameters.
+message SuggestTagsRequest {
+  // Space to read tags from.
+  int64 space_id = 1;
+  // Prefix to match.
+  string q = 2;
+  // Maximum number of suggestions.
+  int32 size = 3;
+}
+
+// SuggestTagsResponse returns matching tags.
+message SuggestTagsResponse {
+  // Matching tags.
+  repeated string tags = 1;
+}
