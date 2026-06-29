@@ -6,6 +6,30 @@ option go_package = "github.com/webitel/webitel-kb/api/kb;kb";
 
 import "general.proto";
 
+// Article kind.
+enum ArticleType {
+  ARTICLE_TYPE_UNSPECIFIED = 0;
+  ARTICLE = 1;
+  FAQ = 2;
+}
+
+// Article lifecycle state.
+enum ArticleState {
+  ARTICLE_STATE_UNSPECIFIED = 0;
+  DRAFT = 1;
+  ACTIVE = 2;
+  INACTIVE = 3;
+}
+
+// Article indexing state.
+enum IndexState {
+  INDEX_STATE_UNSPECIFIED = 0;
+  PENDING = 1;
+  INDEXING = 2;
+  INDEXED = 3;
+  FAILED = 4;
+}
+
 // ArticleSummary is a lightweight read model of an article, used by list,
 // search, resolve and menu responses (no body unless inlined for FAQ menu).
 message ArticleSummary {
@@ -17,16 +41,16 @@ message ArticleSummary {
   int64 parent_id = 3;
   // Hierarchy depth (1..5).
   int32 depth = 4;
-  // Article type: "article" or "faq".
-  string type = 5;
-  // Current title (mirrors the published version).
-  string title = 6;
+  // Article type.
+  ArticleType type = 5;
+  // Current subject (mirrors the published version).
+  string subject = 6;
   // Short text excerpt for previews and search hits.
   string snippet = 7;
   // Article tags.
   repeated string tags = 8;
-  // Lifecycle state: "draft", "active" or "inactive".
-  string state = 9;
+  // Lifecycle state.
+  ArticleState state = 9;
   // FAQ body inlined for menu responses; empty otherwise.
   string body = 10;
   // CreatedAt timestamp (epoch ms).
@@ -67,10 +91,10 @@ message Citation {
 message TreeNode {
   // Article id.
   int64 id = 1;
-  // Article title.
-  string title = 2;
-  // Article type: "article" or "faq".
-  string type = 3;
+  // Article subject.
+  string subject = 2;
+  // Article type.
+  ArticleType type = 3;
   // Hierarchy depth (1..5).
   int32 depth = 4;
   // Child nodes.

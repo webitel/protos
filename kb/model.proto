@@ -17,7 +17,7 @@ service EmbeddingModels {
   // ListModels returns models available to the caller's domain (and globals).
   rpc ListModels(ListModelsRequest) returns (EmbeddingModelList) {
     option (google.api.http) = {
-      get: "/v1/models"
+      get: "/v1/kb/models"
     };
     option (option.access) = ACTION_READ;
   }
@@ -25,7 +25,7 @@ service EmbeddingModels {
   // LocateModel returns a single model by id.
   rpc LocateModel(LocateModelRequest) returns (EmbeddingModel) {
     option (google.api.http) = {
-      get: "/v1/models/{id}"
+      get: "/v1/kb/models/{id}"
     };
     option (option.access) = ACTION_READ;
   }
@@ -33,7 +33,7 @@ service EmbeddingModels {
   // CreateModel registers a new model.
   rpc CreateModel(CreateModelRequest) returns (EmbeddingModel) {
     option (google.api.http) = {
-      post: "/v1/models",
+      post: "/v1/kb/models",
       body: "input"
     };
     option (option.access) = ACTION_UPDATE;
@@ -42,10 +42,10 @@ service EmbeddingModels {
   // UpdateModel updates a model registration.
   rpc UpdateModel(UpdateModelRequest) returns (EmbeddingModel) {
     option (google.api.http) = {
-      put: "/v1/models/{id}",
+      put: "/v1/kb/models/{id}",
       body: "input"
       additional_bindings {
-        patch: "/v1/models/{id}",
+        patch: "/v1/kb/models/{id}",
         body: "input"
       }
     };
@@ -55,7 +55,7 @@ service EmbeddingModels {
   // DeleteModel removes a model registration.
   rpc DeleteModel(DeleteModelRequest) returns (EmbeddingModel) {
     option (google.api.http) = {
-      delete: "/v1/models/{id}"
+      delete: "/v1/kb/models/{id}"
     };
     option (option.access) = ACTION_UPDATE;
   }
@@ -63,7 +63,7 @@ service EmbeddingModels {
   // ValidateModel runs a test embed/rerank call and stamps validated_at on success.
   rpc ValidateModel(ValidateModelRequest) returns (EmbeddingModel) {
     option (google.api.http) = {
-      post: "/v1/models/{id}/validate"
+      post: "/v1/kb/models/{id}/validate"
     };
     option (option.access) = ACTION_UPDATE;
   }
@@ -127,6 +127,10 @@ message ListModelsRequest {
   string q = 3;
   // Optional kind filter ("embedding" or "reranker").
   string kind = 4;
+  // Sorting criteria (e.g. field:asc).
+  string sort = 5;
+  // Set of fields to return.
+  repeated string fields = 6;
 }
 
 // EmbeddingModelList is a page of models.

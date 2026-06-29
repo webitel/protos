@@ -8,86 +8,77 @@ import "general.proto";
 import "google/api/annotations.proto";
 import "proto/webitel/option.proto";
 
-// Attachments manages files bound to an article, proxied to Webitel Storage.
+// Attachments lists and removes files bound to an article.
 service Attachments {
   option (option.objclass) = "kb_articles";
 
-  // ListAttachments returns the attachments of an article.
-  rpc ListAttachments(ListAttachmentsRequest) returns (AttachmentList) {
+  // ListFiles returns the files attached to an article.
+  rpc ListFiles(ListFilesRequest) returns (FileList) {
     option (google.api.http) = {
-      get: "/v1/articles/{article_id}/attachments"
+      get: "/v1/kb/articles/{article_etag}/files"
     };
     option (option.access) = ACTION_READ;
   }
 
-  // CreateAttachment uploads a file and binds it to an article.
-  rpc CreateAttachment(CreateAttachmentRequest) returns (Attachment) {
+  // DeleteFile unbinds and removes a file from an article.
+  rpc DeleteFile(DeleteFileRequest) returns (File) {
     option (google.api.http) = {
-      post: "/v1/articles/{article_id}/attachments",
-      body: "*"
-    };
-    option (option.access) = ACTION_UPDATE;
-  }
-
-  // DeleteAttachment removes an attachment.
-  rpc DeleteAttachment(DeleteAttachmentRequest) returns (Attachment) {
-    option (google.api.http) = {
-      delete: "/v1/articles/{article_id}/attachments/{id}"
+      delete: "/v1/kb/articles/{article_etag}/files/{id}"
     };
     option (option.access) = ACTION_UPDATE;
   }
 }
 
-// Attachment is a file bound to an article.
-message Attachment {
-  // Unique identifier of the attachment.
+// File is metadata of a stored file bound to an article.
+message File {
+  // Storage file id.
   int64 id = 1;
-  // Owning article id.
-  int64 article_id = 2;
-  // Pointer into Webitel Storage.
-  string storage_uri = 3;
-  // Original file name.
-  string filename = 4;
-  // MIME type.
-  string mime_type = 5;
-  // File size in bytes.
-  int64 size_bytes = 6;
+  // User who uploaded the file.
+  general.ExtendedLookup created_by = 2;
   // CreatedAt timestamp (epoch ms).
-  int64 created_at = 20;
-  // User who uploaded the attachment.
-  general.Lookup created_by = 22;
+  int64 created_at = 3;
+  // File size in bytes.
+  int64 size = 4;
+  // MIME type.
+  string mime = 5;
+  // File name.
+  string name = 6;
+  // Download url.
+  string url = 7;
+  // Storage source.
+  string source = 8;
 }
 
-// ListAttachmentsRequest selects the article.
-message ListAttachmentsRequest {
-  // Owning article id.
-  int64 article_id = 1;
-}
-
-// AttachmentList is a list of attachments.
-message AttachmentList {
-  // Attachments of the article.
-  repeated Attachment items = 1;
+// FileList is a page of files.
+message FileList {
+  // Files on this page.
+  repeated File items = 1;
   // Whether a next page exists.
   bool next = 2;
 }
 
-// CreateAttachmentRequest uploads a file for an article.
-message CreateAttachmentRequest {
-  // Owning article id.
-  int64 article_id = 1;
-  // Original file name.
-  string filename = 2;
-  // MIME type.
-  string mime_type = 3;
-  // Raw file content.
-  bytes content = 4;
+// ListFilesRequest selects the article and pages its files.
+message ListFilesRequest {
+  // Concurrency token / locator of the owning article.
+  string article_etag = 1;
+  // Page number (1-based).
+  int32 page = 2;
+  // Page size.
+  int32 size = 3;
+  // Search term.
+  string q = 4;
+  // Set of fields to return.
+  repeated string fields = 5;
+  // Optional file ids to fetch.
+  repeated int64 ids = 6;
+  // Sorting criteria (e.g. field:asc).
+  string sort = 7;
 }
 
-// DeleteAttachmentRequest selects an attachment to delete.
-message DeleteAttachmentRequest {
-  // Owning article id.
-  int64 article_id = 1;
-  // Attachment id.
-  int64 id = 2;
+// DeleteFileRequest selects a file to remove from an article.
+message DeleteFileRequest {
+  // File id.
+  int64 id = 1;
+  // Concurrency token / locator of the owning article.
+  string article_etag = 2;
 }

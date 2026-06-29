@@ -19,7 +19,7 @@ service Articles {
   // ListArticles lists articles within a space with optional filters.
   rpc ListArticles(ListArticlesRequest) returns (ArticleList) {
     option (google.api.http) = {
-      get: "/v1/articles"
+      get: "/v1/kb/articles"
     };
     option (option.access) = ACTION_READ;
   }
@@ -27,7 +27,7 @@ service Articles {
   // LocateArticle returns a single article by etag.
   rpc LocateArticle(LocateArticleRequest) returns (Article) {
     option (google.api.http) = {
-      get: "/v1/articles/{etag}"
+      get: "/v1/kb/articles/{etag}"
     };
     option (option.access) = ACTION_READ;
   }
@@ -35,7 +35,7 @@ service Articles {
   // CreateArticle creates an article and its first version.
   rpc CreateArticle(CreateArticleRequest) returns (Article) {
     option (google.api.http) = {
-      post: "/v1/articles",
+      post: "/v1/kb/articles",
       body: "input"
     };
     option (option.access) = ACTION_UPDATE;
@@ -44,10 +44,10 @@ service Articles {
   // UpdateArticle updates an article, creating a new version (optimistic lock via etag).
   rpc UpdateArticle(UpdateArticleRequest) returns (Article) {
     option (google.api.http) = {
-      put: "/v1/articles/{etag}",
+      put: "/v1/kb/articles/{etag}",
       body: "input"
       additional_bindings {
-        patch: "/v1/articles/{etag}",
+        patch: "/v1/kb/articles/{etag}",
         body: "input"
       }
     };
@@ -57,7 +57,7 @@ service Articles {
   // DeleteArticle soft-deletes an article.
   rpc DeleteArticle(DeleteArticleRequest) returns (Article) {
     option (google.api.http) = {
-      delete: "/v1/articles/{etag}"
+      delete: "/v1/kb/articles/{etag}"
     };
     option (option.access) = ACTION_UPDATE;
   }
@@ -65,7 +65,7 @@ service Articles {
   // MoveArticle reparents an article, validating cycles and max depth.
   rpc MoveArticle(MoveArticleRequest) returns (Article) {
     option (google.api.http) = {
-      post: "/v1/articles/{etag}/move",
+      post: "/v1/kb/articles/{etag}/move",
       body: "*"
     };
     option (option.access) = ACTION_UPDATE;
@@ -74,7 +74,7 @@ service Articles {
   // ListChildren returns the direct children of an article.
   rpc ListChildren(ListChildrenRequest) returns (ArticleList) {
     option (google.api.http) = {
-      get: "/v1/articles/{id}/children"
+      get: "/v1/kb/articles/{id}/children"
     };
     option (option.access) = ACTION_READ;
   }
@@ -82,7 +82,7 @@ service Articles {
   // ListAncestors returns the ancestor chain (root first), serving breadcrumbs.
   rpc ListAncestors(ListAncestorsRequest) returns (ArticleList) {
     option (google.api.http) = {
-      get: "/v1/articles/{id}/ancestors"
+      get: "/v1/kb/articles/{id}/ancestors"
     };
     option (option.access) = ACTION_READ;
   }
@@ -90,7 +90,7 @@ service Articles {
   // GetTree returns the article hierarchy of a space, RBAC filtered.
   rpc GetTree(GetTreeRequest) returns (GetTreeResponse) {
     option (google.api.http) = {
-      get: "/v1/spaces/{space_id}/tree"
+      get: "/v1/kb/spaces/{space_id}/tree"
     };
     option (option.access) = ACTION_READ;
   }
@@ -100,26 +100,28 @@ service Articles {
 message Article {
   // Unique identifier of the article.
   int64 id = 1;
+  // Owning domain id.
+  int64 domain_id = 2;
   // Space the article belongs to.
-  int64 space_id = 2;
+  general.Lookup space = 3;
   // Parent article id; 0 for a top-level article.
-  int64 parent_id = 3;
+  int64 parent_id = 4;
   // Hierarchy depth (1..5).
-  int32 depth = 4;
-  // Article type: "article" or "faq".
-  string type = 5;
-  // Current title (mirrors the published version).
-  string title = 6;
+  int32 depth = 5;
+  // Article type.
+  ArticleType type = 6;
+  // Current subject (mirrors the published version).
+  string subject = 7;
   // Article tags.
-  repeated string tags = 7;
-  // Lifecycle state: "draft", "active" or "inactive".
-  string state = 8;
-  // Indexing state: "pending", "indexing", "indexed" or "failed".
-  string index_state = 9;
+  repeated string tags = 8;
+  // Lifecycle state.
+  ArticleState state = 9;
+  // Indexing state.
+  IndexState index_state = 10;
   // Published version id; 0 if not yet published.
-  int64 published_version_id = 10;
+  int64 published_version_id = 11;
   // Optimistic-lock counter.
-  int32 row_version = 11;
+  int32 ver = 12;
   // CreatedAt timestamp (epoch ms).
   int64 created_at = 20;
   // UpdatedAt timestamp (epoch ms).
@@ -128,7 +130,7 @@ message Article {
   general.Lookup created_by = 22;
   // User who last updated the article.
   general.Lookup updated_by = 23;
-  // Concurrency token encoding id and row_version.
+  // Concurrency token encoding id and ver.
   string etag = 30;
 }
 
@@ -138,14 +140,14 @@ message InputArticle {
   int64 space_id = 1;
   // Parent article id; 0 for a top-level article.
   int64 parent_id = 2;
-  // Article type: "article" or "faq".
-  string type = 3;
-  // Article title.
-  string title = 4;
+  // Article type.
+  ArticleType type = 3;
+  // Article subject.
+  string subject = 4;
   // Article tags.
   repeated string tags = 5;
   // Lifecycle state.
-  string state = 6;
+  ArticleState state = 6;
   // Editor document; serialized server-side to markdown/plaintext/tsvector.
   google.protobuf.Struct body_rich_text = 7;
 }
@@ -156,16 +158,20 @@ message ListArticlesRequest {
   int32 size = 1;
   // Page number (1-based).
   int32 page = 2;
-  // Optional title search.
+  // Optional subject search.
   string q = 3;
   // Space to list within.
   int64 space_id = 4;
   // Optional tag filter.
   repeated string tags = 5;
   // Optional state filter.
-  string state = 6;
+  ArticleState state = 6;
   // Optional type filter.
-  string type = 7;
+  ArticleType type = 7;
+  // Sorting criteria (e.g. field:asc).
+  string sort = 8;
+  // Set of fields to return.
+  repeated string fields = 9;
 }
 
 // ArticleList is a page of articles.

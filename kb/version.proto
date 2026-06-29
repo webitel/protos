@@ -16,7 +16,7 @@ service Versions {
   // ListVersions returns the version history of an article (newest first).
   rpc ListVersions(ListVersionsRequest) returns (ArticleVersionList) {
     option (google.api.http) = {
-      get: "/v1/articles/{article_id}/versions"
+      get: "/v1/kb/articles/{article_id}/versions"
     };
     option (option.access) = ACTION_READ;
   }
@@ -24,7 +24,7 @@ service Versions {
   // GetVersion returns a single version by number.
   rpc GetVersion(GetVersionRequest) returns (ArticleVersion) {
     option (google.api.http) = {
-      get: "/v1/articles/{article_id}/versions/{version_number}"
+      get: "/v1/kb/articles/{article_id}/versions/{version_number}"
     };
     option (option.access) = ACTION_READ;
   }
@@ -32,7 +32,7 @@ service Versions {
   // RestoreVersion creates a new version from a past one.
   rpc RestoreVersion(RestoreVersionRequest) returns (ArticleVersion) {
     option (google.api.http) = {
-      post: "/v1/articles/{article_id}/versions/{version_number}/restore",
+      post: "/v1/kb/articles/{article_id}/versions/{version_number}/restore",
       body: "*"
     };
     option (option.access) = ACTION_UPDATE;
@@ -47,8 +47,8 @@ message ArticleVersion {
   int64 article_id = 2;
   // Monotonic version number within the article.
   int32 version_number = 3;
-  // Versioned title.
-  string title = 4;
+  // Versioned subject.
+  string subject = 4;
   // Editor document for this version.
   google.protobuf.Struct body_rich_text = 5;
   // Markdown serialization (chunking input).
@@ -73,6 +73,10 @@ message ListVersionsRequest {
   int32 size = 2;
   // Page number (1-based).
   int32 page = 3;
+  // Sorting criteria (e.g. field:asc).
+  string sort = 4;
+  // Set of fields to return.
+  repeated string fields = 5;
 }
 
 // ArticleVersionList is a page of versions.

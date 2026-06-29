@@ -16,7 +16,7 @@ service Spaces {
   // ListSpaces returns spaces in the caller's domain.
   rpc ListSpaces(ListSpacesRequest) returns (SpaceList) {
     option (google.api.http) = {
-      get: "/v1/spaces"
+      get: "/v1/kb/spaces"
     };
     option (option.access) = ACTION_READ;
   }
@@ -24,7 +24,7 @@ service Spaces {
   // LocateSpace returns a single space by id.
   rpc LocateSpace(LocateSpaceRequest) returns (Space) {
     option (google.api.http) = {
-      get: "/v1/spaces/{id}"
+      get: "/v1/kb/spaces/{id}"
     };
     option (option.access) = ACTION_READ;
   }
@@ -32,7 +32,7 @@ service Spaces {
   // CreateSpace creates a space; language is immutable after creation.
   rpc CreateSpace(CreateSpaceRequest) returns (Space) {
     option (google.api.http) = {
-      post: "/v1/spaces",
+      post: "/v1/kb/spaces",
       body: "input"
     };
     option (option.access) = ACTION_UPDATE;
@@ -41,10 +41,10 @@ service Spaces {
   // UpdateSpace updates a space (language cannot be changed).
   rpc UpdateSpace(UpdateSpaceRequest) returns (Space) {
     option (google.api.http) = {
-      put: "/v1/spaces/{id}",
+      put: "/v1/kb/spaces/{id}",
       body: "input"
       additional_bindings {
-        patch: "/v1/spaces/{id}",
+        patch: "/v1/kb/spaces/{id}",
         body: "input"
       }
     };
@@ -54,7 +54,7 @@ service Spaces {
   // DeleteSpace soft-deletes a space.
   rpc DeleteSpace(DeleteSpaceRequest) returns (Space) {
     option (google.api.http) = {
-      delete: "/v1/spaces/{id}"
+      delete: "/v1/kb/spaces/{id}"
     };
     option (option.access) = ACTION_UPDATE;
   }
@@ -68,6 +68,8 @@ message Space {
   int64 domain_id = 2;
   // Human-readable name.
   string name = 3;
+  // Free-text description.
+  string description = 12;
   // Space language; immutable, drives full-text config and retrieval.
   string language = 4;
   // Active embedding model id (kind=embedding).
@@ -83,7 +85,7 @@ message Space {
   // Chunking strategy identifier.
   string chunking_strategy = 10;
   // Article used as the space home page; 0 if unset.
-  int64 home_page_id = 11;
+  int64 home_article_id = 11;
   // CreatedAt timestamp (epoch ms).
   int64 created_at = 20;
   // UpdatedAt timestamp (epoch ms).
@@ -98,6 +100,8 @@ message Space {
 message InputSpace {
   // Human-readable name.
   string name = 1;
+  // Free-text description.
+  string description = 9;
   // Space language; immutable after creation.
   string language = 2;
   // Active embedding model id.
@@ -111,7 +115,7 @@ message InputSpace {
   // Chunking strategy identifier.
   string chunking_strategy = 7;
   // Article used as the space home page.
-  int64 home_page_id = 8;
+  int64 home_article_id = 8;
 }
 
 // ListSpacesRequest parameters.
@@ -122,6 +126,10 @@ message ListSpacesRequest {
   int32 page = 2;
   // Optional name search.
   string q = 3;
+  // Sorting criteria (e.g. field:asc).
+  string sort = 4;
+  // Set of fields to return.
+  repeated string fields = 5;
 }
 
 // SpaceList is a page of spaces.

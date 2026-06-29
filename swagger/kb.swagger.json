@@ -34,7 +34,7 @@
     "application/json"
   ],
   "paths": {
-    "/v1/articles": {
+    "/v1/kb/articles": {
       "get": {
         "summary": "ListArticles lists articles within a space with optional filters.",
         "operationId": "ListArticles",
@@ -71,7 +71,7 @@
           },
           {
             "name": "q",
-            "description": "Optional title search.",
+            "description": "Optional subject search.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -100,14 +100,45 @@
             "description": "Optional state filter.",
             "in": "query",
             "required": false,
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "ARTICLE_STATE_UNSPECIFIED",
+              "DRAFT",
+              "ACTIVE",
+              "INACTIVE"
+            ],
+            "default": "ARTICLE_STATE_UNSPECIFIED"
           },
           {
             "name": "type",
             "description": "Optional type filter.",
             "in": "query",
             "required": false,
+            "type": "string",
+            "enum": [
+              "ARTICLE_TYPE_UNSPECIFIED",
+              "ARTICLE",
+              "FAQ"
+            ],
+            "default": "ARTICLE_TYPE_UNSPECIFIED"
+          },
+          {
+            "name": "sort",
+            "description": "Sorting criteria (e.g. field:asc).",
+            "in": "query",
+            "required": false,
             "type": "string"
+          },
+          {
+            "name": "fields",
+            "description": "Set of fields to return.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -147,7 +178,7 @@
         ]
       }
     },
-    "/v1/articles/resolve": {
+    "/v1/kb/articles/resolve": {
       "post": {
         "summary": "Resolve returns article summaries for the given ids with RBAC applied",
         "operationId": "Resolve",
@@ -181,7 +212,7 @@
         ]
       }
     },
-    "/v1/articles/search": {
+    "/v1/kb/articles/search": {
       "get": {
         "summary": "Search runs fast full-text search over title, tags and plaintext (no vector).",
         "operationId": "Search",
@@ -264,7 +295,7 @@
         ]
       }
     },
-    "/v1/articles/semantic_search": {
+    "/v1/kb/articles/semantic_search": {
       "post": {
         "summary": "SemanticSearch runs hybrid retrieval (vector + full-text, RRF) and returns\nchunks plus optional citations.",
         "operationId": "SemanticSearch",
@@ -298,7 +329,7 @@
         ]
       }
     },
-    "/v1/articles/suggest": {
+    "/v1/kb/articles/suggest": {
       "post": {
         "summary": "Suggest runs hybrid retrieval with cross-encoder rerank for operator assist.",
         "operationId": "Suggest",
@@ -332,15 +363,15 @@
         ]
       }
     },
-    "/v1/articles/{article_id}/attachments": {
+    "/v1/kb/articles/{article_etag}/files": {
       "get": {
-        "summary": "ListAttachments returns the attachments of an article.",
-        "operationId": "ListAttachments",
+        "summary": "ListFiles returns the files attached to an article.",
+        "operationId": "ListFiles",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/webitel.kb.AttachmentList"
+              "$ref": "#/definitions/webitel.kb.FileList"
             }
           },
           "default": {
@@ -352,51 +383,64 @@
         },
         "parameters": [
           {
-            "name": "article_id",
-            "description": "Owning article id.",
+            "name": "article_etag",
+            "description": "Concurrency token / locator of the owning article.",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
-          }
-        ],
-        "tags": [
-          "Attachments"
-        ]
-      },
-      "post": {
-        "summary": "CreateAttachment uploads a file and binds it to an article.",
-        "operationId": "CreateAttachment",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/webitel.kb.Attachment"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/google.rpc.Status"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "article_id",
-            "description": "Owning article id.",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "string"
           },
           {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/webitel.kb.Attachments.CreateAttachmentBody"
-            }
+            "name": "page",
+            "description": "Page number (1-based).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "description": "Page size.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "q",
+            "description": "Search term.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "description": "Set of fields to return.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "ids",
+            "description": "Optional file ids to fetch.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "sort",
+            "description": "Sorting criteria (e.g. field:asc).",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -404,15 +448,15 @@
         ]
       }
     },
-    "/v1/articles/{article_id}/attachments/{id}": {
+    "/v1/kb/articles/{article_etag}/files/{id}": {
       "delete": {
-        "summary": "DeleteAttachment removes an attachment.",
-        "operationId": "DeleteAttachment",
+        "summary": "DeleteFile unbinds and removes a file from an article.",
+        "operationId": "DeleteFile",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/webitel.kb.Attachment"
+              "$ref": "#/definitions/webitel.kb.File"
             }
           },
           "default": {
@@ -424,16 +468,15 @@
         },
         "parameters": [
           {
-            "name": "article_id",
-            "description": "Owning article id.",
+            "name": "article_etag",
+            "description": "Concurrency token / locator of the owning article.",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "string"
           },
           {
             "name": "id",
-            "description": "Attachment id.",
+            "description": "File id.",
             "in": "path",
             "required": true,
             "type": "string",
@@ -445,7 +488,7 @@
         ]
       }
     },
-    "/v1/articles/{article_id}/versions": {
+    "/v1/kb/articles/{article_id}/versions": {
       "get": {
         "summary": "ListVersions returns the version history of an article (newest first).",
         "operationId": "ListVersions",
@@ -487,6 +530,24 @@
             "required": false,
             "type": "integer",
             "format": "int32"
+          },
+          {
+            "name": "sort",
+            "description": "Sorting criteria (e.g. field:asc).",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "description": "Set of fields to return.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -494,7 +555,7 @@
         ]
       }
     },
-    "/v1/articles/{article_id}/versions/{version_number}": {
+    "/v1/kb/articles/{article_id}/versions/{version_number}": {
       "get": {
         "summary": "GetVersion returns a single version by number.",
         "operationId": "GetVersion",
@@ -535,7 +596,7 @@
         ]
       }
     },
-    "/v1/articles/{article_id}/versions/{version_number}/restore": {
+    "/v1/kb/articles/{article_id}/versions/{version_number}/restore": {
       "post": {
         "summary": "RestoreVersion creates a new version from a past one.",
         "operationId": "RestoreVersion",
@@ -584,7 +645,7 @@
         ]
       }
     },
-    "/v1/articles/{etag}": {
+    "/v1/kb/articles/{etag}": {
       "get": {
         "summary": "LocateArticle returns a single article by etag.",
         "operationId": "LocateArticle",
@@ -724,7 +785,7 @@
         ]
       }
     },
-    "/v1/articles/{etag}/move": {
+    "/v1/kb/articles/{etag}/move": {
       "post": {
         "summary": "MoveArticle reparents an article, validating cycles and max depth.",
         "operationId": "MoveArticle",
@@ -764,7 +825,7 @@
         ]
       }
     },
-    "/v1/articles/{id}/ancestors": {
+    "/v1/kb/articles/{id}/ancestors": {
       "get": {
         "summary": "ListAncestors returns the ancestor chain (root first), serving breadcrumbs.",
         "operationId": "ListAncestors",
@@ -797,7 +858,7 @@
         ]
       }
     },
-    "/v1/articles/{id}/children": {
+    "/v1/kb/articles/{id}/children": {
       "get": {
         "summary": "ListChildren returns the direct children of an article.",
         "operationId": "ListChildren",
@@ -830,7 +891,7 @@
         ]
       }
     },
-    "/v1/models": {
+    "/v1/kb/models": {
       "get": {
         "summary": "ListModels returns models available to the caller's domain (and globals).",
         "operationId": "ListModels",
@@ -878,6 +939,24 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "sort",
+            "description": "Sorting criteria (e.g. field:asc).",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "description": "Set of fields to return.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -917,7 +996,7 @@
         ]
       }
     },
-    "/v1/models/{id}": {
+    "/v1/kb/models/{id}": {
       "get": {
         "summary": "LocateModel returns a single model by id.",
         "operationId": "LocateModel",
@@ -1061,7 +1140,7 @@
         ]
       }
     },
-    "/v1/models/{id}/validate": {
+    "/v1/kb/models/{id}/validate": {
       "post": {
         "summary": "ValidateModel runs a test embed/rerank call and stamps validated_at on success.",
         "operationId": "ValidateModel",
@@ -1094,7 +1173,7 @@
         ]
       }
     },
-    "/v1/spaces": {
+    "/v1/kb/spaces": {
       "get": {
         "summary": "ListSpaces returns spaces in the caller's domain.",
         "operationId": "ListSpaces",
@@ -1135,6 +1214,24 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "sort",
+            "description": "Sorting criteria (e.g. field:asc).",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "description": "Set of fields to return.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -1174,7 +1271,7 @@
         ]
       }
     },
-    "/v1/spaces/{id}": {
+    "/v1/kb/spaces/{id}": {
       "get": {
         "summary": "LocateSpace returns a single space by id.",
         "operationId": "LocateSpace",
@@ -1318,7 +1415,7 @@
         ]
       }
     },
-    "/v1/spaces/{space_id}/articles": {
+    "/v1/kb/spaces/{space_id}/articles": {
       "get": {
         "summary": "Menu lists child articles of a parent for bot menu buttons; FAQ children\ninclude their body inline.",
         "operationId": "Menu",
@@ -1367,7 +1464,7 @@
         ]
       }
     },
-    "/v1/spaces/{space_id}/tags": {
+    "/v1/kb/spaces/{space_id}/tags": {
       "get": {
         "summary": "SuggestTags returns existing tags in a space matching a prefix.",
         "operationId": "SuggestTags",
@@ -1415,7 +1512,7 @@
         ]
       }
     },
-    "/v1/spaces/{space_id}/tree": {
+    "/v1/kb/spaces/{space_id}/tree": {
       "get": {
         "summary": "GetTree returns the article hierarchy of a space, RBAC filtered.",
         "operationId": "GetTree",
@@ -1450,6 +1547,21 @@
     }
   },
   "definitions": {
+    "general.ExtendedLookup": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
     "general.Lookup": {
       "type": "object",
       "properties": {
@@ -1506,9 +1618,13 @@
           "format": "int64",
           "description": "Unique identifier of the article."
         },
-        "space_id": {
+        "domain_id": {
           "type": "string",
           "format": "int64",
+          "description": "Owning domain id."
+        },
+        "space": {
+          "$ref": "#/definitions/general.Lookup",
           "description": "Space the article belongs to."
         },
         "parent_id": {
@@ -1522,12 +1638,12 @@
           "description": "Hierarchy depth (1..5)."
         },
         "type": {
-          "type": "string",
-          "description": "Article type: \"article\" or \"faq\"."
+          "$ref": "#/definitions/webitel.kb.ArticleType",
+          "description": "Article type."
         },
-        "title": {
+        "subject": {
           "type": "string",
-          "description": "Current title (mirrors the published version)."
+          "description": "Current subject (mirrors the published version)."
         },
         "tags": {
           "type": "array",
@@ -1537,19 +1653,19 @@
           "description": "Article tags."
         },
         "state": {
-          "type": "string",
-          "description": "Lifecycle state: \"draft\", \"active\" or \"inactive\"."
+          "$ref": "#/definitions/webitel.kb.ArticleState",
+          "description": "Lifecycle state."
         },
         "index_state": {
-          "type": "string",
-          "description": "Indexing state: \"pending\", \"indexing\", \"indexed\" or \"failed\"."
+          "$ref": "#/definitions/webitel.kb.IndexState",
+          "description": "Indexing state."
         },
         "published_version_id": {
           "type": "string",
           "format": "int64",
           "description": "Published version id; 0 if not yet published."
         },
-        "row_version": {
+        "ver": {
           "type": "integer",
           "format": "int32",
           "description": "Optimistic-lock counter."
@@ -1574,7 +1690,7 @@
         },
         "etag": {
           "type": "string",
-          "description": "Concurrency token encoding id and row_version."
+          "description": "Concurrency token encoding id and ver."
         }
       },
       "description": "Article is the article read model."
@@ -1596,6 +1712,17 @@
         }
       },
       "description": "ArticleList is a page of articles."
+    },
+    "webitel.kb.ArticleState": {
+      "type": "string",
+      "enum": [
+        "ARTICLE_STATE_UNSPECIFIED",
+        "DRAFT",
+        "ACTIVE",
+        "INACTIVE"
+      ],
+      "default": "ARTICLE_STATE_UNSPECIFIED",
+      "description": "Article lifecycle state."
     },
     "webitel.kb.ArticleSummary": {
       "type": "object",
@@ -1621,12 +1748,12 @@
           "description": "Hierarchy depth (1..5)."
         },
         "type": {
-          "type": "string",
-          "description": "Article type: \"article\" or \"faq\"."
+          "$ref": "#/definitions/webitel.kb.ArticleType",
+          "description": "Article type."
         },
-        "title": {
+        "subject": {
           "type": "string",
-          "description": "Current title (mirrors the published version)."
+          "description": "Current subject (mirrors the published version)."
         },
         "snippet": {
           "type": "string",
@@ -1640,8 +1767,8 @@
           "description": "Article tags."
         },
         "state": {
-          "type": "string",
-          "description": "Lifecycle state: \"draft\", \"active\" or \"inactive\"."
+          "$ref": "#/definitions/webitel.kb.ArticleState",
+          "description": "Lifecycle state."
         },
         "body": {
           "type": "string",
@@ -1659,6 +1786,16 @@
         }
       },
       "description": "ArticleSummary is a lightweight read model of an article, used by list,\nsearch, resolve and menu responses (no body unless inlined for FAQ menu)."
+    },
+    "webitel.kb.ArticleType": {
+      "type": "string",
+      "enum": [
+        "ARTICLE_TYPE_UNSPECIFIED",
+        "ARTICLE",
+        "FAQ"
+      ],
+      "default": "ARTICLE_TYPE_UNSPECIFIED",
+      "description": "Article kind."
     },
     "webitel.kb.ArticleVersion": {
       "type": "object",
@@ -1678,9 +1815,9 @@
           "format": "int32",
           "description": "Monotonic version number within the article."
         },
-        "title": {
+        "subject": {
           "type": "string",
-          "description": "Versioned title."
+          "description": "Versioned subject."
         },
         "body_rich_text": {
           "type": "object",
@@ -1743,85 +1880,6 @@
         }
       },
       "description": "MoveArticleRequest reparents an article."
-    },
-    "webitel.kb.Attachment": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "int64",
-          "description": "Unique identifier of the attachment."
-        },
-        "article_id": {
-          "type": "string",
-          "format": "int64",
-          "description": "Owning article id."
-        },
-        "storage_uri": {
-          "type": "string",
-          "description": "Pointer into Webitel Storage."
-        },
-        "filename": {
-          "type": "string",
-          "description": "Original file name."
-        },
-        "mime_type": {
-          "type": "string",
-          "description": "MIME type."
-        },
-        "size_bytes": {
-          "type": "string",
-          "format": "int64",
-          "description": "File size in bytes."
-        },
-        "created_at": {
-          "type": "string",
-          "format": "int64",
-          "description": "CreatedAt timestamp (epoch ms)."
-        },
-        "created_by": {
-          "$ref": "#/definitions/general.Lookup",
-          "description": "User who uploaded the attachment."
-        }
-      },
-      "description": "Attachment is a file bound to an article."
-    },
-    "webitel.kb.AttachmentList": {
-      "type": "object",
-      "properties": {
-        "items": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.kb.Attachment"
-          },
-          "description": "Attachments of the article."
-        },
-        "next": {
-          "type": "boolean",
-          "description": "Whether a next page exists."
-        }
-      },
-      "description": "AttachmentList is a list of attachments."
-    },
-    "webitel.kb.Attachments.CreateAttachmentBody": {
-      "type": "object",
-      "properties": {
-        "filename": {
-          "type": "string",
-          "description": "Original file name."
-        },
-        "mime_type": {
-          "type": "string",
-          "description": "MIME type."
-        },
-        "content": {
-          "type": "string",
-          "format": "byte",
-          "description": "Raw file content."
-        }
-      },
-      "description": "CreateAttachmentRequest uploads a file for an article."
     },
     "webitel.kb.Chunk": {
       "type": "object",
@@ -1953,6 +2011,65 @@
       },
       "description": "EmbeddingModelList is a page of models."
     },
+    "webitel.kb.File": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "description": "Storage file id."
+        },
+        "created_by": {
+          "$ref": "#/definitions/general.ExtendedLookup",
+          "description": "User who uploaded the file."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "CreatedAt timestamp (epoch ms)."
+        },
+        "size": {
+          "type": "string",
+          "format": "int64",
+          "description": "File size in bytes."
+        },
+        "mime": {
+          "type": "string",
+          "description": "MIME type."
+        },
+        "name": {
+          "type": "string",
+          "description": "File name."
+        },
+        "url": {
+          "type": "string",
+          "description": "Download url."
+        },
+        "source": {
+          "type": "string",
+          "description": "Storage source."
+        }
+      },
+      "description": "File is metadata of a stored file bound to an article."
+    },
+    "webitel.kb.FileList": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.kb.File"
+          },
+          "description": "Files on this page."
+        },
+        "next": {
+          "type": "boolean",
+          "description": "Whether a next page exists."
+        }
+      },
+      "description": "FileList is a page of files."
+    },
     "webitel.kb.GetTreeResponse": {
       "type": "object",
       "properties": {
@@ -1966,6 +2083,18 @@
         }
       },
       "description": "GetTreeResponse returns the root nodes of the space tree."
+    },
+    "webitel.kb.IndexState": {
+      "type": "string",
+      "enum": [
+        "INDEX_STATE_UNSPECIFIED",
+        "PENDING",
+        "INDEXING",
+        "INDEXED",
+        "FAILED"
+      ],
+      "default": "INDEX_STATE_UNSPECIFIED",
+      "description": "Article indexing state."
     },
     "webitel.kb.InputArticle": {
       "type": "object",
@@ -1981,12 +2110,12 @@
           "description": "Parent article id; 0 for a top-level article."
         },
         "type": {
-          "type": "string",
-          "description": "Article type: \"article\" or \"faq\"."
+          "$ref": "#/definitions/webitel.kb.ArticleType",
+          "description": "Article type."
         },
-        "title": {
+        "subject": {
           "type": "string",
-          "description": "Article title."
+          "description": "Article subject."
         },
         "tags": {
           "type": "array",
@@ -1996,7 +2125,7 @@
           "description": "Article tags."
         },
         "state": {
-          "type": "string",
+          "$ref": "#/definitions/webitel.kb.ArticleState",
           "description": "Lifecycle state."
         },
         "body_rich_text": {
@@ -2052,6 +2181,10 @@
           "type": "string",
           "description": "Human-readable name."
         },
+        "description": {
+          "type": "string",
+          "description": "Free-text description."
+        },
         "language": {
           "type": "string",
           "description": "Space language; immutable after creation."
@@ -2078,7 +2211,7 @@
           "type": "string",
           "description": "Chunking strategy identifier."
         },
-        "home_page_id": {
+        "home_article_id": {
           "type": "string",
           "format": "int64",
           "description": "Article used as the space home page."
@@ -2231,6 +2364,10 @@
           "type": "string",
           "description": "Human-readable name."
         },
+        "description": {
+          "type": "string",
+          "description": "Free-text description."
+        },
         "language": {
           "type": "string",
           "description": "Space language; immutable, drives full-text config and retrieval."
@@ -2262,7 +2399,7 @@
           "type": "string",
           "description": "Chunking strategy identifier."
         },
-        "home_page_id": {
+        "home_article_id": {
           "type": "string",
           "format": "int64",
           "description": "Article used as the space home page; 0 if unset."
@@ -2385,13 +2522,13 @@
           "format": "int64",
           "description": "Article id."
         },
-        "title": {
+        "subject": {
           "type": "string",
-          "description": "Article title."
+          "description": "Article subject."
         },
         "type": {
-          "type": "string",
-          "description": "Article type: \"article\" or \"faq\"."
+          "$ref": "#/definitions/webitel.kb.ArticleType",
+          "description": "Article type."
         },
         "depth": {
           "type": "integer",
