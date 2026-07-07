@@ -934,8 +934,8 @@
             "type": "string"
           },
           {
-            "name": "kind",
-            "description": "Optional kind filter (\"embedding\" or \"reranker\").",
+            "name": "type",
+            "description": "Optional type filter (\"embedding\" or \"reranker\").",
             "in": "query",
             "required": false,
             "type": "string"
@@ -1304,7 +1304,7 @@
         ]
       },
       "delete": {
-        "summary": "DeleteSpace soft-deletes a space.",
+        "summary": "DeleteSpace deletes a space; a space with active articles cannot be deleted.",
         "operationId": "DeleteSpace",
         "responses": {
           "200": {
@@ -1795,7 +1795,7 @@
         "FAQ"
       ],
       "default": "ARTICLE_TYPE_UNSPECIFIED",
-      "description": "Article kind."
+      "description": "Article type."
     },
     "webitel.kb.ArticleVersion": {
       "type": "object",
@@ -1947,9 +1947,9 @@
           "format": "int64",
           "description": "Owning domain id; 0 for a global (Webitel-seeded) model."
         },
-        "kind": {
+        "type": {
           "type": "string",
-          "description": "Model kind: \"embedding\" or \"reranker\"."
+          "description": "Model type: \"embedding\" or \"reranker\"."
         },
         "name": {
           "type": "string",
@@ -2138,9 +2138,9 @@
     "webitel.kb.InputEmbeddingModel": {
       "type": "object",
       "properties": {
-        "kind": {
+        "type": {
           "type": "string",
-          "description": "Model kind: \"embedding\" or \"reranker\"."
+          "description": "Model type: \"embedding\" or \"reranker\"."
         },
         "name": {
           "type": "string",
@@ -2215,6 +2215,14 @@
           "type": "string",
           "format": "int64",
           "description": "Article used as the space home page."
+        },
+        "team_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          },
+          "description": "Team ids the space is bound to as default operator visibility;\nthe set replaces the current binding, empty removes it."
         }
       },
       "description": "InputSpace carries the writable fields of a space."
@@ -2375,7 +2383,7 @@
         "embedding_model_id": {
           "type": "string",
           "format": "int64",
-          "description": "Active embedding model id (kind=embedding)."
+          "description": "Active embedding model id (type=embedding)."
         },
         "target_embedding_model_id": {
           "type": "string",
@@ -2385,7 +2393,7 @@
         "reranker_model_id": {
           "type": "string",
           "format": "int64",
-          "description": "Reranker model id (kind=reranker)."
+          "description": "Reranker model id (type=reranker)."
         },
         "vector_search_enabled": {
           "type": "boolean",
@@ -2403,6 +2411,14 @@
           "type": "string",
           "format": "int64",
           "description": "Article used as the space home page; 0 if unset."
+        },
+        "teams": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/general.Lookup"
+          },
+          "description": "Teams the space is bound to as default operator visibility;\nempty when no binding is configured."
         },
         "created_at": {
           "type": "string",

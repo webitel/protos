@@ -51,7 +51,7 @@ service Spaces {
     option (option.access) = ACTION_UPDATE;
   }
 
-  // DeleteSpace soft-deletes a space.
+  // DeleteSpace deletes a space; a space with active articles cannot be deleted.
   rpc DeleteSpace(DeleteSpaceRequest) returns (Space) {
     option (google.api.http) = {
       delete: "/v1/kb/spaces/{id}"
@@ -72,11 +72,11 @@ message Space {
   string description = 12;
   // Space language; immutable, drives full-text config and retrieval.
   string language = 4;
-  // Active embedding model id (kind=embedding).
+  // Active embedding model id (type=embedding).
   int64 embedding_model_id = 5;
   // Target embedding model id for a pending model migration.
   int64 target_embedding_model_id = 6;
-  // Reranker model id (kind=reranker).
+  // Reranker model id (type=reranker).
   int64 reranker_model_id = 7;
   // Whether articles in this space are embedded for vector search.
   bool vector_search_enabled = 8;
@@ -86,6 +86,9 @@ message Space {
   string chunking_strategy = 10;
   // Article used as the space home page; 0 if unset.
   int64 home_article_id = 11;
+  // Teams the space is bound to as default operator visibility;
+  // empty when no binding is configured.
+  repeated general.Lookup teams = 13;
   // CreatedAt timestamp (epoch ms).
   int64 created_at = 20;
   // UpdatedAt timestamp (epoch ms).
@@ -116,6 +119,9 @@ message InputSpace {
   string chunking_strategy = 7;
   // Article used as the space home page.
   int64 home_article_id = 8;
+  // Team ids the space is bound to as default operator visibility;
+  // the set replaces the current binding, empty removes it.
+  repeated int64 team_ids = 10;
 }
 
 // ListSpacesRequest parameters.
