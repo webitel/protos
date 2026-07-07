@@ -137,6 +137,15 @@ service Dictionaries {
       body: "*"
     };
   }
+  // Batch create dictionary records, resolving Select/Multiselect
+  // lookup columns by display name (case-insensitive) instead of id.
+  rpc BatchCreateData(BatchCreateDatasetRequest) returns (BatchCreateDatasetResponse) {
+    option (google.api.http) = {
+      post: "/dictionaries/{repo}/batch"
+      response_body: "*"
+      body: "*"
+    };
+  }
 }
 
 // ----------------------------------- //
@@ -258,5 +267,37 @@ message ImportCSVRequest {
   }
   action on_data_error = 10;
   action on_empty_line = 11;
+}
+
+message BatchCreateDatasetRequest {
+  // `types.repo`
+  string repo = 1;
+  // Parsed records to create. For Select(lookup) columns each row carries
+  // the related record display name (string); for Multiselect(list of lookup)
+  // columns - an array of display names. Backend resolves name -> id
+  // (case-insensitive).
+  repeated google.protobuf.Struct rows = 2;
+}
+
+message BatchCreateDatasetResponse {
+  // Total number of input rows.
+  int32 total = 1;
+  // Number of successfully imported rows.
+  int32 imported = 2;
+  // Number of failed rows.
+  int32 failed = 3;
+  // Per-row errors (rows processed independently).
+  repeated BatchCreateError errors = 4;
+}
+
+message BatchCreateError {
+  // 0-based index of the row within the input `rows` array.
+  int32 row = 1;
+  // Code (id) of the problematic column.
+  string field = 2;
+  // Original input value that could not be processed.
+  string value = 3;
+  // Error code: lookup.not_found | lookup.ambiguous | validation.failed
+  string code = 4;
 }
 
