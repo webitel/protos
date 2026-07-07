@@ -24311,6 +24311,46 @@
         }
       }
     },
+    "/dictionaries/{repo}/batch": {
+      "post": {
+        "tags": [
+          "Dictionaries"
+        ],
+        "summary": "Batch create dictionary records, resolving Select/Multiselect\nlookup columns by display name (case-insensitive) instead of id.",
+        "operationId": "BatchCreateData",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "`types.repo`",
+            "name": "repo",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DictionariesBatchCreateDataBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/dataBatchCreateDatasetResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        }
+      }
+    },
     "/dictionaries/{repo}/csv": {
       "post": {
         "tags": [
@@ -42899,6 +42939,18 @@
         }
       }
     },
+    "DictionariesBatchCreateDataBody": {
+      "type": "object",
+      "properties": {
+        "rows": {
+          "description": "Parsed records to create. For Select(lookup) columns each row carries\nthe related record display name (string); for Multiselect(list of lookup)\ncolumns - an array of display names. Backend resolves name -\u003e id\n(case-insensitive).",
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
     "DictionariesImportCSVBody": {
       "type": "object",
       "properties": {
@@ -48615,6 +48667,56 @@
         ],
         "next": true,
         "page": 1
+      }
+    },
+    "dataBatchCreateDatasetResponse": {
+      "type": "object",
+      "properties": {
+        "errors": {
+          "description": "Per-row errors (rows processed independently).",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/dataBatchCreateError"
+          }
+        },
+        "failed": {
+          "description": "Number of failed rows.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "imported": {
+          "description": "Number of successfully imported rows.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "total": {
+          "description": "Total number of input rows.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "dataBatchCreateError": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "title": "Error code: lookup.not_found | lookup.ambiguous | validation.failed"
+        },
+        "field": {
+          "description": "Code (id) of the problematic column.",
+          "type": "string"
+        },
+        "row": {
+          "description": "0-based index of the row within the input `rows` array.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "value": {
+          "description": "Original input value that could not be processed.",
+          "type": "string"
+        }
       }
     },
     "dataDataset": {
