@@ -4967,6 +4967,45 @@
         }
       }
     },
+    "/call_center/queues/attempts/{attempt_id}/assign": {
+      "patch": {
+        "tags": [
+          "MemberService"
+        ],
+        "operationId": "AssignAttempt",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "attempt_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engine.MemberService.AssignAttemptBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.AssignAttemptResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/call_center/queues/attempts/{attempt_id}/renewal": {
       "patch": {
         "tags": [
@@ -32493,7 +32532,8 @@
                 "expand_contact_tabs",
                 "default_workspace_tab",
                 "block_all_member_numbers_from_list",
-                "login_options"
+                "login_options",
+                "default_members_filter"
               ],
               "type": "string"
             },
@@ -50908,6 +50948,9 @@
         }
       }
     },
+    "engine.AssignAttemptResponse": {
+      "type": "object"
+    },
     "engine.Attempt": {
       "type": "object",
       "properties": {
@@ -55041,6 +55084,16 @@
         }
       }
     },
+    "engine.MemberService.AssignAttemptBody": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "description": "Optional. If omitted (0), the attempt is assigned to the calling user's own agent.",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "engine.MemberService.AttemptCallbackBody": {
       "type": "object",
       "properties": {
@@ -58129,7 +58182,8 @@
         "expand_contact_tabs",
         "default_workspace_tab",
         "block_all_member_numbers_from_list",
-        "login_options"
+        "login_options",
+        "default_members_filter"
       ]
     },
     "engine.SystemSettingService.PatchSystemSettingBody": {
