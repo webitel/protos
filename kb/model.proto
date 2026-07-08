@@ -1,0 +1,174 @@
+syntax = "proto3";
+
+package webitel.kb;
+
+option go_package = "github.com/webitel/webitel-kb/api/kb;kb";
+
+import "general.proto";
+import "google/api/annotations.proto";
+import "proto/webitel/option.proto";
+
+// EmbeddingModels manages the registry of embedding and reranker models.
+// The encrypted provider credential is never returned; it is set via api_key
+// on input and validated by a test call before a space may select the model.
+service EmbeddingModels {
+  option (option.objclass) = "kb_models";
+
+  // ListModels returns models available to the caller's domain (and globals).
+  rpc ListModels(ListModelsRequest) returns (EmbeddingModelList) {
+    option (google.api.http) = {
+      get: "/v1/kb/models"
+    };
+    option (option.access) = ACTION_READ;
+  }
+
+  // LocateModel returns a single model by id.
+  rpc LocateModel(LocateModelRequest) returns (EmbeddingModel) {
+    option (google.api.http) = {
+      get: "/v1/kb/models/{id}"
+    };
+    option (option.access) = ACTION_READ;
+  }
+
+  // CreateModel registers a new model.
+  rpc CreateModel(CreateModelRequest) returns (EmbeddingModel) {
+    option (google.api.http) = {
+      post: "/v1/kb/models",
+      body: "input"
+    };
+    option (option.access) = ACTION_UPDATE;
+  }
+
+  // UpdateModel updates a model registration.
+  rpc UpdateModel(UpdateModelRequest) returns (EmbeddingModel) {
+    option (google.api.http) = {
+      put: "/v1/kb/models/{id}",
+      body: "input"
+      additional_bindings {
+        patch: "/v1/kb/models/{id}",
+        body: "input"
+      }
+    };
+    option (option.access) = ACTION_UPDATE;
+  }
+
+  // DeleteModel removes a model registration.
+  rpc DeleteModel(DeleteModelRequest) returns (EmbeddingModel) {
+    option (google.api.http) = {
+      delete: "/v1/kb/models/{id}"
+    };
+    option (option.access) = ACTION_UPDATE;
+  }
+
+  // ValidateModel runs a test embed/rerank call and stamps validated_at on success.
+  rpc ValidateModel(ValidateModelRequest) returns (EmbeddingModel) {
+    option (google.api.http) = {
+      post: "/v1/kb/models/{id}/validate"
+    };
+    option (option.access) = ACTION_UPDATE;
+  }
+}
+
+// EmbeddingModel is a registry entry read model (credential omitted).
+message EmbeddingModel {
+  // Unique identifier of the model.
+  int64 id = 1;
+  // Owning domain id; 0 for a global (Webitel-seeded) model.
+  int64 domain_id = 2;
+  // Model type: "embedding" or "reranker".
+  string type = 3;
+  // Human-readable name shown in the admin UI.
+  string name = 4;
+  // Provider key (gemini, openai, cohere, azure, bge-m3, e5, bge-reranker, byom).
+  string provider = 5;
+  // Whether the model runs self-hosted.
+  bool is_self_hosted = 6;
+  // Provider model name or HuggingFace id.
+  string model_ref = 7;
+  // Embedding dimension; 0 for rerankers.
+  int32 dimensions = 8;
+  // Self-hosted / Azure / BYOM endpoint url.
+  string endpoint = 9;
+  // Timestamp of the last successful validation (epoch ms); 0 if never validated.
+  int64 validated_at = 10;
+  // CreatedAt timestamp (epoch ms).
+  int64 created_at = 20;
+  // User who created the model.
+  general.Lookup created_by = 22;
+}
+
+// InputEmbeddingModel carries the writable fields of a model.
+message InputEmbeddingModel {
+  // Model type: "embedding" or "reranker".
+  string type = 1;
+  // Human-readable name.
+  string name = 2;
+  // Provider key.
+  string provider = 3;
+  // Whether the model runs self-hosted.
+  bool is_self_hosted = 4;
+  // Provider model name or HuggingFace id.
+  string model_ref = 5;
+  // Embedding dimension; omit for rerankers.
+  int32 dimensions = 6;
+  // Self-hosted / Azure / BYOM endpoint url.
+  string endpoint = 7;
+  // Write-only provider credential; encrypted at rest, never read back.
+  string api_key = 8;
+}
+
+// ListModelsRequest parameters.
+message ListModelsRequest {
+  // Page size.
+  int32 size = 1;
+  // Page number (1-based).
+  int32 page = 2;
+  // Optional name search.
+  string q = 3;
+  // Optional type filter ("embedding" or "reranker").
+  string type = 4;
+  // Sorting criteria (e.g. field:asc).
+  string sort = 5;
+  // Set of fields to return.
+  repeated string fields = 6;
+}
+
+// EmbeddingModelList is a page of models.
+message EmbeddingModelList {
+  // Models on this page.
+  repeated EmbeddingModel items = 1;
+  // Whether a next page exists.
+  bool next = 2;
+}
+
+// LocateModelRequest selects a model by id.
+message LocateModelRequest {
+  // Model id.
+  int64 id = 1;
+}
+
+// CreateModelRequest wraps the model to create.
+message CreateModelRequest {
+  // Model fields.
+  InputEmbeddingModel input = 1;
+}
+
+// UpdateModelRequest wraps the model id and updated fields.
+message UpdateModelRequest {
+  // Model id.
+  int64 id = 1;
+  // Updated model fields.
+  InputEmbeddingModel input = 2;
+}
+
+// DeleteModelRequest selects a model to delete.
+message DeleteModelRequest {
+  // Model id.
+  int64 id = 1;
+}
+
+// ValidateModelRequest selects a model to validate.
+message ValidateModelRequest {
+  // Model id.
+  int64 id = 1;
+}

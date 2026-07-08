@@ -1,0 +1,173 @@
+syntax = "proto3";
+
+package webitel.kb;
+
+option go_package = "github.com/webitel/webitel-kb/api/kb;kb";
+
+import "general.proto";
+import "google/api/annotations.proto";
+import "proto/webitel/option.proto";
+
+// Spaces manages knowledge-base spaces: top-level containers that fix language
+// and retrieval configuration (embedding/reranker models, vector toggle).
+service Spaces {
+  option (option.objclass) = "kb_spaces";
+
+  // ListSpaces returns spaces in the caller's domain.
+  rpc ListSpaces(ListSpacesRequest) returns (SpaceList) {
+    option (google.api.http) = {
+      get: "/v1/kb/spaces"
+    };
+    option (option.access) = ACTION_READ;
+  }
+
+  // LocateSpace returns a single space by id.
+  rpc LocateSpace(LocateSpaceRequest) returns (Space) {
+    option (google.api.http) = {
+      get: "/v1/kb/spaces/{id}"
+    };
+    option (option.access) = ACTION_READ;
+  }
+
+  // CreateSpace creates a space; language is immutable after creation.
+  rpc CreateSpace(CreateSpaceRequest) returns (Space) {
+    option (google.api.http) = {
+      post: "/v1/kb/spaces",
+      body: "input"
+    };
+    option (option.access) = ACTION_UPDATE;
+  }
+
+  // UpdateSpace updates a space (language cannot be changed).
+  rpc UpdateSpace(UpdateSpaceRequest) returns (Space) {
+    option (google.api.http) = {
+      put: "/v1/kb/spaces/{id}",
+      body: "input"
+      additional_bindings {
+        patch: "/v1/kb/spaces/{id}",
+        body: "input"
+      }
+    };
+    option (option.access) = ACTION_UPDATE;
+  }
+
+  // DeleteSpace deletes a space; a space with active articles cannot be deleted.
+  rpc DeleteSpace(DeleteSpaceRequest) returns (Space) {
+    option (google.api.http) = {
+      delete: "/v1/kb/spaces/{id}"
+    };
+    option (option.access) = ACTION_UPDATE;
+  }
+}
+
+// Space is a knowledge-base space read model.
+message Space {
+  // Unique identifier of the space.
+  int64 id = 1;
+  // Owning domain id.
+  int64 domain_id = 2;
+  // Human-readable name.
+  string name = 3;
+  // Free-text description.
+  string description = 12;
+  // Space language; immutable, drives full-text config and retrieval.
+  string language = 4;
+  // Active embedding model id (type=embedding).
+  int64 embedding_model_id = 5;
+  // Target embedding model id for a pending model migration.
+  int64 target_embedding_model_id = 6;
+  // Reranker model id (type=reranker).
+  int64 reranker_model_id = 7;
+  // Whether articles in this space are embedded for vector search.
+  bool vector_search_enabled = 8;
+  // Whether reranking is applied (default off, on for suggest).
+  bool rerank_enabled = 9;
+  // Chunking strategy identifier.
+  string chunking_strategy = 10;
+  // Article used as the space home page; 0 if unset.
+  int64 home_article_id = 11;
+  // Teams the space is bound to as default operator visibility;
+  // empty when no binding is configured.
+  repeated general.Lookup teams = 13;
+  // CreatedAt timestamp (epoch ms).
+  int64 created_at = 20;
+  // UpdatedAt timestamp (epoch ms).
+  int64 updated_at = 21;
+  // User who created the space.
+  general.Lookup created_by = 22;
+  // User who last updated the space.
+  general.Lookup updated_by = 23;
+}
+
+// InputSpace carries the writable fields of a space.
+message InputSpace {
+  // Human-readable name.
+  string name = 1;
+  // Free-text description.
+  string description = 9;
+  // Space language; immutable after creation.
+  string language = 2;
+  // Active embedding model id.
+  int64 embedding_model_id = 3;
+  // Reranker model id.
+  int64 reranker_model_id = 4;
+  // Whether articles are embedded for vector search.
+  bool vector_search_enabled = 5;
+  // Whether reranking is applied.
+  bool rerank_enabled = 6;
+  // Chunking strategy identifier.
+  string chunking_strategy = 7;
+  // Article used as the space home page.
+  int64 home_article_id = 8;
+  // Team ids the space is bound to as default operator visibility;
+  // the set replaces the current binding, empty removes it.
+  repeated int64 team_ids = 10;
+}
+
+// ListSpacesRequest parameters.
+message ListSpacesRequest {
+  // Page size.
+  int32 size = 1;
+  // Page number (1-based).
+  int32 page = 2;
+  // Optional name search.
+  string q = 3;
+  // Sorting criteria (e.g. field:asc).
+  string sort = 4;
+  // Set of fields to return.
+  repeated string fields = 5;
+}
+
+// SpaceList is a page of spaces.
+message SpaceList {
+  // Spaces on this page.
+  repeated Space items = 1;
+  // Whether a next page exists.
+  bool next = 2;
+}
+
+// LocateSpaceRequest selects a space by id.
+message LocateSpaceRequest {
+  // Space id.
+  int64 id = 1;
+}
+
+// CreateSpaceRequest wraps the space to create.
+message CreateSpaceRequest {
+  // Space fields.
+  InputSpace input = 1;
+}
+
+// UpdateSpaceRequest wraps the space id and updated fields.
+message UpdateSpaceRequest {
+  // Space id.
+  int64 id = 1;
+  // Updated space fields.
+  InputSpace input = 2;
+}
+
+// DeleteSpaceRequest selects a space to delete.
+message DeleteSpaceRequest {
+  // Space id.
+  int64 id = 1;
+}
