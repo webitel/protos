@@ -4958,6 +4958,45 @@
         ]
       }
     },
+    "/call_center/queues/attempts/{attempt_id}/assign": {
+      "patch": {
+        "operationId": "AssignAttempt",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.AssignAttemptResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "attempt_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engine.MemberService.AssignAttemptBody"
+            }
+          }
+        ],
+        "tags": [
+          "MemberService"
+        ]
+      }
+    },
     "/call_center/queues/attempts/{attempt_id}/renewal": {
       "patch": {
         "operationId": "AttemptsRenewalResult",
@@ -13850,7 +13889,8 @@
                 "expand_contact_tabs",
                 "default_workspace_tab",
                 "block_all_member_numbers_from_list",
-                "login_options"
+                "login_options",
+                "default_members_filter"
               ]
             },
             "collectionFormat": "multi"
@@ -16416,6 +16456,9 @@
         },
         "data": {}
       }
+    },
+    "engine.AssignAttemptResponse": {
+      "type": "object"
     },
     "engine.Attempt": {
       "type": "object",
@@ -20550,6 +20593,16 @@
         }
       }
     },
+    "engine.MemberService.AssignAttemptBody": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "type": "string",
+          "format": "int64",
+          "description": "Optional. If omitted (0), the attempt is assigned to the calling user's own agent."
+        }
+      }
+    },
     "engine.MemberService.AttemptCallbackBody": {
       "type": "object",
       "properties": {
@@ -23637,7 +23690,8 @@
         "expand_contact_tabs",
         "default_workspace_tab",
         "block_all_member_numbers_from_list",
-        "login_options"
+        "login_options",
+        "default_members_filter"
       ],
       "default": "empty_system_settings_name"
     },

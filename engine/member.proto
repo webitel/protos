@@ -153,6 +153,21 @@ service MemberService {
             body: "*"
         };
     }
+
+    rpc AssignAttempt(AssignAttemptRequest) returns (AssignAttemptResponse) {
+        option (google.api.http) = {
+            patch: "/call_center/queues/attempts/{attempt_id}/assign"
+            body: "*"
+        };
+    }
+}
+
+message AssignAttemptRequest {
+    int64 attempt_id = 1;
+    int64 agent_id = 2;     // Optional. If omitted (0), the attempt is assigned to the calling user's own agent.
+}
+
+message AssignAttemptResponse {
 }
 
 message AttemptRenewalResultRequest {
