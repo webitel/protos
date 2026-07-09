@@ -207,6 +207,22 @@ message ThreadSearchRequest {
     (buf.validate.field).int32.gte = 1,
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
+
+  // Filter threads where the contacts identified by these (iss, sub)
+  // identities are members. Identities are resolved to contacts inside
+  // the query, so no contact UUID is required from the caller.
+  repeated ContactIdentity participants = 12;
+}
+
+// ContactIdentity addresses a contact by its external identity (issuer + subject)
+// instead of its UUID. Resolved to a contact via the unique (domain_id, issuer_id,
+// subject_id) tuple.
+message ContactIdentity {
+  // Subject identifier (subject_id).
+  string sub = 1;
+
+  // Issuer identifier (issuer_id).
+  string iss = 2;
 }
 
 // GetThreadRequest defines parameters for retrieving a single thread.
