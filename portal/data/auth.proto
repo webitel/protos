@@ -1,0 +1,127 @@
+syntax = "proto3";
+package webitel.portal;
+option go_package = "webitel.go/api/portal;portal";
+
+import "data/push.proto";
+import "data/account.proto";
+import "data/messages.proto";
+
+// import "google/rpc/status.proto";
+// import "google/protobuf/any.proto";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+// Access Token Request
+message TokenRequest {
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    // POST /token
+    example: "{\"scope\":[\"call\",\"chat\"],\"grant_type\":\"identity\",\"response_type\":[\"token\",\"user\",\"call\",\"chat\"],\"identity\":{\"iss\":\"https://my.example.org/accounts\",\"sub\":\"j.doe\",\"name\":\"John Doe\",\"given_name\":\"John\",\"family_name\":\"Doe\",\"middle_name\":\"\",\"birthdate\":\"\",\"zoneinfo\":\"US/Arizona\",\"profile\":\"https://my.example.org/people/j.doe\",\"picture\":\"\",\"gender\":\"male\",\"locale\":\"en-US\",\"email\":\"j.doe@mx.example.org\",\"email_verified\":true,\"phone_number\":\"+1 202-555-0190\",\"phone_number_verified\":false,\"metadata\":{\"extra_var\":\"my string\",\"complex_var\":{\"array\":[73,\"str\",null,{}]}},\"sources\":[{\"sub\":\"phone:2025550190\"},{\"iss\":\"https://my.example.org/support\",\"sub\":\"m3lJ9VzG8yF6wzwQ\"}]},\"push\":{\"FCM\":\"android_client_firebase_cloud_messaging_subscription_token\"}}"
+  };
+
+  // ------------- Authorization ------------ //
+
+  // RECOMMENDED. An opaque value used by the client to maintain
+  // state between the request and callback.  The authorization
+  // server includes this value when redirecting the user-agent back
+  // to the client.  The parameter SHOULD be used for preventing
+  // cross-site request forgery
+  string state = 1;
+
+  // OPTIONAL. The scope of the access request
+  // Posible values are:
+  // * chat ; [I]nstant [M]essaging service
+  // * call ; [V]oice[o]ver[IP] SIP service
+  repeated string scope = 2;
+
+  // REQUIRED. Confidential client authorization token.
+  // May be transmitted in header: X-Portal-Client.
+  // Keep it a secret.
+  string app_token = 3;
+
+  // ---------------- Request ----------------- //
+
+  // REQUIRED. Grant type.
+  // Posible values ; - not implemented ; + supported
+  // - authorization_code ; Authorization Code Grant
+  // - client_credentials ; Client Credentials Grant
+  // - refresh_token      ; Refreshing an Access Token
+  // - password           ; Resource Owner Password Credentials Grant
+  // Extension Grants
+  // + identity           ; Public end-User Identity Grant
+  string grant_type = 4;
+
+  // REQUIRED. Response type.
+  // Posible values ; - not implemented ; + supported
+  // + token    ; Access token response
+  // - id_token ;
+  // Extensions
+  // + user     ; End-User account profile
+  // + call     ; SIP account credentials
+  // + chat     ; IM account details
+  repeated string response_type = 5;
+
+  // Refresh token string to obtain NEW access token.
+  // REQUIRED. When grant_type is set to "refresh_token".
+  string refresh_token = 11;
+
+  // Identity of the end-User account association.
+  // REQUIRED. When grant_type is set to "identity".
+  Identity identity = 12;
+
+  // Authorization code grant.
+  // REQUIRED. When grant_type is set to "authorization_code".
+  string code = 13;
+
+  // -------------- Extensions ---------------- //
+
+  // OPTIONAL. Sign up client device for PUSH notifications.
+  DevicePush push = 21;
+}
+
+// Access Token Response
+message AccessToken {
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    // GET /token
+    example: "{\"expires_in\":3555,\"token_type\":\"bearer\",\"access_token\":\"LxEYRr_5YIiNnvQXgZ-y_I830xuhrSQi-EsgzbQhdIMPxScSIsiey8s1KKSoD4CP\",\"scope\":[\"call\",\"chat\"],\"user\":{\"identity\":{\"iss\":\"https://my.example.org/accounts\",\"sub\":\"j.doe\",\"name\":\"John Doe\",\"given_name\":\"John\",\"family_name\":\"Doe\",\"middle_name\":\"\",\"birthdate\":\"\",\"zoneinfo\":\"US/Arizona\",\"profile\":\"https://my.example.org/people/j.doe\",\"picture\":\"\",\"gender\":\"male\",\"locale\":\"en-US\",\"email\":\"j.doe@mx.example.org\",\"email_verified\":true,\"phone_number\":\"+1 202-555-0190\",\"phone_number_verified\":false,\"metadata\":{\"extra_var\":\"my string\",\"complex_var\":{\"array\":[73,\"str\",null,{}]}}}},\"call\":{\"proxy\":\"sip:example.org:5064;transport=udp\",\"realm\":\"demo.webitel.com\",\"user_id\":\"F3-frzuRNTOzZ2B-q2S_lQ\"},\"chat\":{\"user\":{\"id\":\"0f36b039bd0936c9a4b9d48abd6f4f15\",\"type\":\"portal\",\"name\":\"You\"}}}"
+  };
+
+  // RECOMMENDED. The lifetime in seconds of the access token.
+  int32 expires_in = 1;
+
+  // REQUIRED. The type of the token issued. Value is case insensitive.
+  string token_type = 2;
+
+  // REQUIRED. The access token issued by the authorization server.
+  string access_token = 3;
+
+  // OPTIONAL. The refresh token, which can be used to obtain
+  // new access tokens using the same authorization grant.
+  string refresh_token = 4;
+
+  // OPTIONAL, if identical to the scope requested by the client;
+  // otherwise, REQUIRED. The scope of the access token.
+  repeated string scope = 5;
+
+  // REQUIRED if the "state" parameter was present in the client
+  // authorization request. The exact value received from the client.
+  string state = 6;
+
+  // ---------------- OpenID Connect ---------------- //
+
+  // // OpenID Connect. Not supported yet
+  // string id_token = 11;
+
+  // ------------------ Extensions ------------------ //
+
+  // End-User account profile.
+  UserProfile user = 21;
+
+  // VoIP / SIP service credentials.
+  CallAccount call = 22;
+
+  // [I]nstant [M]essaging dialog state.
+  ChatAccount chat = 23;
+
+}

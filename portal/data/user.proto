@@ -1,0 +1,131 @@
+syntax = "proto3";
+package webitel.portal;
+option go_package = "webitel.go/api/portal;portal";
+
+import "data/block.proto";
+import "data/lookup.proto";
+import "data/account.proto";
+import "google/rpc/status.proto";
+// import "google/protobuf/struct.proto";
+
+import "google/api/visibility.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+// // End-User Owner account
+// message EndUser {
+//   // prfile.id
+//   string id = 1;
+
+//   // External Customer [Id]entity
+//   // Self provided and owned information
+//   Profile profile = 1;
+//   // Shorthand name by which the End-User wishes to
+//   // be referred to at the RP, such as janedoe or j.doe.
+//   string username = 2;
+//   // string password = 3; // hidden
+
+//   // ----- READONLY ----- //
+
+//   // Device(s) ever connected
+//   repeated Session sessions = 31;
+// }
+
+// message UserList {
+//   repeated User data = 1;
+//   int32 page = 2;
+//   bool next = 3;
+// }
+
+message CreateUserRequest {
+
+  // Portal unique id
+  InputId portal = 1;
+
+  // NEW User details
+  InputUser input = 2;
+}
+
+message SearchUserRequest {
+  InputId portal = 1;
+  repeated string id = 2;
+  string q = 3; // {name}
+}
+
+// InputUser update changes
+message InputUser {
+  // OPTIONAL. Block portal account authentication.
+  Block block = 11;
+  // OPTIONAL. Contact associated with domain account.
+  Lookup contact = 10;
+  // End-User profile info.
+  // [FOR] create only; cannot update
+  UserProfile profile = 12;
+  // Sign IN username
+  // [FOR] create only; cannot update
+  string username = 13;
+  // Sign IN invite token / reset password
+  string password = 14;
+
+}
+
+message UpdateUserRequest {
+  // ------- PATCH Options ------- //
+
+  // JSON PATCH fields mask.
+  // List of JPath fields specified in body(input).
+  repeated string x_json_mask = 1
+  [(google.api.field_visibility) = {
+    restriction: "PREVIEW" // "INTERNAL"
+  },
+  (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    read_only: true
+    pattern: "^$"
+  }];
+
+  // Portal unique id
+  InputId portal = 2;
+  // User unique id
+  string id = 3;
+  // Update user changes
+  InputUser input = 4;
+}
+
+message BlockUserRequest {
+
+  // ------- Identity ------- //
+
+  // Portal unique id
+  InputId portal = 2;
+  // User unique id
+  string id = 3;
+
+  // -------- Input -------- //
+
+  // Reason for blocking the user authentication.
+  // **NOTE**: User will face this `message` on further login attempts.
+  google.rpc.Status block = 5
+  [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "{\"message\":\"Your account has been suspended. Please contact the portal\'s support service\"}"
+    }
+  ];
+
+  // Reset blocking reason -even- already blocked ?
+  bool reset = 6;
+
+  // Log the User Out immediately ?
+  bool logout = 7;
+}
+
+message CreateContactRequest {
+  // Portal unique id
+  InputId portal = 1;
+  // User account unique id
+  string id = 2;
+}
+
+// PortalUsers analytics
+message PortalUsers {
+  // Online sessions count
+  int32 online = 1;
+}
