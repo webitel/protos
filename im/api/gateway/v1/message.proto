@@ -67,7 +67,16 @@ service Message {
     };
   }
 
+  // Sends a system message (e.g., user joined, user left).
   rpc SendSystemMessage(SendSystemMessageRequest) returns (SendMessageResponse);
+
+  // Edits an existing message by ID. Only the sender or authorized users can edit messages.
+  rpc EditMessage(EditMessageRequest) returns (EditMessageResponse) {
+    option (google.api.http) = {
+      patch: "/v1/messages/{id}"
+      body: "*"
+    };
+  }
 }
 
 message ReadMessageRequest {
@@ -432,4 +441,19 @@ message InteractiveCallbackResponse {
 
   // Unix time in milliseconds when callback button was clicked.
   int64 reacted_at = 5;
+}
+
+message EditMessageRequest {
+  // Original message ID to be edited.
+  string id = 1 [(buf.validate.field).required = true, (buf.validate.field).string.uuid = true];
+
+  // New content for the message. Must not be empty.
+  string body = 2 [(buf.validate.field).required = true, (buf.validate.field).string = {min_len: 1}];
+}
+
+message EditMessageResponse {
+  string id = 1;
+
+  // Unix time in milliseconds when the message was edited.
+  int64 edited_at = 2;
 }

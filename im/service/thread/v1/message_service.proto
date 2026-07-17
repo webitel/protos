@@ -38,6 +38,9 @@ service Message {
 
   // Sends a system message (e.g., "User X joined the chat").
   rpc SendSystemMessage(SendSystemMessageRequest) returns (SendMessageResponse);
+
+  // Edits a previously sent message.
+  rpc EditMessage(EditMessageRequest) returns (EditMessageResponse);
 }
 
 message ReadMessageRequest {
@@ -432,4 +435,29 @@ message InteractiveCallbackResponse {
 
   // Unix time in milliseconds when callback button was clicked.
   int64 reacted_at = 5;
+}
+
+message EditMessageRequest {
+  // User who edits the message.
+  Peer edited_by = 1 [(buf.validate.field).required = true];
+
+  // Original message ID.
+  string id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+
+  // New message body.
+  string body = 3;
+}
+
+message EditMessageResponse {
+  // Original message ID.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+
+  // Unix time in milliseconds when the message was edited.
+  int64 edited_at = 2;
 }
