@@ -6420,6 +6420,151 @@
         ]
       }
     },
+    "/call_center/queues/{queue_id}/members/reset/count": {
+      "get": {
+        "summary": "Returns the number of queue members that match the specified\nreset criteria without performing the reset operation.\nCan be used to preview the impact of a reset request.",
+        "operationId": "ResetMembersCount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.ResetMembersCountResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "queue_id",
+            "description": "Identifier of the queue.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "ids",
+            "description": "Filter by specific queue member identifiers.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "bucket_id",
+            "description": "Filter by bucket identifiers.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "stop_cause",
+            "description": "Filter by stop causes.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "agent_id",
+            "description": "Filter by assigned agent identifiers.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "numbers",
+            "description": "Filter by member phone numbers.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "variables[string]",
+            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "description": "Filter by related entity identifiers.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "created_at.from",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "created_at.to",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "priority.from",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "priority.to",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "q",
+            "description": "Search pattern used to filter queue members.\nThe value is matched against the member name\nand against the member's searchable destination values.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "MemberService"
+        ]
+      }
+    },
     "/call_center/queues/{queue_id}/members/{id}": {
       "get": {
         "summary": "ReadQueueRouting",
@@ -21075,6 +21220,9 @@
         },
         "priority": {
           "$ref": "#/definitions/engine.FilterBetween"
+        },
+        "q": {
+          "type": "string"
         }
       }
     },
@@ -22717,6 +22865,17 @@
     },
     "engine.ResetActiveAttemptsResponse": {
       "type": "object"
+    },
+    "engine.ResetMembersCountResponse": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "string",
+          "format": "int64",
+          "description": "Total number of matching queue members."
+        }
+      },
+      "description": "ResetMembersCountResponse contains the total number\nof queue members matching the specified criteria."
     },
     "engine.ResetMembersResponse": {
       "type": "object",
