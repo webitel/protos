@@ -12,6 +12,21 @@ enum ThreadRole {
   ROLE_SUPERVISOR  = 4;
 }
 
+// MessageDeliveryStatus is a per-recipient delivery state of a message.
+// Transitions are monotonic: SENT -> DELIVERED -> READ.
+// FAILED is terminal but may be superseded by a later DELIVERED (retry).
+enum MessageDeliveryStatus {
+  MESSAGE_DELIVERY_STATUS_UNSPECIFIED = 0;
+  // Accepted by the system and queued for delivery.
+  MESSAGE_DELIVERY_STATUS_SENT        = 1;
+  // Reached the recipient (stream ACK, push, provider receipt, bot dispatch).
+  MESSAGE_DELIVERY_STATUS_DELIVERED   = 2;
+  // Read by the recipient. Not applicable to bots.
+  MESSAGE_DELIVERY_STATUS_READ        = 3;
+  // Delivery failed (provider rejected, invalid contact, channel restriction).
+  MESSAGE_DELIVERY_STATUS_FAILED      = 4;
+}
+
 // ThreadMember represents a thread participant
 // with optional type-specific settings.
 message ThreadMember {

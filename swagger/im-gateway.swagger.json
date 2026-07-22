@@ -102,6 +102,9 @@
       "name": "webitel.im.service.thread.v1.MessageHistory"
     },
     {
+      "name": "webitel.im.service.thread.v1.MessageStatus"
+    },
+    {
       "name": "webitel.im.service.thread.v1.ThreadManagement"
     }
   ],
@@ -2196,9 +2199,49 @@
         ]
       }
     },
+    "/v1/messages/{id}": {
+      "patch": {
+        "summary": "Edits an existing message by ID. Only the sender or authorized users can edit messages.",
+        "operationId": "Message_EditMessage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.EditMessageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Original message ID to be edited.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.Message.EditMessageBody"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.Message"
+        ]
+      }
+    },
     "/v1/messages/{id}/read": {
       "post": {
-        "summary": "Mark message as read by id.",
+        "summary": "Marks the thread as read up to the given message (inclusive):\nevery earlier unread message of the caller in the thread is covered.",
         "operationId": "Message_Read",
         "responses": {
           "200": {
@@ -3572,6 +3615,19 @@
       },
       "description": "Media container for documents attachments."
     },
+    "webitel.im.api.gateway.v1.EditMessageResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "edited_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Unix time in milliseconds when the message was edited."
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.GetContactSettingsResponse": {
       "type": "object",
       "properties": {
@@ -3658,6 +3714,21 @@
         "reacted_metadata": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.InteractiveCallback",
           "description": "Metadata for button reaction for interactive message."
+        },
+        "reply_to": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ReplyToMessage"
+        },
+        "delivery_status": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageDeliveryStatus",
+          "description": "Aggregated delivery status across recipients: FAILED when every\nrecipient failed, otherwise the minimal status among non-failed ones.\nUNSPECIFIED for messages without per-recipient tracking (historical)."
+        },
+        "statuses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageRecipientStatus"
+          },
+          "description": "Per-recipient delivery details."
         }
       },
       "description": "HistoryMessage represents a single message\nin thread history."
@@ -4041,6 +4112,15 @@
       "type": "object",
       "title": "No Data"
     },
+    "webitel.im.api.gateway.v1.Message.EditMessageBody": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "string",
+          "description": "New content for the message. Must not be empty."
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.Message.SendInteractiveCallbackBody": {
       "type": "object",
       "properties": {
@@ -4069,6 +4149,18 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.MessageDeliveryStatus": {
+      "type": "string",
+      "enum": [
+        "MESSAGE_DELIVERY_STATUS_UNSPECIFIED",
+        "MESSAGE_DELIVERY_STATUS_SENT",
+        "MESSAGE_DELIVERY_STATUS_DELIVERED",
+        "MESSAGE_DELIVERY_STATUS_READ",
+        "MESSAGE_DELIVERY_STATUS_FAILED"
+      ],
+      "default": "MESSAGE_DELIVERY_STATUS_UNSPECIFIED",
+      "description": "MessageDeliveryStatus is a per-recipient delivery state of a message.\nTransitions are monotonic: SENT -\u003e DELIVERED -\u003e READ.\nFAILED is terminal but may be superseded by a later DELIVERED (retry).\n\n - MESSAGE_DELIVERY_STATUS_SENT: Accepted by the system and queued for delivery.\n - MESSAGE_DELIVERY_STATUS_DELIVERED: Reached the recipient (stream ACK, push, provider receipt, bot dispatch).\n - MESSAGE_DELIVERY_STATUS_READ: Read by the recipient. Not applicable to bots.\n - MESSAGE_DELIVERY_STATUS_FAILED: Delivery failed (provider rejected, invalid contact, channel restriction)."
+    },
     "webitel.im.api.gateway.v1.MessageLocation": {
       "type": "object",
       "properties": {
@@ -4087,6 +4179,40 @@
           "type": "string"
         }
       }
+    },
+    "webitel.im.api.gateway.v1.MessageRecipientStatus": {
+      "type": "object",
+      "properties": {
+        "member_id": {
+          "type": "string",
+          "description": "Recipient contact id."
+        },
+        "status": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageDeliveryStatus"
+        },
+        "delivered_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Unix time in milliseconds; zero when not reached."
+        },
+        "read_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "failed_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "via": {
+          "type": "string",
+          "description": "Confirmation source: ws|push|provider|bot."
+        },
+        "error": {
+          "type": "string",
+          "description": "JSON-encoded provider error details for FAILED."
+        }
+      },
+      "description": "MessageRecipientStatus is a per-recipient delivery state of a message."
     },
     "webitel.im.api.gateway.v1.PUSHSubscription": {
       "type": "object",
@@ -4156,6 +4282,40 @@
     },
     "webitel.im.api.gateway.v1.RemoveMemberResponse": {
       "type": "object"
+    },
+    "webitel.im.api.gateway.v1.ReplyToMessage": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "sender": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadMember"
+        },
+        "sender_id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "body": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "attachment_kind": {
+          "type": "string"
+        },
+        "attachment_name": {
+          "type": "string"
+        },
+        "attachment_mime": {
+          "type": "string"
+        }
+      }
     },
     "webitel.im.api.gateway.v1.SearchLeftResponse": {
       "type": "object",
@@ -4261,6 +4421,9 @@
         },
         "send_as": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.PeerIdentity"
+        },
+        "reply_to_message_id": {
+          "type": "string"
         }
       },
       "description": "SendContactRequest sends contact information."
@@ -4287,6 +4450,15 @@
         "send_id": {
           "type": "string",
           "title": "optional client-generated id for deduplication"
+        },
+        "reply_to_message_id": {
+          "type": "string"
+        },
+        "external_id": {
+          "type": "string"
+        },
+        "reply_to_external_id": {
+          "type": "string"
         }
       },
       "description": "Represents a request to send a message with document."
@@ -4367,6 +4539,9 @@
         },
         "send_as": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.PeerIdentity"
+        },
+        "reply_to_message_id": {
+          "type": "string"
         }
       },
       "description": "SendLocationRequest sends a geographic location message."
@@ -4400,6 +4575,15 @@
         },
         "send_as": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.PeerIdentity"
+        },
+        "reply_to_message_id": {
+          "type": "string"
+        },
+        "external_id": {
+          "type": "string"
+        },
+        "reply_to_external_id": {
+          "type": "string"
         }
       },
       "description": "Represents a request to send a text message."
@@ -6387,6 +6571,17 @@
         "domain_id": {
           "type": "integer",
           "format": "int32"
+        },
+        "message_id": {
+          "type": "string",
+          "description": "Internal message context for per-recipient delivery status tracking.\n\nInternal message UUID"
+        },
+        "thread_id": {
+          "type": "string",
+          "title": "Internal thread UUID"
+        },
+        "reply_to_external_id": {
+          "type": "string"
         }
       },
       "description": "ProviderSendDocumentRequest sends a document with an optional caption."
@@ -6416,6 +6611,17 @@
         "domain_id": {
           "type": "integer",
           "format": "int32"
+        },
+        "message_id": {
+          "type": "string",
+          "description": "Internal message context for per-recipient delivery status tracking.\n\nInternal message UUID"
+        },
+        "thread_id": {
+          "type": "string",
+          "title": "Internal thread UUID"
+        },
+        "reply_to_external_id": {
+          "type": "string"
         }
       },
       "description": "ProviderSendImageRequest sends an image with an optional caption."
@@ -6444,6 +6650,17 @@
         "interactive": {
           "$ref": "#/definitions/webitel.im.provider.v1.ProviderInteractive",
           "description": "Interactive payload — exactly one kind must be set."
+        },
+        "message_id": {
+          "type": "string",
+          "description": "Internal message context for per-recipient delivery status tracking.\n\nInternal message UUID"
+        },
+        "thread_id": {
+          "type": "string",
+          "title": "Internal thread UUID"
+        },
+        "reply_to_external_id": {
+          "type": "string"
         }
       },
       "description": "ProviderSendInteractiveRequest sends a message with interactive UI elements."
@@ -6488,6 +6705,14 @@
             "type": "string"
           },
           "description": "Template variables sourced from the system message metadata.\nInjected into the template via Go text/template syntax (e.g. {{.new_member_role}})."
+        },
+        "message_id": {
+          "type": "string",
+          "description": "Internal message context for per-recipient delivery status tracking.\n\nInternal message UUID"
+        },
+        "thread_id": {
+          "type": "string",
+          "title": "Internal thread UUID"
         }
       },
       "description": "ProviderSendSystemMessageRequest delivers a system event to the external chat partner.\nThe provider service resolves the gate-specific template and renders the final text\nusing the supplied variables before sending via the underlying provider API."
@@ -6515,12 +6740,23 @@
           "type": "integer",
           "format": "int32"
         },
+        "message_id": {
+          "type": "string",
+          "description": "Internal message context for per-recipient delivery status tracking:\nthe provider service persists the provider_message_id mapping on send\nand reports MarkDelivered/MarkRead/MarkFailed receipts back to im-thread.\n\nInternal message UUID"
+        },
+        "thread_id": {
+          "type": "string",
+          "title": "Internal thread UUID"
+        },
         "metadata": {
           "type": "object",
           "additionalProperties": {
             "type": "string"
           },
           "title": "Optional platform-specific parameters"
+        },
+        "reply_to_external_id": {
+          "type": "string"
         }
       },
       "description": "ProviderSendTextRequest sends a simple text message."
@@ -6549,6 +6785,24 @@
       ],
       "default": "PROVIDER_STATUS_UNSPECIFIED",
       "description": "/ ProviderStatus represents the operational state of a provider gateway.\n\n - PROVIDER_STATUS_ACTIVE: Provider is healthy and processing messages\n - PROVIDER_STATUS_INACTIVE: Manually disabled by user\n - PROVIDER_STATUS_ERROR: Connection or authentication failed"
+    },
+    "webitel.im.provider.v1.ProviderStatusCapabilities": {
+      "type": "object",
+      "properties": {
+        "delivered": {
+          "type": "boolean",
+          "description": "The channel emits delivery receipts."
+        },
+        "read": {
+          "type": "boolean",
+          "description": "The channel emits read/seen receipts."
+        },
+        "failed": {
+          "type": "boolean",
+          "description": "The channel reports failed deliveries."
+        }
+      },
+      "description": "ProviderStatusCapabilities declares which delivery-status receipts the\nchannel emits. A channel without a capability leaves messages in the last\nreachable state; the UI uses these flags to avoid drawing unreachable\nstatus marks."
     },
     "webitel.im.provider.v1.ProviderSummary": {
       "type": "object",
@@ -6583,6 +6837,10 @@
           "type": "string",
           "format": "int64",
           "title": "Unix timestamp in milliseconds"
+        },
+        "capabilities": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderStatusCapabilities",
+          "description": "Delivery-status receipts the channel is able to produce; unset when no\nprovider adapter is registered for the channel type."
         }
       }
     },
