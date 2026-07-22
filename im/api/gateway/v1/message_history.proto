@@ -186,6 +186,44 @@ message ReplyToMessage {
   optional string attachment_mime = 9;
 }
 
+// MessageDeliveryStatus is a per-recipient delivery state of a message.
+// Transitions are monotonic: SENT -> DELIVERED -> READ.
+// FAILED is terminal but may be superseded by a later DELIVERED (retry).
+enum MessageDeliveryStatus {
+  MESSAGE_DELIVERY_STATUS_UNSPECIFIED = 0;
+
+  // Accepted by the system and queued for delivery.
+  MESSAGE_DELIVERY_STATUS_SENT = 1;
+
+  // Reached the recipient (stream ACK, push, provider receipt, bot dispatch).
+  MESSAGE_DELIVERY_STATUS_DELIVERED = 2;
+
+  // Read by the recipient. Not applicable to bots.
+  MESSAGE_DELIVERY_STATUS_READ = 3;
+
+  // Delivery failed (provider rejected, invalid contact, channel restriction).
+  MESSAGE_DELIVERY_STATUS_FAILED = 4;
+}
+
+// MessageRecipientStatus is a per-recipient delivery state of a message.
+message MessageRecipientStatus {
+  // Recipient contact id.
+  string member_id = 1;
+
+  MessageDeliveryStatus status = 2;
+
+  // Unix time in milliseconds; zero when not reached.
+  int64 delivered_at = 3;
+  int64 read_at = 4;
+  int64 failed_at = 5;
+
+  // Confirmation source: ws|push|provider|bot.
+  string via = 6;
+
+  // JSON-encoded provider error details for FAILED.
+  string error = 7;
+}
+
 // HistoryMessage represents a single message
 // in thread history.
 message HistoryMessage {
@@ -231,6 +269,14 @@ message HistoryMessage {
   InteractiveCallback reacted_metadata = 15;
 
   ReplyToMessage reply_to = 16;
+
+  // Aggregated delivery status across recipients: FAILED when every
+  // recipient failed, otherwise the minimal status among non-failed ones.
+  // UNSPECIFIED for messages without per-recipient tracking (historical).
+  MessageDeliveryStatus delivery_status = 17;
+
+  // Per-recipient delivery details.
+  repeated MessageRecipientStatus statuses = 18;
 }
 
 message InteractiveCallback {

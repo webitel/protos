@@ -155,6 +155,11 @@ swagger_mix:
 		> ./swagger/api.json || true
 
 
+.PHONY: im-lint
+
+im-lint:
+	buf lint im
+
 .PHONY: clean
 
 clean:
