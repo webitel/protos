@@ -59,7 +59,60 @@ message ServerEvent {
 
     // Heartbeat signal to maintain connection and detect "half-open" sockets.
     PingEvent ping_event = 9;
+
+    // Per-recipient delivery status change of one or more messages.
+    MessageStatusEvent message_status_event = 10;
   }
+}
+
+//------------------------------------------------------------------------------
+// MESSAGE DELIVERY STATUS
+//------------------------------------------------------------------------------
+
+// MessageDeliveryStatus is a per-recipient delivery state of a message.
+// Transitions are monotonic: SENT -> DELIVERED -> READ.
+// FAILED is terminal but may be superseded by a later DELIVERED (retry).
+enum MessageDeliveryStatus {
+  MESSAGE_DELIVERY_STATUS_UNSPECIFIED = 0;
+
+  // Accepted by the system and queued for delivery.
+  MESSAGE_DELIVERY_STATUS_SENT = 1;
+
+  // Reached the recipient (stream ACK, push, provider receipt, bot dispatch).
+  MESSAGE_DELIVERY_STATUS_DELIVERED = 2;
+
+  // Read by the recipient. Not applicable to bots.
+  MESSAGE_DELIVERY_STATUS_READ = 3;
+
+  // Delivery failed (provider rejected, invalid contact, channel restriction).
+  MESSAGE_DELIVERY_STATUS_FAILED = 4;
+}
+
+// MessageStatusEvent notifies thread participants that the delivery status
+// of one or more messages changed for a recipient. Read receipts are bulk
+// ("read up to"), so a single event may cover multiple messages of the same
+// recipient in the same thread.
+message MessageStatusEvent {
+  // Thread the messages belong to.
+  string thread_id = 1;
+
+  // Recipient contact id whose statuses changed.
+  string member_id = 2;
+
+  // Messages whose status changed for the recipient.
+  repeated string message_ids = 3;
+
+  // The new delivery state.
+  MessageDeliveryStatus status = 4;
+
+  // Confirmation source: ws|push|provider|bot.
+  string via = 5;
+
+  // JSON-encoded provider error details for FAILED.
+  string error = 6;
+
+  // Unix time in milliseconds when the status changed.
+  int64 occurred_at = 7;
 }
 
 //------------------------------------------------------------------------------

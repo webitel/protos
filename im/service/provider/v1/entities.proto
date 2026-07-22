@@ -8,16 +8,33 @@ option go_package = "github.com/webitel/im-provider-service/gen/go/api/v1;impb";
 
 // --- Base Entities ---
 
+// ProviderStatusCapabilities declares which delivery-status receipts the
+// channel emits. A channel without a capability leaves messages in the last
+// reachable state; the UI uses these flags to avoid drawing unreachable
+// status marks.
+message ProviderStatusCapabilities {
+  // The channel emits delivery receipts.
+  bool delivered = 1;
+  // The channel emits read/seen receipts.
+  bool read = 2;
+  // The channel reports failed deliveries.
+  bool failed = 3;
+}
+
 message ProviderSummary {
   string id = 1;
   string name = 2;
   webitel.im.provider.v1.ProviderType type = 3;
   webitel.im.provider.v1.ProviderStatus status = 4;
-  string webhook_url = 5; 
-  string contact = 6; 
-  string provider_app_id = 7; 
+  string webhook_url = 5;
+  string contact = 6;
+  string provider_app_id = 7;
   int64 created_at = 8; // Unix timestamp in milliseconds
   int64 updated_at = 9; // Unix timestamp in milliseconds
+
+  // Delivery-status receipts the channel is able to produce; unset when no
+  // provider adapter is registered for the channel type.
+  ProviderStatusCapabilities capabilities = 10;
 }
 
 message ProviderMetaApp {
