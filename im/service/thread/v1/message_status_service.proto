@@ -1,0 +1,146 @@
+syntax = "proto3";
+
+package webitel.im.service.thread.v1;
+
+import "buf/validate/validate.proto";
+import "service/thread/v1/shared.proto";
+
+option go_package = "github.com/webitel/im-thread-service/gen/go/api/v1;impb";
+
+// MessageStatus is an internal service-to-service API for reporting
+// per-recipient message delivery confirmations. Called by im-delivery
+// (stream ACKs, pushes) and im-providers (provider webhooks receipts).
+//
+// All RPCs accept batches and are idempotent: status transitions are
+// monotonic (SENT -> DELIVERED -> READ; FAILED only from SENT, and may be
+// superseded by a later DELIVERED), so duplicate and out-of-order receipts
+// are safely ignored.
+service MessageStatus {
+  // Marks messages as delivered to recipients.
+  rpc MarkDelivered(MarkDeliveredRequest) returns (MarkStatusResponse);
+
+  // Marks messages as read by recipients with read-up-to semantics:
+  // every earlier unread message of the recipient in the thread is
+  // marked as read by a single receipt.
+  rpc MarkRead(MarkReadRequest) returns (MarkStatusResponse);
+
+  // Marks messages as failed for recipients with error details.
+  rpc MarkFailed(MarkFailedRequest) returns (MarkStatusResponse);
+}
+
+// DeliveryReceipt confirms that a single message reached a recipient.
+message DeliveryReceipt {
+  string thread_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+
+  string message_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+
+  // Recipient contact id (thread_dialog.member_id).
+  string member_id = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+
+  // Unix time in milliseconds when the delivery was confirmed.
+  // Zero means "now".
+  int64 delivered_at = 4;
+
+  // Confirmation source: ws|push|provider|bot.
+  string via = 5;
+
+  int32 domain_id = 6;
+}
+
+message MarkDeliveredRequest {
+  repeated DeliveryReceipt receipts = 1 [(buf.validate.field).repeated = {
+    min_items: 1
+    max_items: 500
+  }];
+}
+
+// ReadReceipt confirms that a recipient has read the thread up to a message.
+message ReadReceipt {
+  string thread_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+
+  // Recipient contact id (thread_dialog.member_id).
+  string member_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+
+  // Read up to this message id (inclusive): all earlier unread messages
+  // of the recipient in the thread are marked as read too.
+  string up_to_message_id = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+
+  // Unix time in milliseconds when the read was confirmed. Zero means "now".
+  int64 read_at = 4;
+
+  // Confirmation source: ws|push|provider|bot.
+  string via = 5;
+
+  int32 domain_id = 6;
+}
+
+message MarkReadRequest {
+  repeated ReadReceipt receipts = 1 [(buf.validate.field).repeated = {
+    min_items: 1
+    max_items: 500
+  }];
+}
+
+// FailureReceipt reports that delivery of a message to a recipient failed.
+message FailureReceipt {
+  string thread_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+
+  string message_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+
+  // Recipient contact id (thread_dialog.member_id).
+  string member_id = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+
+  // Unix time in milliseconds when the failure was reported. Zero means "now".
+  int64 failed_at = 4;
+
+  // Confirmation source: ws|push|provider|bot.
+  string via = 5;
+
+  int32 domain_id = 6;
+
+  // Provider/channel error code (e.g. HTTP status, provider error code).
+  string error_code = 7;
+
+  // Human-readable error detail from the provider.
+  string error_message = 8;
+}
+
+message MarkFailedRequest {
+  repeated FailureReceipt receipts = 1 [(buf.validate.field).repeated = {
+    min_items: 1
+    max_items: 500
+  }];
+}
+
+message MarkStatusResponse {
+  // Number of per-recipient statuses actually changed by the request.
+  // Duplicate or out-of-order receipts do not count.
+  int64 updated = 1;
+}

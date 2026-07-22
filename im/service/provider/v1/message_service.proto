@@ -80,6 +80,12 @@ message ProviderSendTextRequest {
   string text = 4; // The textual content of the message
   int32 domain_id = 5;
 
+  // Internal message context for per-recipient delivery status tracking:
+  // the provider service persists the provider_message_id mapping on send
+  // and reports MarkDelivered/MarkRead/MarkFailed receipts back to im-thread.
+  string message_id = 6; // Internal message UUID
+  string thread_id = 7; // Internal thread UUID
+
   map<string, string> metadata = 10; // Optional platform-specific parameters
 
   string reply_to_external_id = 11;
@@ -94,6 +100,10 @@ message ProviderSendDocumentRequest {
   string caption = 5; // Optional text accompanying the file
   int32 domain_id = 6;
 
+  // Internal message context for per-recipient delivery status tracking.
+  string message_id = 7; // Internal message UUID
+  string thread_id = 8; // Internal thread UUID
+
   string reply_to_external_id = 11;
 }
 
@@ -105,6 +115,10 @@ message ProviderSendImageRequest {
   repeated ProviderFile images = 4;
   string caption = 5;
   int32 domain_id = 6;
+
+  // Internal message context for per-recipient delivery status tracking.
+  string message_id = 7; // Internal message UUID
+  string thread_id = 8; // Internal thread UUID
 
   string reply_to_external_id = 11;
 }
@@ -123,6 +137,10 @@ message ProviderSendInteractiveRequest {
 
   // Interactive payload — exactly one kind must be set.
   ProviderInteractive interactive = 6;
+
+  // Internal message context for per-recipient delivery status tracking.
+  string message_id = 7; // Internal message UUID
+  string thread_id = 8; // Internal thread UUID
 
   string reply_to_external_id = 11;
 }
@@ -205,4 +223,8 @@ message ProviderSendSystemMessageRequest {
   // Template variables sourced from the system message metadata.
   // Injected into the template via Go text/template syntax (e.g. {{.new_member_role}}).
   map<string, string> vars = 5;
+
+  // Internal message context for per-recipient delivery status tracking.
+  string message_id = 6; // Internal message UUID
+  string thread_id = 7; // Internal thread UUID
 }

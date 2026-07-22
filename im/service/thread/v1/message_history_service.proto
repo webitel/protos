@@ -97,6 +97,25 @@ message ReplyToMessage {
   optional string attachment_mime = 8;
 }
 
+// MessageRecipientStatus is a per-recipient delivery state of a message.
+message MessageRecipientStatus {
+  // Recipient contact id (thread_dialog.member_id).
+  string member_id = 1;
+
+  MessageDeliveryStatus status = 2;
+
+  // Unix time in milliseconds; zero when not reached.
+  int64 delivered_at = 3;
+  int64 read_at = 4;
+  int64 failed_at = 5;
+
+  // Confirmation source: ws|push|provider|bot.
+  string via = 6;
+
+  // JSON-encoded provider error details for FAILED.
+  string error = 7;
+}
+
 message HistoryMessage {
   string id = 1;
   string thread_id = 2;
@@ -117,6 +136,14 @@ message HistoryMessage {
   InteractiveCallback reacted_metadata = 16;
 
   ReplyToMessage reply_to = 17;
+
+  // Aggregated delivery status across recipients: FAILED when every
+  // recipient failed, otherwise the minimal status among non-failed ones.
+  // UNSPECIFIED for messages without per-recipient tracking (historical).
+  MessageDeliveryStatus delivery_status = 18;
+
+  // Per-recipient delivery details.
+  repeated MessageRecipientStatus statuses = 19;
 }
 
 message SearchMessageHistoryResponse {
