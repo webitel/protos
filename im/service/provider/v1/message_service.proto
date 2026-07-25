@@ -42,6 +42,22 @@ service ProviderMessageService {
     };
   }
 
+  // SendLocation delivers a geographic location to the external chat partner.
+  rpc SendLocation(ProviderSendLocationRequest) returns (ProviderSendMessageResponse) {
+    option (google.api.http) = {
+      post: "/im/provider/send/location"
+      body: "*"
+    };
+  }
+
+  // SendContact delivers a contact card to the external chat partner.
+  rpc SendContact(ProviderSendContactRequest) returns (ProviderSendMessageResponse) {
+    option (google.api.http) = {
+      post: "/im/provider/send/contact"
+      body: "*"
+    };
+  }
+
   // SendSystemMessage delivers a system event notification to the external chat partner.
   // The im-providers-service resolves the gate-specific template and renders it as text
   // before forwarding to the underlying provider (Facebook, WhatsApp, etc.).
@@ -188,6 +204,33 @@ message ProviderKeyboardButtonCallback {
 // ProviderKeyboardButtonRequest prompts the user for device data (location, phone, email).
 message ProviderKeyboardButtonRequest {
   string action = 1;
+}
+
+// ProviderSendLocationRequest sends a geographic location.
+message ProviderSendLocationRequest {
+  ProviderType type = 1;
+  string gate_id = 2;
+  string external_user_id = 3;
+  int32 domain_id = 4;
+  double latitude = 5;
+  double longitude = 6;
+  optional string name = 7; // Optional place name
+  optional string address = 8; // Optional street address
+
+  string reply_to_external_id = 11;
+}
+
+// ProviderSendContactRequest sends a contact card.
+message ProviderSendContactRequest {
+  ProviderType type = 1;
+  string gate_id = 2;
+  string external_user_id = 3;
+  int32 domain_id = 4;
+  string name = 5;
+  string phone_number = 6;
+  optional string email = 7;
+
+  string reply_to_external_id = 11;
 }
 
 // ProviderSendSystemMessageRequest delivers a system event to the external chat partner.

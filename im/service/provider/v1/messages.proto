@@ -222,6 +222,45 @@ message ProviderUpdateWhatsAppGateResponse {
 message ProviderDeleteWhatsAppGateRequest { string id = 1; }
 message ProviderDeleteWhatsAppGateResponse { webitel.im.provider.v1.ProviderWhatsAppGate item = 1; }
 
+/// ProviderCreateViberGateRequest registers a Viber bot as a messaging gateway.
+message ProviderCreateViberGateRequest {
+  string name = 1; // Name of the gateway in Webitel
+  Peer peer = 2; // Webitel bot identity (sub and iss)
+  string auth_token = 3; // Viber bot auth token (X-Viber-Auth-Token); handled as sensitive
+  string sender_name = 4; // Display name attached to every outbound message; defaults from account info when empty
+  string sender_avatar = 5; // Optional avatar URL attached to outbound messages
+  bool enabled = 6;
+}
+
+/// ProviderCreateViberGateResponse returns the newly activated Viber provider.
+message ProviderCreateViberGateResponse {
+  webitel.im.provider.v1.ProviderViberGate item = 1;
+}
+
+/// ProviderGetViberGateRequest fetches a Viber provider configuration.
+message ProviderGetViberGateRequest { string id = 1; }
+message ProviderGetViberGateResponse { webitel.im.provider.v1.ProviderViberGate item = 1; }
+
+/// ProviderUpdateViberGateRequest updates Viber gateway settings. A non-empty auth_token rotates the bot token.
+message ProviderUpdateViberGateRequest {
+  string id = 1;
+  string name = 2;
+  Peer peer = 3; // Webitel bot identity (sub and iss)
+  string auth_token = 4; // New bot token, if rotated
+  string sender_name = 5;
+  string sender_avatar = 6;
+  bool enabled = 7;
+}
+
+/// ProviderUpdateViberGateResponse returns the updated Viber provider.
+message ProviderUpdateViberGateResponse {
+  webitel.im.provider.v1.ProviderViberGate item = 1;
+}
+
+/// ProviderDeleteViberGateRequest removes the Viber integration.
+message ProviderDeleteViberGateRequest { string id = 1; }
+message ProviderDeleteViberGateResponse { webitel.im.provider.v1.ProviderViberGate item = 1; }
+
 // --- Generic Discovery & Resource Management ---
 
 /// ProviderListGatesRequest contains pagination and filtering logic for discovering providers.
