@@ -8669,6 +8669,278 @@
         }
       }
     },
+    "/call_center/skill_presets": {
+      "get": {
+        "description": "Returns skill presets matching the specified search criteria.",
+        "tags": [
+          "Skill Presets"
+        ],
+        "summary": "Search skill presets",
+        "operationId": "SearchSkillPreset",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page number (1-based).",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Maximum number of items per page.",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Search pattern applied to preset names.",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Sort expression.\nExample: \"-name\", \"+created_at\".",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "List of fields to include in the response.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "description": "Filter by preset identifiers.",
+            "name": "ids",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "description": "Filter by associated skill identifiers.",
+            "name": "skill_ids",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Skip the default preset in the search results.",
+            "name": "skip_default",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.SearchSkillPresetResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Creates a new skill preset with the specified name, description, and associated skills.",
+        "tags": [
+          "Skill Presets"
+        ],
+        "summary": "Create a skill preset",
+        "operationId": "CreateSkillPreset",
+        "parameters": [
+          {
+            "description": "Request for creating a skill preset.",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engine.CreateSkillPresetRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.CreateSkillPresetResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Deletes the specified skill presets.",
+        "tags": [
+          "Skill Presets"
+        ],
+        "summary": "Delete skill presets",
+        "operationId": "DeleteSkillPreset",
+        "parameters": [
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "description": "Identifiers of skill presets to delete.",
+            "name": "ids",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.DeleteSkillPresetResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/call_center/skill_presets/{id}": {
+      "get": {
+        "description": "Returns a skill preset identified by the specified ID.",
+        "tags": [
+          "Skill Presets"
+        ],
+        "summary": "Get a skill preset",
+        "operationId": "GetSkillPreset",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Skill preset identifier.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.GetSkillPresetResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Replaces all editable properties of an existing skill preset.",
+        "tags": [
+          "Skill Presets"
+        ],
+        "summary": "Update a skill preset",
+        "operationId": "UpdateSkillPreset",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Skill preset identifier.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engine.SkillPresetService.UpdateSkillPresetBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.UpdateSkillPresetResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "patch": {
+        "description": "Updates one or more fields of an existing skill preset.",
+        "tags": [
+          "Skill Presets"
+        ],
+        "summary": "Patch a skill preset",
+        "operationId": "PatchSkillPreset",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Skill preset identifier.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engine.SkillPresetService.PatchSkillPresetBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.PatchSkillPresetResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/call_center/skills": {
       "get": {
         "tags": [
@@ -52965,6 +53237,38 @@
         }
       }
     },
+    "engine.CreateSkillPresetRequest": {
+      "description": "Request for creating a skill preset.",
+      "type": "object",
+      "properties": {
+        "description": {
+          "description": "Optional description.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Display name of the preset.",
+          "type": "string"
+        },
+        "skills": {
+          "description": "Skills included in the preset.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/engine.Lookup"
+          }
+        }
+      }
+    },
+    "engine.CreateSkillPresetResponse": {
+      "description": "Response containing the created skill preset.",
+      "type": "object",
+      "properties": {
+        "item": {
+          "description": "Created skill preset.",
+          "$ref": "#/definitions/engine.SkillPreset"
+        }
+      }
+    },
     "engine.CreateSkillRequest": {
       "type": "object",
       "properties": {
@@ -53204,6 +53508,20 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/engine.SkillAgentItem"
+          }
+        }
+      }
+    },
+    "engine.DeleteSkillPresetResponse": {
+      "description": "Response containing deleted skill presets.",
+      "type": "object",
+      "properties": {
+        "items": {
+          "description": "Deleted skill presets.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/engine.SkillPreset"
           }
         }
       }
@@ -53583,6 +53901,16 @@
         "potential_rows": {
           "type": "integer",
           "format": "int64"
+        }
+      }
+    },
+    "engine.GetSkillPresetResponse": {
+      "description": "Response containing the requested skill preset.",
+      "type": "object",
+      "properties": {
+        "item": {
+          "description": "Requested skill preset.",
+          "$ref": "#/definitions/engine.SkillPreset"
         }
       }
     },
@@ -56282,6 +56610,16 @@
         }
       }
     },
+    "engine.PatchSkillPresetResponse": {
+      "description": "Response containing patched skill preset.",
+      "type": "object",
+      "properties": {
+        "item": {
+          "description": "Patched skill preset item.",
+          "$ref": "#/definitions/engine.SkillPreset"
+        }
+      }
+    },
     "engine.PresetQuery": {
       "type": "object",
       "properties": {
@@ -58135,6 +58473,24 @@
         }
       }
     },
+    "engine.SearchSkillPresetResponse": {
+      "description": "Search results for skill presets.",
+      "type": "object",
+      "properties": {
+        "items": {
+          "description": "Matching skill presets.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/engine.SkillPreset"
+          }
+        },
+        "next": {
+          "description": "Indicates whether another page of results exists.",
+          "type": "boolean"
+        }
+      }
+    },
     "engine.SendPushResponse": {
       "type": "object",
       "properties": {
@@ -58256,6 +58612,102 @@
         },
         "team": {
           "$ref": "#/definitions/engine.Lookup"
+        }
+      }
+    },
+    "engine.SkillPreset": {
+      "description": "SkillPreset represents a reusable collection\nof skills that can be assigned within the Call Center.",
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "description": "Creation timestamp (Unix time, milliseconds).",
+          "type": "string",
+          "format": "int64"
+        },
+        "created_by": {
+          "description": "User who created the preset.",
+          "$ref": "#/definitions/engine.Lookup"
+        },
+        "description": {
+          "description": "Optional preset description.",
+          "type": "string"
+        },
+        "id": {
+          "description": "Unique preset identifier.",
+          "type": "string",
+          "format": "int64"
+        },
+        "name": {
+          "description": "Display name of the preset.",
+          "type": "string"
+        },
+        "skills": {
+          "description": "Skills included in the preset.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/engine.Lookup"
+          }
+        },
+        "updated_at": {
+          "description": "Last update timestamp (Unix time, milliseconds).",
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_by": {
+          "description": "User who last updated the preset.",
+          "$ref": "#/definitions/engine.Lookup"
+        }
+      }
+    },
+    "engine.SkillPresetService.PatchSkillPresetBody": {
+      "description": "Request for partially updating a skill preset.",
+      "type": "object",
+      "properties": {
+        "description": {
+          "description": "Updated preset description.",
+          "type": "string"
+        },
+        "fields": {
+          "description": "List of fields to update.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "name": {
+          "description": "Updated preset name.",
+          "type": "string"
+        },
+        "skills": {
+          "description": "Updated list of skills.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/engine.Lookup"
+          }
+        }
+      }
+    },
+    "engine.SkillPresetService.UpdateSkillPresetBody": {
+      "description": "Request for replacing a skill preset.",
+      "type": "object",
+      "properties": {
+        "description": {
+          "description": "Optional description.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Display name.",
+          "type": "string"
+        },
+        "skills": {
+          "description": "Skills assigned to the preset.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/engine.Lookup"
+          }
         }
       }
     },
@@ -58939,6 +59391,16 @@
         "score": {
           "type": "number",
           "format": "float"
+        }
+      }
+    },
+    "engine.UpdateSkillPresetResponse": {
+      "description": "Response containing updated skill preset.",
+      "type": "object",
+      "properties": {
+        "item": {
+          "description": "Updated skill preset.",
+          "$ref": "#/definitions/engine.SkillPreset"
         }
       }
     },
@@ -71258,6 +71720,9 @@
     },
     {
       "name": "SchemaVersionService"
+    },
+    {
+      "name": "SkillPresetService"
     },
     {
       "name": "SystemSettingService"
