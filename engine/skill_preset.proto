@@ -1,0 +1,246 @@
+syntax = "proto3";
+
+package engine;
+
+import "const.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/webitel/protos/engine";
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Skill Preset Service"
+    version: "1.0"
+    description: "API for managing skill presets in Call Center"
+  }
+  schemes: HTTP
+  schemes: HTTPS
+  consumes: "application/json"
+  produces: "application/json"
+};
+
+// SkillPresetService provides operations for managing
+// skill presets used by the Call Center.
+service SkillPresetService {
+  // Created a new skill preset.
+  rpc CreateSkillPreset(CreateSkillPresetRequest) returns (CreateSkillPresetResponse) {
+    option (google.api.http) = {
+      post: "/call_center/skill_presets"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Create a skill preset"
+      description: "Creates a new skill preset with the specified name, description, and associated skills."
+      tags: "Skill Presets"
+    };
+  }
+
+  // Retrieves a skill preset by its identifier.
+  rpc GetSkillPreset(GetSkillPresetRequest) returns (GetSkillPresetResponse) {
+    option (google.api.http) = {get: "/call_center/skill_presets/{id}"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get a skill preset"
+      description: "Returns a skill preset identified by the specified ID."
+      tags: "Skill Presets"
+    };
+  }
+
+  // Searches skill presets using filtering,
+  // sorting and pagination options.
+  rpc SearchSkillPreset(SearchSkillPresetRequest) returns (SearchSkillPresetResponse) {
+    option (google.api.http) = {get: "/call_center/skill_presets"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Search skill presets"
+      description: "Returns skill presets matching the specified search criteria."
+      tags: "Skill Presets"
+    };
+  }
+
+  // Replaces an existing skill preset.
+  rpc UpdateSkillPreset(UpdateSkillPresetRequest) returns (UpdateSkillPresetResponse) {
+    option (google.api.http) = {
+      put: "/call_center/skill_presets/{id}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Update a skill preset"
+      description: "Replaces all editable properties of an existing skill preset."
+      tags: "Skill Presets"
+    };
+  }
+
+  // Updates selected fields of a skill preset.
+  rpc PatchSkillPreset(PatchSkillPresetRequest) returns (PatchSkillPresetResponse) {
+    option (google.api.http) = {
+      patch: "/call_center/skill_presets/{id}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Patch a skill preset"
+      description: "Updates one or more fields of an existing skill preset."
+      tags: "Skill Presets"
+    };
+  }
+
+  // Deletes one or more skill presets.
+  rpc DeleteSkillPreset(DeleteSkillPresetRequest) returns (DeleteSkillPresetResponse) {
+    option (google.api.http) = {delete: "/call_center/skill_presets"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Delete skill presets"
+      description: "Deletes the specified skill presets."
+      tags: "Skill Presets"
+    };
+  }
+}
+
+// SkillPreset represents a reusable collection
+// of skills that can be assigned within the Call Center.
+message SkillPreset {
+  // Unique preset identifier.
+  int64 id = 1;
+
+  // User who created the preset.
+  Lookup created_by = 2;
+
+  // Creation timestamp (Unix time, milliseconds).
+  int64 created_at = 3;
+
+  // User who last updated the preset.
+  Lookup updated_by = 4;
+
+  // Last update timestamp (Unix time, milliseconds).
+  int64 updated_at = 5;
+
+  // Display name of the preset.
+  string name = 6;
+
+  // Optional preset description.
+  string description = 7;
+
+  // Skills included in the preset.
+  repeated Lookup skills = 8;
+}
+
+// Request for creating a skill preset.
+message CreateSkillPresetRequest {
+  // Display name of the preset.
+  string name = 1;
+
+  // Optional description.
+  string description = 2;
+
+  // Skills included in the preset.
+  repeated Lookup skills = 3;
+}
+
+// Response containing the created skill preset.
+message CreateSkillPresetResponse {
+  // Created skill preset.
+  SkillPreset item = 1;
+}
+
+// Request for deleting one or more skill presets.
+message DeleteSkillPresetRequest {
+  // Identifiers of skill presets to delete.
+  repeated int64 ids = 1;
+}
+
+// Response containing deleted skill presets.
+message DeleteSkillPresetResponse {
+  // Deleted skill presets.
+  repeated SkillPreset items = 1;
+}
+
+// Request for replacing a skill preset.
+message UpdateSkillPresetRequest {
+  // Skill preset identifier.
+  int64 id = 1;
+
+  // Display name.
+  string name = 2;
+
+  // Optional description.
+  string description = 3;
+
+  // Skills assigned to the preset.
+  repeated Lookup skills = 4;
+}
+
+// Response containing updated skill preset.
+message UpdateSkillPresetResponse {
+  // Updated skill preset.
+  SkillPreset item = 1;
+}
+
+// Request for partially updating a skill preset.
+message PatchSkillPresetRequest {
+  // List of fields to update.
+  repeated string fields = 1;
+
+  // Skill preset identifier.
+  int64 id = 2;
+
+  // Updated preset name.
+  optional string name = 3;
+
+  // Updated preset description.
+  optional string description = 4;
+
+  // Updated list of skills.
+  repeated Lookup skills = 5;
+}
+
+// Response containing patched skill preset.
+message PatchSkillPresetResponse {
+  // Patched skill preset item.
+  SkillPreset item = 1;
+}
+
+// Search criteria for skill presets.
+message SearchSkillPresetRequest {
+  // Page number (1-based).
+  int32 page = 1;
+
+  // Maximum number of items per page.
+  int32 size = 2;
+
+  // Search pattern applied to preset names.
+  string q = 3;
+
+  // Sort expression.
+  // Example: "-name", "+created_at".
+  string sort = 4;
+
+  // List of fields to include in the response.
+  repeated string fields = 5;
+
+  // Filter by preset identifiers.
+  repeated int64 ids = 6;
+
+  // Filter by associated skill identifiers.
+  repeated int64 skill_ids = 7;
+
+  // Skip the default preset in the search results.
+  bool skip_default = 8;
+}
+
+// Search results for skill presets.
+message SearchSkillPresetResponse {
+  // Matching skill presets.
+  repeated SkillPreset items = 1;
+
+  // Indicates whether another page of results exists.
+  bool next = 2;
+}
+
+// Request for retrieving a skill preset.
+message GetSkillPresetRequest {
+  // Skill preset identifier.
+  int64 id = 1;
+}
+
+// Response containing the requested skill preset.
+message GetSkillPresetResponse {
+  // Requested skill preset.
+  SkillPreset item = 1;
+}
