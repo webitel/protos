@@ -2023,6 +2023,39 @@
         ]
       }
     },
+    "/v1/messages/delete": {
+      "post": {
+        "summary": "Deletes one or more messages authored by the caller in an active chat.\nThe messages disappear for every participant; their content is retained\nin storage marked as deleted. Best-effort: the response reports which ids\nwere actually deleted and which ones were skipped.",
+        "operationId": "Message_DeleteMessages",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.DeleteMessagesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.DeleteMessagesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.Message"
+        ]
+      }
+    },
     "/v1/messages/document": {
       "post": {
         "summary": "SendDocument delivers a document message.",
@@ -3510,6 +3543,42 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.DeleteMessagesRequest": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Messages to delete. Only messages authored by the caller are removed."
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.DeleteMessagesResponse": {
+      "type": "object",
+      "properties": {
+        "deleted_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Messages that were actually deleted by this call."
+        },
+        "skipped_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Requested messages left untouched: not found, already deleted,\nnot authored by the caller, or the chat is closed."
+        },
+        "deleted_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Unix time in milliseconds when the messages were deleted."
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.Device": {
       "type": "object",
       "properties": {
@@ -3729,6 +3798,15 @@
             "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageRecipientStatus"
           },
           "description": "Per-recipient delivery details."
+        },
+        "deleted": {
+          "type": "boolean",
+          "description": "True when the message was deleted by its author. Content fields\n(body, attachments, contact, location, interactive, metadata) are\ncleared for deleted messages; clients should render a tombstone."
+        },
+        "deleted_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Unix time in milliseconds when the message was deleted."
         }
       },
       "description": "HistoryMessage represents a single message\nin thread history."
