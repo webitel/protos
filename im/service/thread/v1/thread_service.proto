@@ -21,6 +21,11 @@ service ThreadManagement {
   // Lists threads that a specific contact has left
   rpc SearchLeft(SearchLeftRequest) returns (SearchLeftResponse);
 
+  // Returns the unread summary for a participant: the number of chats that
+  // have unread messages and the total number of unread messages across all
+  // chats. Counts are individual to the participant's own read state.
+  rpc GetUnreadSummary(GetUnreadSummaryRequest) returns (GetUnreadSummaryResponse);
+
   // Creates a new group thread.
   // The creator becomes the owner of the thread.
   // Returns a single thread by its identifier.
@@ -138,6 +143,12 @@ message Thread {
   // This bot is the default return point when all temporary bots complete.
   // Empty string if no owner bot has been identified yet.
   string owner_bot_member_id = 15;
+
+  // Number of unread messages in this thread for the requesting participant
+  // (ThreadSearchRequest.self_id). Counts content messages the participant has
+  // not read yet; the participant's own messages and system messages are
+  // excluded. Zero when self_id is not provided.
+  int32 unread_count = 16;
 }
 
 //#endregion
@@ -251,6 +262,27 @@ message SearchThreadResponse {
 
   // Indicates whether there is a next page available.
   bool next = 2;
+}
+
+// GetUnreadSummaryRequest asks for the unread totals of a single participant.
+message GetUnreadSummaryRequest {
+  // Contact id of the participant whose unread totals are requested.
+  string self_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  // Domain identifier the participant belongs to.
+  int32 domain_id = 2 [(buf.validate.field).int32.gt = 0];
+}
+
+// GetUnreadSummaryResponse carries the participant's unread totals.
+message GetUnreadSummaryResponse {
+  // Number of chats (threads) that have at least one unread message.
+  int32 unread_chats = 1;
+
+  // Total number of unread messages across all chats.
+  int64 unread_messages = 2;
 }
 
 message SearchLeftRequest {

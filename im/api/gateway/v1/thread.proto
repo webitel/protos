@@ -23,6 +23,12 @@ service ThreadManagement {
     option (google.api.http) = {get: "/v1/threads/left"};
   }
 
+  // Returns the unread summary for the calling participant: the number of
+  // chats with unread messages and the total number of unread messages.
+  rpc GetUnreadSummary(GetUnreadSummaryRequest) returns (GetUnreadSummaryResponse) {
+    option (google.api.http) = {get: "/v1/threads/unread"};
+  }
+
   rpc Create(ThreadManagementCreateRequest) returns (ThreadManagementCreateResponse) {
     option (google.api.http) = {
       post: "/v1/threads"
@@ -159,6 +165,11 @@ message Thread {
 
   // Optional variables associated with the thread.
   ThreadVariables variables = 13;
+
+  // Number of unread messages in this thread for the calling participant.
+  // Counts content messages not yet read; the caller's own messages and
+  // system messages are excluded.
+  int32 unread_count = 14;
 }
 
 //#endregion
@@ -236,6 +247,19 @@ message SearchThreadResponse {
 
   // Indicates whether there is a next page available.
   bool next = 2;
+}
+
+// GetUnreadSummaryRequest is empty: the participant is taken from the
+// authenticated caller by the gateway.
+message GetUnreadSummaryRequest {}
+
+// GetUnreadSummaryResponse carries the caller's unread totals.
+message GetUnreadSummaryResponse {
+  // Number of chats (threads) that have at least one unread message.
+  int32 unread_chats = 1;
+
+  // Total number of unread messages across all chats.
+  int64 unread_messages = 2;
 }
 
 message SearchLeftRequest {
