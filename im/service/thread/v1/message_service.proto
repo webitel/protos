@@ -41,6 +41,10 @@ service Message {
 
   // Edits a previously sent message.
   rpc EditMessage(EditMessageRequest) returns (EditMessageResponse);
+
+  // Soft-deletes messages authored by the caller in threads the caller is
+  // still a member of. Best-effort: unremovable ids come back as skipped.
+  rpc DeleteMessages(DeleteMessagesRequest) returns (DeleteMessagesResponse);
 }
 
 message ReadMessageRequest {
@@ -460,4 +464,30 @@ message EditMessageResponse {
 
   // Unix time in milliseconds when the message was edited.
   int64 edited_at = 2;
+}
+
+message DeleteMessagesRequest {
+  // User who deletes the messages.
+  Peer deleted_by = 1 [(buf.validate.field).required = true];
+
+  // Messages to delete.
+  repeated string ids = 2 [(buf.validate.field).repeated = {
+    min_items: 1
+    max_items: 100
+    items: {
+      string: {uuid: true}
+    }
+  }];
+}
+
+message DeleteMessagesResponse {
+  // Messages that were actually deleted by this call.
+  repeated string deleted_ids = 1;
+
+  // Requested messages left untouched: not found, already deleted,
+  // not authored by the caller, or the chat is closed.
+  repeated string skipped_ids = 2;
+
+  // Unix time in milliseconds when the messages were deleted.
+  int64 deleted_at = 3;
 }

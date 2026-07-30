@@ -78,6 +78,15 @@ service Message {
       body: "*"
     };
   }
+
+  // Deletes one or more messages authored by the caller in an active chat.
+  // Best-effort: the response reports which ids were deleted and which skipped.
+  rpc DeleteMessages(DeleteMessagesRequest) returns (DeleteMessagesResponse) {
+    option (google.api.http) = {
+      post: "/v1/messages/delete"
+      body: "*"
+    };
+  }
 }
 
 message ReadMessageRequest {
@@ -457,4 +466,27 @@ message EditMessageResponse {
 
   // Unix time in milliseconds when the message was edited.
   int64 edited_at = 2;
+}
+
+message DeleteMessagesRequest {
+  // Messages to delete. Only messages authored by the caller are removed.
+  repeated string ids = 1 [(buf.validate.field).repeated = {
+    min_items: 1
+    max_items: 100
+    items: {
+      string: {uuid: true}
+    }
+  }];
+}
+
+message DeleteMessagesResponse {
+  // Messages that were actually deleted by this call.
+  repeated string deleted_ids = 1;
+
+  // Requested messages left untouched: not found, already deleted,
+  // not authored by the caller, or the chat is closed.
+  repeated string skipped_ids = 2;
+
+  // Unix time in milliseconds when the messages were deleted.
+  int64 deleted_at = 3;
 }
