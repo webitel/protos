@@ -11619,6 +11619,58 @@
         }
       }
     },
+    "/calls/{call_id}/exports/archive": {
+      "get": {
+        "tags": [
+          "PdfService"
+        ],
+        "summary": "Streams a ZIP archive bundling the given, already-uploaded call files (e.g. PDFs).\nSynchronous: the archive is assembled on the fly and streamed back chunk by chunk,\nso the caller does not need to poll for completion.",
+        "operationId": "DownloadCallArchive",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Unique identifier of the call.",
+            "name": "call_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "description": "IDs of already-uploaded files (e.g. PDFs) to bundle into one ZIP archive.",
+            "name": "file_ids",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "title": "Stream result of webitel_media_exporter.DownloadCallArchiveResponse",
+              "properties": {
+                "error": {
+                  "$ref": "#/definitions/google.rpc.Status"
+                },
+                "result": {
+                  "$ref": "#/definitions/webitel_media_exporter.DownloadCallArchiveResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/calls/{call_id}/exports/pdf": {
       "get": {
         "tags": [
@@ -70410,6 +70462,16 @@
           "description": "ID of the deleted record.",
           "type": "string",
           "format": "int64"
+        }
+      }
+    },
+    "webitel_media_exporter.DownloadCallArchiveResponse": {
+      "type": "object",
+      "title": "One frame of a streamed ZIP archive download. The file name is carried via the \"filename\"\ngRPC response header (set before the first frame)",
+      "properties": {
+        "data": {
+          "type": "string",
+          "format": "byte"
         }
       }
     },
