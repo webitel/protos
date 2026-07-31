@@ -1577,6 +1577,40 @@
         ]
       }
     },
+    "/im/provider/send/typing": {
+      "post": {
+        "summary": "SendTyping forwards an ephemeral \"typing…\" action to the external chat\npartner (e.g. Telegram sendChatAction, Meta sender_action). It is\nfire-and-forget and best-effort: channels whose provider does not support\ntyping are a silent no-op. Nothing is persisted.",
+        "operationId": "ProviderMessageService_SendTyping",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderSendTypingResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "ProviderSendTypingRequest asks a provider to show/hide a typing indicator\nto the external chat partner.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderSendTypingRequest"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.ProviderMessageService"
+        ]
+      }
+    },
     "/v1/auth/devices": {
       "post": {
         "summary": "Register device to receive PUSH notifications",
@@ -2015,6 +2049,39 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/webitel.im.api.gateway.v1.SendContactRequest"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.Message"
+        ]
+      }
+    },
+    "/v1/messages/delete": {
+      "post": {
+        "summary": "Deletes one or more messages authored by the caller in an active chat.\nThe messages disappear for every participant; their content is retained\nin storage marked as deleted. Best-effort: the response reports which ids\nwere actually deleted and which ones were skipped.",
+        "operationId": "Message_DeleteMessages",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.DeleteMessagesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.DeleteMessagesRequest"
             }
           }
         ],
@@ -2483,6 +2550,29 @@
             "format": "int32"
           }
         ],
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadManagement"
+        ]
+      }
+    },
+    "/v1/threads/unread": {
+      "get": {
+        "summary": "Returns the unread summary for the calling participant: the number of\nchats with unread messages and the total number of unread messages.",
+        "operationId": "ThreadManagement_GetUnreadSummary",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.GetUnreadSummaryResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
         "tags": [
           "webitel.im.api.gateway.v1.ThreadManagement"
         ]
@@ -3510,6 +3600,42 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.DeleteMessagesRequest": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Messages to delete. Only messages authored by the caller are removed."
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.DeleteMessagesResponse": {
+      "type": "object",
+      "properties": {
+        "deleted_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Messages that were actually deleted by this call."
+        },
+        "skipped_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Requested messages left untouched: not found, already deleted,\nnot authored by the caller, or the chat is closed."
+        },
+        "deleted_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Unix time in milliseconds when the messages were deleted."
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.Device": {
       "type": "object",
       "properties": {
@@ -3644,6 +3770,22 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.GetUnreadSummaryResponse": {
+      "type": "object",
+      "properties": {
+        "unread_chats": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of chats (threads) that have at least one unread message."
+        },
+        "unread_messages": {
+          "type": "string",
+          "format": "int64",
+          "description": "Total number of unread messages across all chats."
+        }
+      },
+      "description": "GetUnreadSummaryResponse carries the caller's unread totals."
+    },
     "webitel.im.api.gateway.v1.HistoryMessage": {
       "type": "object",
       "properties": {
@@ -3729,6 +3871,15 @@
             "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageRecipientStatus"
           },
           "description": "Per-recipient delivery details."
+        },
+        "deleted": {
+          "type": "boolean",
+          "description": "True when the message was deleted by its author. Content fields\n(body, attachments, contact, location, interactive, metadata) are\ncleared for deleted messages; clients should render a tombstone."
+        },
+        "deleted_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Unix time in milliseconds when the message was deleted."
         }
       },
       "description": "HistoryMessage represents a single message\nin thread history."
@@ -4666,6 +4817,11 @@
         "variables": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadVariables",
           "description": "Optional variables associated with the thread."
+        },
+        "unread_count": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of unread messages in this thread for the calling participant.\nCounts content messages not yet read; the caller's own messages and\nsystem messages are excluded."
         }
       },
       "description": "Thread represents a thread (aka chat or conversation) entity."
@@ -6761,6 +6917,40 @@
       },
       "description": "ProviderSendTextRequest sends a simple text message."
     },
+    "webitel.im.provider.v1.ProviderSendTypingRequest": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderType",
+          "title": "Explicit provider type (FACEBOOK, WHATSAPP, etc.)"
+        },
+        "gate_id": {
+          "type": "string",
+          "title": "Internal ID of the specific configured gateway"
+        },
+        "external_user_id": {
+          "type": "string",
+          "title": "Recipient's platform-specific identifier"
+        },
+        "domain_id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "typing_on": {
+          "type": "boolean",
+          "title": "true = start typing, false = stop"
+        },
+        "thread_id": {
+          "type": "string",
+          "title": "Internal thread UUID (for logging/correlation)"
+        }
+      },
+      "description": "ProviderSendTypingRequest asks a provider to show/hide a typing indicator\nto the external chat partner."
+    },
+    "webitel.im.provider.v1.ProviderSendTypingResponse": {
+      "type": "object",
+      "description": "ProviderSendTypingResponse is intentionally empty: typing is fire-and-forget."
+    },
     "webitel.im.provider.v1.ProviderSetGateTemplateResponse": {
       "type": "object",
       "properties": {
@@ -6800,6 +6990,10 @@
         "failed": {
           "type": "boolean",
           "description": "The channel reports failed deliveries."
+        },
+        "typing": {
+          "type": "boolean",
+          "description": "The channel can forward a native \"typing…\" indicator to the chat partner."
         }
       },
       "description": "ProviderStatusCapabilities declares which delivery-status receipts the\nchannel emits. A channel without a capability leaves messages in the last\nreachable state; the UI uses these flags to avoid drawing unreachable\nstatus marks."

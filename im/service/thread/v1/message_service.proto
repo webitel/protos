@@ -41,7 +41,53 @@ service Message {
 
   // Edits a previously sent message.
   rpc EditMessage(EditMessageRequest) returns (EditMessageResponse);
+
+  // Soft-deletes messages authored by the caller in threads the caller is
+  // still a member of. Best-effort: unremovable ids come back as skipped.
+  rpc DeleteMessages(DeleteMessagesRequest) returns (DeleteMessagesResponse);
+
+  // Sends an ephemeral typing indicator to the other participants of a thread.
+  //
+  // The event is real-time only: it is published fire-and-forget (it never
+  // touches the transactional outbox), is delivered only to currently online
+  // participants, is never stored in history and never triggers a push.
+  //
+  // The same RPC serves humans (no timeout_ms) and bots (custom timeout_ms,
+  // e.g. to hold the indicator while an answer is generated). When preview_text
+  // is provided the client draft is forwarded to authorized (operator /
+  // supervisor) recipients only; this is gated by a server-side feature flag
+  // and is silently dropped when the flag is disabled.
+  rpc SendTyping(SendTypingRequest) returns (SendTypingResponse);
 }
+
+// SendTypingRequest carries an ephemeral typing indicator for a thread.
+message SendTypingRequest {
+  // Participant who is typing.
+  Peer from = 1 [(buf.validate.field).required = true];
+
+  // Target thread. Use the Peer.thread_id variant.
+  Peer to = 2 [(buf.validate.field).required = true];
+
+  // Domain ID for multi-tenant isolation.
+  int64 domain_id = 3;
+
+  // How long clients should keep the indicator visible, in milliseconds.
+  // Optional; the server defaults it (typically 6000) and clamps it to 30000.
+  // Bots may use higher values to hold the indicator over long operations.
+  optional int32 timeout_ms = 4 [(buf.validate.field).int32 = {
+    gte: 0
+    lte: 30000
+  }];
+
+  // Optional live draft of the message being typed (Live Typing Preview).
+  // Forwarded only to authorized recipients and only when the preview feature
+  // is enabled. Max 1024 bytes; the server truncates on a rune boundary.
+  // An empty value clears a previously shown preview.
+  optional string preview_text = 5 [(buf.validate.field).string.max_bytes = 1024];
+}
+
+// SendTypingResponse is intentionally empty: typing is fire-and-forget.
+message SendTypingResponse {}
 
 message ReadMessageRequest {
   string id = 1;
@@ -460,4 +506,30 @@ message EditMessageResponse {
 
   // Unix time in milliseconds when the message was edited.
   int64 edited_at = 2;
+}
+
+message DeleteMessagesRequest {
+  // User who deletes the messages.
+  Peer deleted_by = 1 [(buf.validate.field).required = true];
+
+  // Messages to delete.
+  repeated string ids = 2 [(buf.validate.field).repeated = {
+    min_items: 1
+    max_items: 100
+    items: {
+      string: {uuid: true}
+    }
+  }];
+}
+
+message DeleteMessagesResponse {
+  // Messages that were actually deleted by this call.
+  repeated string deleted_ids = 1;
+
+  // Requested messages left untouched: not found, already deleted,
+  // not authored by the caller, or the chat is closed.
+  repeated string skipped_ids = 2;
+
+  // Unix time in milliseconds when the messages were deleted.
+  int64 deleted_at = 3;
 }
