@@ -1,0 +1,94 @@
+syntax = "proto3";
+
+package im.service.provider.v1;
+
+
+
+
+
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "service/provider/v1/entities.proto";
+import "service/provider/v1/messages.proto";
+
+option go_package = "github.com/webitel/im-provider-service/gen/go/api/v1;impb";
+
+service TelegramBotService {
+  rpc CreateTelegramBotGate (CreateTelegramBotGateRequest) returns (CreateTelegramBotGateResponse) {
+    option (google.api.http) = { post: "/im/gates/telegram", body: "*" };
+  }
+
+  rpc GetTelegramBotGate (GetTelegramBotGateRequest) returns (GetTelegramBotGateResponse) {
+    option (google.api.http) = { get: "/im/gates/telegram/{id}" };
+  }
+
+  rpc UpdateTelegramBotGate (UpdateTelegramBotGateRequest) returns (UpdateTelegramBotGateResponse) {
+   option (google.api.http) = { patch: "/im/gates/telegram/{id}", body: "*" };
+  }
+
+  rpc DeleteTelegramBotGate (DeleteTelegramBotGateRequest) returns (DeleteTelegramBotGateResponse) {
+    option (google.api.http) = { delete: "/im/gates/telegram/{id}" };
+  }
+
+}
+
+
+message CreateTelegramBotGateRequest {
+    string name = 1
+        [(buf.validate.field).required = true
+    ];
+
+   string api_token = 2;
+
+    webitel.im.provider.v1.Peer peer = 3
+        [(buf.validate.field).required = true];
+
+    string webhook_secret = 4
+        [(buf.validate.field).required = true];
+
+    bool enabled = 5;
+
+    string uri = 6
+        [(buf.validate.field).required = true];
+
+}
+
+message CreateTelegramBotGateResponse {
+    webitel.im.provider.v1.ProviderTelegramBotGate item = 1;
+}
+
+message GetTelegramBotGateRequest {
+    string id = 1
+        [(buf.validate.field).required = true,
+        (buf.validate.field).string.uuid = true];
+}
+
+message GetTelegramBotGateResponse {
+    webitel.im.provider.v1.ProviderTelegramBotGate item = 1;
+}
+
+message UpdateTelegramBotGateRequest {
+    string id = 1
+        [(buf.validate.field).required = true,
+        (buf.validate.field).string.uuid = true];
+    optional string name = 2;
+    optional string api_token = 3;
+    optional string webhook_secret = 4;
+    optional webitel.im.provider.v1.Peer peer = 5;
+    optional bool enabled = 6;
+}
+
+message UpdateTelegramBotGateResponse {
+    webitel.im.provider.v1.ProviderTelegramBotGate item = 1;
+}
+
+message DeleteTelegramBotGateRequest {
+    string id = 1
+        [(buf.validate.field).required = true,
+        (buf.validate.field).string.uuid = true];
+}
+
+message DeleteTelegramBotGateResponse {
+    webitel.im.provider.v1.ProviderTelegramBotGate item = 1;
+}

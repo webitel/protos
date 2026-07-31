@@ -1,0 +1,698 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Webitel Customer Portal API",
+    "version": "dev",
+    "contact": {
+      "name": "Webitel LLC",
+      "url": "https://www.webitel.com",
+      "email": "support@webitel.com"
+    },
+    "license": {
+      "name": "MIT"
+    }
+  },
+  "tags": [
+    {
+      "name": "Customer"
+    }
+  ],
+  "host": "nx.webitel.org",
+  "basePath": "/api",
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/portal/device": {
+      "post": {
+        "summary": "Register PUSH subscription. App token authentication required",
+        "description": "(Device) {",
+        "operationId": "Customer_RegisterDevice",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.portal.RegisterDeviceResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.portal.RegisterDeviceRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Customer"
+        ]
+      }
+    },
+    "/portal/logout": {
+      "post": {
+        "summary": "Invalidate the user's session access token",
+        "operationId": "Customer_Logout",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.portal.UpdateDisconnect"
+            }
+          }
+        },
+        "tags": [
+          "Customer"
+        ],
+        "security": [
+          {
+            "Device Id": [],
+            "Portal User": []
+          }
+        ]
+      }
+    },
+    "/portal/token": {
+      "get": {
+        "summary": "Inspect authentication of the user's session access token",
+        "operationId": "Customer_Inspect",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.portal.AccessToken"
+            }
+          }
+        },
+        "tags": [
+          "Customer"
+        ],
+        "security": [
+          {
+            "Device Id": [],
+            "Portal User": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "Obtain your user's access token to portal service(s)",
+        "operationId": "Customer_Token",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.portal.AccessToken"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.portal.TokenRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Customer"
+        ],
+        "security": [
+          {
+            "Device Id": [],
+            "Portal App": []
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "google.protobuf.Any": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "google.protobuf.NullValue": {
+      "type": "string",
+      "enum": [
+        "NULL_VALUE"
+      ],
+      "default": "NULL_VALUE",
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+    },
+    "google.rpc.Status": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code]."
+        },
+        "message": {
+          "type": "string",
+          "description": "A developer-facing error message, which should be in English. Any\nuser-facing error message should be localized and sent in the\n[google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client."
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/google.protobuf.Any"
+          },
+          "description": "A list of messages that carry the error details.  There is a common set of\nmessage types for APIs to use."
+        }
+      },
+      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https://github.com/grpc). Each `Status` message contains\nthree pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the\n[API Design Guide](https://cloud.google.com/apis/design/errors)."
+    },
+    "webitel.chat.Peer": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Contact unique **ID**entifier.\nContact **type**-specific string."
+        },
+        "type": {
+          "type": "string",
+          "description": "Contact **type** provider."
+        },
+        "name": {
+          "type": "string",
+          "description": "Contact display **name**."
+        }
+      },
+      "description": "Peer contact."
+    },
+    "webitel.portal.AccessToken": {
+      "type": "object",
+      "example": {
+        "expires_in": 3555,
+        "token_type": "bearer",
+        "access_token": "LxEYRr_5YIiNnvQXgZ-y_I830xuhrSQi-EsgzbQhdIMPxScSIsiey8s1KKSoD4CP",
+        "scope": [
+          "call",
+          "chat"
+        ],
+        "user": {
+          "identity": {
+            "iss": "https://my.example.org/accounts",
+            "sub": "j.doe",
+            "name": "John Doe",
+            "given_name": "John",
+            "family_name": "Doe",
+            "middle_name": "",
+            "birthdate": "",
+            "zoneinfo": "US/Arizona",
+            "profile": "https://my.example.org/people/j.doe",
+            "picture": "",
+            "gender": "male",
+            "locale": "en-US",
+            "email": "j.doe@mx.example.org",
+            "email_verified": true,
+            "phone_number": "+1 202-555-0190",
+            "phone_number_verified": false,
+            "metadata": {
+              "extra_var": "my string",
+              "complex_var": {
+                "array": [
+                  73,
+                  "str",
+                  null,
+                  {}
+                ]
+              }
+            }
+          }
+        },
+        "call": {
+          "proxy": "sip:example.org:5064;transport=udp",
+          "realm": "demo.webitel.com",
+          "user_id": "F3-frzuRNTOzZ2B-q2S_lQ"
+        },
+        "chat": {
+          "user": {
+            "id": "0f36b039bd0936c9a4b9d48abd6f4f15",
+            "type": "portal",
+            "name": "You"
+          }
+        }
+      },
+      "properties": {
+        "expires_in": {
+          "type": "integer",
+          "format": "int32",
+          "description": "RECOMMENDED. The lifetime in seconds of the access token."
+        },
+        "token_type": {
+          "type": "string",
+          "description": "REQUIRED. The type of the token issued. Value is case insensitive."
+        },
+        "access_token": {
+          "type": "string",
+          "description": "REQUIRED. The access token issued by the authorization server."
+        },
+        "refresh_token": {
+          "type": "string",
+          "description": "OPTIONAL. The refresh token, which can be used to obtain\nnew access tokens using the same authorization grant."
+        },
+        "scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "OPTIONAL, if identical to the scope requested by the client;\notherwise, REQUIRED. The scope of the access token."
+        },
+        "state": {
+          "type": "string",
+          "description": "REQUIRED if the \"state\" parameter was present in the client\nauthorization request. The exact value received from the client."
+        },
+        "user": {
+          "$ref": "#/definitions/webitel.portal.UserProfile",
+          "description": "End-User account profile."
+        },
+        "call": {
+          "$ref": "#/definitions/webitel.portal.CallAccount",
+          "description": "VoIP / SIP service credentials."
+        },
+        "chat": {
+          "$ref": "#/definitions/webitel.portal.ChatAccount",
+          "description": "[I]nstant [M]essaging dialog state."
+        }
+      },
+      "title": "Access Token Response"
+    },
+    "webitel.portal.CallAccount": {
+      "type": "object",
+      "properties": {
+        "proxy": {
+          "type": "string",
+          "title": "SIP host / proxy"
+        },
+        "realm": {
+          "type": "string",
+          "title": "SIP realm / domain"
+        },
+        "user_id": {
+          "type": "string",
+          "title": "SIP username; extension"
+        },
+        "auth_id": {
+          "type": "string",
+          "title": "SIP authorization"
+        },
+        "secret": {
+          "type": "string",
+          "title": "SIP password"
+        },
+        "video": {
+          "type": "boolean",
+          "title": "Video is allowed ?"
+        }
+      },
+      "title": "Portal Service VoIP/SIP Account"
+    },
+    "webitel.portal.ChatAccount": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/webitel.chat.Peer",
+          "description": "User self. The sender. You."
+        }
+      },
+      "title": "Customer end-User messaging account settings"
+    },
+    "webitel.portal.DevicePush": {
+      "type": "object",
+      "properties": {
+        "FCM": {
+          "type": "string",
+          "title": "[F]irebase [C]loud [M]essaging Service (firebase token for google firebase)"
+        },
+        "APN": {
+          "type": "string",
+          "title": "[A]pple [P]ush [N]otification Service (device token for apple push)"
+        },
+        "web": {
+          "$ref": "#/definitions/webitel.portal.WebPush",
+          "title": "For 10 web push, the token must be a JSON-encoded object with the following keys:\nendpoint: Absolute URL exposed by the push service where the application server can send push messages\nkeys: P-256 elliptic curve Diffie-Hellman parameters in the following object\np256dh: Base64url-encoded P-256 elliptic curve Diffie-Hellman public key\nauth: Base64url-encoded authentication secret"
+        },
+        "secret": {
+          "type": "string",
+          "title": "For FCM and APNS VoIP, optional encryption key used to encrypt push notifications"
+        }
+      },
+      "title": "PUSH Subscription\nhttps://core.telegram.org/api/push-updates#subscribing-to-notifications"
+    },
+    "webitel.portal.Echo": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "webitel.portal.Identity": {
+      "type": "object",
+      "properties": {
+        "iss": {
+          "type": "string",
+          "description": "REQUIRED. Issuer Identifier for the Issuer of the response.\nThe iss value is a case sensitive URL using the https scheme that contains scheme, host,\nand optionally, port number and path components and no query or fragment components."
+        },
+        "sub": {
+          "type": "string",
+          "description": "REQUIRED. Subject Identifier.\nA locally unique and never reassigned identifier within the Issuer for the End-User,\nwhich is intended to be consumed by the Client, e.g., 24400320 or AItOawmwtWwcT0k51BayewNvutrJUqsvl6qs7A4.\nIt MUST NOT exceed 255 ASCII characters in length.\nThe sub value is a case sensitive string."
+        },
+        "name": {
+          "type": "string",
+          "description": "REQUIRED. End-User's full name in displayable form including all name parts,\npossibly including titles and suffixes, ordered according to the End-User's locale and preferences."
+        },
+        "given_name": {
+          "type": "string",
+          "description": "Given name(s) or first name(s) of the End-User.\nNote that in some cultures, people can have multiple given names;\nall can be present, with the names being separated by space characters."
+        },
+        "family_name": {
+          "type": "string",
+          "description": "Surname(s) or last name(s) of the End-User.\nNote that in some cultures, people can have multiple family names or no family name;\nall can be present, with the names being separated by space characters."
+        },
+        "middle_name": {
+          "type": "string",
+          "description": "Middle name(s) of the End-User.\nNote that in some cultures, people can have multiple middle names;\nall can be present, with the names being separated by space characters.\nAlso note that in some cultures, middle names are not used."
+        },
+        "birthdate": {
+          "type": "string",
+          "description": "OPTIONAL. End-User's birthday, represented as an ISO 8601:2004 [ISO8601‑2004] YYYY-MM-DD format.\nThe year MAY be 0000, indicating that it is omitted.\nTo represent only the year, YYYY format is allowed."
+        },
+        "zoneinfo": {
+          "type": "string",
+          "description": "OPTIONAL. String from zoneinfo [zoneinfo] time zone database representing the End-User's time zone.\nFor example, Europe/Kyiv or America/Los_Angeles."
+        },
+        "profile": {
+          "type": "string",
+          "description": "OPTIONAL. URL of the End-User's profile page.\nThe contents of this Web page SHOULD be about the End-User.\nNOTE: Issuer SP (IdP) related URL."
+        },
+        "picture": {
+          "type": "string",
+          "description": "OPTIONAL. URL of the End-User's profile picture.\nThis URL MUST refer to an image file\n(for example, a PNG, JPEG, or GIF image file),\nrather than to a Web page containing an image."
+        },
+        "gender": {
+          "type": "string",
+          "description": "OPTIONAL. End-User's gender.\nValues defined by this specification are `female` and `male`.\nOther values MAY be used when neither of the defined values are applicable."
+        },
+        "locale": {
+          "type": "string",
+          "description": "End-User's locale, represented as a BCP47 [RFC5646] language tag.\nThis is typically an ISO 639-1 Alpha-2 [ISO639‑1] language code in lowercase\nand an ISO 3166-1 Alpha-2 [ISO3166‑1] country code in uppercase,\nseparated by a dash. For example, `en-US` or `uk-UA`."
+        },
+        "email": {
+          "type": "string",
+          "description": "End-User's preferred e-mail address.\nIts value MUST conform to the RFC 5322 [RFC5322] addr-spec syntax.\nThe RP MUST NOT rely upon this value being unique, as discussed in Section 5.7."
+        },
+        "email_verified": {
+          "type": "boolean",
+          "description": "True if the End-User's e-mail address has been verified; otherwise false."
+        },
+        "phone_number": {
+          "type": "string",
+          "description": "End-User's preferred telephone number.\nE.164 is RECOMMENDED as the format of this Claim, for example, +1 (425) 555-1212 or +56 (2) 687 2400.\nIf the phone number contains an extension, it is RECOMMENDED that\nthe extension be represented using the RFC 3966 [RFC3966] extension syntax, for example, +1 (604) 555-1234;ext=5678."
+        },
+        "phone_number_verified": {
+          "type": "boolean",
+          "description": "True if the End-User's phone number has been verified; otherwise false."
+        },
+        "metadata": {
+          "type": "object",
+          "description": "End-User's extra attributes metadata."
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.portal.SourceId"
+          },
+          "description": "Additional source(s) associated with given \"identity\".\nUsed to merge two or more well-known end-user subjects."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Time the End-User's information was last updated.\nIts value is a JSON number representing the number of seconds from 1970-01-01T0:0:0Z as measured in UTC until the date/time."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "deleted_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "title": "Identity of the End-User at the Issuer.\nhttps://openid.net/specs/openid-connect-core-1_0.html#Claims"
+    },
+    "webitel.portal.RegisterDeviceRequest": {
+      "type": "object",
+      "properties": {
+        "push": {
+          "$ref": "#/definitions/webitel.portal.DevicePush",
+          "description": "PUSH subscription update.\nSet provider type specific registered device token.\nNone to deregister device PUSH subscription."
+        }
+      }
+    },
+    "webitel.portal.RegisterDeviceResponse": {
+      "type": "object"
+    },
+    "webitel.portal.SourceId": {
+      "type": "object",
+      "properties": {
+        "iss": {
+          "type": "string",
+          "description": "REQUIRED. Issuer Identifier for the Issuer of the response.\nThe iss value is a case sensitive URL using the https scheme that contains scheme, host,\nand optionally, port number and path components and no query or fragment components."
+        },
+        "sub": {
+          "type": "string",
+          "description": "REQUIRED. Subject Identifier.\nA locally unique and never reassigned identifier within the Issuer for the End-User,\nwhich is intended to be consumed by the Client, e.g., 24400320 or AItOawmwtWwcT0k51BayewNvutrJUqsvl6qs7A4.\nIt MUST NOT exceed 255 ASCII characters in length.\nThe sub value is a case sensitive string."
+        }
+      },
+      "title": "Subject source identification"
+    },
+    "webitel.portal.TokenRequest": {
+      "type": "object",
+      "example": {
+        "scope": [
+          "call",
+          "chat"
+        ],
+        "grant_type": "identity",
+        "response_type": [
+          "token",
+          "user",
+          "call",
+          "chat"
+        ],
+        "identity": {
+          "iss": "https://my.example.org/accounts",
+          "sub": "j.doe",
+          "name": "John Doe",
+          "given_name": "John",
+          "family_name": "Doe",
+          "middle_name": "",
+          "birthdate": "",
+          "zoneinfo": "US/Arizona",
+          "profile": "https://my.example.org/people/j.doe",
+          "picture": "",
+          "gender": "male",
+          "locale": "en-US",
+          "email": "j.doe@mx.example.org",
+          "email_verified": true,
+          "phone_number": "+1 202-555-0190",
+          "phone_number_verified": false,
+          "metadata": {
+            "extra_var": "my string",
+            "complex_var": {
+              "array": [
+                73,
+                "str",
+                null,
+                {}
+              ]
+            }
+          },
+          "sources": [
+            {
+              "sub": "phone:2025550190"
+            },
+            {
+              "iss": "https://my.example.org/support",
+              "sub": "m3lJ9VzG8yF6wzwQ"
+            }
+          ]
+        },
+        "push": {
+          "FCM": "android_client_firebase_cloud_messaging_subscription_token"
+        }
+      },
+      "properties": {
+        "state": {
+          "type": "string",
+          "title": "RECOMMENDED. An opaque value used by the client to maintain\nstate between the request and callback.  The authorization\nserver includes this value when redirecting the user-agent back\nto the client.  The parameter SHOULD be used for preventing\ncross-site request forgery"
+        },
+        "scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "OPTIONAL. The scope of the access request\nPosible values are:\n* chat ; [I]nstant [M]essaging service\n* call ; [V]oice[o]ver[IP] SIP service"
+        },
+        "app_token": {
+          "type": "string",
+          "description": "REQUIRED. Confidential client authorization token.\nMay be transmitted in header: X-Portal-Client.\nKeep it a secret."
+        },
+        "grant_type": {
+          "type": "string",
+          "title": "REQUIRED. Grant type.\nPosible values ; - not implemented ; + supported\n- authorization_code ; Authorization Code Grant\n- client_credentials ; Client Credentials Grant\n- refresh_token      ; Refreshing an Access Token\n- password           ; Resource Owner Password Credentials Grant\nExtension Grants\n+ identity           ; Public end-User Identity Grant"
+        },
+        "response_type": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "REQUIRED. Response type.\nPosible values ; - not implemented ; + supported\n+ token    ; Access token response\n- id_token ;\nExtensions\n+ user     ; End-User account profile\n+ call     ; SIP account credentials\n+ chat     ; IM account details"
+        },
+        "refresh_token": {
+          "type": "string",
+          "description": "Refresh token string to obtain NEW access token.\nREQUIRED. When grant_type is set to \"refresh_token\"."
+        },
+        "identity": {
+          "$ref": "#/definitions/webitel.portal.Identity",
+          "description": "Identity of the end-User account association.\nREQUIRED. When grant_type is set to \"identity\"."
+        },
+        "code": {
+          "type": "string",
+          "description": "Authorization code grant.\nREQUIRED. When grant_type is set to \"authorization_code\"."
+        },
+        "push": {
+          "$ref": "#/definitions/webitel.portal.DevicePush",
+          "description": "OPTIONAL. Sign up client device for PUSH notifications."
+        }
+      },
+      "title": "Access Token Request"
+    },
+    "webitel.portal.Update": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "int64",
+          "description": "Date when this update was sent."
+        },
+        "data": {
+          "$ref": "#/definitions/google.protobuf.Any",
+          "title": "Update notification arguments data"
+        }
+      },
+      "title": "Update notification message.\nMAY be `Response` to the `Request`\n-OR- well-known Update *like message"
+    },
+    "webitel.portal.UpdateDisconnect": {
+      "type": "object",
+      "properties": {
+        "cause": {
+          "$ref": "#/definitions/google.rpc.Status",
+          "title": "The disconnect reason"
+        }
+      },
+      "description": "UpdateDisconnect notifies the client about\nan imminent disconnect due to specified reason."
+    },
+    "webitel.portal.UserProfile": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "READONLY. profile.id"
+        },
+        "username": {
+          "type": "string",
+          "description": "OPTIONAL.\nShorthand name by which the End-User\nwishes to be referred to at the RP,\nsuch as janedoe or j.doe."
+        },
+        "identity": {
+          "$ref": "#/definitions/webitel.portal.Identity",
+          "description": "READONLY. End-User profile info."
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.portal.Identity"
+          },
+          "title": "READONLY. Extra identities associated"
+        }
+      },
+      "description": "End-User Owner Profile."
+    },
+    "webitel.portal.WebPush": {
+      "type": "object",
+      "properties": {
+        "endpoint": {
+          "type": "string",
+          "title": "endpoint: Absolute URL exposed by the push service where the application server can send push messages"
+        },
+        "key": {
+          "$ref": "#/definitions/webitel.portal.WebPush.Key",
+          "title": "P-256 elliptic curve Diffie-Hellman parameters"
+        }
+      },
+      "title": "WebPUSH subscription"
+    },
+    "webitel.portal.WebPush.Key": {
+      "type": "object",
+      "properties": {
+        "auth": {
+          "type": "string",
+          "format": "byte",
+          "title": "auth: Base64url-encoded authentication secret"
+        },
+        "p256dh": {
+          "type": "string",
+          "format": "byte",
+          "title": "p256dh: Base64url-encoded P-256 elliptic curve Diffie-Hellman public key"
+        }
+      },
+      "title": "keys: P-256 elliptic curve Diffie-Hellman parameters in the following object\np256dh: Base64url-encoded P-256 elliptic curve Diffie-Hellman public key\nauth: Base64url-encoded authentication secret"
+    }
+  },
+  "securityDefinitions": {
+    "Device Id": {
+      "type": "apiKey",
+      "description": "Webitel **portal** client **device** self identification",
+      "name": "X-Portal-Device",
+      "in": "header"
+    },
+    "Portal App": {
+      "type": "apiKey",
+      "description": "Webitel **portal** client **app** authorization **token**",
+      "name": "X-Portal-Client",
+      "in": "header"
+    },
+    "Portal User": {
+      "type": "apiKey",
+      "description": "Webitel **portal** end-user **customer** authorization",
+      "name": "X-Portal-Access",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "Portal Admin": []
+    }
+  ]
+}
