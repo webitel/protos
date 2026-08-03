@@ -199,6 +199,8 @@ message ThreadMessage {
     }
 
     QuotedMessage reply_to = 11;
+
+    ForwardOrigin forward_origin = 12;
 }
 
 message QuotedMessage {
@@ -210,6 +212,30 @@ message QuotedMessage {
   string attachment_kind = 6;
   string attachment_name = 7;
   string attachment_mime = 8;
+}
+
+enum ForwardOriginKind {
+  FORWARD_ORIGIN_KIND_UNSPECIFIED = 0;
+
+  FORWARD_ORIGIN_KIND_INTERNAL = 1;
+
+  FORWARD_ORIGIN_KIND_EXTERNAL_USER = 2;
+
+  FORWARD_ORIGIN_KIND_EXTERNAL_HIDDEN_USER = 3;
+
+  FORWARD_ORIGIN_KIND_EXTERNAL_CHAT = 4;
+}
+
+message ForwardOrigin {
+  ForwardOriginKind kind = 1;
+
+  string sender_id = 2;
+
+  string sender_name = 3;
+
+  int64 original_sent_at = 4;
+
+  string source_message_id = 5;
 }
 
 message Identity {

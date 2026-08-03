@@ -97,6 +97,14 @@ message ReplyToMessage {
   optional string attachment_mime = 8;
 }
 
+message ForwardOrigin {
+  ForwardOriginKind kind = 1;
+  string sender_id = 2;
+  string sender_name = 3;
+  int64 original_sent_at = 4;
+  string source_message_id = 5;
+}
+
 // MessageRecipientStatus is a per-recipient delivery state of a message.
 message MessageRecipientStatus {
   // Recipient contact id (thread_dialog.member_id).
@@ -152,6 +160,10 @@ message HistoryMessage {
 
   // Unix time in milliseconds when the message was deleted.
   int64 deleted_at = 21;
+
+  // Set when this message is a forward. Never populated for a deleted
+  // message: the tombstone must not leak the origin name.
+  ForwardOrigin forward_origin = 22;
 }
 
 message SearchMessageHistoryResponse {

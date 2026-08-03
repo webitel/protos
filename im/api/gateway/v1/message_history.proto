@@ -186,6 +186,27 @@ message ReplyToMessage {
   optional string attachment_mime = 9;
 }
 
+// ForwardOrigin is a snapshot of the original author taken at forward time.
+// Unlike ReplyToMessage it carries no enriched ThreadMember: the original author
+// is generally not a member of the chat the copy landed in, so sender_name is
+// the only label a client can rely on.
+message ForwardOrigin {
+  ForwardOriginKind kind = 1;
+
+  // Contact id of the original author. Empty unless kind is INTERNAL.
+  string sender_id = 2;
+
+  // Display name of the original author — the "from whom" label.
+  string sender_name = 3;
+
+  // When the original message was sent, Unix time in milliseconds.
+  int64 original_sent_at = 4;
+
+  // Source message this copy was made from. Empty unless kind is INTERNAL,
+  // and cleared if the source is later purged.
+  string source_message_id = 5;
+}
+
 // MessageDeliveryStatus is a per-recipient delivery state of a message.
 // Transitions are monotonic: SENT -> DELIVERED -> READ.
 // FAILED is terminal but may be superseded by a later DELIVERED (retry).
@@ -285,6 +306,10 @@ message HistoryMessage {
 
   // Unix time in milliseconds when the message was deleted.
   int64 deleted_at = 20;
+
+  // Set when this message is a forward. Never populated for a deleted
+  // message: the tombstone must not leak the origin name.
+  ForwardOrigin forward_origin = 21;
 }
 
 message InteractiveCallback {
