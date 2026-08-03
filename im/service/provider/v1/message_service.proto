@@ -51,7 +51,32 @@ service ProviderMessageService {
       body: "*"
     };
   }
+
+  // SendTyping forwards an ephemeral "typing…" action to the external chat
+  // partner (e.g. Telegram sendChatAction, Meta sender_action). It is
+  // fire-and-forget and best-effort: channels whose provider does not support
+  // typing are a silent no-op. Nothing is persisted.
+  rpc SendTyping(ProviderSendTypingRequest) returns (ProviderSendTypingResponse) {
+    option (google.api.http) = {
+      post: "/im/provider/send/typing"
+      body: "*"
+    };
+  }
 }
+
+// ProviderSendTypingRequest asks a provider to show/hide a typing indicator
+// to the external chat partner.
+message ProviderSendTypingRequest {
+  ProviderType type = 1; // Explicit provider type (FACEBOOK, WHATSAPP, etc.)
+  string gate_id = 2; // Internal ID of the specific configured gateway
+  string external_user_id = 3; // Recipient's platform-specific identifier
+  int32 domain_id = 4;
+  bool typing_on = 5; // true = start typing, false = stop
+  string thread_id = 6; // Internal thread UUID (for logging/correlation)
+}
+
+// ProviderSendTypingResponse is intentionally empty: typing is fire-and-forget.
+message ProviderSendTypingResponse {}
 
 // --- Shared Types ---
 
