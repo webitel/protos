@@ -2,11 +2,11 @@ syntax = "proto3";
 
 package engine;
 
-option go_package = "github.com/webitel/protos/engine";
-
+import "const.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/struct.proto";
-import "const.proto";
+
+option go_package = "github.com/webitel/protos/engine";
 
 service TriggerService {
   // Create Trigger
@@ -18,15 +18,11 @@ service TriggerService {
   }
   // List of Trigger
   rpc SearchTrigger(SearchTriggerRequest) returns (ListTrigger) {
-    option (google.api.http) = {
-      get: "/trigger"
-    };
+    option (google.api.http) = {get: "/trigger"};
   }
   // Trigger item
   rpc ReadTrigger(ReadTriggerRequest) returns (Trigger) {
-    option (google.api.http) = {
-      get: "/trigger/{id}"
-    };
+    option (google.api.http) = {get: "/trigger/{id}"};
   }
   // Update Trigger
   rpc UpdateTrigger(UpdateTriggerRequest) returns (Trigger) {
@@ -45,11 +41,8 @@ service TriggerService {
 
   // Remove Trigger
   rpc DeleteTrigger(DeleteTriggerRequest) returns (Trigger) {
-    option (google.api.http) = {
-      delete: "/trigger/{id}"
-    };
+    option (google.api.http) = {delete: "/trigger/{id}"};
   }
-
 
   rpc CreateTriggerJob(CreateTriggerJobRequest) returns (TriggerJob) {
     option (google.api.http) = {
@@ -59,9 +52,7 @@ service TriggerService {
   }
 
   rpc SearchTriggerJob(SearchTriggerJobRequest) returns (ListTriggerJob) {
-    option (google.api.http) = {
-      get: "/trigger/{trigger_id}/job"
-    };
+    option (google.api.http) = {get: "/trigger/{trigger_id}/job"};
   }
 }
 
@@ -75,9 +66,10 @@ enum TriggerObjectType {
   empty_trigger_object = 0;
   cases = 1;
   case_files = 2;
-  case_comments=3;
-  case_links=4;
-  related_cases=5;
+  case_comments = 3;
+  case_links = 4;
+  related_cases = 5;
+  call = 6;
 }
 
 enum TriggerEventType {
@@ -86,6 +78,7 @@ enum TriggerEventType {
   update = 2;
   remove = 3;
   resolution_time = 4;
+  record_call = 5;
 }
 
 enum TriggerJobState {
@@ -97,7 +90,7 @@ enum TriggerJobState {
 
 message CreateTriggerJobRequest {
   int32 trigger_id = 1;
-  map<string,string> variables = 2;
+  map<string, string> variables = 2;
 }
 
 message TriggerJob {
@@ -126,7 +119,6 @@ message SearchTriggerJobRequest {
   repeated TriggerJobState state = 10;
 }
 
-
 message ListTriggerJob {
   bool next = 1;
   repeated TriggerJob items = 2;
@@ -138,7 +130,7 @@ message Trigger {
   bool enabled = 3;
   TriggerType type = 4;
   Lookup schema = 5;
-  map<string,string> variables = 6;
+  map<string, string> variables = 6;
   string description = 7;
   string expression = 8;
   Lookup timezone = 9;
@@ -152,7 +144,7 @@ message CreateTriggerRequest {
   bool enabled = 2;
   TriggerType type = 3;
   Lookup schema = 4;
-  map<string,string> variables = 5;
+  map<string, string> variables = 5;
   string description = 6;
   string expression = 7;
   Lookup timezone = 8;
@@ -188,7 +180,7 @@ message UpdateTriggerRequest {
   bool enabled = 3;
   TriggerType type = 4;
   Lookup schema = 5;
-  map<string,string> variables = 6;
+  map<string, string> variables = 6;
   string description = 7;
   string expression = 8;
   Lookup timezone = 9;
@@ -205,7 +197,7 @@ message PatchTriggerRequest {
   bool enabled = 4;
   TriggerType type = 5;
   Lookup schema = 6;
-  map<string,string> variables = 7;
+  map<string, string> variables = 7;
   string description = 8;
   string expression = 9;
   Lookup timezone = 10;
