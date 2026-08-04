@@ -164,6 +164,28 @@ message HistoryMessage {
   // Set when this message is a forward. Never populated for a deleted
   // message: the tombstone must not leak the origin name.
   ForwardOrigin forward_origin = 22;
+  // Emoji reactions currently held on the message, aggregated per emoji.
+  repeated MessageReaction reactions = 23;
+}
+
+// MessageReaction is the aggregate of one emoji's reactions on a message:
+// how many members reacted with it, whether the caller is one of them, and a
+// capped sample of reactor ids for rendering avatars/tooltips.
+message MessageReaction {
+  // The reaction (unicode emoji today).
+  ReactionContent reaction = 1;
+
+  // Number of members currently holding this reaction.
+  int32 count = 2;
+
+  // True when the requesting caller is one of the reactors.
+  bool reacted_by_me = 3;
+
+  // Capped sample of reactor contact ids (for UI); not necessarily all of them.
+  repeated string reactor_ids = 4;
+
+  // Unix time in milliseconds of the most recent reaction with this emoji.
+  int64 last_reacted_at = 5;
 }
 
 message SearchMessageHistoryResponse {

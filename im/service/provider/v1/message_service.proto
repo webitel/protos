@@ -62,7 +62,45 @@ service ProviderMessageService {
       body: "*"
     };
   }
+
+  // SendReaction forwards an emoji reaction change to the external chat partner
+  // (e.g. Telegram setMessageReaction). Best-effort and messenger-dependent:
+  // providers without reaction support are a silent no-op. An empty emoji (with
+  // removed=true) clears the caller's reaction on the target message.
+  rpc SendReaction(ProviderSendReactionRequest) returns (ProviderSendReactionResponse) {
+    option (google.api.http) = {
+      post: "/im/provider/send/reaction"
+      body: "*"
+    };
+  }
 }
+
+// ProviderSendReactionRequest asks a provider to set or clear an emoji reaction
+// on a message already delivered to the external chat partner.
+message ProviderSendReactionRequest {
+  ProviderType type = 1; // Explicit provider type (FACEBOOK, WHATSAPP, etc.)
+  string gate_id = 2; // Internal ID of the specific configured gateway
+  string external_user_id = 3; // Recipient's platform-specific identifier
+  int32 domain_id = 4;
+
+  // Platform-specific id of the message being reacted to (resolved by im-thread
+  // from its external-id mapping for the target gate).
+  string external_message_id = 5;
+
+  // Emoji to set; empty when the reaction is being cleared.
+  string emoji = 6;
+
+  // True when the reaction is being removed rather than set.
+  bool removed = 7;
+
+  // Internal message context for logging/correlation.
+  string message_id = 8; // Internal message UUID
+  string thread_id = 9; // Internal thread UUID
+}
+
+// ProviderSendReactionResponse is intentionally empty: reactions are
+// fire-and-forget and best-effort.
+message ProviderSendReactionResponse {}
 
 // ProviderSendTypingRequest asks a provider to show/hide a typing indicator
 // to the external chat partner.

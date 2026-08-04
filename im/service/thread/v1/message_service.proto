@@ -51,6 +51,16 @@ service Message {
   // missing, unreadable or unforwardable come back as skipped.
   rpc ForwardMessages(ForwardMessagesRequest) returns (ForwardMessagesResponse);
   
+  // Sets or clears the caller's emoji reaction on a single message.
+  //
+  // A member may hold at most one reaction per message: a new emoji replaces
+  // the previous one, sending the same emoji again clears it (toggle), and an
+  // empty emoji clears it explicitly. The call is idempotent (send_id) and
+  // serves both webitel participants and inbound reactions relayed from an
+  // external messenger. Whether a reaction is forwarded to the far side
+  // depends on the messenger's capabilities.
+  rpc SetReaction(SetReactionRequest) returns (SetReactionResponse);
+
   // Sends an ephemeral typing indicator to the other participants of a thread.
   //
   // The event is real-time only: it is published fire-and-forget (it never
@@ -616,4 +626,72 @@ message DeleteMessagesResponse {
 
   // Unix time in milliseconds when the messages were deleted.
   int64 deleted_at = 3;
+}
+
+// The outcome of a SetReaction call, relative to the reaction the caller
+// previously held on the message.
+enum ReactionAction {
+  REACTION_ACTION_UNSPECIFIED = 0;
+
+  // The caller's reaction was created or changed to the requested emoji.
+  REACTION_ACTION_SET = 1;
+
+  // The caller's reaction was cleared (toggle off or empty emoji).
+  REACTION_ACTION_REMOVED = 2;
+
+  // The stored state already matched the request; nothing changed.
+  REACTION_ACTION_UNCHANGED = 3;
+}
+
+// ReactionContent is what a reaction carries. It is a union so the contract can
+// grow to custom (sticker-backed) emoji without a breaking change; today only
+// the unicode `emoji` arm is implemented — `custom_emoji_id` is reserved and
+// rejected by the server.
+message ReactionContent {
+  oneof kind {
+    // A single unicode emoji (grapheme). An empty request-level reaction (unset
+    // oneof) clears the caller's reaction.
+    string emoji = 1 [(buf.validate.field).string.max_bytes = 64];
+
+    // Reserved for messenger/custom (sticker-backed) emoji, referenced by id.
+    // Not yet implemented.
+    string custom_emoji_id = 2;
+  }
+}
+
+message SetReactionRequest {
+  // Member leaving the reaction (operator, client, or a bot on their behalf).
+  Peer reactor = 1 [(buf.validate.field).required = true];
+
+  // Message being reacted to.
+  string message_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+
+  // Reaction to set. Leave unset (or emoji="") to clear the caller's reaction.
+  ReactionContent reaction = 3;
+
+  // Domain ID for multi-tenant isolation.
+  int64 domain_id = 4;
+
+  // Optional target thread; resolved from the message when omitted.
+  optional string thread_id = 5 [(buf.validate.field).string.uuid = true];
+
+  // Optional client-generated id for deduplication.
+  string send_id = 20;
+
+  // Optional external message id for reactions relayed from a messenger.
+  string external_id = 21;
+}
+
+message SetReactionResponse {
+  // What the call did relative to the caller's previous reaction.
+  ReactionAction action = 1;
+
+  // The reaction now stored for the caller; empty when it was removed.
+  ReactionContent reaction = 2;
+
+  // Unix time in milliseconds when the reaction was set; zero when removed.
+  int64 reacted_at = 3;
 }
