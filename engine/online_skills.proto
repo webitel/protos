@@ -1,0 +1,242 @@
+syntax = "proto3";
+
+package engine;
+
+import "const.proto";
+import "google/api/annotations.proto";
+import "google/api/visibility.proto";
+import "google/protobuf/empty.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/webitel/protos/engine";
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Online Skills Service"
+    version: "1.0"
+    description: "API for managing online skills in Call Center"
+  }
+  schemes: HTTP
+  schemes: HTTPS
+  consumes: "application/json"
+  produces: "application/json"
+};
+
+// OnlineSkillsService provides operations for managing
+// online skills used by the Call Center.
+service OnlineSkillsService {
+  // Creates a new online skills entry.
+  rpc CreateOnlineSkills(CreateOnlineSkillsRequest) returns (CreateOnlineSkillsResponse) {
+    option (google.api.http) = {
+      post: "/call_center/online_skills"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Create online skills"
+      description: "Creates a new online skills entry with the specified name, description, and associated skills."
+      tags: "Online Skills"
+    };
+  }
+
+  // Retrieves an online skills entry by its identifier.
+  rpc GetOnlineSkills(GetOnlineSkillsRequest) returns (GetOnlineSkillsResponse) {
+    option (google.api.http) = {get: "/call_center/online_skills/{id}"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get online skills"
+      description: "Returns an online skills entry identified by the specified ID."
+      tags: "Online Skills"
+    };
+  }
+
+  // Searches online skills using filtering,
+  // sorting and pagination options.
+  rpc SearchOnlineSkills(SearchOnlineSkillsRequest) returns (SearchOnlineSkillsResponse) {
+    option (google.api.http) = {get: "/call_center/online_skills"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Search online skills"
+      description: "Returns online skills matching the specified search criteria."
+      tags: "Online Skills"
+    };
+  }
+
+  // Replaces an existing online skills entry.
+  rpc UpdateOnlineSkills(UpdateOnlineSkillsRequest) returns (UpdateOnlineSkillsResponse) {
+    option (google.api.http) = {
+      put: "/call_center/online_skills/{id}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Update online skills"
+      description: "Replaces all editable properties of an existing online skills entry."
+      tags: "Online Skills"
+    };
+  }
+
+  // Updates selected fields of an online skills entry.
+  rpc PatchOnlineSkills(PatchOnlineSkillsRequest) returns (PatchOnlineSkillsResponse) {
+    option (google.api.http) = {
+      patch: "/call_center/online_skills/{id}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Patch online skills"
+      description: "Updates one or more fields of an existing online skills entry."
+      tags: "Online Skills"
+    };
+  }
+
+  // Deletes one or more online skills entries.
+  rpc DeleteOnlineSkills(DeleteOnlineSkillsRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {delete: "/call_center/online_skills/{id}"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Delete online skills"
+      description: "Deletes the specified online skills entries."
+      tags: "Online Skills"
+    };
+  }
+}
+
+// OnlineSkills represents a reusable collection
+// of skills that can be assigned within the Call Center.
+message OnlineSkills {
+  // Unique identifier.
+  int64 id = 1;
+
+  // User who created the entry.
+  Lookup created_by = 2;
+
+  // Creation timestamp (Unix time, milliseconds).
+  int64 created_at = 3;
+
+  // User who last updated the entry.
+  Lookup updated_by = 4;
+
+  // Last update timestamp (Unix time, milliseconds).
+  int64 updated_at = 5;
+
+  // Display name.
+  string name = 6;
+
+  // Optional description.
+  string description = 7;
+
+  // Skills included in the entry.
+  repeated Lookup skills = 8;
+}
+
+// Request for creating online skills.
+message CreateOnlineSkillsRequest {
+  // Display name.
+  string name = 1;
+
+  // Optional description.
+  string description = 2;
+
+  // Skills included in the entry.
+  repeated Lookup skills = 3;
+}
+
+// Response containing the created online skills.
+message CreateOnlineSkillsResponse {
+  // Created online skills item.
+  OnlineSkills item = 1;
+}
+
+// Request for deleting one or more online skills entries.
+message DeleteOnlineSkillsRequest {
+  // Identifiers of online skills to delete.
+  int64 id = 1;
+}
+
+// Request for replacing online skills.
+message UpdateOnlineSkillsRequest {
+  // Online skills identifier.
+  int64 id = 1;
+
+  // Display name.
+  string name = 2;
+
+  // Optional description.
+  string description = 3;
+
+  // Skills assigned.
+  repeated Lookup skills = 4;
+}
+
+// Response containing updated online skills.
+message UpdateOnlineSkillsResponse {
+  // Updated online skills item.
+  OnlineSkills item = 1;
+}
+
+// Request for partially updating online skills.
+message PatchOnlineSkillsRequest {
+  // List of fields to update.
+  repeated string fields = 1 [(google.api.field_visibility) = {restriction: "PREVIEW"}];
+
+  // Online skills identifier.
+  int64 id = 2;
+
+  // Updated name.
+  optional string name = 3;
+
+  // Updated description.
+  optional string description = 4;
+
+  // Updated list of skills.
+  repeated Lookup skills = 5;
+}
+
+// Response containing patched online skills.
+message PatchOnlineSkillsResponse {
+  // Patched online skills item.
+  OnlineSkills item = 1;
+}
+
+// Search criteria for online skills.
+message SearchOnlineSkillsRequest {
+  // Page number (1-based).
+  int32 page = 1;
+
+  // Maximum number of items per page.
+  int32 size = 2;
+
+  // Search pattern applied to names.
+  string q = 3;
+
+  // Sort expression.
+  // Example: "-name", "+created_at".
+  string sort = 4;
+
+  // List of fields to include in the response.
+  repeated string fields = 5;
+
+  // Filter by online skills identifiers.
+  repeated int64 ids = 6;
+
+  // Filter by associated skill identifiers.
+  repeated int64 skill_ids = 7;
+
+  // Skip the default entry in the search results.
+  bool skip_default = 8;
+}
+
+// Search results for online skills.
+message SearchOnlineSkillsResponse {
+  // Matching online skills items.
+  repeated OnlineSkills items = 1;
+
+  // Indicates whether another page of results exists.
+  bool next = 2;
+}
+
+// Request for retrieving online skills.
+message GetOnlineSkillsRequest {
+  // Online skills identifier.
+  int64 id = 1;
+}
+
+// Response containing the requested online skills.
+message GetOnlineSkillsResponse {
+  // Requested online skills item.
+  OnlineSkills item = 1;
+}
