@@ -68,7 +68,33 @@ message ServerEvent {
 
     // Ephemeral "…is typing" indicator (optionally with a live draft preview).
     TypingEvent typing_event = 12;
+
+    // A member set or cleared an emoji reaction on a message.
+    MessageReactionEvent message_reaction_event = 13;
   }
+}
+
+// MessageReactionEvent notifies thread participants that a member set or
+// cleared an emoji reaction on a message. Clients match the message by id and
+// update its reaction list for the given member.
+message MessageReactionEvent {
+  // Message the reaction applies to.
+  string message_id = 1;
+
+  // Thread the message belongs to.
+  string thread_id = 2;
+
+  // Member who reacted.
+  Peer reactor = 3;
+
+  // Emoji that was set. Empty when the reaction was cleared.
+  string emoji = 4;
+
+  // True when the reaction was removed rather than set.
+  bool removed = 5;
+
+  // Unix time in milliseconds when the reaction changed.
+  int64 reacted_at = 6;
 }
 
 // TypingEvent is an ephemeral, real-time "…is typing" indicator.
@@ -210,22 +236,6 @@ message NewMessageEvent {
       description: "Message delivered via the stream",
     }
   ];
-}
-
-// MessageDeletedEvent notifies thread participants that a message was deleted
-// by its author. Clients match the message by id and remove it.
-message MessageDeletedEvent {
-  // Identifier of the deleted message.
-  string id = 1;
-
-  // Thread the message belonged to.
-  string thread_id = 2;
-
-  // Participant who deleted the message.
-  Peer deleted_by = 3;
-
-  // Unix time in milliseconds when the message was deleted.
-  int64 deleted_at = 4;
 }
 
 message ThreadMessage {

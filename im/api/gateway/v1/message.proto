@@ -97,6 +97,14 @@ service Message {
       body: "*"
     };
   }
+
+  // Sets or clears the caller's emoji reaction on a single message.
+  rpc SetReaction(SetReactionRequest) returns (SetReactionResponse) {
+    option (google.api.http) = {
+      post: "/v1/messages/{message_id}/reaction"
+      body: "*"
+    };
+  }
 }
 
 // ForwardOriginKind tells the client how to label a forwarded message and
@@ -573,4 +581,32 @@ message DeleteMessagesResponse {
 
   // Unix time in milliseconds when the messages were deleted.
   int64 deleted_at = 3;
+}
+
+message SetReactionRequest {
+  // Member setting the reaction.
+  Peer reactor = 1 [(buf.validate.field).required = true];
+
+  // Message being reacted to.
+  string message_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+
+  // Emoji to set. Empty string clears the reaction.
+  string emoji = 3;
+
+  // Optional client-generated id for deduplication.
+  string send_id = 20;
+}
+
+message SetReactionResponse {
+  // What the call did relative to the caller's previous reaction (SET, REMOVED, UNCHANGED).
+  string action = 1;
+
+  // The emoji now stored for the caller; empty when it was removed.
+  string emoji = 2;
+
+  // Unix time in milliseconds when the reaction was set; zero when removed.
+  int64 reacted_at = 3;
 }
