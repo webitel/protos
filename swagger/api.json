@@ -26654,6 +26654,132 @@
         }
       }
     },
+    "/im/gates/telegram": {
+      "post": {
+        "tags": [
+          "im.service.provider.v1.TelegramBotService"
+        ],
+        "operationId": "TelegramBotService_CreateTelegramBotGate",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/im.service.provider.v1.CreateTelegramBotGateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/im.service.provider.v1.CreateTelegramBotGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/im/gates/telegram/{id}": {
+      "get": {
+        "tags": [
+          "im.service.provider.v1.TelegramBotService"
+        ],
+        "operationId": "TelegramBotService_GetTelegramBotGate",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/im.service.provider.v1.GetTelegramBotGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "im.service.provider.v1.TelegramBotService"
+        ],
+        "operationId": "TelegramBotService_DeleteTelegramBotGate",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/im.service.provider.v1.DeleteTelegramBotGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "im.service.provider.v1.TelegramBotService"
+        ],
+        "operationId": "TelegramBotService_UpdateTelegramBotGate",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/im.service.provider.v1.TelegramBotService.UpdateTelegramBotGateBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/im.service.provider.v1.UpdateTelegramBotGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/im/gates/whatsapp": {
       "post": {
         "tags": [
@@ -27461,6 +27587,40 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/webitel.im.provider.v1.ProviderSendMessageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/im/provider/send/reaction": {
+      "post": {
+        "tags": [
+          "webitel.im.provider.v1.ProviderMessageService"
+        ],
+        "summary": "SendReaction forwards an emoji reaction change to the external chat partner\n(e.g. Telegram setMessageReaction). Best-effort and messenger-dependent:\nproviders without reaction support are a silent no-op. An empty emoji (with\nremoved=true) clears the caller's reaction on the target message.",
+        "operationId": "ProviderMessageService_SendReaction",
+        "parameters": [
+          {
+            "description": "ProviderSendReactionRequest asks a provider to set or clear an emoji reaction\non a message already delivered to the external chat partner.",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderSendReactionRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderSendReactionResponse"
             }
           },
           "default": {
@@ -40122,7 +40282,7 @@
         "tags": [
           "webitel.im.api.gateway.v1.Message"
         ],
-        "summary": "Deletes one or more messages authored by the caller in an active chat.\nThe messages disappear for every participant; their content is retained\nin storage marked as deleted. Best-effort: the response reports which ids\nwere actually deleted and which ones were skipped.",
+        "summary": "Deletes one or more messages authored by the caller in an active chat.\nBest-effort: the response reports which ids were deleted and which skipped.",
         "operationId": "Message_DeleteMessages",
         "parameters": [
           {
@@ -40173,6 +40333,39 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/webitel.im.api.gateway.v1.SendDocumentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/messages/forward": {
+      "post": {
+        "tags": [
+          "webitel.im.api.gateway.v1.Message"
+        ],
+        "summary": "Forwards messages the caller can read into a direct chat with [to],\nstamping each copy with its original author. The source chat is untouched.\nBest-effort: the response reports which sources were skipped.",
+        "operationId": "Message_ForwardMessages",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardMessagesRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardMessagesResponse"
             }
           },
           "default": {
@@ -40391,6 +40584,46 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/webitel.im.api.gateway.v1.ReadMessageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/messages/{message_id}/reaction": {
+      "post": {
+        "tags": [
+          "webitel.im.api.gateway.v1.Message"
+        ],
+        "summary": "Sets or clears the caller's emoji reaction on a single message.",
+        "operationId": "Message_SetReaction",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Message being reacted to.",
+            "name": "message_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.Message.SetReactionBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SetReactionResponse"
             }
           },
           "default": {
@@ -40916,6 +41149,11 @@
           {
             "type": "boolean",
             "name": "can_change_thread_info",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "name": "can_delete_messages",
             "in": "query"
           }
         ],
@@ -59774,6 +60012,81 @@
         }
       }
     },
+    "im.service.provider.v1.CreateTelegramBotGateRequest": {
+      "type": "object",
+      "properties": {
+        "api_token": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "peer": {
+          "$ref": "#/definitions/webitel.im.provider.v1.Peer"
+        },
+        "uri": {
+          "type": "string"
+        },
+        "webhook_secret": {
+          "type": "string"
+        }
+      }
+    },
+    "im.service.provider.v1.CreateTelegramBotGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderTelegramBotGate"
+        }
+      }
+    },
+    "im.service.provider.v1.DeleteTelegramBotGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderTelegramBotGate"
+        }
+      }
+    },
+    "im.service.provider.v1.GetTelegramBotGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderTelegramBotGate"
+        }
+      }
+    },
+    "im.service.provider.v1.TelegramBotService.UpdateTelegramBotGateBody": {
+      "type": "object",
+      "properties": {
+        "api_token": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "peer": {
+          "$ref": "#/definitions/webitel.im.provider.v1.Peer"
+        },
+        "webhook_secret": {
+          "type": "string"
+        }
+      }
+    },
+    "im.service.provider.v1.UpdateTelegramBotGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderTelegramBotGate"
+        }
+      }
+    },
     "knowledgebaseArticle": {
       "type": "object",
       "properties": {
@@ -67021,6 +67334,108 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.ForwardMessagesRequest": {
+      "type": "object",
+      "properties": {
+        "message_ids": {
+          "description": "Sources to copy, in the order they should appear at the destination.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "send_as": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.PeerIdentity"
+        },
+        "send_id": {
+          "type": "string",
+          "title": "optional client-generated id for deduplication"
+        },
+        "to": {
+          "description": "Recipient of the copies: a user contact or a bot contact (flow schema).",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Peer"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.ForwardMessagesResponse": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "description": "Ids of the created copies, in forwarded order.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "skipped_ids": {
+          "description": "Sources that were not forwarded: unknown id, no read access to the source\nchat, already deleted, or a type that cannot be forwarded.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "thread_id": {
+          "description": "Direct chat the copies landed in.",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.ForwardOrigin": {
+      "description": "ForwardOrigin is a snapshot of the original author taken at forward time.\nUnlike ReplyToMessage it carries no enriched ThreadMember: the original author\nis generally not a member of the chat the copy landed in, so sender_name is\nthe only label a client can rely on.",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardOriginKind"
+        },
+        "original_sent_at": {
+          "description": "When the original message was sent, Unix time in milliseconds.",
+          "type": "string",
+          "format": "int64"
+        },
+        "sender_id": {
+          "description": "Contact id of the original author. Empty unless kind is INTERNAL.",
+          "type": "string"
+        },
+        "sender_name": {
+          "description": "Display name of the original author — the \"from whom\" label.",
+          "type": "string"
+        },
+        "source_message_id": {
+          "description": "Source message this copy was made from. Empty unless kind is INTERNAL,\nand cleared if the source is later purged.",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.ForwardOriginInput": {
+      "description": "ForwardOriginInput carries what an external channel told us about the\noriginal author of an inbound forwarded message. Set by providers on\ningress, not by end clients.",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardOriginKind"
+        },
+        "original_sent_at": {
+          "description": "When the message was originally sent, Unix time in milliseconds.\nZero when the platform does not report it.",
+          "type": "string",
+          "format": "int64"
+        },
+        "sender_name": {
+          "description": "Display name of the original author. Empty when the platform hides it.",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.ForwardOriginKind": {
+      "description": "ForwardOriginKind tells the client how to label a forwarded message and\nwhether the origin points at anything addressable inside Webitel.\n\n - FORWARD_ORIGIN_KIND_INTERNAL: Forwarded inside Webitel: sender_id and source_message_id are set.\n - FORWARD_ORIGIN_KIND_EXTERNAL_USER: Forwarded into the chat from an external messenger, author named.\n - FORWARD_ORIGIN_KIND_EXTERNAL_HIDDEN_USER: Same, but the author chose to hide their account, so there is no name.\n - FORWARD_ORIGIN_KIND_EXTERNAL_CHAT: Origin is an external group or channel rather than a person.",
+      "type": "string",
+      "default": "FORWARD_ORIGIN_KIND_UNSPECIFIED",
+      "enum": [
+        "FORWARD_ORIGIN_KIND_UNSPECIFIED",
+        "FORWARD_ORIGIN_KIND_INTERNAL",
+        "FORWARD_ORIGIN_KIND_EXTERNAL_USER",
+        "FORWARD_ORIGIN_KIND_EXTERNAL_HIDDEN_USER",
+        "FORWARD_ORIGIN_KIND_EXTERNAL_CHAT"
+      ]
+    },
     "webitel.im.api.gateway.v1.GetContactSettingsResponse": {
       "type": "object",
       "properties": {
@@ -67070,7 +67485,7 @@
           "format": "int64"
         },
         "deleted": {
-          "description": "True when the message was deleted by its author. Content fields\n(body, attachments, contact, location, interactive, metadata) are\ncleared for deleted messages; clients should render a tombstone.",
+          "description": "True when the message was deleted by its author. Every content field\n(body, attachments, contact, location, interactive, metadata) is cleared,\nso clients should render a tombstone.",
           "type": "boolean"
         },
         "deleted_at": {
@@ -67094,6 +67509,10 @@
           "description": "Message last update timestamp (Unix time, milliseconds).",
           "type": "string",
           "format": "int64"
+        },
+        "forward_origin": {
+          "description": "Set when this message is a forward. Never populated for a deleted\nmessage: the tombstone must not leak the origin name.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardOrigin"
         },
         "id": {
           "description": "Unique message identifier.",
@@ -67553,6 +67972,23 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.Message.SetReactionBody": {
+      "type": "object",
+      "properties": {
+        "emoji": {
+          "description": "Emoji to set. Empty string clears the reaction.",
+          "type": "string"
+        },
+        "reactor": {
+          "description": "Member setting the reaction.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Peer"
+        },
+        "send_id": {
+          "description": "Optional client-generated id for deduplication.",
+          "type": "string"
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.MessageContact": {
       "type": "object",
       "properties": {
@@ -67818,6 +68254,10 @@
           "description": "Email must be valid if provided.",
           "type": "string"
         },
+        "forward_origin": {
+          "description": "Set by providers when the channel reports this message was forwarded to us.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardOriginInput"
+        },
         "metadata": {
           "description": "Arbitrary metadata.",
           "type": "object"
@@ -67862,6 +68302,10 @@
         },
         "external_id": {
           "type": "string"
+        },
+        "forward_origin": {
+          "description": "Set by providers when the channel reports this message was forwarded to us.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardOriginInput"
         },
         "reply_to_external_id": {
           "type": "string"
@@ -67930,6 +68374,10 @@
           "description": "Optional human-readable address.",
           "type": "string"
         },
+        "forward_origin": {
+          "description": "Set by providers when the channel reports this message was forwarded to us.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardOriginInput"
+        },
         "latitude": {
           "description": "Latitude in degrees. Must be between -90 and +90.",
           "type": "number",
@@ -67988,6 +68436,10 @@
         "external_id": {
           "type": "string"
         },
+        "forward_origin": {
+          "description": "Set by providers when the channel reports this message was forwarded to us.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardOriginInput"
+        },
         "reply_to_external_id": {
           "type": "string"
         },
@@ -68015,6 +68467,24 @@
         },
         "to": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.Peer"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.SetReactionResponse": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "description": "What the call did relative to the caller's previous reaction (SET, REMOVED, UNCHANGED).",
+          "type": "string"
+        },
+        "emoji": {
+          "description": "The emoji now stored for the caller; empty when it was removed.",
+          "type": "string"
+        },
+        "reacted_at": {
+          "description": "Unix time in milliseconds when the reaction was set; zero when removed.",
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -68200,6 +68670,9 @@
           "type": "boolean"
         },
         "can_change_thread_info": {
+          "type": "boolean"
+        },
+        "can_delete_messages": {
           "type": "boolean"
         },
         "can_remove_members": {
@@ -70103,6 +70576,52 @@
         }
       }
     },
+    "webitel.im.provider.v1.ProviderSendReactionRequest": {
+      "description": "ProviderSendReactionRequest asks a provider to set or clear an emoji reaction\non a message already delivered to the external chat partner.",
+      "type": "object",
+      "properties": {
+        "domain_id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "emoji": {
+          "description": "Emoji to set; empty when the reaction is being cleared.",
+          "type": "string"
+        },
+        "external_message_id": {
+          "description": "Platform-specific id of the message being reacted to (resolved by im-thread\nfrom its external-id mapping for the target gate).",
+          "type": "string"
+        },
+        "external_user_id": {
+          "type": "string",
+          "title": "Recipient's platform-specific identifier"
+        },
+        "gate_id": {
+          "type": "string",
+          "title": "Internal ID of the specific configured gateway"
+        },
+        "message_id": {
+          "description": "Internal message context for logging/correlation.\n\nInternal message UUID",
+          "type": "string"
+        },
+        "removed": {
+          "description": "True when the reaction is being removed rather than set.",
+          "type": "boolean"
+        },
+        "thread_id": {
+          "type": "string",
+          "title": "Internal thread UUID"
+        },
+        "type": {
+          "title": "Explicit provider type (FACEBOOK, WHATSAPP, etc.)",
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderType"
+        }
+      }
+    },
+    "webitel.im.provider.v1.ProviderSendReactionResponse": {
+      "description": "ProviderSendReactionResponse is intentionally empty: reactions are\nfire-and-forget and best-effort.",
+      "type": "object"
+    },
     "webitel.im.provider.v1.ProviderSendSystemMessageRequest": {
       "description": "ProviderSendSystemMessageRequest delivers a system event to the external chat partner.\nThe provider service resolves the gate-specific template and renders the final text\nusing the supplied variables before sending via the underlying provider API.",
       "type": "object",
@@ -70301,6 +70820,31 @@
           "title": "Unix timestamp in milliseconds"
         },
         "webhook_url": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.provider.v1.ProviderTelegramBotGate": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderStatus"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "uri": {
           "type": "string"
         }
       }
@@ -72345,6 +72889,9 @@
     },
     {
       "name": "webitel.im.provider.v1.MetaOAuthService"
+    },
+    {
+      "name": "im.service.provider.v1.TelegramBotService"
     },
     {
       "name": "webitel.im.provider.v1.GateTemplateService"
