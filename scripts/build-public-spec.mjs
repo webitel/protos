@@ -19,7 +19,8 @@
 //                   operations carry none of these tags are dropped
 //                   (default: keep everything)
 
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync, readdirSync } from "node:fs";
+import { dirname, join } from "node:path";
 import converter from "swagger2openapi";
 
 const SOURCE = process.env.SOURCE_SPEC || "swagger/api.json";
@@ -55,6 +56,64 @@ const HTTP_METHODS = new Set([
   "head",
   "trace",
 ]);
+
+// --- re-tag by protos module ------------------------------------------------
+// gRPC emits verbose per-service tags (webitel.im.api.gateway.v1.Message), and
+// one service's endpoints get split across URL prefixes (/im, /v1). To make
+// Postman group requests into one folder per protos module, re-tag every
+// operation with the module it came from — derived from which per-service
+// swagger/<module>.swagger.json file declares that path. This mirrors the repo
+// layout (im, cases, storage, engine, wfm, ...).
+function moduleNameFromFile(f) {
+  const base = f.replace(/\.swagger\.json$/, "");
+  return base === "im-gateway" ? "im" : base;
+}
+function retagByModule(spec, dir) {
+  // (METHOD PATH) -> module, built from the individual swagger files.
+  const map = new Map();
+  const files = readdirSync(dir)
+    .filter((f) => f.endsWith(".swagger.json"))
+    .sort();
+  for (const f of files) {
+    let doc;
+    try {
+      doc = JSON.parse(readFileSync(join(dir, f), "utf8"));
+    } catch {
+      continue;
+    }
+    const mod = moduleNameFromFile(f);
+    for (const [p, item] of Object.entries(doc.paths || {})) {
+      for (const method of Object.keys(item)) {
+        if (!HTTP_METHODS.has(method)) continue;
+        const key = `${method} ${p}`;
+        if (!map.has(key)) map.set(key, mod); // first file (sorted) wins
+      }
+    }
+  }
+
+  const used = new Set();
+  let unmapped = 0;
+  for (const [p, item] of Object.entries(spec.paths || {})) {
+    for (const [method, op] of Object.entries(item)) {
+      if (!HTTP_METHODS.has(method)) continue;
+      const mod = map.get(`${method} ${p}`);
+      if (mod) {
+        op.tags = [mod];
+        used.add(mod);
+      } else {
+        unmapped++;
+      }
+    }
+  }
+  // Stable, alphabetical folder order in Postman.
+  spec.tags = [...used].sort().map((name) => ({ name }));
+  console.error(
+    `Re-tagged operations into ${used.size} module folders: ${[...used].sort().join(", ")}` +
+      (unmapped ? ` (${unmapped} ops had no source file, kept original tags)` : ""),
+  );
+}
+
+retagByModule(openapi, dirname(SOURCE));
 
 // --- normalize colliding path templates ------------------------------------
 // gRPC HTTP annotations across services use inconsistent path-param names, so
