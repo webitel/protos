@@ -155,6 +155,15 @@ swagger_mix:
 		> ./swagger/api.json || true
 
 
+.PHONY: swagger_public
+
+# Build the public OpenAPI 3.0 spec (swagger/api.public.json) from the merged
+# Swagger 2.0 bundle and push it to Postman Spec Hub (Spec Hub needs 3.0).
+# Override host/scope via PUBLIC_API_HOST / INCLUDE_TAGS env vars.
+swagger_public:
+	npm install --no-save swagger2openapi@7
+	node scripts/build-public-spec.mjs
+
 .PHONY: im-lint
 
 im-lint:
