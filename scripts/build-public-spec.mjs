@@ -57,13 +57,13 @@ const HTTP_METHODS = new Set([
   "trace",
 ]);
 
-// --- re-tag with a hierarchical folder path that mirrors the protos layout ---
+// --- re-tag as module / service (flat, two levels) --------------------------
 // Root folder = the protos module (from which swagger/<module>.swagger.json
-// declares the path; im-gateway → im). Nested subfolders = the gRPC package
-// segments from the operation's tag. So webitel.im.api.gateway.v1.Message under
-// the im module becomes the folder path im/api/gateway/v1/Message. The tag is
-// stored as a slash-joined string; postman-collection.mjs expands it into real
-// nested folders.
+// declares the path; im-gateway → im). Second level = the gRPC service (last
+// segment of the operation's tag). So webitel.im.api.gateway.v1.Message becomes
+// the folder path im/Message. The tag is stored as a slash-joined string;
+// postman-collection.mjs expands it into nested folders. Deeper proto package
+// nesting is intentionally dropped — cleaner for public API consumers.
 function moduleNameFromFile(f) {
   const base = f.replace(/\.swagger\.json$/, "");
   return base === "im-gateway" ? "im" : base;
@@ -97,11 +97,10 @@ function retagHierarchical(spec, dir) {
     for (const [method, op] of Object.entries(item)) {
       if (!HTTP_METHODS.has(method)) continue;
       const mod = moduleMap.get(`${method} ${p}`);
-      let segs = ((op.tags && op.tags[0]) || "").split(".").filter(Boolean);
-      if (segs[0] === "webitel") segs = segs.slice(1); // drop vendor prefix
-      if (mod && segs[0] === mod) segs = segs.slice(1); // avoid im/im/...
-      const root = mod || segs.shift() || "other";
-      const folderPath = [root, ...segs].join("/");
+      const segs = ((op.tags && op.tags[0]) || "").split(".").filter(Boolean);
+      const service = segs[segs.length - 1] || "Service"; // gRPC service name
+      const root = mod || (segs[0] === "webitel" ? segs[1] : segs[0]) || "other";
+      const folderPath = `${root}/${service}`;
       op.tags = [folderPath];
       used.add(folderPath);
       if (!mod) unmapped++;
@@ -109,7 +108,7 @@ function retagHierarchical(spec, dir) {
   }
   spec.tags = [...used].sort().map((name) => ({ name }));
   console.error(
-    `Re-tagged into ${used.size} hierarchical folders (module/…/service)` +
+    `Re-tagged into ${used.size} module/service folders` +
       (unmapped ? ` (${unmapped} ops had no source file)` : ""),
   );
 }
