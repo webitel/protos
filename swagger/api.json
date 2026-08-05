@@ -30702,6 +30702,111 @@
         }
       }
     },
+    "/portal/device": {
+      "post": {
+        "description": "(Device) {",
+        "tags": [
+          "Customer"
+        ],
+        "summary": "Register PUSH subscription. App token authentication required",
+        "operationId": "Customer_RegisterDevice",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.portal.RegisterDeviceRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.portal.RegisterDeviceResponse"
+            }
+          }
+        }
+      }
+    },
+    "/portal/logout": {
+      "post": {
+        "security": [
+          {
+            "Device Id": [],
+            "Portal User": []
+          }
+        ],
+        "tags": [
+          "Customer"
+        ],
+        "summary": "Invalidate the user's session access token",
+        "operationId": "Customer_Logout",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.portal.UpdateDisconnect"
+            }
+          }
+        }
+      }
+    },
+    "/portal/token": {
+      "get": {
+        "security": [
+          {
+            "Device Id": [],
+            "Portal User": []
+          }
+        ],
+        "tags": [
+          "Customer"
+        ],
+        "summary": "Inspect authentication of the user's session access token",
+        "operationId": "Customer_Inspect",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.portal.AccessToken"
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "Device Id": [],
+            "Portal App": []
+          }
+        ],
+        "tags": [
+          "Customer"
+        ],
+        "summary": "Obtain your user's access token to portal service(s)",
+        "operationId": "Customer_Token",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.portal.TokenRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.portal.AccessToken"
+            }
+          }
+        }
+      }
+    },
     "/presence": {
       "patch": {
         "description": "(UserPresence) {",
@@ -40229,6 +40334,1477 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/webitel.im.api.gateway.v1.UpdateContactSettingsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/kb/articles": {
+      "get": {
+        "tags": [
+          "Articles"
+        ],
+        "summary": "ListArticles lists articles within a space with optional filters.",
+        "operationId": "ListArticles",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page size.",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page number (1-based).",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Optional subject search.",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Space to list within.",
+            "name": "space_id",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Optional tag filter.",
+            "name": "tags",
+            "in": "query"
+          },
+          {
+            "enum": [
+              "ARTICLE_STATE_UNSPECIFIED",
+              "DRAFT",
+              "ACTIVE",
+              "INACTIVE"
+            ],
+            "type": "string",
+            "default": "ARTICLE_STATE_UNSPECIFIED",
+            "description": "Optional state filter.",
+            "name": "state",
+            "in": "query"
+          },
+          {
+            "enum": [
+              "ARTICLE_TYPE_UNSPECIFIED",
+              "ARTICLE",
+              "FAQ"
+            ],
+            "type": "string",
+            "default": "ARTICLE_TYPE_UNSPECIFIED",
+            "description": "Optional type filter.",
+            "name": "type",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Sorting criteria (e.g. field:asc).",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Set of fields to return.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.ArticleList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Articles"
+        ],
+        "summary": "CreateArticle creates an article and its first version.",
+        "operationId": "CreateArticle",
+        "parameters": [
+          {
+            "description": "Article fields.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.InputArticle"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.Article"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/kb/articles/resolve": {
+      "post": {
+        "tags": [
+          "Retrieval"
+        ],
+        "summary": "Resolve returns article summaries for the given ids with RBAC applied",
+        "operationId": "Resolve",
+        "parameters": [
+          {
+            "description": "ResolveRequest selects articles by id within the given spaces.",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.ResolveRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.ResolveResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/kb/articles/search": {
+      "get": {
+        "tags": [
+          "Retrieval"
+        ],
+        "summary": "Search runs fast full-text search over title, tags and plaintext (no vector).",
+        "operationId": "Search_Retrieval",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Free-text query.",
+            "name": "query",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "description": "Spaces to search within.",
+            "name": "space_ids",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Optional tag filter.",
+            "name": "tags",
+            "in": "query"
+          },
+          {
+            "enum": [
+              "TAG_MATCH_ALL",
+              "TAG_MATCH_ANY"
+            ],
+            "type": "string",
+            "default": "TAG_MATCH_ALL",
+            "description": "How to combine the tag filter.\n\n - TAG_MATCH_ALL: Default: match articles having ALL listed tags (AND).\n - TAG_MATCH_ANY: Match articles having ANY listed tag (OR).",
+            "name": "tag_match",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page size.",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page number (1-based).",
+            "name": "page",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.SearchResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/kb/articles/semantic_search": {
+      "post": {
+        "tags": [
+          "Retrieval"
+        ],
+        "summary": "SemanticSearch runs hybrid retrieval (vector + full-text, RRF) and returns\nchunks plus optional citations.",
+        "operationId": "SemanticSearch",
+        "parameters": [
+          {
+            "description": "SemanticSearchRequest parameters for hybrid retrieval.",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.SemanticSearchRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.SemanticSearchResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/kb/articles/suggest": {
+      "post": {
+        "tags": [
+          "Retrieval"
+        ],
+        "summary": "Suggest runs hybrid retrieval with cross-encoder rerank for operator assist.",
+        "operationId": "Suggest",
+        "parameters": [
+          {
+            "description": "SuggestRequest parameters for operator assist.",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.SuggestRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.SuggestResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/kb/articles/{article_etag}/files": {
+      "get": {
+        "tags": [
+          "Attachments"
+        ],
+        "summary": "ListFiles returns the files attached to an article.",
+        "operationId": "ListFiles_Attachments",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Concurrency token / locator of the owning article.",
+            "name": "article_etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page number (1-based).",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page size.",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Search term.",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Set of fields to return.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "description": "Optional file ids to fetch.",
+            "name": "ids",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Sorting criteria (e.g. field:asc).",
+            "name": "sort",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.FileList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/kb/articles/{article_etag}/files/{id}": {
+      "delete": {
+        "tags": [
+          "Attachments"
+        ],
+        "summary": "DeleteFile unbinds and removes a file from an article.",
+        "operationId": "DeleteFile_Attachments",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Concurrency token / locator of the owning article.",
+            "name": "article_etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "File id.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.File"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/kb/articles/{article_id}/versions": {
+      "get": {
+        "tags": [
+          "Versions"
+        ],
+        "summary": "ListVersions returns the version history of an article (newest first).",
+        "operationId": "ListVersions",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Owning article id.",
+            "name": "article_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page size.",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page number (1-based).",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Sorting criteria (e.g. field:asc).",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Set of fields to return.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.ArticleVersionList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/kb/articles/{article_id}/versions/{version_number}": {
+      "get": {
+        "tags": [
+          "Versions"
+        ],
+        "summary": "GetVersion returns a single version by number.",
+        "operationId": "GetVersion",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Owning article id.",
+            "name": "article_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Version number.",
+            "name": "version_number",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.ArticleVersion"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/kb/articles/{article_id}/versions/{version_number}/restore": {
+      "post": {
+        "tags": [
+          "Versions"
+        ],
+        "summary": "RestoreVersion creates a new version from a past one.",
+        "operationId": "RestoreVersion",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Owning article id.",
+            "name": "article_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Version number to restore.",
+            "name": "version_number",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.Versions.RestoreVersionBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.ArticleVersion"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/kb/articles/{etag}": {
+      "get": {
+        "tags": [
+          "Articles"
+        ],
+        "summary": "LocateArticle returns a single article by etag.",
+        "operationId": "LocateArticle",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Concurrency token / locator.",
+            "name": "etag",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.Article"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Articles"
+        ],
+        "summary": "UpdateArticle updates an article, creating a new version (optimistic lock via etag).",
+        "operationId": "UpdateArticle",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Concurrency token of the article to update.",
+            "name": "etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Updated article fields.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.InputArticle"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.Article"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Articles"
+        ],
+        "summary": "DeleteArticle soft-deletes an article.",
+        "operationId": "DeleteArticle",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Concurrency token of the article to delete.",
+            "name": "etag",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.Article"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Articles"
+        ],
+        "summary": "UpdateArticle updates an article, creating a new version (optimistic lock via etag).",
+        "operationId": "UpdateArticle2",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Concurrency token of the article to update.",
+            "name": "etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Updated article fields.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.InputArticle"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.Article"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/kb/articles/{etag}/move": {
+      "post": {
+        "tags": [
+          "Articles"
+        ],
+        "summary": "MoveArticle reparents an article, validating cycles and max depth.",
+        "operationId": "MoveArticle",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Concurrency token of the article to move.",
+            "name": "etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.Articles.MoveArticleBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.Article"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/kb/articles/{id}/ancestors": {
+      "get": {
+        "tags": [
+          "Articles"
+        ],
+        "summary": "ListAncestors returns the ancestor chain (root first), serving breadcrumbs.",
+        "operationId": "ListAncestors",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Article id.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.ArticleList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/kb/articles/{id}/children": {
+      "get": {
+        "tags": [
+          "Articles"
+        ],
+        "summary": "ListChildren returns the direct children of an article.",
+        "operationId": "ListChildren",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Parent article id.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.ArticleList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/kb/models": {
+      "get": {
+        "tags": [
+          "EmbeddingModels"
+        ],
+        "summary": "ListModels returns models available to the caller's domain (and globals).",
+        "operationId": "ListModels",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page size.",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page number (1-based).",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Optional name search.",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Optional type filter (\"embedding\" or \"reranker\").",
+            "name": "type",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Sorting criteria (e.g. field:asc).",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Set of fields to return.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.EmbeddingModelList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "EmbeddingModels"
+        ],
+        "summary": "CreateModel registers a new model.",
+        "operationId": "CreateModel",
+        "parameters": [
+          {
+            "description": "Model fields.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.InputEmbeddingModel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.EmbeddingModel"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/kb/models/{id}": {
+      "get": {
+        "tags": [
+          "EmbeddingModels"
+        ],
+        "summary": "LocateModel returns a single model by id.",
+        "operationId": "LocateModel",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Model id.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.EmbeddingModel"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "EmbeddingModels"
+        ],
+        "summary": "UpdateModel updates a model registration.",
+        "operationId": "UpdateModel",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Model id.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Updated model fields.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.InputEmbeddingModel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.EmbeddingModel"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "EmbeddingModels"
+        ],
+        "summary": "DeleteModel removes a model registration.",
+        "operationId": "DeleteModel",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Model id.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.EmbeddingModel"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "EmbeddingModels"
+        ],
+        "summary": "UpdateModel updates a model registration.",
+        "operationId": "UpdateModel2",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Model id.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Updated model fields.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.InputEmbeddingModel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.EmbeddingModel"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/kb/models/{id}/validate": {
+      "post": {
+        "tags": [
+          "EmbeddingModels"
+        ],
+        "summary": "ValidateModel runs a test embed/rerank call and stamps validated_at on success.",
+        "operationId": "ValidateModel",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Model id.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.EmbeddingModel"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/kb/spaces": {
+      "get": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "ListSpaces returns spaces in the caller's domain.",
+        "operationId": "ListSpaces",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page size.",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Page number (1-based).",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Optional name search.",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Sorting criteria (e.g. field:asc).",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Set of fields to return.",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.SpaceList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "CreateSpace creates a space; language is immutable after creation.",
+        "operationId": "CreateSpace",
+        "parameters": [
+          {
+            "description": "Space fields.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.InputSpace"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.Space"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/kb/spaces/{id}": {
+      "get": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "LocateSpace returns a single space by id.",
+        "operationId": "LocateSpace",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Space id.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.Space"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "UpdateSpace updates a space (language cannot be changed).",
+        "operationId": "UpdateSpace",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Space id.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Updated space fields.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.InputSpace"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.Space"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "DeleteSpace deletes a space; a space with active articles cannot be deleted.",
+        "operationId": "DeleteSpace",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Space id.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.Space"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "UpdateSpace updates a space (language cannot be changed).",
+        "operationId": "UpdateSpace2",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Space id.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Updated space fields.",
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.InputSpace"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.Space"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/kb/spaces/{space_id}/articles": {
+      "get": {
+        "tags": [
+          "Retrieval"
+        ],
+        "summary": "Menu lists child articles of a parent for bot menu buttons; FAQ children\ninclude their body inline.",
+        "operationId": "Menu",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Space to read from.",
+            "name": "space_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Parent article id; 0 for top level.",
+            "name": "parent_id",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Maximum hierarchy depth to return.",
+            "name": "depth_limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.MenuResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/kb/spaces/{space_id}/tags": {
+      "get": {
+        "tags": [
+          "Tags"
+        ],
+        "summary": "SuggestTags returns existing tags in a space matching a prefix.",
+        "operationId": "SuggestTags",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Space to read tags from.",
+            "name": "space_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Prefix to match.",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "Maximum number of suggestions.",
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.SuggestTagsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/kb/spaces/{space_id}/tree": {
+      "get": {
+        "tags": [
+          "Articles"
+        ],
+        "summary": "GetTree returns the article hierarchy of a space, RBAC filtered.",
+        "operationId": "GetTree",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Space id.",
+            "name": "space_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.GetTreeResponse"
             }
           },
           "default": {
@@ -70942,6 +72518,1441 @@
         }
       }
     },
+    "webitel.kb.Article": {
+      "description": "Article is the article read model.",
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "description": "CreatedAt timestamp (epoch ms).",
+          "type": "string",
+          "format": "int64"
+        },
+        "created_by": {
+          "description": "User who created the article.",
+          "$ref": "#/definitions/general.Lookup"
+        },
+        "depth": {
+          "description": "Hierarchy depth (1..5).",
+          "type": "integer",
+          "format": "int32"
+        },
+        "domain_id": {
+          "description": "Owning domain id.",
+          "type": "string",
+          "format": "int64"
+        },
+        "etag": {
+          "description": "Concurrency token encoding id and ver.",
+          "type": "string"
+        },
+        "id": {
+          "description": "Unique identifier of the article.",
+          "type": "string",
+          "format": "int64"
+        },
+        "index_state": {
+          "description": "Indexing state.",
+          "$ref": "#/definitions/webitel.kb.IndexState"
+        },
+        "parent_id": {
+          "description": "Parent article id; 0 for a top-level article.",
+          "type": "string",
+          "format": "int64"
+        },
+        "published_version_id": {
+          "description": "Published version id; 0 if not yet published.",
+          "type": "string",
+          "format": "int64"
+        },
+        "space": {
+          "description": "Space the article belongs to.",
+          "$ref": "#/definitions/general.Lookup"
+        },
+        "state": {
+          "description": "Lifecycle state.",
+          "$ref": "#/definitions/webitel.kb.ArticleState"
+        },
+        "subject": {
+          "description": "Current subject (mirrors the published version).",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Article tags.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "type": {
+          "description": "Article type.",
+          "$ref": "#/definitions/webitel.kb.ArticleType"
+        },
+        "updated_at": {
+          "description": "UpdatedAt timestamp (epoch ms).",
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_by": {
+          "description": "User who last updated the article.",
+          "$ref": "#/definitions/general.Lookup"
+        },
+        "ver": {
+          "description": "Optimistic-lock counter.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "webitel.kb.ArticleList": {
+      "description": "ArticleList is a page of articles.",
+      "type": "object",
+      "properties": {
+        "items": {
+          "description": "Articles on this page.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.kb.Article"
+          }
+        },
+        "next": {
+          "description": "Whether a next page exists.",
+          "type": "boolean"
+        }
+      }
+    },
+    "webitel.kb.ArticleState": {
+      "description": "Article lifecycle state.",
+      "type": "string",
+      "default": "ARTICLE_STATE_UNSPECIFIED",
+      "enum": [
+        "ARTICLE_STATE_UNSPECIFIED",
+        "DRAFT",
+        "ACTIVE",
+        "INACTIVE"
+      ]
+    },
+    "webitel.kb.ArticleSummary": {
+      "description": "ArticleSummary is a lightweight read model of an article, used by list,\nsearch, resolve and menu responses (no body unless inlined for FAQ menu).",
+      "type": "object",
+      "properties": {
+        "body": {
+          "description": "FAQ body inlined for menu responses; empty otherwise.",
+          "type": "string"
+        },
+        "created_at": {
+          "description": "CreatedAt timestamp (epoch ms).",
+          "type": "string",
+          "format": "int64"
+        },
+        "depth": {
+          "description": "Hierarchy depth (1..5).",
+          "type": "integer",
+          "format": "int32"
+        },
+        "id": {
+          "description": "Unique identifier of the article.",
+          "type": "string",
+          "format": "int64"
+        },
+        "parent_id": {
+          "description": "Parent article id; 0 for a top-level article.",
+          "type": "string",
+          "format": "int64"
+        },
+        "snippet": {
+          "description": "Short text excerpt for previews and search hits.",
+          "type": "string"
+        },
+        "space_id": {
+          "description": "Space the article belongs to.",
+          "type": "string",
+          "format": "int64"
+        },
+        "state": {
+          "description": "Lifecycle state.",
+          "$ref": "#/definitions/webitel.kb.ArticleState"
+        },
+        "subject": {
+          "description": "Current subject (mirrors the published version).",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Article tags.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "type": {
+          "description": "Article type.",
+          "$ref": "#/definitions/webitel.kb.ArticleType"
+        },
+        "updated_at": {
+          "description": "UpdatedAt timestamp (epoch ms).",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "webitel.kb.ArticleType": {
+      "description": "Article type.",
+      "type": "string",
+      "default": "ARTICLE_TYPE_UNSPECIFIED",
+      "enum": [
+        "ARTICLE_TYPE_UNSPECIFIED",
+        "ARTICLE",
+        "FAQ"
+      ]
+    },
+    "webitel.kb.ArticleVersion": {
+      "description": "ArticleVersion is an immutable snapshot of article content.",
+      "type": "object",
+      "properties": {
+        "article_id": {
+          "description": "Owning article id.",
+          "type": "string",
+          "format": "int64"
+        },
+        "body_markdown": {
+          "description": "Markdown serialization (chunking input).",
+          "type": "string"
+        },
+        "body_plain": {
+          "description": "Plaintext serialization (full-text source).",
+          "type": "string"
+        },
+        "body_rich_text": {
+          "description": "Editor document for this version.",
+          "type": "object"
+        },
+        "created_at": {
+          "description": "CreatedAt timestamp (epoch ms).",
+          "type": "string",
+          "format": "int64"
+        },
+        "created_by": {
+          "description": "User who authored the version.",
+          "$ref": "#/definitions/general.Lookup"
+        },
+        "id": {
+          "description": "Unique identifier of the version.",
+          "type": "string",
+          "format": "int64"
+        },
+        "notes": {
+          "description": "Optional author notes.",
+          "type": "string"
+        },
+        "restored_from": {
+          "description": "Version this one was restored from; 0 if authored directly.",
+          "type": "string",
+          "format": "int64"
+        },
+        "subject": {
+          "description": "Versioned subject.",
+          "type": "string"
+        },
+        "version_number": {
+          "description": "Monotonic version number within the article.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "webitel.kb.ArticleVersionList": {
+      "description": "ArticleVersionList is a page of versions.",
+      "type": "object",
+      "properties": {
+        "items": {
+          "description": "Versions on this page.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.kb.ArticleVersion"
+          }
+        },
+        "next": {
+          "description": "Whether a next page exists.",
+          "type": "boolean"
+        }
+      }
+    },
+    "webitel.kb.Articles.MoveArticleBody": {
+      "description": "MoveArticleRequest reparents an article.",
+      "type": "object",
+      "properties": {
+        "new_parent_id": {
+          "description": "New parent id; 0 to move to top level.",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "webitel.kb.Chunk": {
+      "description": "Chunk is a contiguous slice of an article version, the unit returned by\nsemantic search and consumed by downstream RAG.",
+      "type": "object",
+      "properties": {
+        "article_id": {
+          "description": "Article the chunk originates from.",
+          "type": "string",
+          "format": "int64"
+        },
+        "chunk_index": {
+          "description": "Ordinal position of the chunk within the version.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "content": {
+          "description": "Chunk text content.",
+          "type": "string"
+        },
+        "score": {
+          "description": "Relevance score assigned by retrieval (higher is better).",
+          "type": "number",
+          "format": "double"
+        },
+        "version_id": {
+          "description": "Article version the chunk was produced from.",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "webitel.kb.Citation": {
+      "description": "Citation is a structured source reference returned alongside retrieval\nresults; rendering is up to the consumer (chips, spoken, or suppressed).",
+      "type": "object",
+      "properties": {
+        "article_id": {
+          "description": "Source article id.",
+          "type": "string",
+          "format": "int64"
+        },
+        "snippet": {
+          "description": "Quoted snippet supporting the answer.",
+          "type": "string"
+        },
+        "title": {
+          "description": "Source article title.",
+          "type": "string"
+        },
+        "url": {
+          "description": "Deep link to the source article.",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.kb.EmbeddingModel": {
+      "description": "EmbeddingModel is a registry entry read model (credential omitted).",
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "description": "CreatedAt timestamp (epoch ms).",
+          "type": "string",
+          "format": "int64"
+        },
+        "created_by": {
+          "description": "User who created the model.",
+          "$ref": "#/definitions/general.Lookup"
+        },
+        "dimensions": {
+          "description": "Embedding dimension; 0 for rerankers.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "domain_id": {
+          "description": "Owning domain id; 0 for a global (Webitel-seeded) model.",
+          "type": "string",
+          "format": "int64"
+        },
+        "endpoint": {
+          "description": "Self-hosted / Azure / BYOM endpoint url.",
+          "type": "string"
+        },
+        "id": {
+          "description": "Unique identifier of the model.",
+          "type": "string",
+          "format": "int64"
+        },
+        "is_self_hosted": {
+          "description": "Whether the model runs self-hosted.",
+          "type": "boolean"
+        },
+        "model_ref": {
+          "description": "Provider model name or HuggingFace id.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Human-readable name shown in the admin UI.",
+          "type": "string"
+        },
+        "provider": {
+          "description": "Provider key (gemini, openai, cohere, azure, bge-m3, e5, bge-reranker, byom).",
+          "type": "string"
+        },
+        "type": {
+          "description": "Model type: \"embedding\" or \"reranker\".",
+          "type": "string"
+        },
+        "validated_at": {
+          "description": "Timestamp of the last successful validation (epoch ms); 0 if never validated.",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "webitel.kb.EmbeddingModelList": {
+      "description": "EmbeddingModelList is a page of models.",
+      "type": "object",
+      "properties": {
+        "items": {
+          "description": "Models on this page.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.kb.EmbeddingModel"
+          }
+        },
+        "next": {
+          "description": "Whether a next page exists.",
+          "type": "boolean"
+        }
+      }
+    },
+    "webitel.kb.File": {
+      "description": "File is metadata of a stored file bound to an article.",
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "description": "CreatedAt timestamp (epoch ms).",
+          "type": "string",
+          "format": "int64"
+        },
+        "created_by": {
+          "description": "User who uploaded the file.",
+          "$ref": "#/definitions/general.ExtendedLookup"
+        },
+        "id": {
+          "description": "Storage file id.",
+          "type": "string",
+          "format": "int64"
+        },
+        "mime": {
+          "description": "MIME type.",
+          "type": "string"
+        },
+        "name": {
+          "description": "File name.",
+          "type": "string"
+        },
+        "size": {
+          "description": "File size in bytes.",
+          "type": "string",
+          "format": "int64"
+        },
+        "source": {
+          "description": "Storage source.",
+          "type": "string"
+        },
+        "url": {
+          "description": "Download url.",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.kb.FileList": {
+      "description": "FileList is a page of files.",
+      "type": "object",
+      "properties": {
+        "items": {
+          "description": "Files on this page.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.kb.File"
+          }
+        },
+        "next": {
+          "description": "Whether a next page exists.",
+          "type": "boolean"
+        }
+      }
+    },
+    "webitel.kb.GetTreeResponse": {
+      "description": "GetTreeResponse returns the root nodes of the space tree.",
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "description": "Root-level tree nodes.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.kb.TreeNode"
+          }
+        }
+      }
+    },
+    "webitel.kb.IndexState": {
+      "description": "Article indexing state.",
+      "type": "string",
+      "default": "INDEX_STATE_UNSPECIFIED",
+      "enum": [
+        "INDEX_STATE_UNSPECIFIED",
+        "PENDING",
+        "INDEXING",
+        "INDEXED",
+        "FAILED"
+      ]
+    },
+    "webitel.kb.InputArticle": {
+      "description": "InputArticle carries the writable fields of an article and its body.",
+      "type": "object",
+      "properties": {
+        "body_rich_text": {
+          "description": "Editor document; serialized server-side to markdown/plaintext/tsvector.",
+          "type": "object"
+        },
+        "parent_id": {
+          "description": "Parent article id; 0 for a top-level article.",
+          "type": "string",
+          "format": "int64"
+        },
+        "space_id": {
+          "description": "Target space.",
+          "type": "string",
+          "format": "int64"
+        },
+        "state": {
+          "description": "Lifecycle state.",
+          "$ref": "#/definitions/webitel.kb.ArticleState"
+        },
+        "subject": {
+          "description": "Article subject.",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Article tags.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "type": {
+          "description": "Article type.",
+          "$ref": "#/definitions/webitel.kb.ArticleType"
+        }
+      }
+    },
+    "webitel.kb.InputEmbeddingModel": {
+      "description": "InputEmbeddingModel carries the writable fields of a model.",
+      "type": "object",
+      "properties": {
+        "api_key": {
+          "description": "Write-only provider credential; encrypted at rest, never read back.",
+          "type": "string"
+        },
+        "dimensions": {
+          "description": "Embedding dimension; omit for rerankers.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "endpoint": {
+          "description": "Self-hosted / Azure / BYOM endpoint url.",
+          "type": "string"
+        },
+        "is_self_hosted": {
+          "description": "Whether the model runs self-hosted.",
+          "type": "boolean"
+        },
+        "model_ref": {
+          "description": "Provider model name or HuggingFace id.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Human-readable name.",
+          "type": "string"
+        },
+        "provider": {
+          "description": "Provider key.",
+          "type": "string"
+        },
+        "type": {
+          "description": "Model type: \"embedding\" or \"reranker\".",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.kb.InputSpace": {
+      "description": "InputSpace carries the writable fields of a space.",
+      "type": "object",
+      "properties": {
+        "chunking_strategy": {
+          "description": "Chunking strategy identifier.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Free-text description.",
+          "type": "string"
+        },
+        "embedding_model_id": {
+          "description": "Active embedding model id.",
+          "type": "string",
+          "format": "int64"
+        },
+        "home_article_id": {
+          "description": "Article used as the space home page.",
+          "type": "string",
+          "format": "int64"
+        },
+        "language": {
+          "description": "Space language; immutable after creation.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Human-readable name.",
+          "type": "string"
+        },
+        "rerank_enabled": {
+          "description": "Whether reranking is applied.",
+          "type": "boolean"
+        },
+        "reranker_model_id": {
+          "description": "Reranker model id.",
+          "type": "string",
+          "format": "int64"
+        },
+        "team_ids": {
+          "description": "Team ids the space is bound to as default operator visibility;\nthe set replaces the current binding, empty removes it.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
+        "vector_search_enabled": {
+          "description": "Whether articles are embedded for vector search.",
+          "type": "boolean"
+        }
+      }
+    },
+    "webitel.kb.MenuResponse": {
+      "description": "MenuResponse returns child articles for menu rendering.",
+      "type": "object",
+      "properties": {
+        "items": {
+          "description": "Child article summaries (FAQ children include body inline).",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.kb.ArticleSummary"
+          }
+        }
+      }
+    },
+    "webitel.kb.ResolveRequest": {
+      "description": "ResolveRequest selects articles by id within the given spaces.",
+      "type": "object",
+      "properties": {
+        "ids": {
+          "description": "Article ids to resolve.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
+        "space_ids": {
+          "description": "Spaces the ids are expected in (RBAC scope).",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        }
+      }
+    },
+    "webitel.kb.ResolveResponse": {
+      "description": "ResolveResponse returns the resolved article summaries.",
+      "type": "object",
+      "properties": {
+        "items": {
+          "description": "Resolved article summaries (RBAC filtered).",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.kb.ArticleSummary"
+          }
+        }
+      }
+    },
+    "webitel.kb.SearchResponse": {
+      "description": "SearchResponse is a page of article summaries.",
+      "type": "object",
+      "properties": {
+        "items": {
+          "description": "Matched article summaries.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.kb.ArticleSummary"
+          }
+        },
+        "next": {
+          "description": "Whether a next page exists.",
+          "type": "boolean"
+        }
+      }
+    },
+    "webitel.kb.SemanticSearchRequest": {
+      "description": "SemanticSearchRequest parameters for hybrid retrieval.",
+      "type": "object",
+      "properties": {
+        "include_citations": {
+          "description": "Whether to include structured citations.",
+          "type": "boolean"
+        },
+        "query": {
+          "description": "Natural-language query (e.g. STT transcript).",
+          "type": "string"
+        },
+        "space_ids": {
+          "description": "Spaces to search within (bot service scope).",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
+        "tag_match": {
+          "description": "How to combine the tag filter.",
+          "$ref": "#/definitions/webitel.kb.TagMatch"
+        },
+        "tags": {
+          "description": "Optional tag filter.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "top_k": {
+          "description": "Maximum number of chunks to return.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "webitel.kb.SemanticSearchResponse": {
+      "description": "SemanticSearchResponse returns ranked chunks and optional citations.",
+      "type": "object",
+      "properties": {
+        "chunks": {
+          "description": "Top-K ranked chunks.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.kb.Chunk"
+          }
+        },
+        "citations": {
+          "description": "Structured citations (empty unless requested).",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.kb.Citation"
+          }
+        }
+      }
+    },
+    "webitel.kb.Space": {
+      "description": "Space is a knowledge-base space read model.",
+      "type": "object",
+      "properties": {
+        "chunking_strategy": {
+          "description": "Chunking strategy identifier.",
+          "type": "string"
+        },
+        "created_at": {
+          "description": "CreatedAt timestamp (epoch ms).",
+          "type": "string",
+          "format": "int64"
+        },
+        "created_by": {
+          "description": "User who created the space.",
+          "$ref": "#/definitions/general.Lookup"
+        },
+        "description": {
+          "description": "Free-text description.",
+          "type": "string"
+        },
+        "domain_id": {
+          "description": "Owning domain id.",
+          "type": "string",
+          "format": "int64"
+        },
+        "embedding_model_id": {
+          "description": "Active embedding model id (type=embedding).",
+          "type": "string",
+          "format": "int64"
+        },
+        "home_article_id": {
+          "description": "Article used as the space home page; 0 if unset.",
+          "type": "string",
+          "format": "int64"
+        },
+        "id": {
+          "description": "Unique identifier of the space.",
+          "type": "string",
+          "format": "int64"
+        },
+        "language": {
+          "description": "Space language; immutable, drives full-text config and retrieval.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Human-readable name.",
+          "type": "string"
+        },
+        "rerank_enabled": {
+          "description": "Whether reranking is applied (default off, on for suggest).",
+          "type": "boolean"
+        },
+        "reranker_model_id": {
+          "description": "Reranker model id (type=reranker).",
+          "type": "string",
+          "format": "int64"
+        },
+        "target_embedding_model_id": {
+          "description": "Target embedding model id for a pending model migration.",
+          "type": "string",
+          "format": "int64"
+        },
+        "teams": {
+          "description": "Teams the space is bound to as default operator visibility;\nempty when no binding is configured.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/general.Lookup"
+          }
+        },
+        "updated_at": {
+          "description": "UpdatedAt timestamp (epoch ms).",
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_by": {
+          "description": "User who last updated the space.",
+          "$ref": "#/definitions/general.Lookup"
+        },
+        "vector_search_enabled": {
+          "description": "Whether articles in this space are embedded for vector search.",
+          "type": "boolean"
+        }
+      }
+    },
+    "webitel.kb.SpaceList": {
+      "description": "SpaceList is a page of spaces.",
+      "type": "object",
+      "properties": {
+        "items": {
+          "description": "Spaces on this page.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.kb.Space"
+          }
+        },
+        "next": {
+          "description": "Whether a next page exists.",
+          "type": "boolean"
+        }
+      }
+    },
+    "webitel.kb.SuggestRequest": {
+      "description": "SuggestRequest parameters for operator assist.",
+      "type": "object",
+      "properties": {
+        "customer_message": {
+          "description": "Latest customer message used as the query.",
+          "type": "string"
+        },
+        "return_chunks": {
+          "description": "When true return chunks instead of article summaries.",
+          "type": "boolean"
+        },
+        "space_ids": {
+          "description": "Spaces to search within.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
+        "team_id": {
+          "description": "Operator team id (team binding scope).",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "webitel.kb.SuggestResponse": {
+      "description": "SuggestResponse returns reranked suggestions.",
+      "type": "object",
+      "properties": {
+        "articles": {
+          "description": "Suggested article summaries.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.kb.ArticleSummary"
+          }
+        },
+        "chunks": {
+          "description": "Suggested chunks for draft generation.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.kb.Chunk"
+          }
+        }
+      }
+    },
+    "webitel.kb.SuggestTagsResponse": {
+      "description": "SuggestTagsResponse returns matching tags.",
+      "type": "object",
+      "properties": {
+        "tags": {
+          "description": "Matching tags.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "webitel.kb.TagMatch": {
+      "description": "Tag-filter combination mode.\n\n - TAG_MATCH_ALL: Default: match articles having ALL listed tags (AND).\n - TAG_MATCH_ANY: Match articles having ANY listed tag (OR).",
+      "type": "string",
+      "default": "TAG_MATCH_ALL",
+      "enum": [
+        "TAG_MATCH_ALL",
+        "TAG_MATCH_ANY"
+      ]
+    },
+    "webitel.kb.TreeNode": {
+      "description": "TreeNode is a single node of an article hierarchy tree.",
+      "type": "object",
+      "properties": {
+        "children": {
+          "description": "Child nodes.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.kb.TreeNode"
+          }
+        },
+        "depth": {
+          "description": "Hierarchy depth (1..5).",
+          "type": "integer",
+          "format": "int32"
+        },
+        "id": {
+          "description": "Article id.",
+          "type": "string",
+          "format": "int64"
+        },
+        "subject": {
+          "description": "Article subject.",
+          "type": "string"
+        },
+        "type": {
+          "description": "Article type.",
+          "$ref": "#/definitions/webitel.kb.ArticleType"
+        }
+      }
+    },
+    "webitel.kb.Versions.RestoreVersionBody": {
+      "description": "RestoreVersionRequest selects a version to restore.",
+      "type": "object",
+      "properties": {
+        "notes": {
+          "description": "Optional notes for the new version.",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.portal.AccessToken": {
+      "type": "object",
+      "title": "Access Token Response",
+      "properties": {
+        "access_token": {
+          "description": "REQUIRED. The access token issued by the authorization server.",
+          "type": "string"
+        },
+        "call": {
+          "description": "VoIP / SIP service credentials.",
+          "$ref": "#/definitions/webitel.portal.CallAccount"
+        },
+        "chat": {
+          "description": "[I]nstant [M]essaging dialog state.",
+          "$ref": "#/definitions/webitel.portal.ChatAccount"
+        },
+        "expires_in": {
+          "description": "RECOMMENDED. The lifetime in seconds of the access token.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "refresh_token": {
+          "description": "OPTIONAL. The refresh token, which can be used to obtain\nnew access tokens using the same authorization grant.",
+          "type": "string"
+        },
+        "scope": {
+          "description": "OPTIONAL, if identical to the scope requested by the client;\notherwise, REQUIRED. The scope of the access token.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "state": {
+          "description": "REQUIRED if the \"state\" parameter was present in the client\nauthorization request. The exact value received from the client.",
+          "type": "string"
+        },
+        "token_type": {
+          "description": "REQUIRED. The type of the token issued. Value is case insensitive.",
+          "type": "string"
+        },
+        "user": {
+          "description": "End-User account profile.",
+          "$ref": "#/definitions/webitel.portal.UserProfile"
+        }
+      },
+      "example": {
+        "access_token": "LxEYRr_5YIiNnvQXgZ-y_I830xuhrSQi-EsgzbQhdIMPxScSIsiey8s1KKSoD4CP",
+        "call": {
+          "proxy": "sip:example.org:5064;transport=udp",
+          "realm": "demo.webitel.com",
+          "user_id": "F3-frzuRNTOzZ2B-q2S_lQ"
+        },
+        "chat": {
+          "user": {
+            "id": "0f36b039bd0936c9a4b9d48abd6f4f15",
+            "name": "You",
+            "type": "portal"
+          }
+        },
+        "expires_in": 3555,
+        "scope": [
+          "call",
+          "chat"
+        ],
+        "token_type": "bearer",
+        "user": {
+          "identity": {
+            "birthdate": "",
+            "email": "j.doe@mx.example.org",
+            "email_verified": true,
+            "family_name": "Doe",
+            "gender": "male",
+            "given_name": "John",
+            "iss": "https://my.example.org/accounts",
+            "locale": "en-US",
+            "metadata": {
+              "complex_var": {
+                "array": [
+                  73,
+                  "str",
+                  null,
+                  {}
+                ]
+              },
+              "extra_var": "my string"
+            },
+            "middle_name": "",
+            "name": "John Doe",
+            "phone_number": "+1 202-555-0190",
+            "phone_number_verified": false,
+            "picture": "",
+            "profile": "https://my.example.org/people/j.doe",
+            "sub": "j.doe",
+            "zoneinfo": "US/Arizona"
+          }
+        }
+      }
+    },
+    "webitel.portal.CallAccount": {
+      "type": "object",
+      "title": "Portal Service VoIP/SIP Account",
+      "properties": {
+        "auth_id": {
+          "type": "string",
+          "title": "SIP authorization"
+        },
+        "proxy": {
+          "type": "string",
+          "title": "SIP host / proxy"
+        },
+        "realm": {
+          "type": "string",
+          "title": "SIP realm / domain"
+        },
+        "secret": {
+          "type": "string",
+          "title": "SIP password"
+        },
+        "user_id": {
+          "type": "string",
+          "title": "SIP username; extension"
+        },
+        "video": {
+          "type": "boolean",
+          "title": "Video is allowed ?"
+        }
+      }
+    },
+    "webitel.portal.ChatAccount": {
+      "type": "object",
+      "title": "Customer end-User messaging account settings",
+      "properties": {
+        "user": {
+          "description": "User self. The sender. You.",
+          "$ref": "#/definitions/webitel.chat.Peer"
+        }
+      }
+    },
+    "webitel.portal.DevicePush": {
+      "type": "object",
+      "title": "PUSH Subscription\nhttps://core.telegram.org/api/push-updates#subscribing-to-notifications",
+      "properties": {
+        "APN": {
+          "type": "string",
+          "title": "[A]pple [P]ush [N]otification Service (device token for apple push)"
+        },
+        "FCM": {
+          "type": "string",
+          "title": "[F]irebase [C]loud [M]essaging Service (firebase token for google firebase)"
+        },
+        "secret": {
+          "type": "string",
+          "title": "For FCM and APNS VoIP, optional encryption key used to encrypt push notifications"
+        },
+        "web": {
+          "title": "For 10 web push, the token must be a JSON-encoded object with the following keys:\nendpoint: Absolute URL exposed by the push service where the application server can send push messages\nkeys: P-256 elliptic curve Diffie-Hellman parameters in the following object\np256dh: Base64url-encoded P-256 elliptic curve Diffie-Hellman public key\nauth: Base64url-encoded authentication secret",
+          "$ref": "#/definitions/webitel.portal.WebPush"
+        }
+      }
+    },
+    "webitel.portal.Echo": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "webitel.portal.Identity": {
+      "type": "object",
+      "title": "Identity of the End-User at the Issuer.\nhttps://openid.net/specs/openid-connect-core-1_0.html#Claims",
+      "properties": {
+        "birthdate": {
+          "description": "OPTIONAL. End-User's birthday, represented as an ISO 8601:2004 [ISO8601‑2004] YYYY-MM-DD format.\nThe year MAY be 0000, indicating that it is omitted.\nTo represent only the year, YYYY format is allowed.",
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "deleted_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "email": {
+          "description": "End-User's preferred e-mail address.\nIts value MUST conform to the RFC 5322 [RFC5322] addr-spec syntax.\nThe RP MUST NOT rely upon this value being unique, as discussed in Section 5.7.",
+          "type": "string"
+        },
+        "email_verified": {
+          "description": "True if the End-User's e-mail address has been verified; otherwise false.",
+          "type": "boolean"
+        },
+        "family_name": {
+          "description": "Surname(s) or last name(s) of the End-User.\nNote that in some cultures, people can have multiple family names or no family name;\nall can be present, with the names being separated by space characters.",
+          "type": "string"
+        },
+        "gender": {
+          "description": "OPTIONAL. End-User's gender.\nValues defined by this specification are `female` and `male`.\nOther values MAY be used when neither of the defined values are applicable.",
+          "type": "string"
+        },
+        "given_name": {
+          "description": "Given name(s) or first name(s) of the End-User.\nNote that in some cultures, people can have multiple given names;\nall can be present, with the names being separated by space characters.",
+          "type": "string"
+        },
+        "iss": {
+          "description": "REQUIRED. Issuer Identifier for the Issuer of the response.\nThe iss value is a case sensitive URL using the https scheme that contains scheme, host,\nand optionally, port number and path components and no query or fragment components.",
+          "type": "string"
+        },
+        "locale": {
+          "description": "End-User's locale, represented as a BCP47 [RFC5646] language tag.\nThis is typically an ISO 639-1 Alpha-2 [ISO639‑1] language code in lowercase\nand an ISO 3166-1 Alpha-2 [ISO3166‑1] country code in uppercase,\nseparated by a dash. For example, `en-US` or `uk-UA`.",
+          "type": "string"
+        },
+        "metadata": {
+          "description": "End-User's extra attributes metadata.",
+          "type": "object"
+        },
+        "middle_name": {
+          "description": "Middle name(s) of the End-User.\nNote that in some cultures, people can have multiple middle names;\nall can be present, with the names being separated by space characters.\nAlso note that in some cultures, middle names are not used.",
+          "type": "string"
+        },
+        "name": {
+          "description": "REQUIRED. End-User's full name in displayable form including all name parts,\npossibly including titles and suffixes, ordered according to the End-User's locale and preferences.",
+          "type": "string"
+        },
+        "phone_number": {
+          "description": "End-User's preferred telephone number.\nE.164 is RECOMMENDED as the format of this Claim, for example, +1 (425) 555-1212 or +56 (2) 687 2400.\nIf the phone number contains an extension, it is RECOMMENDED that\nthe extension be represented using the RFC 3966 [RFC3966] extension syntax, for example, +1 (604) 555-1234;ext=5678.",
+          "type": "string"
+        },
+        "phone_number_verified": {
+          "description": "True if the End-User's phone number has been verified; otherwise false.",
+          "type": "boolean"
+        },
+        "picture": {
+          "description": "OPTIONAL. URL of the End-User's profile picture.\nThis URL MUST refer to an image file\n(for example, a PNG, JPEG, or GIF image file),\nrather than to a Web page containing an image.",
+          "type": "string"
+        },
+        "profile": {
+          "description": "OPTIONAL. URL of the End-User's profile page.\nThe contents of this Web page SHOULD be about the End-User.\nNOTE: Issuer SP (IdP) related URL.",
+          "type": "string"
+        },
+        "sources": {
+          "description": "Additional source(s) associated with given \"identity\".\nUsed to merge two or more well-known end-user subjects.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.portal.SourceId"
+          }
+        },
+        "sub": {
+          "description": "REQUIRED. Subject Identifier.\nA locally unique and never reassigned identifier within the Issuer for the End-User,\nwhich is intended to be consumed by the Client, e.g., 24400320 or AItOawmwtWwcT0k51BayewNvutrJUqsvl6qs7A4.\nIt MUST NOT exceed 255 ASCII characters in length.\nThe sub value is a case sensitive string.",
+          "type": "string"
+        },
+        "updated_at": {
+          "description": "Time the End-User's information was last updated.\nIts value is a JSON number representing the number of seconds from 1970-01-01T0:0:0Z as measured in UTC until the date/time.",
+          "type": "string",
+          "format": "int64"
+        },
+        "zoneinfo": {
+          "description": "OPTIONAL. String from zoneinfo [zoneinfo] time zone database representing the End-User's time zone.\nFor example, Europe/Kyiv or America/Los_Angeles.",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.portal.RegisterDeviceRequest": {
+      "type": "object",
+      "properties": {
+        "push": {
+          "description": "PUSH subscription update.\nSet provider type specific registered device token.\nNone to deregister device PUSH subscription.",
+          "$ref": "#/definitions/webitel.portal.DevicePush"
+        }
+      }
+    },
+    "webitel.portal.RegisterDeviceResponse": {
+      "type": "object"
+    },
+    "webitel.portal.SourceId": {
+      "type": "object",
+      "title": "Subject source identification",
+      "properties": {
+        "iss": {
+          "description": "REQUIRED. Issuer Identifier for the Issuer of the response.\nThe iss value is a case sensitive URL using the https scheme that contains scheme, host,\nand optionally, port number and path components and no query or fragment components.",
+          "type": "string"
+        },
+        "sub": {
+          "description": "REQUIRED. Subject Identifier.\nA locally unique and never reassigned identifier within the Issuer for the End-User,\nwhich is intended to be consumed by the Client, e.g., 24400320 or AItOawmwtWwcT0k51BayewNvutrJUqsvl6qs7A4.\nIt MUST NOT exceed 255 ASCII characters in length.\nThe sub value is a case sensitive string.",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.portal.TokenRequest": {
+      "type": "object",
+      "title": "Access Token Request",
+      "properties": {
+        "app_token": {
+          "description": "REQUIRED. Confidential client authorization token.\nMay be transmitted in header: X-Portal-Client.\nKeep it a secret.",
+          "type": "string"
+        },
+        "code": {
+          "description": "Authorization code grant.\nREQUIRED. When grant_type is set to \"authorization_code\".",
+          "type": "string"
+        },
+        "grant_type": {
+          "type": "string",
+          "title": "REQUIRED. Grant type.\nPosible values ; - not implemented ; + supported\n- authorization_code ; Authorization Code Grant\n- client_credentials ; Client Credentials Grant\n- refresh_token      ; Refreshing an Access Token\n- password           ; Resource Owner Password Credentials Grant\nExtension Grants\n+ identity           ; Public end-User Identity Grant"
+        },
+        "identity": {
+          "description": "Identity of the end-User account association.\nREQUIRED. When grant_type is set to \"identity\".",
+          "$ref": "#/definitions/webitel.portal.Identity"
+        },
+        "push": {
+          "description": "OPTIONAL. Sign up client device for PUSH notifications.",
+          "$ref": "#/definitions/webitel.portal.DevicePush"
+        },
+        "refresh_token": {
+          "description": "Refresh token string to obtain NEW access token.\nREQUIRED. When grant_type is set to \"refresh_token\".",
+          "type": "string"
+        },
+        "response_type": {
+          "type": "array",
+          "title": "REQUIRED. Response type.\nPosible values ; - not implemented ; + supported\n+ token    ; Access token response\n- id_token ;\nExtensions\n+ user     ; End-User account profile\n+ call     ; SIP account credentials\n+ chat     ; IM account details",
+          "items": {
+            "type": "string"
+          }
+        },
+        "scope": {
+          "type": "array",
+          "title": "OPTIONAL. The scope of the access request\nPosible values are:\n* chat ; [I]nstant [M]essaging service\n* call ; [V]oice[o]ver[IP] SIP service",
+          "items": {
+            "type": "string"
+          }
+        },
+        "state": {
+          "type": "string",
+          "title": "RECOMMENDED. An opaque value used by the client to maintain\nstate between the request and callback.  The authorization\nserver includes this value when redirecting the user-agent back\nto the client.  The parameter SHOULD be used for preventing\ncross-site request forgery"
+        }
+      },
+      "example": {
+        "grant_type": "identity",
+        "identity": {
+          "birthdate": "",
+          "email": "j.doe@mx.example.org",
+          "email_verified": true,
+          "family_name": "Doe",
+          "gender": "male",
+          "given_name": "John",
+          "iss": "https://my.example.org/accounts",
+          "locale": "en-US",
+          "metadata": {
+            "complex_var": {
+              "array": [
+                73,
+                "str",
+                null,
+                {}
+              ]
+            },
+            "extra_var": "my string"
+          },
+          "middle_name": "",
+          "name": "John Doe",
+          "phone_number": "+1 202-555-0190",
+          "phone_number_verified": false,
+          "picture": "",
+          "profile": "https://my.example.org/people/j.doe",
+          "sources": [
+            {
+              "sub": "phone:2025550190"
+            },
+            {
+              "iss": "https://my.example.org/support",
+              "sub": "m3lJ9VzG8yF6wzwQ"
+            }
+          ],
+          "sub": "j.doe",
+          "zoneinfo": "US/Arizona"
+        },
+        "push": {
+          "FCM": "android_client_firebase_cloud_messaging_subscription_token"
+        },
+        "response_type": [
+          "token",
+          "user",
+          "call",
+          "chat"
+        ],
+        "scope": [
+          "call",
+          "chat"
+        ]
+      }
+    },
+    "webitel.portal.Update": {
+      "type": "object",
+      "title": "Update notification message.\nMAY be `Response` to the `Request`\n-OR- well-known Update *like message",
+      "properties": {
+        "data": {
+          "title": "Update notification arguments data",
+          "$ref": "#/definitions/google.protobuf.Any"
+        },
+        "date": {
+          "description": "Date when this update was sent.",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "webitel.portal.UpdateDisconnect": {
+      "description": "UpdateDisconnect notifies the client about\nan imminent disconnect due to specified reason.",
+      "type": "object",
+      "properties": {
+        "cause": {
+          "title": "The disconnect reason",
+          "$ref": "#/definitions/google.rpc.Status"
+        }
+      }
+    },
+    "webitel.portal.UserProfile": {
+      "description": "End-User Owner Profile.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "READONLY. profile.id"
+        },
+        "identity": {
+          "description": "READONLY. End-User profile info.",
+          "$ref": "#/definitions/webitel.portal.Identity"
+        },
+        "sources": {
+          "type": "array",
+          "title": "READONLY. Extra identities associated",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.portal.Identity"
+          }
+        },
+        "username": {
+          "description": "OPTIONAL.\nShorthand name by which the End-User\nwishes to be referred to at the RP,\nsuch as janedoe or j.doe.",
+          "type": "string"
+        }
+      }
+    },
+    "webitel.portal.WebPush": {
+      "type": "object",
+      "title": "WebPUSH subscription",
+      "properties": {
+        "endpoint": {
+          "type": "string",
+          "title": "endpoint: Absolute URL exposed by the push service where the application server can send push messages"
+        },
+        "key": {
+          "title": "P-256 elliptic curve Diffie-Hellman parameters",
+          "$ref": "#/definitions/webitel.portal.WebPush.Key"
+        }
+      }
+    },
+    "webitel.portal.WebPush.Key": {
+      "type": "object",
+      "title": "keys: P-256 elliptic curve Diffie-Hellman parameters in the following object\np256dh: Base64url-encoded P-256 elliptic curve Diffie-Hellman public key\nauth: Base64url-encoded authentication secret",
+      "properties": {
+        "auth": {
+          "type": "string",
+          "format": "byte",
+          "title": "auth: Base64url-encoded authentication secret"
+        },
+        "p256dh": {
+          "type": "string",
+          "format": "byte",
+          "title": "p256dh: Base64url-encoded P-256 elliptic curve Diffie-Hellman public key"
+        }
+      }
+    },
     "webitelContactsAttachment": {
       "type": "object",
       "properties": {
@@ -72398,11 +75409,32 @@
       "type": "apiKey",
       "name": "X-Webitel-Access",
       "in": "header"
+    },
+    "Device Id": {
+      "description": "Webitel **portal** client **device** self identification",
+      "type": "apiKey",
+      "name": "X-Portal-Device",
+      "in": "header"
+    },
+    "Portal App": {
+      "description": "Webitel **portal** client **app** authorization **token**",
+      "type": "apiKey",
+      "name": "X-Portal-Client",
+      "in": "header"
+    },
+    "Portal User": {
+      "description": "Webitel **portal** end-user **customer** authorization",
+      "type": "apiKey",
+      "name": "X-Portal-Access",
+      "in": "header"
     }
   },
   "security": [
     {
       "AccessToken": []
+    },
+    {
+      "Portal Admin": []
     }
   ],
   "tags": [
@@ -72521,25 +75553,196 @@
       "name": "WebHookService"
     },
     {
-      "name": "BackendProfileService"
+      "name": "Priorities"
     },
     {
-      "name": "CognitiveProfileService"
+      "name": "Services"
     },
     {
-      "name": "FileService"
+      "name": "CaseComments"
     },
     {
-      "name": "FilePoliciesService"
+      "name": "RelatedCases"
     },
     {
-      "name": "FileTranscriptService"
+      "name": "CaseFiles"
     },
     {
-      "name": "ImportTemplateService"
+      "name": "CaseLinks"
     },
     {
-      "name": "MediaFileService"
+      "name": "StatusConditions"
+    },
+    {
+      "name": "Sources"
+    },
+    {
+      "name": "SLAConditions"
+    },
+    {
+      "name": "Cases"
+    },
+    {
+      "name": "CaseCommunications"
+    },
+    {
+      "name": "CaseTimeline"
+    },
+    {
+      "name": "Catalogs"
+    },
+    {
+      "name": "CloseReasons"
+    },
+    {
+      "name": "CloseReasonGroups"
+    },
+    {
+      "name": "SLAs"
+    },
+    {
+      "name": "Statuses"
+    },
+    {
+      "name": "FTSService"
+    },
+    {
+      "name": "webitel.im.api.delivery.v1.Delivery"
+    },
+    {
+      "name": "webitel.im.api.gateway.v1.Bots"
+    },
+    {
+      "name": "webitel.im.api.gateway.v1.ViasService"
+    },
+    {
+      "name": "webitel.im.api.gateway.v1.Contacts"
+    },
+    {
+      "name": "webitel.im.api.gateway.v1.ContactSettingsManagement"
+    },
+    {
+      "name": "webitel.im.api.gateway.v1.Message"
+    },
+    {
+      "name": "webitel.im.api.gateway.v1.ThreadPermission"
+    },
+    {
+      "name": "webitel.im.api.gateway.v1.MessageHistory"
+    },
+    {
+      "name": "webitel.im.api.gateway.v1.Account"
+    },
+    {
+      "name": "webitel.im.api.gateway.v1.ThreadManagement"
+    },
+    {
+      "name": "webitel.im.api.provider.v1.FacebookService"
+    },
+    {
+      "name": "webitel.im.api.provider.v1.GateService"
+    },
+    {
+      "name": "webitel.im.api.provider.v1.ProviderMessageService"
+    },
+    {
+      "name": "webitel.im.api.provider.v1.MetaAppService"
+    },
+    {
+      "name": "webitel.im.api.provider.v1.MetaOAuthService"
+    },
+    {
+      "name": "webitel.im.api.provider.v1.WhatsAppService"
+    },
+    {
+      "name": "webitel.im.service.admin.v1.Applications"
+    },
+    {
+      "name": "webitel.im.service.auth.v1.Account"
+    },
+    {
+      "name": "webitel.im.service.contact.v1.ContactSettings"
+    },
+    {
+      "name": "webitel.im.service.contact.v1.Contacts"
+    },
+    {
+      "name": "webitel.im.service.contact.v1.ContactPrivacy"
+    },
+    {
+      "name": "webitel.im.service.contact.v1.Vias"
+    },
+    {
+      "name": "webitel.im.provider.v1.FacebookService"
+    },
+    {
+      "name": "webitel.im.provider.v1.GateService"
+    },
+    {
+      "name": "webitel.im.provider.v1.ProviderMessageService"
+    },
+    {
+      "name": "webitel.im.provider.v1.MetaAppService"
+    },
+    {
+      "name": "webitel.im.provider.v1.MetaOAuthService"
+    },
+    {
+      "name": "im.service.provider.v1.TelegramBotService"
+    },
+    {
+      "name": "webitel.im.provider.v1.GateTemplateService"
+    },
+    {
+      "name": "webitel.im.provider.v1.WhatsAppService"
+    },
+    {
+      "name": "webitel.im.service.thread.v1.Message"
+    },
+    {
+      "name": "webitel.im.service.thread.v1.ThreadPermissionManagement"
+    },
+    {
+      "name": "webitel.im.service.thread.v1.MessageHistory"
+    },
+    {
+      "name": "webitel.im.service.thread.v1.MessageStatus"
+    },
+    {
+      "name": "webitel.im.service.thread.v1.ThreadManagement"
+    },
+    {
+      "name": "Articles"
+    },
+    {
+      "name": "Attachments"
+    },
+    {
+      "name": "EmbeddingModels"
+    },
+    {
+      "name": "Retrieval"
+    },
+    {
+      "name": "Spaces"
+    },
+    {
+      "name": "Tags"
+    },
+    {
+      "name": "Versions"
+    },
+    {
+      "name": "ConfigService"
+    },
+    {
+      "name": "LoggerService"
+    },
+    {
+      "name": "PdfService"
+    },
+    {
+      "name": "MeetingService"
     },
     {
       "name": "ChatService"
@@ -72561,10 +75764,28 @@
       "name": "ContactsChatCatalog"
     },
     {
-      "name": "ConfigService"
+      "name": "Customer"
     },
     {
-      "name": "LoggerService"
+      "name": "BackendProfileService"
+    },
+    {
+      "name": "CognitiveProfileService"
+    },
+    {
+      "name": "FileService"
+    },
+    {
+      "name": "FilePoliciesService"
+    },
+    {
+      "name": "FileTranscriptService"
+    },
+    {
+      "name": "ImportTemplateService"
+    },
+    {
+      "name": "MediaFileService"
     },
     {
       "name": "Presence"
@@ -72675,16 +75896,7 @@
       "name": "Domains"
     },
     {
-      "name": "Articles"
-    },
-    {
       "name": "KnowledgebaseSearch"
-    },
-    {
-      "name": "Spaces"
-    },
-    {
-      "name": "Tags"
     },
     {
       "name": "LDAP"
@@ -72724,171 +75936,6 @@
     },
     {
       "name": "WorkingScheduleService"
-    },
-    {
-      "name": "Priorities"
-    },
-    {
-      "name": "Services"
-    },
-    {
-      "name": "CaseComments"
-    },
-    {
-      "name": "RelatedCases"
-    },
-    {
-      "name": "CaseFiles"
-    },
-    {
-      "name": "CaseLinks"
-    },
-    {
-      "name": "StatusConditions"
-    },
-    {
-      "name": "Sources"
-    },
-    {
-      "name": "SLAConditions"
-    },
-    {
-      "name": "Cases"
-    },
-    {
-      "name": "CaseCommunications"
-    },
-    {
-      "name": "CaseTimeline"
-    },
-    {
-      "name": "Catalogs"
-    },
-    {
-      "name": "CloseReasons"
-    },
-    {
-      "name": "CloseReasonGroups"
-    },
-    {
-      "name": "SLAs"
-    },
-    {
-      "name": "Statuses"
-    },
-    {
-      "name": "FTSService"
-    },
-    {
-      "name": "PdfService"
-    },
-    {
-      "name": "MeetingService"
-    },
-    {
-      "name": "webitel.im.api.delivery.v1.Delivery"
-    },
-    {
-      "name": "webitel.im.api.gateway.v1.Bots"
-    },
-    {
-      "name": "webitel.im.api.gateway.v1.ViasService"
-    },
-    {
-      "name": "webitel.im.api.gateway.v1.Contacts"
-    },
-    {
-      "name": "webitel.im.api.gateway.v1.ContactSettingsManagement"
-    },
-    {
-      "name": "webitel.im.api.gateway.v1.Message"
-    },
-    {
-      "name": "webitel.im.api.gateway.v1.ThreadPermission"
-    },
-    {
-      "name": "webitel.im.api.gateway.v1.MessageHistory"
-    },
-    {
-      "name": "webitel.im.api.gateway.v1.Account"
-    },
-    {
-      "name": "webitel.im.api.gateway.v1.ThreadManagement"
-    },
-    {
-      "name": "webitel.im.api.provider.v1.FacebookService"
-    },
-    {
-      "name": "webitel.im.api.provider.v1.GateService"
-    },
-    {
-      "name": "webitel.im.api.provider.v1.ProviderMessageService"
-    },
-    {
-      "name": "webitel.im.api.provider.v1.MetaAppService"
-    },
-    {
-      "name": "webitel.im.api.provider.v1.MetaOAuthService"
-    },
-    {
-      "name": "webitel.im.api.provider.v1.WhatsAppService"
-    },
-    {
-      "name": "webitel.im.service.admin.v1.Applications"
-    },
-    {
-      "name": "webitel.im.service.auth.v1.Account"
-    },
-    {
-      "name": "webitel.im.service.contact.v1.ContactSettings"
-    },
-    {
-      "name": "webitel.im.service.contact.v1.Contacts"
-    },
-    {
-      "name": "webitel.im.service.contact.v1.ContactPrivacy"
-    },
-    {
-      "name": "webitel.im.service.contact.v1.Vias"
-    },
-    {
-      "name": "webitel.im.provider.v1.FacebookService"
-    },
-    {
-      "name": "webitel.im.provider.v1.GateService"
-    },
-    {
-      "name": "webitel.im.provider.v1.ProviderMessageService"
-    },
-    {
-      "name": "webitel.im.provider.v1.MetaAppService"
-    },
-    {
-      "name": "webitel.im.provider.v1.MetaOAuthService"
-    },
-    {
-      "name": "im.service.provider.v1.TelegramBotService"
-    },
-    {
-      "name": "webitel.im.provider.v1.GateTemplateService"
-    },
-    {
-      "name": "webitel.im.provider.v1.WhatsAppService"
-    },
-    {
-      "name": "webitel.im.service.thread.v1.Message"
-    },
-    {
-      "name": "webitel.im.service.thread.v1.ThreadPermissionManagement"
-    },
-    {
-      "name": "webitel.im.service.thread.v1.MessageHistory"
-    },
-    {
-      "name": "webitel.im.service.thread.v1.MessageStatus"
-    },
-    {
-      "name": "webitel.im.service.thread.v1.ThreadManagement"
     }
   ]
 }
