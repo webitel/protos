@@ -57,6 +57,48 @@ const collection = await new Promise((resolve, reject) => {
 collection.info = collection.info || {};
 collection.info.name = NAME;
 
+// openapi-to-postman emits one flat folder per tag, named with the slash-joined
+// hierarchical path (e.g. "im/api/gateway/v1/Message"). Expand those into real
+// nested folders so the collection mirrors the protos directory layout.
+function nestBySlash(items) {
+  const root = { item: [] };
+  const childrenOf = new Map(); // node -> Map(segment -> childNode)
+  const indexFor = (node) => {
+    if (!childrenOf.has(node)) childrenOf.set(node, new Map());
+    return childrenOf.get(node);
+  };
+  for (const it of items) {
+    const isFolder = Array.isArray(it.item);
+    if (!isFolder || !it.name.includes("/")) {
+      root.item.push(it);
+      continue;
+    }
+    const segs = it.name.split("/");
+    let node = root;
+    for (const seg of segs) {
+      const idx = indexFor(node);
+      let child = idx.get(seg);
+      if (!child) {
+        child = { name: seg, item: [] };
+        idx.set(seg, child);
+        node.item.push(child);
+      }
+      node = child;
+    }
+    node.item.push(...it.item); // requests land in the leaf folder
+    if (it.description && !node.description) node.description = it.description;
+  }
+  return root.item;
+}
+function pruneEmpty(items) {
+  return items.filter((it) => {
+    if (!Array.isArray(it.item)) return true; // a request
+    it.item = pruneEmpty(it.item);
+    return it.item.length > 0; // keep folders that still hold something
+  });
+}
+collection.item = pruneEmpty(nestBySlash(collection.item));
+
 async function api(method, path, body) {
   const res = await fetch(`${BASE}${path}`, {
     method,

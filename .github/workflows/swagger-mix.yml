@@ -112,17 +112,11 @@ jobs:
       - name: Merge Swagger files
         run: |
           set +e
-          swagger mixin swagger/engine.swagger.json \
-            swagger/storage.swagger.json \
-            swagger/messages.swagger.json \
-            swagger/logger.swagger.json \
-            swagger/webitel-go.swagger.json \
-            swagger/wfm.swagger.json \
-            swagger/cases.swagger.json \
-            swagger/fts.swagger.json \
-            swagger/media-exporter.swagger.json \
-            swagger/meetings.swagger.json \
-            swagger/im-gateway.swagger.json \
+          # Merge every per-service spec so all protos modules land in api.json
+          # (engine first to keep its host/basePath as the bundle default).
+          swagger mixin \
+            swagger/engine.swagger.json \
+            $(ls swagger/*.swagger.json | grep -v '/engine\.swagger\.json$') \
             --output swagger/api.json
 
           EXIT_CODE=$?

@@ -57,24 +57,21 @@ const HTTP_METHODS = new Set([
   "trace",
 ]);
 
-// --- re-tag by protos module ------------------------------------------------
-// gRPC emits verbose per-service tags (webitel.im.api.gateway.v1.Message), and
-// one service's endpoints get split across URL prefixes (/im, /v1). To make
-// Postman group requests into one folder per protos module, re-tag every
-// operation with the module it came from — derived from which per-service
-// swagger/<module>.swagger.json file declares that path. This mirrors the repo
-// layout (im, cases, storage, engine, wfm, ...).
+// --- re-tag with a hierarchical folder path that mirrors the protos layout ---
+// Root folder = the protos module (from which swagger/<module>.swagger.json
+// declares the path; im-gateway → im). Nested subfolders = the gRPC package
+// segments from the operation's tag. So webitel.im.api.gateway.v1.Message under
+// the im module becomes the folder path im/api/gateway/v1/Message. The tag is
+// stored as a slash-joined string; postman-collection.mjs expands it into real
+// nested folders.
 function moduleNameFromFile(f) {
   const base = f.replace(/\.swagger\.json$/, "");
   return base === "im-gateway" ? "im" : base;
 }
-function retagByModule(spec, dir) {
-  // (METHOD PATH) -> module, built from the individual swagger files.
+function buildModuleMap(dir) {
+  // (METHOD PATH) -> module, built from the individual per-service swagger files.
   const map = new Map();
-  const files = readdirSync(dir)
-    .filter((f) => f.endsWith(".swagger.json"))
-    .sort();
-  for (const f of files) {
+  for (const f of readdirSync(dir).filter((f) => f.endsWith(".swagger.json")).sort()) {
     let doc;
     try {
       doc = JSON.parse(readFileSync(join(dir, f), "utf8"));
@@ -90,30 +87,34 @@ function retagByModule(spec, dir) {
       }
     }
   }
-
+  return map;
+}
+function retagHierarchical(spec, dir) {
+  const moduleMap = buildModuleMap(dir);
   const used = new Set();
   let unmapped = 0;
   for (const [p, item] of Object.entries(spec.paths || {})) {
     for (const [method, op] of Object.entries(item)) {
       if (!HTTP_METHODS.has(method)) continue;
-      const mod = map.get(`${method} ${p}`);
-      if (mod) {
-        op.tags = [mod];
-        used.add(mod);
-      } else {
-        unmapped++;
-      }
+      const mod = moduleMap.get(`${method} ${p}`);
+      let segs = ((op.tags && op.tags[0]) || "").split(".").filter(Boolean);
+      if (segs[0] === "webitel") segs = segs.slice(1); // drop vendor prefix
+      if (mod && segs[0] === mod) segs = segs.slice(1); // avoid im/im/...
+      const root = mod || segs.shift() || "other";
+      const folderPath = [root, ...segs].join("/");
+      op.tags = [folderPath];
+      used.add(folderPath);
+      if (!mod) unmapped++;
     }
   }
-  // Stable, alphabetical folder order in Postman.
   spec.tags = [...used].sort().map((name) => ({ name }));
   console.error(
-    `Re-tagged operations into ${used.size} module folders: ${[...used].sort().join(", ")}` +
-      (unmapped ? ` (${unmapped} ops had no source file, kept original tags)` : ""),
+    `Re-tagged into ${used.size} hierarchical folders (module/…/service)` +
+      (unmapped ? ` (${unmapped} ops had no source file)` : ""),
   );
 }
 
-retagByModule(openapi, dirname(SOURCE));
+retagHierarchical(openapi, dirname(SOURCE));
 
 // --- normalize colliding path templates ------------------------------------
 // gRPC HTTP annotations across services use inconsistent path-param names, so
@@ -198,6 +199,16 @@ function normalizePathTemplates(spec) {
 }
 
 normalizePathTemplates(openapi);
+
+// Recompute the tag list from surviving operations — collapsing duplicate paths
+// above can leave tags with no operations (e.g. im/api/provider/v1/* dupes).
+{
+  const live = new Set();
+  for (const item of Object.values(openapi.paths || {}))
+    for (const [method, op] of Object.entries(item))
+      if (HTTP_METHODS.has(method) && op.tags && op.tags[0]) live.add(op.tags[0]);
+  openapi.tags = [...live].sort().map((name) => ({ name }));
+}
 
 // --- servers ---------------------------------------------------------------
 openapi.servers = [{ url: serverUrl, description: "Webitel public API" }];
