@@ -56,7 +56,7 @@ jobs:
           INCLUDE_TAGS: ${{ vars.PUBLIC_INCLUDE_TAGS }}
           PUBLIC_TITLE: ${{ vars.PUBLIC_API_TITLE }}
         run: |
-          npm install --no-save swagger2openapi@7
+          npm install --no-save swagger2openapi@7 openapi-to-postmanv2
           node scripts/build-public-spec.mjs
 
       - name: Push to Postman Spec Hub
@@ -70,3 +70,15 @@ jobs:
           POSTMAN_WORKSPACE_ID: ${{ vars.POSTMAN_WORKSPACE_ID }}
           POSTMAN_SPEC_NAME: ${{ vars.PUBLIC_API_TITLE }}
         run: node scripts/postman-sync.mjs
+
+      - name: Push collection to Postman (grouped by module)
+        if: steps.guard.outputs.enabled == 'true'
+        env:
+          POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
+          SPEC_FILE: swagger/api.public.json
+          # Set POSTMAN_COLLECTION_UID to update in place; on the first run leave it
+          # empty and set POSTMAN_WORKSPACE_ID to create it (the run logs the new uid).
+          POSTMAN_COLLECTION_UID: ${{ vars.POSTMAN_COLLECTION_UID }}
+          POSTMAN_WORKSPACE_ID: ${{ vars.POSTMAN_WORKSPACE_ID }}
+          POSTMAN_COLLECTION_NAME: ${{ vars.PUBLIC_API_TITLE }}
+        run: node scripts/postman-collection.mjs
