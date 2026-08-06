@@ -59,7 +59,134 @@ message ServerEvent {
 
     // Heartbeat signal to maintain connection and detect "half-open" sockets.
     PingEvent ping_event = 9;
+
+    // Per-recipient delivery status change of one or more messages.
+    MessageStatusEvent message_status_event = 10;
+
+    // A message was deleted by its author and must be removed from the chat.
+    MessageDeletedEvent message_deleted_event = 11;
+
+    // Ephemeral "…is typing" indicator (optionally with a live draft preview).
+    TypingEvent typing_event = 12;
+
+    // A member set or cleared an emoji reaction on a message.
+    MessageReactionEvent message_reaction_event = 13;
   }
+}
+
+// MessageReactionEvent notifies thread participants that a member set or
+// cleared an emoji reaction on a message. Clients match the message by id and
+// update its reaction list for the given member.
+message MessageReactionEvent {
+  // Message the reaction applies to.
+  string message_id = 1;
+
+  // Thread the message belongs to.
+  string thread_id = 2;
+
+  // Member who reacted.
+  Peer reactor = 3;
+
+  // Emoji that was set. Empty when the reaction was cleared.
+  string emoji = 4;
+
+  // True when the reaction was removed rather than set.
+  bool removed = 5;
+
+  // Unix time in milliseconds when the reaction changed.
+  int64 reacted_at = 6;
+}
+
+// TypingEvent is an ephemeral, real-time "…is typing" indicator.
+//
+// It is never stored, never pushed and never replayed on reconnect: it is
+// delivered only to participants that are online at the moment. Clients show
+// the indicator for timeout_ms and self-expire it (no explicit stop event is
+// required in the common flow — it is superseded by the message or by TTL).
+message TypingEvent {
+  // Thread the indicator belongs to.
+  string thread_id = 1;
+
+  // Participant who is typing.
+  string member_id = 2;
+
+  // How long to keep the indicator visible, in milliseconds.
+  int32 timeout_ms = 3;
+
+  // Live draft of the message being typed (Live Typing Preview).
+  //
+  // PRIVACY: this is the sender's unsent text. The delivery service attaches it
+  // ONLY for sessions whose member is authorized to see the preview (resolved
+  // server-side from the ephemeral event's allow-list); it is absent for every
+  // other session. Clients MUST NOT log or persist it. The allow-list itself is
+  // a server-only concept and is never sent to clients.
+  optional string preview_text = 4;
+}
+
+// MessageDeletedEvent notifies thread participants that a message was deleted
+// by its author. Clients match the message by id and remove it.
+message MessageDeletedEvent {
+  // Identifier of the deleted message.
+  string id = 1;
+
+  // Thread the message belonged to.
+  string thread_id = 2;
+
+  // Participant who deleted the message.
+  Peer deleted_by = 3;
+
+  // Unix time in milliseconds when the message was deleted.
+  int64 deleted_at = 4;
+}
+
+//------------------------------------------------------------------------------
+// MESSAGE DELIVERY STATUS
+//------------------------------------------------------------------------------
+
+// MessageDeliveryStatus is a per-recipient delivery state of a message.
+// Transitions are monotonic: SENT -> DELIVERED -> READ.
+// FAILED is terminal but may be superseded by a later DELIVERED (retry).
+enum MessageDeliveryStatus {
+  MESSAGE_DELIVERY_STATUS_UNSPECIFIED = 0;
+
+  // Accepted by the system and queued for delivery.
+  MESSAGE_DELIVERY_STATUS_SENT = 1;
+
+  // Reached the recipient (stream ACK, push, provider receipt, bot dispatch).
+  MESSAGE_DELIVERY_STATUS_DELIVERED = 2;
+
+  // Read by the recipient. Not applicable to bots.
+  MESSAGE_DELIVERY_STATUS_READ = 3;
+
+  // Delivery failed (provider rejected, invalid contact, channel restriction).
+  MESSAGE_DELIVERY_STATUS_FAILED = 4;
+}
+
+// MessageStatusEvent notifies thread participants that the delivery status
+// of one or more messages changed for a recipient. Read receipts are bulk
+// ("read up to"), so a single event may cover multiple messages of the same
+// recipient in the same thread.
+message MessageStatusEvent {
+  // Thread the messages belong to.
+  string thread_id = 1;
+
+  // Recipient contact id whose statuses changed.
+  string member_id = 2;
+
+  // Messages whose status changed for the recipient.
+  repeated string message_ids = 3;
+
+  // The new delivery state.
+  MessageDeliveryStatus status = 4;
+
+  // Confirmation source: ws|push|provider|bot.
+  string via = 5;
+
+  // JSON-encoded provider error details for FAILED.
+  string error = 6;
+
+  // Unix time in milliseconds when the status changed.
+  int64 occurred_at = 7;
 }
 
 //------------------------------------------------------------------------------
@@ -127,6 +254,8 @@ message ThreadMessage {
     }
 
     QuotedMessage reply_to = 11;
+
+    ForwardOrigin forward_origin = 12;
 }
 
 message QuotedMessage {
@@ -138,6 +267,30 @@ message QuotedMessage {
   string attachment_kind = 6;
   string attachment_name = 7;
   string attachment_mime = 8;
+}
+
+enum ForwardOriginKind {
+  FORWARD_ORIGIN_KIND_UNSPECIFIED = 0;
+
+  FORWARD_ORIGIN_KIND_INTERNAL = 1;
+
+  FORWARD_ORIGIN_KIND_EXTERNAL_USER = 2;
+
+  FORWARD_ORIGIN_KIND_EXTERNAL_HIDDEN_USER = 3;
+
+  FORWARD_ORIGIN_KIND_EXTERNAL_CHAT = 4;
+}
+
+message ForwardOrigin {
+  ForwardOriginKind kind = 1;
+
+  string sender_id = 2;
+
+  string sender_name = 3;
+
+  int64 original_sent_at = 4;
+
+  string source_message_id = 5;
 }
 
 message Identity {

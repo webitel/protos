@@ -1,0 +1,84 @@
+name: Postman sync
+
+# Runs after the "Swagger" workflow finishes merging swagger/api.json on main.
+# Converts the merged Swagger 2.0 bundle to a public OpenAPI 3.0 spec and pushes
+# it to Postman Spec Hub. No-op (skips cleanly) until POSTMAN_API_KEY is set.
+on:
+  workflow_run:
+    workflows: ["Swagger"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions: { contents: read }
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    name: Push spec to Postman
+    runs-on: ubuntu-latest
+    # For workflow_run, only proceed when the upstream merge succeeded.
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Check for Postman API key
+        id: guard
+        env:
+          POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
+        run: |
+          if [ -z "$POSTMAN_API_KEY" ]; then
+            echo "::notice::POSTMAN_API_KEY secret is not set — skipping Postman sync."
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout main (includes the latest merged api.json)
+        if: steps.guard.outputs.enabled == 'true'
+        uses: actions/checkout@v6
+        with:
+          ref: main
+
+      - name: Setup Node
+        if: steps.guard.outputs.enabled == 'true'
+        uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+
+      - name: Build public OpenAPI 3.0 spec
+        if: steps.guard.outputs.enabled == 'true'
+        env:
+          # Public server shown in the docs. Set the PUBLIC_API_HOST repo variable
+          # to your production host; falls back to the source spec's host otherwise.
+          PUBLIC_API_HOST: ${{ vars.PUBLIC_API_HOST }}
+          # Optional: comma-separated tag whitelist to publish only public services.
+          INCLUDE_TAGS: ${{ vars.PUBLIC_INCLUDE_TAGS }}
+          PUBLIC_TITLE: ${{ vars.PUBLIC_API_TITLE }}
+        run: |
+          npm install --no-save swagger2openapi@7 openapi-to-postmanv2
+          node scripts/build-public-spec.mjs
+
+      - name: Push to Postman Spec Hub
+        if: steps.guard.outputs.enabled == 'true'
+        env:
+          POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
+          SPEC_FILE: swagger/api.public.json
+          # Set POSTMAN_SPEC_ID to update in place; on the first run leave it empty
+          # and set POSTMAN_WORKSPACE_ID to create the spec (the run logs the new id).
+          POSTMAN_SPEC_ID: ${{ vars.POSTMAN_SPEC_ID }}
+          POSTMAN_WORKSPACE_ID: ${{ vars.POSTMAN_WORKSPACE_ID }}
+          POSTMAN_SPEC_NAME: ${{ vars.PUBLIC_API_TITLE }}
+        run: node scripts/postman-sync.mjs
+
+      - name: Push collection to Postman (grouped by module)
+        if: steps.guard.outputs.enabled == 'true'
+        env:
+          POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
+          SPEC_FILE: swagger/api.public.json
+          # Set POSTMAN_COLLECTION_UID to update in place; on the first run leave it
+          # empty and set POSTMAN_WORKSPACE_ID to create it (the run logs the new uid).
+          POSTMAN_COLLECTION_UID: ${{ vars.POSTMAN_COLLECTION_UID }}
+          POSTMAN_WORKSPACE_ID: ${{ vars.POSTMAN_WORKSPACE_ID }}
+          POSTMAN_COLLECTION_NAME: ${{ vars.PUBLIC_API_TITLE }}
+        run: node scripts/postman-collection.mjs

@@ -97,6 +97,33 @@ message ReplyToMessage {
   optional string attachment_mime = 8;
 }
 
+message ForwardOrigin {
+  ForwardOriginKind kind = 1;
+  string sender_id = 2;
+  string sender_name = 3;
+  int64 original_sent_at = 4;
+  string source_message_id = 5;
+}
+
+// MessageRecipientStatus is a per-recipient delivery state of a message.
+message MessageRecipientStatus {
+  // Recipient contact id (thread_dialog.member_id).
+  string member_id = 1;
+
+  MessageDeliveryStatus status = 2;
+
+  // Unix time in milliseconds; zero when not reached.
+  int64 delivered_at = 3;
+  int64 read_at = 4;
+  int64 failed_at = 5;
+
+  // Confirmation source: ws|push|provider|bot.
+  string via = 6;
+
+  // JSON-encoded provider error details for FAILED.
+  string error = 7;
+}
+
 message HistoryMessage {
   string id = 1;
   string thread_id = 2;
@@ -117,6 +144,48 @@ message HistoryMessage {
   InteractiveCallback reacted_metadata = 16;
 
   ReplyToMessage reply_to = 17;
+
+  // Aggregated delivery status across recipients: FAILED when every
+  // recipient failed, otherwise the minimal status among non-failed ones.
+  // UNSPECIFIED for messages without per-recipient tracking (historical).
+  MessageDeliveryStatus delivery_status = 18;
+
+  // Per-recipient delivery details.
+  repeated MessageRecipientStatus statuses = 19;
+
+  // True when the message was deleted by its author. Every content field
+  // (body, attachments, contact, location, interactive, metadata) is cleared,
+  // so clients should render a tombstone.
+  bool deleted = 20;
+
+  // Unix time in milliseconds when the message was deleted.
+  int64 deleted_at = 21;
+
+  // Set when this message is a forward. Never populated for a deleted
+  // message: the tombstone must not leak the origin name.
+  ForwardOrigin forward_origin = 22;
+  // Emoji reactions currently held on the message, aggregated per emoji.
+  repeated MessageReaction reactions = 23;
+}
+
+// MessageReaction is the aggregate of one emoji's reactions on a message:
+// how many members reacted with it, whether the caller is one of them, and a
+// capped sample of reactor ids for rendering avatars/tooltips.
+message MessageReaction {
+  // The reaction (unicode emoji today).
+  ReactionContent reaction = 1;
+
+  // Number of members currently holding this reaction.
+  int32 count = 2;
+
+  // True when the requesting caller is one of the reactors.
+  bool reacted_by_me = 3;
+
+  // Capped sample of reactor contact ids (for UI); not necessarily all of them.
+  repeated string reactor_ids = 4;
+
+  // Unix time in milliseconds of the most recent reaction with this emoji.
+  int64 last_reacted_at = 5;
 }
 
 message SearchMessageHistoryResponse {

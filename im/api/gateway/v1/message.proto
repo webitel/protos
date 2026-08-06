@@ -28,7 +28,8 @@ service Message {
     };
   }
 
-  // Mark message as read by id.
+  // Marks the thread as read up to the given message (inclusive):
+  // every earlier unread message of the caller in the thread is covered.
   rpc Read(ReadMessageRequest) returns (ReadMessageResponse) {
     option (google.api.http) = {post: "/v1/messages/{id}/read"};
   }
@@ -81,6 +82,95 @@ service Message {
       body: "*"
     };
   }
+
+  // Deletes one or more messages authored by the caller in an active chat.
+  // Best-effort: the response reports which ids were deleted and which skipped.
+  rpc DeleteMessages(DeleteMessagesRequest) returns (DeleteMessagesResponse) {
+    option (google.api.http) = {
+      post: "/v1/messages/delete"
+      body: "*"
+    };
+  }
+
+  // Forwards messages the caller can read into a direct chat with [to],
+  // stamping each copy with its original author. The source chat is untouched.
+  // Best-effort: the response reports which sources were skipped.
+  rpc ForwardMessages(ForwardMessagesRequest) returns (ForwardMessagesResponse) {
+    option (google.api.http) = {
+      post: "/v1/messages/forward"
+      body: "*"
+    };
+  }
+
+  // Sets or clears the caller's emoji reaction on a single message.
+  rpc SetReaction(SetReactionRequest) returns (SetReactionResponse) {
+    option (google.api.http) = {
+      post: "/v1/messages/{message_id}/reaction"
+      body: "*"
+    };
+  }
+}
+
+// ForwardOriginKind tells the client how to label a forwarded message and
+// whether the origin points at anything addressable inside Webitel.
+enum ForwardOriginKind {
+  FORWARD_ORIGIN_KIND_UNSPECIFIED = 0;
+
+  // Forwarded inside Webitel: sender_id and source_message_id are set.
+  FORWARD_ORIGIN_KIND_INTERNAL = 1;
+
+  // Forwarded into the chat from an external messenger, author named.
+  FORWARD_ORIGIN_KIND_EXTERNAL_USER = 2;
+
+  // Same, but the author chose to hide their account, so there is no name.
+  FORWARD_ORIGIN_KIND_EXTERNAL_HIDDEN_USER = 3;
+
+  // Origin is an external group or channel rather than a person.
+  FORWARD_ORIGIN_KIND_EXTERNAL_CHAT = 4;
+}
+
+// ForwardOriginInput carries what an external channel told us about the
+// original author of an inbound forwarded message. Set by providers on
+// ingress, not by end clients.
+message ForwardOriginInput {
+  ForwardOriginKind kind = 1 [(buf.validate.field).enum.defined_only = true];
+
+  // Display name of the original author. Empty when the platform hides it.
+  string sender_name = 2;
+
+  // When the message was originally sent, Unix time in milliseconds.
+  // Zero when the platform does not report it.
+  int64 original_sent_at = 3;
+}
+
+message ForwardMessagesRequest {
+  // Recipient of the copies: a user contact or a bot contact (flow schema).
+  Peer to = 1 [(buf.validate.field).required = true];
+
+  // Sources to copy, in the order they should appear at the destination.
+  repeated string message_ids = 2 [(buf.validate.field).repeated = {
+    min_items: 1
+    max_items: 20
+    items: {
+      string: {uuid: true}
+    }
+  }];
+
+  optional PeerIdentity send_as = 3;
+
+  string send_id = 20; // optional client-generated id for deduplication
+}
+
+message ForwardMessagesResponse {
+  // Direct chat the copies landed in.
+  string thread_id = 1;
+
+  // Ids of the created copies, in forwarded order.
+  repeated string ids = 2;
+
+  // Sources that were not forwarded: unknown id, no read access to the source
+  // chat, already deleted, or a type that cannot be forwarded.
+  repeated string skipped_ids = 3;
 }
 
 message ReadMessageRequest {
@@ -133,6 +223,9 @@ message SendTextRequest {
   string external_id = 21;
 
   string reply_to_external_id = 22;
+
+  // Set by providers when the channel reports this message was forwarded to us.
+  optional ForwardOriginInput forward_origin = 23;
 }
 
 // Represents a response to send a text message.
@@ -165,6 +258,9 @@ message SendDocumentRequest {
   string external_id = 21;
 
   string reply_to_external_id = 22;
+
+  // Set by providers when the channel reports this message was forwarded to us.
+  optional ForwardOriginInput forward_origin = 23;
 }
 
 // Represents a response to send message with document.
@@ -224,6 +320,9 @@ message SendLocationRequest {
   optional PeerIdentity send_as = 8;
 
   optional string reply_to_message_id = 9 [(buf.validate.field).string.uuid = true];
+
+  // Set by providers when the channel reports this message was forwarded to us.
+  optional ForwardOriginInput forward_origin = 10;
 }
 
 // SendContactRequest sends contact information.
@@ -252,6 +351,9 @@ message SendContactRequest {
   optional PeerIdentity send_as = 7;
 
   optional string reply_to_message_id = 8 [(buf.validate.field).string.uuid = true];
+
+  // Set by providers when the channel reports this message was forwarded to us.
+  optional ForwardOriginInput forward_origin = 9;
 }
 
 // SendInteractiveMessageRequest sends a structured interactive message.
@@ -517,4 +619,55 @@ message EditMessageResponse {
 
   // Unix time in milliseconds when the message was edited.
   int64 edited_at = 2;
+}
+
+message DeleteMessagesRequest {
+  // Messages to delete. Only messages authored by the caller are removed.
+  repeated string ids = 1 [(buf.validate.field).repeated = {
+    min_items: 1
+    max_items: 100
+    items: {
+      string: {uuid: true}
+    }
+  }];
+}
+
+message DeleteMessagesResponse {
+  // Messages that were actually deleted by this call.
+  repeated string deleted_ids = 1;
+
+  // Requested messages left untouched: not found, already deleted,
+  // not authored by the caller, or the chat is closed.
+  repeated string skipped_ids = 2;
+
+  // Unix time in milliseconds when the messages were deleted.
+  int64 deleted_at = 3;
+}
+
+message SetReactionRequest {
+  // Member setting the reaction.
+  Peer reactor = 1 [(buf.validate.field).required = true];
+
+  // Message being reacted to.
+  string message_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+
+  // Emoji to set. Empty string clears the reaction.
+  string emoji = 3;
+
+  // Optional client-generated id for deduplication.
+  string send_id = 20;
+}
+
+message SetReactionResponse {
+  // What the call did relative to the caller's previous reaction (SET, REMOVED, UNCHANGED).
+  string action = 1;
+
+  // The emoji now stored for the caller; empty when it was removed.
+  string emoji = 2;
+
+  // Unix time in milliseconds when the reaction was set; zero when removed.
+  int64 reacted_at = 3;
 }

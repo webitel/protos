@@ -62,6 +62,9 @@
       "name": "MemberService"
     },
     {
+      "name": "OnlineSkillsService"
+    },
+    {
       "name": "OutboundResourceService"
     },
     {
@@ -3930,6 +3933,284 @@
         ]
       }
     },
+    "/call_center/online_skills": {
+      "get": {
+        "summary": "Search online skills",
+        "description": "Returns online skills matching the specified search criteria.",
+        "operationId": "SearchOnlineSkills",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.SearchOnlineSkillsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "description": "Page number (1-based).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "description": "Maximum number of items per page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "q",
+            "description": "Search pattern applied to names.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort",
+            "description": "Sort expression.\nExample: \"-name\", \"+created_at\".",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "description": "List of fields to include in the response.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "ids",
+            "description": "Filter by online skills identifiers.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "skill_ids",
+            "description": "Filter by associated skill identifiers.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "skip_default",
+            "description": "Skip the default entry in the search results.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "Online Skills"
+        ]
+      },
+      "post": {
+        "summary": "Create online skills",
+        "description": "Creates a new online skills entry with the specified name, description, and associated skills.",
+        "operationId": "CreateOnlineSkills",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.CreateOnlineSkillsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "Request for creating online skills.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engine.CreateOnlineSkillsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Online Skills"
+        ]
+      }
+    },
+    "/call_center/online_skills/{id}": {
+      "get": {
+        "summary": "Get online skills",
+        "description": "Returns an online skills entry identified by the specified ID.",
+        "operationId": "GetOnlineSkills",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.GetOnlineSkillsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Online skills identifier.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "Online Skills"
+        ]
+      },
+      "delete": {
+        "summary": "Delete online skills",
+        "description": "Deletes the specified online skills entries.",
+        "operationId": "DeleteOnlineSkills",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Identifiers of online skills to delete.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "Online Skills"
+        ]
+      },
+      "put": {
+        "summary": "Update online skills",
+        "description": "Replaces all editable properties of an existing online skills entry.",
+        "operationId": "UpdateOnlineSkills",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.UpdateOnlineSkillsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Online skills identifier.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engine.OnlineSkillsService.UpdateOnlineSkillsBody"
+            }
+          }
+        ],
+        "tags": [
+          "Online Skills"
+        ]
+      },
+      "patch": {
+        "summary": "Patch online skills",
+        "description": "Updates one or more fields of an existing online skills entry.",
+        "operationId": "PatchOnlineSkills",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.PatchOnlineSkillsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Online skills identifier.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engine.OnlineSkillsService.PatchOnlineSkillsBody"
+            }
+          }
+        ],
+        "tags": [
+          "Online Skills"
+        ]
+      }
+    },
     "/call_center/pause_causes": {
       "get": {
         "operationId": "SearchAgentPauseCause",
@@ -6413,6 +6694,151 @@
             "schema": {
               "$ref": "#/definitions/engine.MemberService.ResetMembersBody"
             }
+          }
+        ],
+        "tags": [
+          "MemberService"
+        ]
+      }
+    },
+    "/call_center/queues/{queue_id}/members/reset/count": {
+      "get": {
+        "summary": "Returns the number of queue members that match the specified\nreset criteria without performing the reset operation.\nCan be used to preview the impact of a reset request.",
+        "operationId": "ResetMembersCount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.ResetMembersCountResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "queue_id",
+            "description": "Identifier of the queue.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "ids",
+            "description": "Filter by specific queue member identifiers.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "bucket_id",
+            "description": "Filter by bucket identifiers.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "stop_cause",
+            "description": "Filter by stop causes.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "agent_id",
+            "description": "Filter by assigned agent identifiers.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "numbers",
+            "description": "Filter by member phone numbers.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "variables[string]",
+            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "description": "Filter by related entity identifiers.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "created_at.from",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "created_at.to",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "priority.from",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "priority.to",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "q",
+            "description": "Search pattern used to filter queue members.\nThe value is matched against the member name\nand against the member's searchable destination values.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -17938,6 +18364,38 @@
         }
       }
     },
+    "engine.CreateOnlineSkillsRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Display name."
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional description."
+        },
+        "skills": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/engine.Lookup"
+          },
+          "description": "Skills included in the entry."
+        }
+      },
+      "description": "Request for creating online skills."
+    },
+    "engine.CreateOnlineSkillsResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/engine.OnlineSkills",
+          "description": "Created online skills item."
+        }
+      },
+      "description": "Response containing the created online skills."
+    },
     "engine.CreateOutboundResourceDisplayRequest": {
       "type": "object",
       "properties": {
@@ -18907,6 +19365,16 @@
           "type": "string"
         }
       }
+    },
+    "engine.GetOnlineSkillsResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/engine.OnlineSkills",
+          "description": "Requested online skills item."
+        }
+      },
+      "description": "Response containing the requested online skills."
     },
     "engine.GetQueuesGlobalStateResponse": {
       "type": "object",
@@ -21075,6 +21543,9 @@
         },
         "priority": {
           "$ref": "#/definitions/engine.FilterBetween"
+        },
+        "q": {
+          "type": "string"
         }
       }
     },
@@ -21137,6 +21608,95 @@
           "type": "boolean"
         }
       }
+    },
+    "engine.OnlineSkills": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "description": "Unique identifier."
+        },
+        "created_by": {
+          "$ref": "#/definitions/engine.Lookup",
+          "description": "User who created the entry."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Creation timestamp (Unix time, milliseconds)."
+        },
+        "updated_by": {
+          "$ref": "#/definitions/engine.Lookup",
+          "description": "User who last updated the entry."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Last update timestamp (Unix time, milliseconds)."
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name."
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional description."
+        },
+        "skills": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/engine.Lookup"
+          },
+          "description": "Skills included in the entry."
+        }
+      },
+      "description": "OnlineSkills represents a reusable collection\nof skills that can be assigned within the Call Center."
+    },
+    "engine.OnlineSkillsService.PatchOnlineSkillsBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Updated name."
+        },
+        "description": {
+          "type": "string",
+          "description": "Updated description."
+        },
+        "skills": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/engine.Lookup"
+          },
+          "description": "Updated list of skills."
+        }
+      },
+      "description": "Request for partially updating online skills."
+    },
+    "engine.OnlineSkillsService.UpdateOnlineSkillsBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Display name."
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional description."
+        },
+        "skills": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/engine.Lookup"
+          },
+          "description": "Skills assigned."
+        }
+      },
+      "description": "Request for replacing online skills."
     },
     "engine.OpenedWebSocket": {
       "type": "object",
@@ -21600,6 +22160,16 @@
           "$ref": "#/definitions/engine.Lookup"
         }
       }
+    },
+    "engine.PatchOnlineSkillsResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/engine.OnlineSkills",
+          "description": "Patched online skills item."
+        }
+      },
+      "description": "Response containing patched online skills."
     },
     "engine.PatchSkillAgentResponse": {
       "type": "object",
@@ -22718,6 +23288,17 @@
     "engine.ResetActiveAttemptsResponse": {
       "type": "object"
     },
+    "engine.ResetMembersCountResponse": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "string",
+          "format": "int64",
+          "description": "Total number of matching queue members."
+        }
+      },
+      "description": "ResetMembersCountResponse contains the total number\nof queue members matching the specified criteria."
+    },
     "engine.ResetMembersResponse": {
       "type": "object",
       "properties": {
@@ -23440,6 +24021,24 @@
         }
       }
     },
+    "engine.SearchOnlineSkillsResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/engine.OnlineSkills"
+          },
+          "description": "Matching online skills items."
+        },
+        "next": {
+          "type": "boolean",
+          "description": "Indicates whether another page of results exists."
+        }
+      },
+      "description": "Search results for online skills."
+    },
     "engine.SearchSchemaVersionResponse": {
       "type": "object",
       "properties": {
@@ -24082,7 +24681,8 @@
         "create",
         "update",
         "remove",
-        "resolution_time"
+        "resolution_time",
+        "record_call"
       ],
       "default": "empty_trigger_event"
     },
@@ -24136,7 +24736,8 @@
         "case_files",
         "case_comments",
         "case_links",
-        "related_cases"
+        "related_cases",
+        "call"
       ],
       "default": "empty_trigger_object"
     },
@@ -24249,6 +24850,16 @@
         "event"
       ],
       "default": "default_trigger_type"
+    },
+    "engine.UpdateOnlineSkillsResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/engine.OnlineSkills",
+          "description": "Updated online skills item."
+        }
+      },
+      "description": "Response containing updated online skills."
     },
     "engine.UpdateQuestionAnswerRequest": {
       "type": "object",

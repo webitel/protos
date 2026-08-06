@@ -87,6 +87,9 @@
       "name": "webitel.im.provider.v1.MetaOAuthService"
     },
     {
+      "name": "im.service.provider.v1.TelegramBotService"
+    },
+    {
       "name": "webitel.im.provider.v1.GateTemplateService"
     },
     {
@@ -100,6 +103,9 @@
     },
     {
       "name": "webitel.im.service.thread.v1.MessageHistory"
+    },
+    {
+      "name": "webitel.im.service.thread.v1.MessageStatus"
     },
     {
       "name": "webitel.im.service.thread.v1.ThreadManagement"
@@ -685,6 +691,132 @@
         ],
         "tags": [
           "webitel.im.api.provider.v1.FacebookService"
+        ]
+      }
+    },
+    "/im/gates/telegram": {
+      "post": {
+        "operationId": "TelegramBotService_CreateTelegramBotGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/im.service.provider.v1.CreateTelegramBotGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/im.service.provider.v1.CreateTelegramBotGateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "im.service.provider.v1.TelegramBotService"
+        ]
+      }
+    },
+    "/im/gates/telegram/{id}": {
+      "get": {
+        "operationId": "TelegramBotService_GetTelegramBotGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/im.service.provider.v1.GetTelegramBotGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "im.service.provider.v1.TelegramBotService"
+        ]
+      },
+      "delete": {
+        "operationId": "TelegramBotService_DeleteTelegramBotGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/im.service.provider.v1.DeleteTelegramBotGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "im.service.provider.v1.TelegramBotService"
+        ]
+      },
+      "patch": {
+        "operationId": "TelegramBotService_UpdateTelegramBotGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/im.service.provider.v1.UpdateTelegramBotGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/im.service.provider.v1.TelegramBotService.UpdateTelegramBotGateBody"
+            }
+          }
+        ],
+        "tags": [
+          "im.service.provider.v1.TelegramBotService"
         ]
       }
     },
@@ -1506,6 +1638,40 @@
         ]
       }
     },
+    "/im/provider/send/reaction": {
+      "post": {
+        "summary": "SendReaction forwards an emoji reaction change to the external chat partner\n(e.g. Telegram setMessageReaction). Best-effort and messenger-dependent:\nproviders without reaction support are a silent no-op. An empty emoji (with\nremoved=true) clears the caller's reaction on the target message.",
+        "operationId": "ProviderMessageService_SendReaction",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderSendReactionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "ProviderSendReactionRequest asks a provider to set or clear an emoji reaction\non a message already delivered to the external chat partner.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderSendReactionRequest"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.ProviderMessageService"
+        ]
+      }
+    },
     "/im/provider/send/system": {
       "post": {
         "summary": "SendSystemMessage delivers a system event notification to the external chat partner.\nThe im-providers-service resolves the gate-specific template and renders it as text\nbefore forwarding to the underlying provider (Facebook, WhatsApp, etc.).",
@@ -1566,6 +1732,40 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/webitel.im.provider.v1.ProviderSendTextRequest"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.ProviderMessageService"
+        ]
+      }
+    },
+    "/im/provider/send/typing": {
+      "post": {
+        "summary": "SendTyping forwards an ephemeral \"typing…\" action to the external chat\npartner (e.g. Telegram sendChatAction, Meta sender_action). It is\nfire-and-forget and best-effort: channels whose provider does not support\ntyping are a silent no-op. Nothing is persisted.",
+        "operationId": "ProviderMessageService_SendTyping",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderSendTypingResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "ProviderSendTypingRequest asks a provider to show/hide a typing indicator\nto the external chat partner.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderSendTypingRequest"
             }
           }
         ],
@@ -2020,6 +2220,39 @@
         ]
       }
     },
+    "/v1/messages/delete": {
+      "post": {
+        "summary": "Deletes one or more messages authored by the caller in an active chat.\nBest-effort: the response reports which ids were deleted and which skipped.",
+        "operationId": "Message_DeleteMessages",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.DeleteMessagesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.DeleteMessagesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.Message"
+        ]
+      }
+    },
     "/v1/messages/document": {
       "post": {
         "summary": "SendDocument delivers a document message.",
@@ -2046,6 +2279,39 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/webitel.im.api.gateway.v1.SendDocumentRequest"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.Message"
+        ]
+      }
+    },
+    "/v1/messages/forward": {
+      "post": {
+        "summary": "Forwards messages the caller can read into a direct chat with [to],\nstamping each copy with its original author. The source chat is untouched.\nBest-effort: the response reports which sources were skipped.",
+        "operationId": "Message_ForwardMessages",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardMessagesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardMessagesRequest"
             }
           }
         ],
@@ -2196,9 +2462,49 @@
         ]
       }
     },
+    "/v1/messages/{id}": {
+      "patch": {
+        "summary": "Edits an existing message by ID. Only the sender or authorized users can edit messages.",
+        "operationId": "Message_EditMessage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.EditMessageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Original message ID to be edited.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.Message.EditMessageBody"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.Message"
+        ]
+      }
+    },
     "/v1/messages/{id}/read": {
       "post": {
-        "summary": "Mark message as read by id.",
+        "summary": "Marks the thread as read up to the given message (inclusive):\nevery earlier unread message of the caller in the thread is covered.",
         "operationId": "Message_Read",
         "responses": {
           "200": {
@@ -2226,6 +2532,46 @@
             "in": "query",
             "required": false,
             "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.Message"
+        ]
+      }
+    },
+    "/v1/messages/{message_id}/reaction": {
+      "post": {
+        "summary": "Sets or clears the caller's emoji reaction on a single message.",
+        "operationId": "Message_SetReaction",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SetReactionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "message_id",
+            "description": "Message being reacted to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.Message.SetReactionBody"
+            }
           }
         ],
         "tags": [
@@ -2440,6 +2786,29 @@
             "format": "int32"
           }
         ],
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadManagement"
+        ]
+      }
+    },
+    "/v1/threads/unread": {
+      "get": {
+        "summary": "Returns the unread summary for the calling participant: the number of\nchats with unread messages and the total number of unread messages.",
+        "operationId": "ThreadManagement_GetUnreadSummary",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.GetUnreadSummaryResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
         "tags": [
           "webitel.im.api.gateway.v1.ThreadManagement"
         ]
@@ -2760,6 +3129,12 @@
           },
           {
             "name": "can_change_thread_info",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "can_delete_messages",
             "in": "query",
             "required": false,
             "type": "boolean"
@@ -3125,6 +3500,81 @@
       },
       "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https://github.com/grpc). Each `Status` message contains\nthree pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the\n[API Design Guide](https://cloud.google.com/apis/design/errors)."
     },
+    "im.service.provider.v1.CreateTelegramBotGateRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "api_token": {
+          "type": "string"
+        },
+        "peer": {
+          "$ref": "#/definitions/webitel.im.provider.v1.Peer"
+        },
+        "webhook_secret": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "uri": {
+          "type": "string"
+        }
+      }
+    },
+    "im.service.provider.v1.CreateTelegramBotGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderTelegramBotGate"
+        }
+      }
+    },
+    "im.service.provider.v1.DeleteTelegramBotGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderTelegramBotGate"
+        }
+      }
+    },
+    "im.service.provider.v1.GetTelegramBotGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderTelegramBotGate"
+        }
+      }
+    },
+    "im.service.provider.v1.TelegramBotService.UpdateTelegramBotGateBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "api_token": {
+          "type": "string"
+        },
+        "webhook_secret": {
+          "type": "string"
+        },
+        "peer": {
+          "$ref": "#/definitions/webitel.im.provider.v1.Peer"
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "im.service.provider.v1.UpdateTelegramBotGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderTelegramBotGate"
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.AccessToken": {
       "type": "object",
       "properties": {
@@ -3467,6 +3917,42 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.DeleteMessagesRequest": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Messages to delete. Only messages authored by the caller are removed."
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.DeleteMessagesResponse": {
+      "type": "object",
+      "properties": {
+        "deleted_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Messages that were actually deleted by this call."
+        },
+        "skipped_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Requested messages left untouched: not found, already deleted,\nnot authored by the caller, or the chat is closed."
+        },
+        "deleted_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Unix time in milliseconds when the messages were deleted."
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.Device": {
       "type": "object",
       "properties": {
@@ -3572,6 +4058,121 @@
       },
       "description": "Media container for documents attachments."
     },
+    "webitel.im.api.gateway.v1.EditMessageResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "edited_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Unix time in milliseconds when the message was edited."
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.ForwardMessagesRequest": {
+      "type": "object",
+      "properties": {
+        "to": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Peer",
+          "description": "Recipient of the copies: a user contact or a bot contact (flow schema)."
+        },
+        "message_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Sources to copy, in the order they should appear at the destination."
+        },
+        "send_as": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.PeerIdentity"
+        },
+        "send_id": {
+          "type": "string",
+          "title": "optional client-generated id for deduplication"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.ForwardMessagesResponse": {
+      "type": "object",
+      "properties": {
+        "thread_id": {
+          "type": "string",
+          "description": "Direct chat the copies landed in."
+        },
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Ids of the created copies, in forwarded order."
+        },
+        "skipped_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Sources that were not forwarded: unknown id, no read access to the source\nchat, already deleted, or a type that cannot be forwarded."
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.ForwardOrigin": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardOriginKind"
+        },
+        "sender_id": {
+          "type": "string",
+          "description": "Contact id of the original author. Empty unless kind is INTERNAL."
+        },
+        "sender_name": {
+          "type": "string",
+          "description": "Display name of the original author — the \"from whom\" label."
+        },
+        "original_sent_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "When the original message was sent, Unix time in milliseconds."
+        },
+        "source_message_id": {
+          "type": "string",
+          "description": "Source message this copy was made from. Empty unless kind is INTERNAL,\nand cleared if the source is later purged."
+        }
+      },
+      "description": "ForwardOrigin is a snapshot of the original author taken at forward time.\nUnlike ReplyToMessage it carries no enriched ThreadMember: the original author\nis generally not a member of the chat the copy landed in, so sender_name is\nthe only label a client can rely on."
+    },
+    "webitel.im.api.gateway.v1.ForwardOriginInput": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardOriginKind"
+        },
+        "sender_name": {
+          "type": "string",
+          "description": "Display name of the original author. Empty when the platform hides it."
+        },
+        "original_sent_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "When the message was originally sent, Unix time in milliseconds.\nZero when the platform does not report it."
+        }
+      },
+      "description": "ForwardOriginInput carries what an external channel told us about the\noriginal author of an inbound forwarded message. Set by providers on\ningress, not by end clients."
+    },
+    "webitel.im.api.gateway.v1.ForwardOriginKind": {
+      "type": "string",
+      "enum": [
+        "FORWARD_ORIGIN_KIND_UNSPECIFIED",
+        "FORWARD_ORIGIN_KIND_INTERNAL",
+        "FORWARD_ORIGIN_KIND_EXTERNAL_USER",
+        "FORWARD_ORIGIN_KIND_EXTERNAL_HIDDEN_USER",
+        "FORWARD_ORIGIN_KIND_EXTERNAL_CHAT"
+      ],
+      "default": "FORWARD_ORIGIN_KIND_UNSPECIFIED",
+      "description": "ForwardOriginKind tells the client how to label a forwarded message and\nwhether the origin points at anything addressable inside Webitel.\n\n - FORWARD_ORIGIN_KIND_INTERNAL: Forwarded inside Webitel: sender_id and source_message_id are set.\n - FORWARD_ORIGIN_KIND_EXTERNAL_USER: Forwarded into the chat from an external messenger, author named.\n - FORWARD_ORIGIN_KIND_EXTERNAL_HIDDEN_USER: Same, but the author chose to hide their account, so there is no name.\n - FORWARD_ORIGIN_KIND_EXTERNAL_CHAT: Origin is an external group or channel rather than a person."
+    },
     "webitel.im.api.gateway.v1.GetContactSettingsResponse": {
       "type": "object",
       "properties": {
@@ -3587,6 +4188,22 @@
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadPermissions"
         }
       }
+    },
+    "webitel.im.api.gateway.v1.GetUnreadSummaryResponse": {
+      "type": "object",
+      "properties": {
+        "unread_chats": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of chats (threads) that have at least one unread message."
+        },
+        "unread_messages": {
+          "type": "string",
+          "format": "int64",
+          "description": "Total number of unread messages across all chats."
+        }
+      },
+      "description": "GetUnreadSummaryResponse carries the caller's unread totals."
     },
     "webitel.im.api.gateway.v1.HistoryMessage": {
       "type": "object",
@@ -3658,6 +4275,34 @@
         "reacted_metadata": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.InteractiveCallback",
           "description": "Metadata for button reaction for interactive message."
+        },
+        "reply_to": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ReplyToMessage"
+        },
+        "delivery_status": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageDeliveryStatus",
+          "description": "Aggregated delivery status across recipients: FAILED when every\nrecipient failed, otherwise the minimal status among non-failed ones.\nUNSPECIFIED for messages without per-recipient tracking (historical)."
+        },
+        "statuses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageRecipientStatus"
+          },
+          "description": "Per-recipient delivery details."
+        },
+        "deleted": {
+          "type": "boolean",
+          "description": "True when the message was deleted by its author. Every content field\n(body, attachments, contact, location, interactive, metadata) is cleared,\nso clients should render a tombstone."
+        },
+        "deleted_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Unix time in milliseconds when the message was deleted."
+        },
+        "forward_origin": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardOrigin",
+          "description": "Set when this message is a forward. Never populated for a deleted\nmessage: the tombstone must not leak the origin name."
         }
       },
       "description": "HistoryMessage represents a single message\nin thread history."
@@ -4041,6 +4686,15 @@
       "type": "object",
       "title": "No Data"
     },
+    "webitel.im.api.gateway.v1.Message.EditMessageBody": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "string",
+          "description": "New content for the message. Must not be empty."
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.Message.SendInteractiveCallbackBody": {
       "type": "object",
       "properties": {
@@ -4055,6 +4709,23 @@
       },
       "description": "Client sends callback event when user clicks a button."
     },
+    "webitel.im.api.gateway.v1.Message.SetReactionBody": {
+      "type": "object",
+      "properties": {
+        "reactor": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Peer",
+          "description": "Member setting the reaction."
+        },
+        "emoji": {
+          "type": "string",
+          "description": "Emoji to set. Empty string clears the reaction."
+        },
+        "send_id": {
+          "type": "string",
+          "description": "Optional client-generated id for deduplication."
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.MessageContact": {
       "type": "object",
       "properties": {
@@ -4068,6 +4739,18 @@
           "type": "string"
         }
       }
+    },
+    "webitel.im.api.gateway.v1.MessageDeliveryStatus": {
+      "type": "string",
+      "enum": [
+        "MESSAGE_DELIVERY_STATUS_UNSPECIFIED",
+        "MESSAGE_DELIVERY_STATUS_SENT",
+        "MESSAGE_DELIVERY_STATUS_DELIVERED",
+        "MESSAGE_DELIVERY_STATUS_READ",
+        "MESSAGE_DELIVERY_STATUS_FAILED"
+      ],
+      "default": "MESSAGE_DELIVERY_STATUS_UNSPECIFIED",
+      "description": "MessageDeliveryStatus is a per-recipient delivery state of a message.\nTransitions are monotonic: SENT -\u003e DELIVERED -\u003e READ.\nFAILED is terminal but may be superseded by a later DELIVERED (retry).\n\n - MESSAGE_DELIVERY_STATUS_SENT: Accepted by the system and queued for delivery.\n - MESSAGE_DELIVERY_STATUS_DELIVERED: Reached the recipient (stream ACK, push, provider receipt, bot dispatch).\n - MESSAGE_DELIVERY_STATUS_READ: Read by the recipient. Not applicable to bots.\n - MESSAGE_DELIVERY_STATUS_FAILED: Delivery failed (provider rejected, invalid contact, channel restriction)."
     },
     "webitel.im.api.gateway.v1.MessageLocation": {
       "type": "object",
@@ -4087,6 +4770,40 @@
           "type": "string"
         }
       }
+    },
+    "webitel.im.api.gateway.v1.MessageRecipientStatus": {
+      "type": "object",
+      "properties": {
+        "member_id": {
+          "type": "string",
+          "description": "Recipient contact id."
+        },
+        "status": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageDeliveryStatus"
+        },
+        "delivered_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Unix time in milliseconds; zero when not reached."
+        },
+        "read_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "failed_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "via": {
+          "type": "string",
+          "description": "Confirmation source: ws|push|provider|bot."
+        },
+        "error": {
+          "type": "string",
+          "description": "JSON-encoded provider error details for FAILED."
+        }
+      },
+      "description": "MessageRecipientStatus is a per-recipient delivery state of a message."
     },
     "webitel.im.api.gateway.v1.PUSHSubscription": {
       "type": "object",
@@ -4156,6 +4873,40 @@
     },
     "webitel.im.api.gateway.v1.RemoveMemberResponse": {
       "type": "object"
+    },
+    "webitel.im.api.gateway.v1.ReplyToMessage": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "sender": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadMember"
+        },
+        "sender_id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "body": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "attachment_kind": {
+          "type": "string"
+        },
+        "attachment_name": {
+          "type": "string"
+        },
+        "attachment_mime": {
+          "type": "string"
+        }
+      }
     },
     "webitel.im.api.gateway.v1.SearchLeftResponse": {
       "type": "object",
@@ -4261,6 +5012,13 @@
         },
         "send_as": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.PeerIdentity"
+        },
+        "reply_to_message_id": {
+          "type": "string"
+        },
+        "forward_origin": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardOriginInput",
+          "description": "Set by providers when the channel reports this message was forwarded to us."
         }
       },
       "description": "SendContactRequest sends contact information."
@@ -4287,6 +5045,19 @@
         "send_id": {
           "type": "string",
           "title": "optional client-generated id for deduplication"
+        },
+        "reply_to_message_id": {
+          "type": "string"
+        },
+        "external_id": {
+          "type": "string"
+        },
+        "reply_to_external_id": {
+          "type": "string"
+        },
+        "forward_origin": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardOriginInput",
+          "description": "Set by providers when the channel reports this message was forwarded to us."
         }
       },
       "description": "Represents a request to send a message with document."
@@ -4367,6 +5138,13 @@
         },
         "send_as": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.PeerIdentity"
+        },
+        "reply_to_message_id": {
+          "type": "string"
+        },
+        "forward_origin": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardOriginInput",
+          "description": "Set by providers when the channel reports this message was forwarded to us."
         }
       },
       "description": "SendLocationRequest sends a geographic location message."
@@ -4400,6 +5178,19 @@
         },
         "send_as": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.PeerIdentity"
+        },
+        "reply_to_message_id": {
+          "type": "string"
+        },
+        "external_id": {
+          "type": "string"
+        },
+        "reply_to_external_id": {
+          "type": "string"
+        },
+        "forward_origin": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardOriginInput",
+          "description": "Set by providers when the channel reports this message was forwarded to us."
         }
       },
       "description": "Represents a request to send a text message."
@@ -4415,6 +5206,24 @@
         }
       },
       "description": "Represents a response to send a text message."
+    },
+    "webitel.im.api.gateway.v1.SetReactionResponse": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string",
+          "description": "What the call did relative to the caller's previous reaction (SET, REMOVED, UNCHANGED)."
+        },
+        "emoji": {
+          "type": "string",
+          "description": "The emoji now stored for the caller; empty when it was removed."
+        },
+        "reacted_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Unix time in milliseconds when the reaction was set; zero when removed."
+        }
+      }
     },
     "webitel.im.api.gateway.v1.System": {
       "type": "object",
@@ -4482,6 +5291,11 @@
         "variables": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadVariables",
           "description": "Optional variables associated with the thread."
+        },
+        "unread_count": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of unread messages in this thread for the calling participant.\nCounts content messages not yet read; the caller's own messages and\nsystem messages are excluded."
         }
       },
       "description": "Thread represents a thread (aka chat or conversation) entity."
@@ -4613,6 +5427,9 @@
           "type": "boolean"
         },
         "can_change_thread_info": {
+          "type": "boolean"
+        },
+        "can_delete_messages": {
           "type": "boolean"
         }
       }
@@ -6387,6 +7204,17 @@
         "domain_id": {
           "type": "integer",
           "format": "int32"
+        },
+        "message_id": {
+          "type": "string",
+          "description": "Internal message context for per-recipient delivery status tracking.\n\nInternal message UUID"
+        },
+        "thread_id": {
+          "type": "string",
+          "title": "Internal thread UUID"
+        },
+        "reply_to_external_id": {
+          "type": "string"
         }
       },
       "description": "ProviderSendDocumentRequest sends a document with an optional caption."
@@ -6416,6 +7244,17 @@
         "domain_id": {
           "type": "integer",
           "format": "int32"
+        },
+        "message_id": {
+          "type": "string",
+          "description": "Internal message context for per-recipient delivery status tracking.\n\nInternal message UUID"
+        },
+        "thread_id": {
+          "type": "string",
+          "title": "Internal thread UUID"
+        },
+        "reply_to_external_id": {
+          "type": "string"
         }
       },
       "description": "ProviderSendImageRequest sends an image with an optional caption."
@@ -6444,6 +7283,17 @@
         "interactive": {
           "$ref": "#/definitions/webitel.im.provider.v1.ProviderInteractive",
           "description": "Interactive payload — exactly one kind must be set."
+        },
+        "message_id": {
+          "type": "string",
+          "description": "Internal message context for per-recipient delivery status tracking.\n\nInternal message UUID"
+        },
+        "thread_id": {
+          "type": "string",
+          "title": "Internal thread UUID"
+        },
+        "reply_to_external_id": {
+          "type": "string"
         }
       },
       "description": "ProviderSendInteractiveRequest sends a message with interactive UI elements."
@@ -6462,6 +7312,52 @@
         }
       },
       "description": "ProviderSendMessageResponse returns the delivery status and external message ID."
+    },
+    "webitel.im.provider.v1.ProviderSendReactionRequest": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderType",
+          "title": "Explicit provider type (FACEBOOK, WHATSAPP, etc.)"
+        },
+        "gate_id": {
+          "type": "string",
+          "title": "Internal ID of the specific configured gateway"
+        },
+        "external_user_id": {
+          "type": "string",
+          "title": "Recipient's platform-specific identifier"
+        },
+        "domain_id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "external_message_id": {
+          "type": "string",
+          "description": "Platform-specific id of the message being reacted to (resolved by im-thread\nfrom its external-id mapping for the target gate)."
+        },
+        "emoji": {
+          "type": "string",
+          "description": "Emoji to set; empty when the reaction is being cleared."
+        },
+        "removed": {
+          "type": "boolean",
+          "description": "True when the reaction is being removed rather than set."
+        },
+        "message_id": {
+          "type": "string",
+          "description": "Internal message context for logging/correlation.\n\nInternal message UUID"
+        },
+        "thread_id": {
+          "type": "string",
+          "title": "Internal thread UUID"
+        }
+      },
+      "description": "ProviderSendReactionRequest asks a provider to set or clear an emoji reaction\non a message already delivered to the external chat partner."
+    },
+    "webitel.im.provider.v1.ProviderSendReactionResponse": {
+      "type": "object",
+      "description": "ProviderSendReactionResponse is intentionally empty: reactions are\nfire-and-forget and best-effort."
     },
     "webitel.im.provider.v1.ProviderSendSystemMessageRequest": {
       "type": "object",
@@ -6488,6 +7384,14 @@
             "type": "string"
           },
           "description": "Template variables sourced from the system message metadata.\nInjected into the template via Go text/template syntax (e.g. {{.new_member_role}})."
+        },
+        "message_id": {
+          "type": "string",
+          "description": "Internal message context for per-recipient delivery status tracking.\n\nInternal message UUID"
+        },
+        "thread_id": {
+          "type": "string",
+          "title": "Internal thread UUID"
         }
       },
       "description": "ProviderSendSystemMessageRequest delivers a system event to the external chat partner.\nThe provider service resolves the gate-specific template and renders the final text\nusing the supplied variables before sending via the underlying provider API."
@@ -6515,15 +7419,60 @@
           "type": "integer",
           "format": "int32"
         },
+        "message_id": {
+          "type": "string",
+          "description": "Internal message context for per-recipient delivery status tracking:\nthe provider service persists the provider_message_id mapping on send\nand reports MarkDelivered/MarkRead/MarkFailed receipts back to im-thread.\n\nInternal message UUID"
+        },
+        "thread_id": {
+          "type": "string",
+          "title": "Internal thread UUID"
+        },
         "metadata": {
           "type": "object",
           "additionalProperties": {
             "type": "string"
           },
           "title": "Optional platform-specific parameters"
+        },
+        "reply_to_external_id": {
+          "type": "string"
         }
       },
       "description": "ProviderSendTextRequest sends a simple text message."
+    },
+    "webitel.im.provider.v1.ProviderSendTypingRequest": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderType",
+          "title": "Explicit provider type (FACEBOOK, WHATSAPP, etc.)"
+        },
+        "gate_id": {
+          "type": "string",
+          "title": "Internal ID of the specific configured gateway"
+        },
+        "external_user_id": {
+          "type": "string",
+          "title": "Recipient's platform-specific identifier"
+        },
+        "domain_id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "typing_on": {
+          "type": "boolean",
+          "title": "true = start typing, false = stop"
+        },
+        "thread_id": {
+          "type": "string",
+          "title": "Internal thread UUID (for logging/correlation)"
+        }
+      },
+      "description": "ProviderSendTypingRequest asks a provider to show/hide a typing indicator\nto the external chat partner."
+    },
+    "webitel.im.provider.v1.ProviderSendTypingResponse": {
+      "type": "object",
+      "description": "ProviderSendTypingResponse is intentionally empty: typing is fire-and-forget."
     },
     "webitel.im.provider.v1.ProviderSetGateTemplateResponse": {
       "type": "object",
@@ -6549,6 +7498,28 @@
       ],
       "default": "PROVIDER_STATUS_UNSPECIFIED",
       "description": "/ ProviderStatus represents the operational state of a provider gateway.\n\n - PROVIDER_STATUS_ACTIVE: Provider is healthy and processing messages\n - PROVIDER_STATUS_INACTIVE: Manually disabled by user\n - PROVIDER_STATUS_ERROR: Connection or authentication failed"
+    },
+    "webitel.im.provider.v1.ProviderStatusCapabilities": {
+      "type": "object",
+      "properties": {
+        "delivered": {
+          "type": "boolean",
+          "description": "The channel emits delivery receipts."
+        },
+        "read": {
+          "type": "boolean",
+          "description": "The channel emits read/seen receipts."
+        },
+        "failed": {
+          "type": "boolean",
+          "description": "The channel reports failed deliveries."
+        },
+        "typing": {
+          "type": "boolean",
+          "description": "The channel can forward a native \"typing…\" indicator to the chat partner."
+        }
+      },
+      "description": "ProviderStatusCapabilities declares which delivery-status receipts the\nchannel emits. A channel without a capability leaves messages in the last\nreachable state; the UI uses these flags to avoid drawing unreachable\nstatus marks."
     },
     "webitel.im.provider.v1.ProviderSummary": {
       "type": "object",
@@ -6583,6 +7554,35 @@
           "type": "string",
           "format": "int64",
           "title": "Unix timestamp in milliseconds"
+        },
+        "capabilities": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderStatusCapabilities",
+          "description": "Delivery-status receipts the channel is able to produce; unset when no\nprovider adapter is registered for the channel type."
+        }
+      }
+    },
+    "webitel.im.provider.v1.ProviderTelegramBotGate": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderStatus"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },

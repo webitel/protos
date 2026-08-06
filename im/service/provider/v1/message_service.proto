@@ -67,7 +67,70 @@ service ProviderMessageService {
       body: "*"
     };
   }
+
+  // SendTyping forwards an ephemeral "typing…" action to the external chat
+  // partner (e.g. Telegram sendChatAction, Meta sender_action). It is
+  // fire-and-forget and best-effort: channels whose provider does not support
+  // typing are a silent no-op. Nothing is persisted.
+  rpc SendTyping(ProviderSendTypingRequest) returns (ProviderSendTypingResponse) {
+    option (google.api.http) = {
+      post: "/im/provider/send/typing"
+      body: "*"
+    };
+  }
+
+  // SendReaction forwards an emoji reaction change to the external chat partner
+  // (e.g. Telegram setMessageReaction). Best-effort and messenger-dependent:
+  // providers without reaction support are a silent no-op. An empty emoji (with
+  // removed=true) clears the caller's reaction on the target message.
+  rpc SendReaction(ProviderSendReactionRequest) returns (ProviderSendReactionResponse) {
+    option (google.api.http) = {
+      post: "/im/provider/send/reaction"
+      body: "*"
+    };
+  }
 }
+
+// ProviderSendReactionRequest asks a provider to set or clear an emoji reaction
+// on a message already delivered to the external chat partner.
+message ProviderSendReactionRequest {
+  ProviderType type = 1; // Explicit provider type (FACEBOOK, WHATSAPP, etc.)
+  string gate_id = 2; // Internal ID of the specific configured gateway
+  string external_user_id = 3; // Recipient's platform-specific identifier
+  int32 domain_id = 4;
+
+  // Platform-specific id of the message being reacted to (resolved by im-thread
+  // from its external-id mapping for the target gate).
+  string external_message_id = 5;
+
+  // Emoji to set; empty when the reaction is being cleared.
+  string emoji = 6;
+
+  // True when the reaction is being removed rather than set.
+  bool removed = 7;
+
+  // Internal message context for logging/correlation.
+  string message_id = 8; // Internal message UUID
+  string thread_id = 9; // Internal thread UUID
+}
+
+// ProviderSendReactionResponse is intentionally empty: reactions are
+// fire-and-forget and best-effort.
+message ProviderSendReactionResponse {}
+
+// ProviderSendTypingRequest asks a provider to show/hide a typing indicator
+// to the external chat partner.
+message ProviderSendTypingRequest {
+  ProviderType type = 1; // Explicit provider type (FACEBOOK, WHATSAPP, etc.)
+  string gate_id = 2; // Internal ID of the specific configured gateway
+  string external_user_id = 3; // Recipient's platform-specific identifier
+  int32 domain_id = 4;
+  bool typing_on = 5; // true = start typing, false = stop
+  string thread_id = 6; // Internal thread UUID (for logging/correlation)
+}
+
+// ProviderSendTypingResponse is intentionally empty: typing is fire-and-forget.
+message ProviderSendTypingResponse {}
 
 // --- Shared Types ---
 
@@ -96,6 +159,12 @@ message ProviderSendTextRequest {
   string text = 4; // The textual content of the message
   int32 domain_id = 5;
 
+  // Internal message context for per-recipient delivery status tracking:
+  // the provider service persists the provider_message_id mapping on send
+  // and reports MarkDelivered/MarkRead/MarkFailed receipts back to im-thread.
+  string message_id = 6; // Internal message UUID
+  string thread_id = 7; // Internal thread UUID
+
   map<string, string> metadata = 10; // Optional platform-specific parameters
 
   string reply_to_external_id = 11;
@@ -114,6 +183,10 @@ message ProviderSendDocumentRequest {
   string caption = 5; // Optional text accompanying the file
   int32 domain_id = 6;
 
+  // Internal message context for per-recipient delivery status tracking.
+  string message_id = 7; // Internal message UUID
+  string thread_id = 8; // Internal thread UUID
+
   string reply_to_external_id = 11;
   // Display name of the operator (or bot) this message is from, when the channel can
   // show a per-message sender. Empty means "use the gate's own name".
@@ -129,6 +202,10 @@ message ProviderSendImageRequest {
   repeated ProviderFile images = 4;
   string caption = 5;
   int32 domain_id = 6;
+
+  // Internal message context for per-recipient delivery status tracking.
+  string message_id = 7; // Internal message UUID
+  string thread_id = 8; // Internal thread UUID
 
   string reply_to_external_id = 11;
   // Display name of the operator (or bot) this message is from, when the channel can
@@ -151,6 +228,10 @@ message ProviderSendInteractiveRequest {
 
   // Interactive payload — exactly one kind must be set.
   ProviderInteractive interactive = 6;
+
+  // Internal message context for per-recipient delivery status tracking.
+  string message_id = 7; // Internal message UUID
+  string thread_id = 8; // Internal thread UUID
 
   string reply_to_external_id = 11;
   // Display name of the operator (or bot) this message is from, when the channel can
@@ -297,4 +378,8 @@ message ProviderSendSystemMessageRequest {
   // Template variables sourced from the system message metadata.
   // Injected into the template via Go text/template syntax (e.g. {{.new_member_role}}).
   map<string, string> vars = 5;
+
+  // Internal message context for per-recipient delivery status tracking.
+  string message_id = 6; // Internal message UUID
+  string thread_id = 7; // Internal thread UUID
 }

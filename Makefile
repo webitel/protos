@@ -146,14 +146,23 @@ contacts_proto:
 
 swagger_mix:
 	go run github.com/msample/swagger-mixin@latest ./swagger/engine.swagger.json \
-		./swagger/storage.swagger.json ./swagger/messages.swagger.json \
-		./swagger/logger.swagger.json ./swagger/webitel-go.swagger.json \
-		./swagger/wfm.swagger.json ./swagger/cases.swagger.json \
-		./swagger/kb.swagger.json \
-		./swagger/fts.swagger.json ./swagger/media-exporter.swagger.json \
-		./swagger/meetings.swagger.json ./swagger/im-gateway.swagger.json \
+		$$(ls ./swagger/*.swagger.json | grep -v '/engine\.swagger\.json$$') \
 		> ./swagger/api.json || true
 
+
+.PHONY: swagger_public
+
+# Build the public OpenAPI 3.0 spec (swagger/api.public.json) from the merged
+# Swagger 2.0 bundle and push it to Postman Spec Hub (Spec Hub needs 3.0).
+# Override host/scope via PUBLIC_API_HOST / INCLUDE_TAGS env vars.
+swagger_public:
+	npm install --no-save swagger2openapi@7
+	node scripts/build-public-spec.mjs
+
+.PHONY: im-lint
+
+im-lint:
+	buf lint im
 
 .PHONY: clean
 
