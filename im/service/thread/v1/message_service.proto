@@ -6,6 +6,7 @@ import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/struct.proto";
 import "service/thread/v1/peer.proto";
+import "service/thread/v1/shared.proto";
 
 option go_package = "github.com/webitel/im-thread-service/gen/go/api/v1;impb";
 
@@ -43,33 +44,7 @@ service Message {
   rpc EditMessage(EditMessageRequest) returns (EditMessageResponse);
 
   rpc UpdateMessageDelivery(UpdateMessageDeliveryRequest) returns (UpdateMessageDeliveryResponse);
-}
 
-enum MessageDeliveryStatus {
-  MESSAGE_DELIVERY_STATUS_UNSPECIFIED = 0;
-  MESSAGE_DELIVERY_STATUS_DELIVERED = 1;
-  MESSAGE_DELIVERY_STATUS_READ = 2;
-  MESSAGE_DELIVERY_STATUS_FAILED = 3;
-}
-
-message UpdateMessageDeliveryRequest {
-  string gate_id = 1 [(buf.validate.field).required = true];
-
-  string external_message_id = 2 [(buf.validate.field).required = true];
-
-  MessageDeliveryStatus status = 3 [(buf.validate.field).enum = {
-    defined_only: true
-    not_in: [0]
-  }];
-
-  string reason = 4;
-
-  int64 at = 5;
-
-  int32 domain_id = 6;
-}
-
-message UpdateMessageDeliveryResponse {}
   // Soft-deletes messages authored by the caller in threads the caller is
   // still a member of. Best-effort: unremovable ids come back as skipped.
   rpc DeleteMessages(DeleteMessagesRequest) returns (DeleteMessagesResponse);
@@ -78,7 +53,7 @@ message UpdateMessageDeliveryResponse {}
   // stamping each copy with the original author. Best-effort: sources that are
   // missing, unreadable or unforwardable come back as skipped.
   rpc ForwardMessages(ForwardMessagesRequest) returns (ForwardMessagesResponse);
-  
+
   // Sets or clears the caller's emoji reaction on a single message.
   //
   // A member may hold at most one reaction per message: a new emoji replaces
@@ -102,6 +77,25 @@ message UpdateMessageDeliveryResponse {}
   // and is silently dropped when the flag is disabled.
   rpc SendTyping(SendTypingRequest) returns (SendTypingResponse);
 }
+
+message UpdateMessageDeliveryRequest {
+  string gate_id = 1 [(buf.validate.field).required = true];
+
+  string external_message_id = 2 [(buf.validate.field).required = true];
+
+  MessageDeliveryStatus status = 3 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+
+  string reason = 4;
+
+  int64 at = 5;
+
+  int32 domain_id = 6;
+}
+
+message UpdateMessageDeliveryResponse {}
 
 // ForwardOriginKind tells the client how to label a forwarded message and
 // whether the origin points at anything addressable inside Webitel.
