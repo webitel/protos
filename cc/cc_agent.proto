@@ -1,100 +1,100 @@
 syntax = "proto3";
 
-option go_package = "github.com/webitel/protos/cc";
-
 package cc;
 
+import "const.proto";
+
+option go_package = "github.com/webitel/protos/cc";
+
 service AgentService {
-    rpc Online(OnlineRequest) returns (OnlineResponse) {}
-    rpc Offline(OfflineRequest) returns (OfflineResponse) {}
-    rpc Pause(PauseRequest) returns (PauseResponse) {}
+  rpc Online(OnlineRequest) returns (OnlineResponse) {}
+  rpc Offline(OfflineRequest) returns (OfflineResponse) {}
+  rpc Pause(PauseRequest) returns (PauseResponse) {}
 
-    rpc WaitingChannel(WaitingChannelRequest) returns (WaitingChannelResponse) {}
+  rpc WaitingChannel(WaitingChannelRequest) returns (WaitingChannelResponse) {}
 
-    rpc AcceptTask(AcceptTaskRequest) returns (AcceptTaskResponse) {}
-    rpc CloseTask(CloseTaskRequest) returns (CloseTaskResponse) {}
+  rpc AcceptTask(AcceptTaskRequest) returns (AcceptTaskResponse) {}
+  rpc CloseTask(CloseTaskRequest) returns (CloseTaskResponse) {}
 
-    rpc RunTrigger(RunTriggerRequest) returns (RunTriggerResponse) {}
+  rpc RunTrigger(RunTriggerRequest) returns (RunTriggerResponse) {}
 }
 
 message RunTriggerRequest {
-    int64 domain_id = 1;
-    int32 trigger_id = 2;
-    int64 user_id = 3;
-    map<string,string> variables = 4;
+  int64 domain_id = 1;
+  int32 trigger_id = 2;
+  int64 user_id = 3;
+  map<string, string> variables = 4;
 }
 
 message RunTriggerResponse {
-    string job_id = 1;
+  string job_id = 1;
 }
 
 message AcceptTaskRequest {
-    int64 id = 1;
-    string app_id = 2;
-    int64 domain_id = 3;
+  int64 id = 1;
+  string app_id = 2;
+  int64 domain_id = 3;
 }
 
-message AcceptTaskResponse {
-
-}
+message AcceptTaskResponse {}
 
 message CloseTaskRequest {
-    int64 id = 1;
-    string app_id = 2;
-    int64 domain_id = 3;
+  int64 id = 1;
+  string app_id = 2;
+  int64 domain_id = 3;
 }
 
-message CloseTaskResponse {
-
-}
+message CloseTaskResponse {}
 
 message WaitingChannelRequest {
-    int32 agent_id = 1;
-    string channel = 2;
+  int32 agent_id = 1;
+  string channel = 2;
 
-    int64 domain_id = 3;
+  int64 domain_id = 3;
 }
 
 message WaitingChannelResponse {
-    int64 timestamp = 1;
+  int64 timestamp = 1;
 }
 
 message Channel {
-    string channel = 1;
-    string state = 2;
-    int64 joined_at = 3;
+  string channel = 1;
+  string state = 2;
+  int64 joined_at = 3;
 }
 
 message PauseRequest {
-    int64 agent_id = 1;
-    string payload = 2;
-    int32 timeout = 3;
+  int64 agent_id = 1;
+  string payload = 2;
+  int32 timeout = 3;
 
-    int64 domain_id = 4;
-    string status_comment = 5;
+  int64 domain_id = 4;
+  string status_comment = 5;
 }
 
 message PauseResponse {
-    int64 timestamp = 1;
+  int64 timestamp = 1;
 }
 
 message OfflineRequest {
-    int64 agent_id = 1;
-    int64 domain_id = 2;
+  int64 agent_id = 1;
+  int64 domain_id = 2;
 }
 
 message OfflineResponse {
-    int64 timestamp = 1;
+  int64 timestamp = 1;
 }
 
 message OnlineRequest {
-    int64 agent_id = 1;
-    bool on_demand = 2;
+  int64 agent_id = 1;
+  bool on_demand = 2;
+  engine.Lookup online_skill = 3;
 
-    int64 domain_id = 5;
+  int64 domain_id = 5;
 }
 
 message OnlineResponse {
-    int64 timestamp = 1;
-    repeated Channel channel = 2;
+  int64 timestamp = 1;
+  repeated Channel channel = 2;
+  engine.Lookup online_skill = 3;
 }
