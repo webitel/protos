@@ -6,6 +6,7 @@ import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/struct.proto";
 import "service/thread/v1/peer.proto";
+import "service/thread/v1/shared.proto";
 
 option go_package = "github.com/webitel/im-thread-service/gen/go/api/v1;impb";
 
@@ -42,6 +43,8 @@ service Message {
   // Edits a previously sent message.
   rpc EditMessage(EditMessageRequest) returns (EditMessageResponse);
 
+  rpc UpdateMessageDelivery(UpdateMessageDeliveryRequest) returns (UpdateMessageDeliveryResponse);
+
   // Soft-deletes messages authored by the caller in threads the caller is
   // still a member of. Best-effort: unremovable ids come back as skipped.
   rpc DeleteMessages(DeleteMessagesRequest) returns (DeleteMessagesResponse);
@@ -50,7 +53,7 @@ service Message {
   // stamping each copy with the original author. Best-effort: sources that are
   // missing, unreadable or unforwardable come back as skipped.
   rpc ForwardMessages(ForwardMessagesRequest) returns (ForwardMessagesResponse);
-  
+
   // Sets or clears the caller's emoji reaction on a single message.
   //
   // A member may hold at most one reaction per message: a new emoji replaces
@@ -74,6 +77,25 @@ service Message {
   // and is silently dropped when the flag is disabled.
   rpc SendTyping(SendTypingRequest) returns (SendTypingResponse);
 }
+
+message UpdateMessageDeliveryRequest {
+  string gate_id = 1 [(buf.validate.field).required = true];
+
+  string external_message_id = 2 [(buf.validate.field).required = true];
+
+  MessageDeliveryStatus status = 3 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+
+  string reason = 4;
+
+  int64 at = 5;
+
+  int32 domain_id = 6;
+}
+
+message UpdateMessageDeliveryResponse {}
 
 // ForwardOriginKind tells the client how to label a forwarded message and
 // whether the origin points at anything addressable inside Webitel.
@@ -424,6 +446,31 @@ message Interactive {
     // List reply with main list button text and sections with buttons.
     KeyboardListReply list_reply = 5;
   }
+
+  // Where the menu is rendered. Channels that only support one placement ignore it.
+  MenuPlacement placement = 6;
+
+  // Whether the recipient may still type while this menu is displayed.
+  InputFieldState input_field_state = 7;
+}
+
+// MenuPlacement is where a channel should render the menu.
+enum MenuPlacement {
+  MENU_PLACEMENT_UNSPECIFIED = 0;
+  // Inside the message bubble, staying in the conversation history.
+  MENU_PLACEMENT_INLINE = 1;
+  // Over the input field, replacing the previous menu and outliving the message.
+  MENU_PLACEMENT_PERSISTENT = 2;
+}
+
+// InputFieldState controls whether the recipient can type free text while a menu is
+// displayed. Not every channel can enforce it (Telegram cannot).
+enum InputFieldState {
+  INPUT_FIELD_STATE_UNSPECIFIED = 0;
+  INPUT_FIELD_STATE_REGULAR = 1;
+  INPUT_FIELD_STATE_MINIMIZED = 2;
+  // Free text is not possible: the recipient can only press a button.
+  INPUT_FIELD_STATE_HIDDEN = 3;
 }
 
 // Media container for images attachments.
