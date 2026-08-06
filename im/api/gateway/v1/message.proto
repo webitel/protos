@@ -70,6 +70,10 @@ service Message {
   // Sends a system message (e.g., user joined, user left).
   rpc SendSystemMessage(SendSystemMessageRequest) returns (SendMessageResponse);
 
+  // Records what an external channel reported about a message we sent through it
+  // (delivered / seen / failed). Called by provider services, not by end clients.
+  rpc UpdateMessageDelivery(UpdateMessageDeliveryRequest) returns (UpdateMessageDeliveryResponse);
+
   // Edits an existing message by ID. Only the sender or authorized users can edit messages.
   rpc EditMessage(EditMessageRequest) returns (EditMessageResponse) {
     option (google.api.http) = {
@@ -84,6 +88,38 @@ message ReadMessageRequest {
   string thread_id = 2;
 }
 message ReadMessageResponse {}
+
+// MessageDeliveryStatus is the state an external channel reported for a message.
+enum MessageDeliveryStatus {
+  MESSAGE_DELIVERY_STATUS_UNSPECIFIED = 0;
+  // Accepted by the channel and handed to the recipient's device.
+  MESSAGE_DELIVERY_STATUS_DELIVERED = 1;
+  // Seen by the recipient.
+  MESSAGE_DELIVERY_STATUS_READ = 2;
+  // The channel could not deliver it (blocked bot, unsubscribed recipient, ...).
+  MESSAGE_DELIVERY_STATUS_FAILED = 3;
+}
+
+message UpdateMessageDeliveryRequest {
+  // Gate the message was sent through.
+  string gate_id = 1 [(buf.validate.field).required = true];
+
+  // Channel-side message id, as recorded when the message was sent.
+  string external_message_id = 2 [(buf.validate.field).required = true];
+
+  MessageDeliveryStatus status = 3 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+
+  // Human-readable failure detail, when the channel provided one.
+  string reason = 4;
+
+  // When the channel reported the status, in unix milliseconds. Defaults to now.
+  int64 at = 5;
+}
+
+message UpdateMessageDeliveryResponse {}
 
 // Represents a request to send a text message.
 message SendTextRequest {
@@ -293,6 +329,31 @@ message Interactive {
     // List reply with main list button text and sections with buttons.
     KeyboardListReply list_reply = 5;
   }
+
+  // Where the menu is rendered. Channels that only support one placement ignore it.
+  MenuPlacement placement = 6;
+
+  // Whether the recipient may still type while this menu is displayed.
+  InputFieldState input_field_state = 7;
+}
+
+// MenuPlacement is where a channel should render the menu.
+enum MenuPlacement {
+  MENU_PLACEMENT_UNSPECIFIED = 0;
+  // Inside the message bubble, staying in the conversation history.
+  MENU_PLACEMENT_INLINE = 1;
+  // Over the input field, replacing the previous menu and outliving the message.
+  MENU_PLACEMENT_PERSISTENT = 2;
+}
+
+// InputFieldState controls whether the recipient can type free text while a menu is
+// displayed. Not every channel can enforce it (Telegram cannot).
+enum InputFieldState {
+  INPUT_FIELD_STATE_UNSPECIFIED = 0;
+  INPUT_FIELD_STATE_REGULAR = 1;
+  INPUT_FIELD_STATE_MINIMIZED = 2;
+  // Free text is not possible: the recipient can only press a button.
+  INPUT_FIELD_STATE_HIDDEN = 3;
 }
 
 // Media container for images attachments.

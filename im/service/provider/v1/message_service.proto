@@ -99,6 +99,10 @@ message ProviderSendTextRequest {
   map<string, string> metadata = 10; // Optional platform-specific parameters
 
   string reply_to_external_id = 11;
+  // Display name of the operator (or bot) this message is from, when the channel can
+  // show a per-message sender. Empty means "use the gate's own name".
+  string sender_name = 12;
+
 }
 
 // ProviderSendDocumentRequest sends a document with an optional caption.
@@ -111,6 +115,10 @@ message ProviderSendDocumentRequest {
   int32 domain_id = 6;
 
   string reply_to_external_id = 11;
+  // Display name of the operator (or bot) this message is from, when the channel can
+  // show a per-message sender. Empty means "use the gate's own name".
+  string sender_name = 12;
+
 }
 
 // ProviderSendImageRequest sends an image with an optional caption.
@@ -123,6 +131,10 @@ message ProviderSendImageRequest {
   int32 domain_id = 6;
 
   string reply_to_external_id = 11;
+  // Display name of the operator (or bot) this message is from, when the channel can
+  // show a per-message sender. Empty means "use the gate's own name".
+  string sender_name = 12;
+
 }
 
 // ProviderSendInteractiveRequest sends a message with interactive UI elements.
@@ -141,6 +153,10 @@ message ProviderSendInteractiveRequest {
   ProviderInteractive interactive = 6;
 
   string reply_to_external_id = 11;
+  // Display name of the operator (or bot) this message is from, when the channel can
+  // show a per-message sender. Empty means "use the gate's own name".
+  string sender_name = 12;
+
 }
 
 // ProviderInteractive carries the interactive UI definition.
@@ -152,6 +168,31 @@ message ProviderInteractive {
     ProviderKeyboardMarkup markup = 2;
     ProviderKeyboardListReply list_reply = 3;
   }
+
+  // Where the menu is rendered. Channels that only support one placement ignore it.
+  MenuPlacement placement = 4;
+
+  // Whether the recipient may still type while this menu is displayed.
+  InputFieldState input_field_state = 5;
+}
+
+// MenuPlacement is where a channel should render the menu.
+enum MenuPlacement {
+  MENU_PLACEMENT_UNSPECIFIED = 0;
+  // Inside the message bubble, staying in the conversation history.
+  MENU_PLACEMENT_INLINE = 1;
+  // Over the input field, replacing the previous menu and outliving the message.
+  MENU_PLACEMENT_PERSISTENT = 2;
+}
+
+// InputFieldState controls whether the recipient can type free text while a menu is
+// displayed. Not every channel can enforce it (Telegram cannot).
+enum InputFieldState {
+  INPUT_FIELD_STATE_UNSPECIFIED = 0;
+  INPUT_FIELD_STATE_REGULAR = 1;
+  INPUT_FIELD_STATE_MINIMIZED = 2;
+  // Free text is not possible: the recipient can only press a button.
+  INPUT_FIELD_STATE_HIDDEN = 3;
 }
 
 // ProviderKeyboardMarkup is a grid of button rows.
@@ -218,6 +259,10 @@ message ProviderSendLocationRequest {
   optional string address = 8; // Optional street address
 
   string reply_to_external_id = 11;
+  // Display name of the operator (or bot) this message is from, when the channel can
+  // show a per-message sender. Empty means "use the gate's own name".
+  string sender_name = 12;
+
 }
 
 // ProviderSendContactRequest sends a contact card.
@@ -231,6 +276,10 @@ message ProviderSendContactRequest {
   optional string email = 7;
 
   string reply_to_external_id = 11;
+  // Display name of the operator (or bot) this message is from, when the channel can
+  // show a per-message sender. Empty means "use the gate's own name".
+  string sender_name = 12;
+
 }
 
 // ProviderSendSystemMessageRequest delivers a system event to the external chat partner.
