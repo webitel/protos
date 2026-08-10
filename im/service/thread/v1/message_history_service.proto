@@ -17,6 +17,10 @@ service MessageHistory {
   rpc SearchThreadMessagesHistory(SearchMessageHistoryRequest) returns (SearchMessageHistoryResponse);
 
   rpc SearchLeftThreadsMessageHistory(SearchLeftThreadsMessageHistoryRequest) returns (SearchMessageHistoryResponse);
+
+  // Returns the edit and deletion history of a single message, oldest first.
+  // Readable by every member of the thread the message belongs to.
+  rpc GetMessageRevisions(GetMessageRevisionsRequest) returns (GetMessageRevisionsResponse);
 }
 
 message HistoryMessageCursorResponse {
@@ -166,6 +170,65 @@ message HistoryMessage {
   ForwardOrigin forward_origin = 22;
   // Emoji reactions currently held on the message, aggregated per emoji.
   repeated MessageReaction reactions = 23;
+
+  // Contact id of the member who deleted the message; empty when it is live.
+  string deleted_by = 24;
+
+  // Number of entries in the message's change history. Zero means the message
+  // was never edited or deleted; otherwise GetMessageRevisions returns that
+  // many entries.
+  int32 revision_count = 25;
+}
+
+// What happened to a message at one point of its history.
+enum MessageRevisionAction {
+  MESSAGE_REVISION_ACTION_UNSPECIFIED = 0;
+
+  // The message as it was originally sent.
+  MESSAGE_REVISION_ACTION_CREATED = 1;
+
+  // The body was replaced by an edit.
+  MESSAGE_REVISION_ACTION_EDITED = 2;
+
+  // The message was deleted.
+  MESSAGE_REVISION_ACTION_DELETED = 3;
+}
+
+// One entry of a message's change history: what the message read at that
+// point, who changed it and when.
+message MessageRevision {
+  // Position in the history, starting at 1 for the original message.
+  int32 revision_no = 1;
+
+  MessageRevisionAction action = 2;
+
+  // Body the message carried after this change. For DELETED it is the text
+  // the message still carried when it was removed, so the conversation can be
+  // reconstructed even though the timeline only shows a tombstone.
+  string body = 3;
+
+  // Contact id of the member who made the change.
+  string changed_by = 4;
+
+  // Unix time in milliseconds when the change was made.
+  int64 changed_at = 5;
+}
+
+message GetMessageRevisionsRequest {
+  string message_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+
+  int32 domain_id = 2;
+
+  // Member asking for the history; must still be a member of the thread.
+  string caller_id = 3 [(buf.validate.field).string.uuid = true];
+}
+
+message GetMessageRevisionsResponse {
+  // Oldest first. Empty when the message was never edited or deleted.
+  repeated MessageRevision items = 1;
 }
 
 // MessageReaction is the aggregate of one emoji's reactions on a message:
