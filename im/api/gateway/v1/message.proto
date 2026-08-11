@@ -109,6 +109,15 @@ service Message {
       body: "*"
     };
   }
+
+  // Posts an internal note into the thread — visible only to Webitel users,
+  // never delivered to the client and never forwarded to an external messenger.
+  rpc SendInternalNote(SendInternalNoteRequest) returns (SendMessageResponse) {
+    option (google.api.http) = {
+      post: "/v1/messages/internal"
+      body: "*"
+    };
+  }
 }
 
 // ForwardOriginKind tells the client how to label a forwarded message and
@@ -143,6 +152,16 @@ message ForwardOriginInput {
   int64 original_sent_at = 3;
 }
 
+// SendInternalNoteRequest posts an operator-only note into the thread. The
+// sender is taken from the caller's identity; internal-only, no external fields.
+message SendInternalNoteRequest {
+  Peer to = 1 [(buf.validate.field).required = true];
+  string body = 2 [(buf.validate.field).string.min_len = 1];
+  optional PeerIdentity send_as = 3;
+  optional string reply_to_message_id = 4 [(buf.validate.field).string.uuid = true];
+  string send_id = 20; // optional client-generated id for deduplication
+}
+
 message ForwardMessagesRequest {
   // Recipient of the copies: a user contact or a bot contact (flow schema).
   Peer to = 1 [(buf.validate.field).required = true];
@@ -159,6 +178,10 @@ message ForwardMessagesRequest {
   optional PeerIdentity send_as = 3;
 
   string send_id = 20; // optional client-generated id for deduplication
+
+  // Optional internal note posted alongside the forward — visible only to
+  // Webitel users, never delivered to the client.
+  optional string internal_note = 4 [(buf.validate.field).string.max_len = 4096];
 }
 
 message ForwardMessagesResponse {
