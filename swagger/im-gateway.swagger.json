@@ -2843,6 +2843,37 @@
         ]
       }
     },
+    "/v1/messages/{message_id}/revisions": {
+      "get": {
+        "summary": "Returns the edit and deletion history of a single message, oldest first.\nReadable by every member of the thread the message belongs to.",
+        "operationId": "MessageHistory_GetMessageRevisions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.GetMessageRevisionsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "message_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.MessageHistory"
+        ]
+      }
+    },
     "/v1/threads": {
       "get": {
         "summary": "Search threads with filters",
@@ -3544,6 +3575,46 @@
         ],
         "tags": [
           "webitel.im.api.gateway.v1.ThreadManagement"
+        ]
+      }
+    },
+    "/v1/threads/{thread_id}/typing": {
+      "post": {
+        "summary": "Sends an ephemeral \"…is typing\" indicator to the other participants of a\nthread. Real-time only: it is never stored and never triggers a push. The\ntyping member is the authenticated caller, resolved from the token.",
+        "operationId": "Message_SendTyping",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SendTypingResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "thread_id",
+            "description": "Target thread, taken from the path. The typing member is the authenticated\ncaller resolved from the token (contact{sub,iss}); no sender is exposed.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.Message.SendTypingBody"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.Message"
         ]
       }
     },
@@ -4453,6 +4524,19 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.GetMessageRevisionsResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageRevision"
+          },
+          "description": "Oldest first. Empty when the message was never edited or deleted."
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.GetThreadPermissionsResponse": {
       "type": "object",
       "properties": {
@@ -4575,6 +4659,15 @@
         "forward_origin": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardOrigin",
           "description": "Set when this message is a forward. Never populated for a deleted\nmessage: the tombstone must not leak the origin name."
+        },
+        "deleted_by": {
+          "type": "string",
+          "description": "Contact id of the member who deleted the message; empty when it is live."
+        },
+        "revision_count": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of entries in the message's change history. Zero means the message\nwas never edited or deleted; otherwise GetMessageRevisions returns that\nmany entries."
         }
       },
       "description": "HistoryMessage represents a single message\nin thread history."
@@ -5010,20 +5103,30 @@
       },
       "description": "Client sends callback event when user clicks a button."
     },
+    "webitel.im.api.gateway.v1.Message.SendTypingBody": {
+      "type": "object",
+      "properties": {
+        "timeout_ms": {
+          "type": "integer",
+          "format": "int32",
+          "description": "How long clients should keep the indicator visible, in milliseconds.\nOptional; the server defaults it (typically 6000) and clamps it to 30000."
+        },
+        "preview_text": {
+          "type": "string",
+          "description": "Optional live draft of the message being typed (Live Typing Preview),\nforwarded only to authorized recipients when the preview feature is enabled.\nMax 1024 bytes; an empty value clears a previously shown preview."
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.Message.SetReactionBody": {
       "type": "object",
       "properties": {
-        "reactor": {
-          "$ref": "#/definitions/webitel.im.api.gateway.v1.Peer",
-          "description": "Member setting the reaction."
-        },
         "emoji": {
           "type": "string",
-          "description": "Emoji to set. Empty string clears the reaction."
+          "description": "Emoji to set. An empty string clears the caller's reaction; a different\nemoji replaces it; the same emoji is a no-op (reactions are declarative and\nidempotent — one reaction per participant per message)."
         },
         "send_id": {
           "type": "string",
-          "description": "Optional client-generated id for deduplication."
+          "description": "Optional opaque client echo token, returned verbatim on the reaction event\nso an optimistic UI can reconcile. Not used for deduplication or ordering."
         }
       }
     },
@@ -5105,6 +5208,44 @@
         }
       },
       "description": "MessageRecipientStatus is a per-recipient delivery state of a message."
+    },
+    "webitel.im.api.gateway.v1.MessageRevision": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Position in the history, starting at 1 for the original message."
+        },
+        "action": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageRevisionAction"
+        },
+        "body": {
+          "type": "string",
+          "description": "Body the message carried after this change. For DELETED it is the text\nthe message still carried when it was removed, so the conversation can be\nreconstructed even though the timeline only shows a tombstone."
+        },
+        "changed_by": {
+          "type": "string",
+          "description": "Contact id of the member who made the change."
+        },
+        "changed_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Unix time in milliseconds when the change was made."
+        }
+      },
+      "description": "One entry of a message's change history: what the message read at that\npoint, who changed it and when."
+    },
+    "webitel.im.api.gateway.v1.MessageRevisionAction": {
+      "type": "string",
+      "enum": [
+        "MESSAGE_REVISION_ACTION_UNSPECIFIED",
+        "MESSAGE_REVISION_ACTION_CREATED",
+        "MESSAGE_REVISION_ACTION_EDITED",
+        "MESSAGE_REVISION_ACTION_DELETED"
+      ],
+      "default": "MESSAGE_REVISION_ACTION_UNSPECIFIED",
+      "description": "What happened to a message at one point of its history.\n\n - MESSAGE_REVISION_ACTION_CREATED: The message as it was originally sent.\n - MESSAGE_REVISION_ACTION_EDITED: The body was replaced by an edit.\n - MESSAGE_REVISION_ACTION_DELETED: The message was deleted."
     },
     "webitel.im.api.gateway.v1.PUSHSubscription": {
       "type": "object",
@@ -5533,6 +5674,9 @@
         }
       },
       "description": "Represents a response to send a text message."
+    },
+    "webitel.im.api.gateway.v1.SendTypingResponse": {
+      "type": "object"
     },
     "webitel.im.api.gateway.v1.SetReactionResponse": {
       "type": "object",

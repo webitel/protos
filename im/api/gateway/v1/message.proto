@@ -110,6 +110,16 @@ service Message {
     };
   }
 
+  // Sends an ephemeral "…is typing" indicator to the other participants of a
+  // thread. Real-time only: it is never stored and never triggers a push. The
+  // typing member is the authenticated caller, resolved from the token.
+  rpc SendTyping(SendTypingRequest) returns (SendTypingResponse) {
+    option (google.api.http) = {
+      post: "/v1/threads/{thread_id}/typing"
+      body: "*"
+    };
+  }
+
   // Posts an internal note into the thread — visible only to Webitel users,
   // never delivered to the client and never forwarded to an external messenger.
   rpc SendInternalNote(SendInternalNoteRequest) returns (SendMessageResponse) {
@@ -676,8 +686,11 @@ message DeleteMessagesResponse {
 }
 
 message SetReactionRequest {
-  // Member setting the reaction.
-  Peer reactor = 1 [(buf.validate.field).required = true];
+  // The reactor is the authenticated caller: the gateway resolves it from the
+  // token (contact{sub,iss}) and never trusts a client-supplied identity, so
+  // no reactor field is exposed here.
+  reserved 1;
+  reserved "reactor";
 
   // Message being reacted to.
   string message_id = 2 [
@@ -685,10 +698,13 @@ message SetReactionRequest {
     (buf.validate.field).string.uuid = true
   ];
 
-  // Emoji to set. Empty string clears the reaction.
+  // Emoji to set. An empty string clears the caller's reaction; a different
+  // emoji replaces it; the same emoji is a no-op (reactions are declarative and
+  // idempotent — one reaction per participant per message).
   string emoji = 3;
 
-  // Optional client-generated id for deduplication.
+  // Optional opaque client echo token, returned verbatim on the reaction event
+  // so an optimistic UI can reconcile. Not used for deduplication or ordering.
   string send_id = 20;
 }
 
@@ -702,3 +718,26 @@ message SetReactionResponse {
   // Unix time in milliseconds when the reaction was set; zero when removed.
   int64 reacted_at = 3;
 }
+
+message SendTypingRequest {
+  // Target thread, taken from the path. The typing member is the authenticated
+  // caller resolved from the token (contact{sub,iss}); no sender is exposed.
+  string thread_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+
+  // How long clients should keep the indicator visible, in milliseconds.
+  // Optional; the server defaults it (typically 6000) and clamps it to 30000.
+  optional int32 timeout_ms = 2 [(buf.validate.field).int32 = {
+    gte: 0
+    lte: 30000
+  }];
+
+  // Optional live draft of the message being typed (Live Typing Preview),
+  // forwarded only to authorized recipients when the preview feature is enabled.
+  // Max 1024 bytes; an empty value clears a previously shown preview.
+  optional string preview_text = 3 [(buf.validate.field).string.max_bytes = 1024];
+}
+
+message SendTypingResponse {}

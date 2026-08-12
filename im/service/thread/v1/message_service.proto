@@ -59,14 +59,16 @@ service Message {
   // and never forwarded to an external messenger.
   rpc SendInternalNote(SendInternalNoteRequest) returns (SendMessageResponse);
 
-  // Sets or clears the caller's emoji reaction on a single message.
+  // Sets, replaces or clears the caller's emoji reaction on a single message.
   //
-  // A member may hold at most one reaction per message: a new emoji replaces
-  // the previous one, sending the same emoji again clears it (toggle), and an
-  // empty emoji clears it explicitly. The call is idempotent (send_id) and
-  // serves both webitel participants and inbound reactions relayed from an
-  // external messenger. Whether a reaction is forwarded to the far side
-  // depends on the messenger's capabilities.
+  // A member holds at most one reaction per message. The call is declarative:
+  // a different emoji replaces the previous one, an empty emoji clears it, and
+  // the same emoji is a no-op (to toggle off, the client sends an empty emoji).
+  // It is therefore idempotent by construction — an at-least-once redelivery
+  // converges to the same state, so send_id is a pure echo, not a dedup key.
+  // Serves both webitel participants and inbound reactions relayed from an
+  // external messenger; whether a reaction is forwarded to the far side depends
+  // on the messenger's capabilities.
   rpc SetReaction(SetReactionRequest) returns (SetReactionResponse);
 
   // Sends an ephemeral typing indicator to the other participants of a thread.
@@ -751,7 +753,8 @@ message SetReactionRequest {
   // Optional target thread; resolved from the message when omitted.
   optional string thread_id = 5 [(buf.validate.field).string.uuid = true];
 
-  // Optional client-generated id for deduplication.
+  // Optional opaque client echo token, returned verbatim on the reaction event
+  // so an optimistic UI can reconcile. Not used for deduplication or ordering.
   string send_id = 20;
 
   // Optional external message id for reactions relayed from a messenger.
