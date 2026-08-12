@@ -26,6 +26,12 @@ service MessageHistory {
   rpc SearchLeftThreadsMessagesHistory(SearchLeftThreadsMessageHistoryRequest) returns (SearchMessageHistoryResponse) {
     option (google.api.http) = {get: "/v1/threads/{thread_id}/left_threads/messages"};
   }
+
+  // Returns the edit and deletion history of a single message, oldest first.
+  // Readable by every member of the thread the message belongs to.
+  rpc GetMessageRevisions(GetMessageRevisionsRequest) returns (GetMessageRevisionsResponse) {
+    option (google.api.http) = {get: "/v1/messages/{message_id}/revisions"};
+  }
 }
 
 // HistoryMessageCursorResponse defines next/prev id for keyset-pagination.
@@ -291,6 +297,60 @@ message HistoryMessage {
   // Set when this message is a forward. Never populated for a deleted
   // message: the tombstone must not leak the origin name.
   ForwardOrigin forward_origin = 21;
+
+  // Contact id of the member who deleted the message; empty when it is live.
+  string deleted_by = 22;
+
+  // Number of entries in the message's change history. Zero means the message
+  // was never edited or deleted; otherwise GetMessageRevisions returns that
+  // many entries.
+  int32 revision_count = 23;
+}
+
+// What happened to a message at one point of its history.
+enum MessageRevisionAction {
+  MESSAGE_REVISION_ACTION_UNSPECIFIED = 0;
+
+  // The message as it was originally sent.
+  MESSAGE_REVISION_ACTION_CREATED = 1;
+
+  // The body was replaced by an edit.
+  MESSAGE_REVISION_ACTION_EDITED = 2;
+
+  // The message was deleted.
+  MESSAGE_REVISION_ACTION_DELETED = 3;
+}
+
+// One entry of a message's change history: what the message read at that
+// point, who changed it and when.
+message MessageRevision {
+  // Position in the history, starting at 1 for the original message.
+  int32 version = 1;
+
+  MessageRevisionAction action = 2;
+
+  // Body the message carried after this change. For DELETED it is the text
+  // the message still carried when it was removed, so the conversation can be
+  // reconstructed even though the timeline only shows a tombstone.
+  string body = 3;
+
+  // Contact id of the member who made the change.
+  string changed_by = 4;
+
+  // Unix time in milliseconds when the change was made.
+  int64 changed_at = 5;
+}
+
+message GetMessageRevisionsRequest {
+  string message_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+}
+
+message GetMessageRevisionsResponse {
+  // Oldest first. Empty when the message was never edited or deleted.
+  repeated MessageRevision items = 1;
 }
 
 message InteractiveCallback {
