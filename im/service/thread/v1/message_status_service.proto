@@ -35,8 +35,10 @@ message DeliveryReceipt {
     (buf.validate.field).string.uuid = true
   ];
 
+  // Per-message delivery, used by the provider/bot path. Mutually exclusive
+  // with up_to_message_id — exactly one is set (enforced in the service).
   string message_id = 2 [
-    (buf.validate.field).required = true,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
     (buf.validate.field).string.uuid = true
   ];
 
@@ -54,6 +56,18 @@ message DeliveryReceipt {
   string via = 5;
 
   int32 domain_id = 6;
+
+  // Legacy delivered-up-to by message id. Superseded by up_to_seq; optional.
+  string up_to_message_id = 7 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.uuid = true
+  ];
+
+  // Delivered up to this per-thread sequence (inclusive): advances the member's
+  // delivered horizon (thread_dialog.last_delivered_seq) monotonically. The
+  // watermark unit for ws/push; provider/bot per-message receipts set message_id
+  // instead and the store resolves their seq.
+  int64 up_to_seq = 8;
 }
 
 message MarkDeliveredRequest {
@@ -76,10 +90,10 @@ message ReadReceipt {
     (buf.validate.field).string.uuid = true
   ];
 
-  // Read up to this message id (inclusive): all earlier unread messages
-  // of the recipient in the thread are marked as read too.
+  // Legacy read-up-to by message id. Superseded by up_to_seq; kept optional for
+  // transition. Prefer up_to_seq.
   string up_to_message_id = 3 [
-    (buf.validate.field).required = true,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
     (buf.validate.field).string.uuid = true
   ];
 
@@ -90,6 +104,11 @@ message ReadReceipt {
   string via = 5;
 
   int32 domain_id = 6;
+
+  // Read up to this per-thread sequence (inclusive): all earlier unread
+  // messages of the recipient in the thread are marked read too. This is the
+  // watermark the frontend advances; a small ordered integer per thread.
+  int64 up_to_seq = 7;
 }
 
 message MarkReadRequest {

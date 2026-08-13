@@ -12,12 +12,17 @@ option go_package = "github.com/webitel/im-delivery-service/gen/api/v1;impb";
 
 // StreamRequest defines the subscription parameters for the event stream.
 message StreamRequest {
+  // Cursor for stream resumption after reconnect: the id of the last event the
+  // client durably processed. On connect the server replays pending unread
+  // (with fresh envelope ids) when this is stale or absent, so the delivered
+  // watermark self-heals past the 24h envelope-ref TTL. Empty on a fresh stream.
+  string last_event_id = 1;
+
   /*
    * Reserved for future implementation:
    * 1. repeated EventType allowed_events - Filter for specific event types (MESSAGE, ACK, etc.)
    * 2. PingSettings ping                 - Custom heartbeat intervals.
    * 3. int32 max_in_flight               - Flow control (backpressure) limit.
-   * 4. string last_event_id              - Support for stream resumption after reconnect.
    */
 }
 
@@ -112,8 +117,8 @@ message TypingEvent {
   // Thread the indicator belongs to.
   string thread_id = 1;
 
-  // Participant who is typing.
-  string member_id = 2;
+  // Participant who is typing (DEPRECATED: use member.user_id instead).
+  string member_id = 2 [deprecated = true];
 
   // How long to keep the indicator visible, in milliseconds.
   int32 timeout_ms = 3;
@@ -126,6 +131,10 @@ message TypingEvent {
   // other session. Clients MUST NOT log or persist it. The allow-list itself is
   // a server-only concept and is never sent to clients.
   optional string preview_text = 4;
+
+  // Participant who is typing, carrying id and identity (name, etc.).
+  // Mirrors the sender structure of NewMessageEvent for consistent client rendering.
+  Peer member = 5;
 }
 
 // MessageDeletedEvent notifies thread participants that a message was deleted
@@ -192,6 +201,15 @@ message MessageStatusEvent {
 
   // Unix time in milliseconds when the status changed.
   int64 occurred_at = 7;
+
+  // Read/delivered-up-to watermark: the highest message id covered by this
+  // status change. A client advances its local peer-horizon in O(1) from this
+  // instead of iterating message_ids (which stays populated for older clients).
+  string up_to_message_id = 8;
+
+  // Same watermark expressed as the per-thread seq (preferred): the client
+  // advances its local peer-horizon to this integer.
+  int64 up_to_seq = 9;
 }
 
 //------------------------------------------------------------------------------
