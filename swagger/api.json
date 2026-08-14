@@ -17177,6 +17177,7 @@
               "default": "id"
             },
             "collectionFormat": "multi",
+            "x-example": "!updated_at,tag",
             "description": "Sort result dataset of records by fields.\n```\nsort ::= *( ORDER name )\n\nORDER  = ASC / DESC\nDESC   = \"-\" / \"!\"\nASC    = [ \"+\" ]   ; Default\n```\n\nFields available\n\n- `id`(seq)\n- `domain`{name}\n- `created_at`\n- `created_by`{name}\n- `updated_at`\n- `updated_by`{name}\n\nUse ?fields=`field.sort()` option to sort Edge fields.",
             "name": "sort",
             "in": "query"
@@ -17189,6 +17190,7 @@
               "default": "*"
             },
             "collectionFormat": "multi",
+            "x-example": "*,labels.size(3).sort(!updated_at){updated_at,label}",
             "description": "Fields [Q]uery to build result dataset record.\n```\nfields ::= field [ *( \",\" field ) ]\nfield  ::= name [ *( func ) ] [ inner ]\ninner  ::= \"{\" fields \"}\"\nfuncs  ::= *( func )\nfunc   ::= \".\" name \"(\" [ args ] \")\"\nname   ::= ALPHA / DIGIT / USCORE\n\nALPHA    = %x41-5A / %x61-7A  ; \"A\"-\"Z\" / \"a\"-\"z\"\nDIGIT    = %x30-39            ; \"0\"-\"9\"\nUSCORE   = %x5F ; underscore  ; \"_\"\n```",
             "name": "fields",
             "in": "query"
@@ -19344,6 +19346,7 @@
             "required": true
           },
           {
+            "pattern": "^\\.+$",
             "type": "string",
             "description": "Unique ID to remove.",
             "name": "etag",
@@ -19831,6 +19834,7 @@
             "required": true
           },
           {
+            "pattern": "^\\.+$",
             "type": "string",
             "description": "Unique ID to remove.",
             "name": "etag",
@@ -21126,6 +21130,7 @@
             "required": true
           },
           {
+            "pattern": "^\\.+$",
             "type": "string",
             "description": "Unique ID to remove.",
             "name": "etag",
@@ -22376,6 +22381,54 @@
         }
       }
     },
+    "/contacts/{contact_id}/timeline/{type}/{id}/info": {
+      "get": {
+        "tags": [
+          "Timeline"
+        ],
+        "summary": "Show info: variables + postprocessing results, saved for a single\ntimeline communication (call | chat | email), fetched on-demand.",
+        "operationId": "GetTimelineItemInfo",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "enum": [
+              "chat",
+              "call",
+              "email"
+            ],
+            "type": "string",
+            "name": "type",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/contactsGetTimelineItemInfoResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        }
+      }
+    },
     "/contacts/{contact_id}/timezones": {
       "get": {
         "tags": [
@@ -22753,6 +22806,7 @@
             "required": true
           },
           {
+            "pattern": "^\\.+$",
             "type": "string",
             "description": "Unique ID to remove.",
             "name": "etag",
@@ -23192,6 +23246,7 @@
             "required": true
           },
           {
+            "pattern": "^\\w+$",
             "type": "string",
             "description": "Unique ID to remove.",
             "name": "etag",
@@ -23368,6 +23423,7 @@
         "operationId": "DeleteContact",
         "parameters": [
           {
+            "pattern": "^\\w+$",
             "type": "string",
             "description": "Unique ID of the latest version of a resource.",
             "name": "etag",
@@ -24670,6 +24726,7 @@
               "default": "*"
             },
             "collectionFormat": "multi",
+            "x-example": "!updated_at,tag",
             "description": "Sort result dataset of records by fields.\n```\nsort ::= *( ORDER name )\n\nORDER  = ASC / DESC\nDESC   = \"-\" / \"!\"\nASC    = [ \"+\" ]   ; Default\n```\n\nFields available\n\n- `id`(seq)\n- `domain`{name}\n- `created_at`\n- `created_by`{name}\n- `updated_at`\n- `updated_by`{name}\n\nUse ?fields=`field.sort()` option to sort Edge fields.",
             "name": "sort",
             "in": "query"
@@ -24682,6 +24739,7 @@
               "default": "*"
             },
             "collectionFormat": "multi",
+            "x-example": "*,labels.size(3).sort(!updated_at){updated_at,label}",
             "description": "Fields [Q]uery to build result dataset record.\n```\nfields ::= field [ *( \",\" field ) ]\nfield  ::= name [ *( func ) ] [ inner ]\ninner  ::= \"{\" fields \"}\"\nfuncs  ::= *( func )\nfunc   ::= \".\" name \"(\" [ args ] \")\"\nname   ::= ALPHA / DIGIT / USCORE\n\nALPHA    = %x41-5A / %x61-7A  ; \"A\"-\"Z\" / \"a\"-\"z\"\nDIGIT    = %x30-39            ; \"0\"-\"9\"\nUSCORE   = %x5F ; underscore  ; \"_\"\n```",
             "name": "fields",
             "in": "query"
@@ -24927,6 +24985,7 @@
               "default": "*"
             },
             "collectionFormat": "multi",
+            "x-example": "*,labels.size(3).sort(!updated_at){updated_at,label}",
             "description": "Fields [Q]uery to build result dataset record.\n```\nfields ::= field [ *( \",\" field ) ]\nfield  ::= name [ *( func ) ] [ inner ]\ninner  ::= \"{\" fields \"}\"\nfuncs  ::= *( func )\nfunc   ::= \".\" name \"(\" [ args ] \")\"\nname   ::= ALPHA / DIGIT / USCORE\n\nALPHA    = %x41-5A / %x61-7A  ; \"A\"-\"Z\" / \"a\"-\"z\"\nDIGIT    = %x30-39            ; \"0\"-\"9\"\nUSCORE   = %x5F ; underscore  ; \"_\"\n```",
             "name": "fields",
             "in": "query"
@@ -34190,6 +34249,7 @@
               "default": "id"
             },
             "collectionFormat": "multi",
+            "x-example": "!updated_at,tag",
             "description": "Sort result dataset of records by fields.\n```\nsort ::= *( ORDER name )\n\nORDER  = ASC / DESC\nDESC   = \"-\" / \"!\"\nASC    = [ \"+\" ]   ; Default\n```\n\nFields available\n\n- `id`(seq)\n- `domain`{name}\n- `state`",
             "name": "sort",
             "in": "query"
@@ -34202,6 +34262,7 @@
               "default": "*"
             },
             "collectionFormat": "multi",
+            "x-example": "*,labels.size(3).sort(!updated_at){updated_at,label}",
             "name": "fields",
             "in": "query"
           },
@@ -34434,6 +34495,7 @@
         "operationId": "DeleteSpace_Spaces",
         "parameters": [
           {
+            "pattern": "^\\w+$",
             "type": "string",
             "description": "Unique ID of the latest version of a resource.",
             "name": "etag",
@@ -35002,6 +35064,7 @@
             "required": true
           },
           {
+            "pattern": "^\\.+$",
             "type": "string",
             "description": "Unique ID to remove.",
             "name": "etag",
@@ -37898,6 +37961,7 @@
               "default": "*"
             },
             "collectionFormat": "multi",
+            "x-example": "!updated_at,tag",
             "description": "Sort result dataset of records by fields.\n```\nsort ::= *( ORDER name )\n\nORDER  = ASC / DESC\nDESC   = \"-\" / \"!\"\nASC    = [ \"+\" ]   ; Default\n```\n\nFields available\n\n- `id`(seq)\n- `domain`{name}\n- `created_at`\n- `created_by`{name}\n- `updated_at`\n- `updated_by`{name}\n\nUse ?fields=`field.sort()` option to sort Edge fields.",
             "name": "sort",
             "in": "query"
@@ -37910,6 +37974,7 @@
               "default": "*"
             },
             "collectionFormat": "multi",
+            "x-example": "*,labels.size(3).sort(!updated_at){updated_at,label}",
             "description": "Fields [Q]uery to build result dataset record.\n```\nfields ::= field [ *( \",\" field ) ]\nfield  ::= name [ *( func ) ] [ inner ]\ninner  ::= \"{\" fields \"}\"\nfuncs  ::= *( func )\nfunc   ::= \".\" name \"(\" [ args ] \")\"\nname   ::= ALPHA / DIGIT / USCORE\n\nALPHA    = %x41-5A / %x61-7A  ; \"A\"-\"Z\" / \"a\"-\"z\"\nDIGIT    = %x30-39            ; \"0\"-\"9\"\nUSCORE   = %x5F ; underscore  ; \"_\"\n```",
             "name": "fields",
             "in": "query"
@@ -38022,6 +38087,7 @@
               "default": "*"
             },
             "collectionFormat": "multi",
+            "x-example": "!updated_at,tag",
             "description": "Sort result dataset of records by fields.\n```\nsort ::= *( ORDER name )\n\nORDER  = ASC / DESC\nDESC   = \"-\" / \"!\"\nASC    = [ \"+\" ]   ; Default\n```\n\nFields available\n\n- `id`(seq)\n- `domain`{name}\n- `created_at`\n- `created_by`{name}\n- `updated_at`\n- `updated_by`{name}\n\nUse ?fields=`field.sort()` option to sort Edge fields.",
             "name": "sort",
             "in": "query"
@@ -38034,6 +38100,7 @@
               "default": "*"
             },
             "collectionFormat": "multi",
+            "x-example": "*,labels.size(3).sort(!updated_at){updated_at,label}",
             "description": "Fields [Q]uery to build result dataset record.\n```\nfields ::= field [ *( \",\" field ) ]\nfield  ::= name [ *( func ) ] [ inner ]\ninner  ::= \"{\" fields \"}\"\nfuncs  ::= *( func )\nfunc   ::= \".\" name \"(\" [ args ] \")\"\nname   ::= ALPHA / DIGIT / USCORE\n\nALPHA    = %x41-5A / %x61-7A  ; \"A\"-\"Z\" / \"a\"-\"z\"\nDIGIT    = %x30-39            ; \"0\"-\"9\"\nUSCORE   = %x5F ; underscore  ; \"_\"\n```",
             "name": "fields",
             "in": "query"
@@ -38255,6 +38322,7 @@
               "default": "*"
             },
             "collectionFormat": "multi",
+            "x-example": "!updated_at,tag",
             "description": "Sort result dataset of records by fields.\n```\nsort ::= *( ORDER name )\n\nORDER  = ASC / DESC\nDESC   = \"-\" / \"!\"\nASC    = [ \"+\" ]   ; Default\n```\n\nFields available\n\n- `id`(seq)\n- `domain`{name}\n- `created_at`\n- `created_by`{name}\n- `updated_at`\n- `updated_by`{name}\n\nUse ?fields=`field.sort()` option to sort Edge fields.",
             "name": "sort",
             "in": "query"
@@ -38267,6 +38335,7 @@
               "default": "*"
             },
             "collectionFormat": "multi",
+            "x-example": "*,labels.size(3).sort(!updated_at){updated_at,label}",
             "description": "Fields [Q]uery to build result dataset record.\n```\nfields ::= field [ *( \",\" field ) ]\nfield  ::= name [ *( func ) ] [ inner ]\ninner  ::= \"{\" fields \"}\"\nfuncs  ::= *( func )\nfunc   ::= \".\" name \"(\" [ args ] \")\"\nname   ::= ALPHA / DIGIT / USCORE\n\nALPHA    = %x41-5A / %x61-7A  ; \"A\"-\"Z\" / \"a\"-\"z\"\nDIGIT    = %x30-39            ; \"0\"-\"9\"\nUSCORE   = %x5F ; underscore  ; \"_\"\n```",
             "name": "fields",
             "in": "query"
@@ -43388,6 +43457,7 @@
               "default": "*"
             },
             "collectionFormat": "multi",
+            "x-example": "!updated_at,tag",
             "description": "Sort result dataset of records by fields.\n```\nsort ::= *( ORDER name )\n\nORDER  = ASC / DESC\nDESC   = \"-\" / \"!\"\nASC    = [ \"+\" ]   ; Default\n```\n\nFields available\n\n- `id`(seq)\n- `domain`{name}\n- `created_at`\n- `created_by`{name}\n- `updated_at`\n- `updated_by`{name}\n\nUse ?fields=`field.sort()` option to sort Edge fields.",
             "name": "sort",
             "in": "query"
@@ -43400,6 +43470,7 @@
               "default": "*"
             },
             "collectionFormat": "multi",
+            "x-example": "*,labels.size(3).sort(!updated_at){updated_at,label}",
             "description": "Fields [Q]uery to build result dataset record.\n```\nfields ::= field [ *( \",\" field ) ]\nfield  ::= name [ *( func ) ] [ inner ]\ninner  ::= \"{\" fields \"}\"\nfuncs  ::= *( func )\nfunc   ::= \".\" name \"(\" [ args ] \")\"\nname   ::= ALPHA / DIGIT / USCORE\n\nALPHA    = %x41-5A / %x61-7A  ; \"A\"-\"Z\" / \"a\"-\"z\"\nDIGIT    = %x30-39            ; \"0\"-\"9\"\nUSCORE   = %x5F ; underscore  ; \"_\"\n```",
             "name": "fields",
             "in": "query"
@@ -43565,6 +43636,7 @@
               "default": "*"
             },
             "collectionFormat": "multi",
+            "x-example": "*,labels.size(3).sort(!updated_at){updated_at,label}",
             "description": "Fields [Q]uery to build result dataset record.\n```\nfields ::= field [ *( \",\" field ) ]\nfield  ::= name [ *( func ) ] [ inner ]\ninner  ::= \"{\" fields \"}\"\nfuncs  ::= *( func )\nfunc   ::= \".\" name \"(\" [ args ] \")\"\nname   ::= ALPHA / DIGIT / USCORE\n\nALPHA    = %x41-5A / %x61-7A  ; \"A\"-\"Z\" / \"a\"-\"z\"\nDIGIT    = %x30-39            ; \"0\"-\"9\"\nUSCORE   = %x5F ; underscore  ; \"_\"\n```",
             "name": "fields",
             "in": "query"
@@ -45598,10 +45670,6 @@
             "type": "object",
             "$ref": "#/definitions/apiGrantAccessRequestV1"
           }
-        },
-        "object": {
-          "type": "object",
-          "title": "[ON] objclass (either: by entity .id -or- class .name)"
         }
       }
     },
@@ -49109,8 +49177,8 @@
       }
     },
     "contactsAccessMode": {
+      "description": "- READ: Can `fetch` record. [GET]\n - WRITE: Can `update` record. [PUT|PATCH]\n - DELETE: Can `delete` record. [DELETE]",
       "type": "string",
-      "title": "- READ: Can `fetch` record. [GET]\n - WRITE: Can `update` record. [PUT|PATCH]\n - DELETE: Can `delete` record. [DELETE]",
       "default": "READ",
       "enum": [
         "READ",
@@ -49979,6 +50047,25 @@
         "emails_count": {
           "type": "string",
           "format": "int64"
+        }
+      }
+    },
+    "contactsGetTimelineItemInfoResponse": {
+      "type": "object",
+      "properties": {
+        "postprocessing": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/contactsTimelinePostprocessingResult"
+          }
+        },
+        "variables": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/contactsTimelineVariable"
+          }
         }
       }
     },
@@ -51199,6 +51286,32 @@
         "call",
         "email"
       ]
+    },
+    "contactsTimelinePostprocessingResult": {
+      "type": "object",
+      "properties": {
+        "agent": {
+          "$ref": "#/definitions/webitelContactsLookup"
+        },
+        "form": {
+          "title": "postprocessing form answers, saved by the agent"
+        },
+        "reporting_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "contactsTimelineVariable": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
     },
     "contactsTimezone": {
       "description": "A Contact's timezone preference.",
@@ -76521,6 +76634,7 @@
       "name": "Customers"
     },
     {
+      "description": "Permissions service repository",
       "name": "Permissions"
     },
     {
@@ -76536,9 +76650,11 @@
       "name": "AccessStore"
     },
     {
+      "description": "OAuth 2.0 authorization service",
       "name": "OAuth2"
     },
     {
+      "description": "[A]uthorization service",
       "name": "SA"
     },
     {
@@ -76557,78 +76673,100 @@
       "name": "Classes"
     },
     {
+      "description": "Contact comments service catalog.",
       "name": "Comments"
     },
     {
+      "description": "Labels service catalog.",
       "name": "Labels"
     },
     {
+      "description": "Contact email adresses service catalog.",
       "name": "Emails"
     },
     {
       "name": "Upload"
     },
     {
+      "description": "Photos service catalog.",
       "name": "Photos"
     },
     {
+      "description": "Contact Emails service catalog.",
       "name": "Phones"
     },
     {
+      "description": "Contact Managers service catalog.",
       "name": "Managers"
     },
     {
+      "description": "Variables service catalog.",
       "name": "Variables"
     },
     {
+      "description": "Timezones service catalogs.",
       "name": "Timezones"
     },
     {
+      "description": "[I]nstant[M]essaging Clients service catalog.",
       "name": "IMClients"
     },
     {
+      "description": "Service for managing contact groups.",
       "name": "ContactGroups"
     },
     {
+      "description": "Contacts service catalog.",
       "name": "Contacts"
     },
     {
+      "description": "Service for managing conditions.",
       "name": "DynamicConditions"
     },
     {
+      "description": "Service for managing dynamic groups.",
       "name": "DynamicGroups"
     },
     {
+      "description": "Service for managing groups.",
       "name": "Groups"
     },
     {
+      "description": "Languages service catalog.",
       "name": "Languages"
     },
     {
       "name": "Timeline"
     },
     {
+      "description": "Records service",
       "name": "Records"
     },
     {
+      "description": "Types service registry.",
       "name": "Types"
     },
     {
+      "description": "Dictionaries service.",
       "name": "Dictionaries"
     },
     {
+      "description": "Extensions service.",
       "name": "Extensions"
     },
     {
       "name": "Domains"
     },
     {
+      "description": "Articles service catalogs.",
       "name": "KnowledgebaseSearch"
     },
     {
+      "description": "LDAP repository",
       "name": "LDAP"
     },
     {
+      "description": "OAuth 2.0 service federation",
       "name": "OAuth2Federation"
     },
     {
