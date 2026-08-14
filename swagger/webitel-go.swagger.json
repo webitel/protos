@@ -20,7 +20,8 @@
       "name": "Customers"
     },
     {
-      "name": "Permissions"
+      "name": "Permissions",
+      "description": "Permissions service repository"
     },
     {
       "name": "Users"
@@ -35,10 +36,12 @@
       "name": "AccessStore"
     },
     {
-      "name": "OAuth2"
+      "name": "OAuth2",
+      "description": "OAuth 2.0 authorization service"
     },
     {
-      "name": "SA"
+      "name": "SA",
+      "description": "[A]uthorization service"
     },
     {
       "name": "Auth"
@@ -56,76 +59,97 @@
       "name": "Classes"
     },
     {
-      "name": "Comments"
+      "name": "Comments",
+      "description": "Contact comments service catalog."
     },
     {
-      "name": "Labels"
+      "name": "Labels",
+      "description": "Labels service catalog."
     },
     {
-      "name": "Emails"
+      "name": "Emails",
+      "description": "Contact email adresses service catalog."
     },
     {
       "name": "Upload"
     },
     {
-      "name": "Photos"
+      "name": "Photos",
+      "description": "Photos service catalog."
     },
     {
-      "name": "Phones"
+      "name": "Phones",
+      "description": "Contact Emails service catalog."
     },
     {
-      "name": "Managers"
+      "name": "Managers",
+      "description": "Contact Managers service catalog."
     },
     {
-      "name": "Variables"
+      "name": "Variables",
+      "description": "Variables service catalog."
     },
     {
-      "name": "Timezones"
+      "name": "Timezones",
+      "description": "Timezones service catalogs."
     },
     {
-      "name": "IMClients"
+      "name": "IMClients",
+      "description": "[I]nstant[M]essaging Clients service catalog."
     },
     {
-      "name": "ContactGroups"
+      "name": "ContactGroups",
+      "description": "Service for managing contact groups."
     },
     {
-      "name": "Contacts"
+      "name": "Contacts",
+      "description": "Contacts service catalog."
     },
     {
-      "name": "DynamicConditions"
+      "name": "DynamicConditions",
+      "description": "Service for managing conditions."
     },
     {
-      "name": "DynamicGroups"
+      "name": "DynamicGroups",
+      "description": "Service for managing dynamic groups."
     },
     {
-      "name": "Groups"
+      "name": "Groups",
+      "description": "Service for managing groups."
     },
     {
-      "name": "Languages"
+      "name": "Languages",
+      "description": "Languages service catalog."
     },
     {
       "name": "Timeline"
     },
     {
-      "name": "Records"
+      "name": "Records",
+      "description": "Records service"
     },
     {
-      "name": "Types"
+      "name": "Types",
+      "description": "Types service registry."
     },
     {
-      "name": "Dictionaries"
+      "name": "Dictionaries",
+      "description": "Dictionaries service."
     },
     {
-      "name": "Extensions"
+      "name": "Extensions",
+      "description": "Extensions service."
     },
     {
       "name": "Domains"
     },
     {
-      "name": "Articles"
+      "name": "Articles",
+      "description": "Articles service catalogs."
     },
     {
-      "name": "KnowledgebaseSearch"
+      "name": "KnowledgebaseSearch",
+      "description": "Articles service catalogs."
     },
     {
       "name": "Spaces"
@@ -134,10 +158,12 @@
       "name": "Tags"
     },
     {
-      "name": "LDAP"
+      "name": "LDAP",
+      "description": "LDAP repository"
     },
     {
-      "name": "OAuth2Federation"
+      "name": "OAuth2Federation",
+      "description": "OAuth 2.0 service federation"
     },
     {
       "name": "TwoFactorAuthentication"
@@ -392,7 +418,8 @@
               "default": "id",
               "pattern": "^[+|-|!]?\\w+$"
             },
-            "collectionFormat": "multi"
+            "collectionFormat": "multi",
+            "x-example": "!updated_at,tag"
           },
           {
             "name": "fields",
@@ -405,7 +432,8 @@
               "type": "string",
               "default": "*"
             },
-            "collectionFormat": "multi"
+            "collectionFormat": "multi",
+            "x-example": "*,labels.size(3).sort(!updated_at){updated_at,label}"
           },
           {
             "name": "id",
@@ -2287,7 +2315,8 @@
             "description": "Unique ID to remove.",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "pattern": "^\\.+$"
           },
           {
             "name": "fields",
@@ -2811,7 +2840,8 @@
             "description": "Unique ID to remove.",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "pattern": "^\\.+$"
           },
           {
             "name": "fields",
@@ -4140,7 +4170,8 @@
             "description": "Unique ID to remove.",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "pattern": "^\\.+$"
           },
           {
             "name": "fields",
@@ -5493,6 +5524,54 @@
         ]
       }
     },
+    "/contacts/{contact_id}/timeline/{type}/{id}/info": {
+      "get": {
+        "summary": "Show info: variables + postprocessing results, saved for a single\ntimeline communication (call | chat | email), fetched on-demand.",
+        "operationId": "GetTimelineItemInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/contactsGetTimelineItemInfoResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contact_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "chat",
+              "call",
+              "email"
+            ]
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Timeline"
+        ]
+      }
+    },
     "/contacts/{contact_id}/timezones": {
       "get": {
         "summary": "List of the Contact's timezone(s).",
@@ -5829,7 +5908,8 @@
             "description": "Unique ID to remove.",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "pattern": "^\\.+$"
           },
           {
             "name": "fields",
@@ -6265,7 +6345,8 @@
             "description": "Unique ID to remove.",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "pattern": "^\\w+$"
           },
           {
             "name": "fields",
@@ -6528,7 +6609,8 @@
             "description": "Unique ID of the latest version of a resource.",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "pattern": "^\\w+$"
           },
           {
             "name": "fields",
@@ -7893,7 +7975,8 @@
               "default": "*",
               "pattern": "^[+|-|!]?\\w+$"
             },
-            "collectionFormat": "multi"
+            "collectionFormat": "multi",
+            "x-example": "!updated_at,tag"
           },
           {
             "name": "fields",
@@ -7906,7 +7989,8 @@
               "type": "string",
               "default": "*"
             },
-            "collectionFormat": "multi"
+            "collectionFormat": "multi",
+            "x-example": "*,labels.size(3).sort(!updated_at){updated_at,label}"
           },
           {
             "name": "q",
@@ -8156,7 +8240,8 @@
               "type": "string",
               "default": "*"
             },
-            "collectionFormat": "multi"
+            "collectionFormat": "multi",
+            "x-example": "*,labels.size(3).sort(!updated_at){updated_at,label}"
           }
         ],
         "tags": [
@@ -11847,7 +11932,8 @@
               "default": "id",
               "pattern": "^[+|-|!]?\\w+$"
             },
-            "collectionFormat": "multi"
+            "collectionFormat": "multi",
+            "x-example": "!updated_at,tag"
           },
           {
             "name": "fields",
@@ -11859,7 +11945,8 @@
               "type": "string",
               "default": "*"
             },
-            "collectionFormat": "multi"
+            "collectionFormat": "multi",
+            "x-example": "*,labels.size(3).sort(!updated_at){updated_at,label}"
           },
           {
             "name": "id",
@@ -12105,7 +12192,8 @@
             "description": "Unique ID of the latest version of a resource.",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "pattern": "^\\w+$"
           },
           {
             "name": "fields",
@@ -12698,7 +12786,8 @@
             "description": "Unique ID to remove.",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "pattern": "^\\.+$"
           },
           {
             "name": "fields",
@@ -12949,7 +13038,8 @@
               "default": "*",
               "pattern": "^[+|-|!]?\\w+$"
             },
-            "collectionFormat": "multi"
+            "collectionFormat": "multi",
+            "x-example": "!updated_at,tag"
           },
           {
             "name": "fields",
@@ -12962,7 +13052,8 @@
               "type": "string",
               "default": "*"
             },
-            "collectionFormat": "multi"
+            "collectionFormat": "multi",
+            "x-example": "*,labels.size(3).sort(!updated_at){updated_at,label}"
           }
         ],
         "tags": [
@@ -13087,7 +13178,8 @@
               "default": "*",
               "pattern": "^[+|-|!]?\\w+$"
             },
-            "collectionFormat": "multi"
+            "collectionFormat": "multi",
+            "x-example": "!updated_at,tag"
           },
           {
             "name": "fields",
@@ -13100,7 +13192,8 @@
               "type": "string",
               "default": "*"
             },
-            "collectionFormat": "multi"
+            "collectionFormat": "multi",
+            "x-example": "*,labels.size(3).sort(!updated_at){updated_at,label}"
           }
         ],
         "tags": [
@@ -13326,7 +13419,8 @@
               "default": "*",
               "pattern": "^[+|-|!]?\\w+$"
             },
-            "collectionFormat": "multi"
+            "collectionFormat": "multi",
+            "x-example": "!updated_at,tag"
           },
           {
             "name": "fields",
@@ -13339,7 +13433,8 @@
               "type": "string",
               "default": "*"
             },
-            "collectionFormat": "multi"
+            "collectionFormat": "multi",
+            "x-example": "*,labels.size(3).sort(!updated_at){updated_at,label}"
           },
           {
             "name": "q",
@@ -15190,7 +15285,8 @@
               "default": "*",
               "pattern": "^[+|-|!]?\\w+$"
             },
-            "collectionFormat": "multi"
+            "collectionFormat": "multi",
+            "x-example": "!updated_at,tag"
           },
           {
             "name": "fields",
@@ -15203,7 +15299,8 @@
               "type": "string",
               "default": "*"
             },
-            "collectionFormat": "multi"
+            "collectionFormat": "multi",
+            "x-example": "*,labels.size(3).sort(!updated_at){updated_at,label}"
           },
           {
             "name": "q",
@@ -15373,7 +15470,8 @@
               "type": "string",
               "default": "*"
             },
-            "collectionFormat": "multi"
+            "collectionFormat": "multi",
+            "x-example": "*,labels.size(3).sort(!updated_at){updated_at,label}"
           }
         ],
         "tags": [
@@ -15671,10 +15769,6 @@
     "AccessStoreToggleDefaultAccessBody": {
       "type": "object",
       "properties": {
-        "object": {
-          "type": "object",
-          "title": "[ON] objclass (either: by entity .id -or- class .name)"
-        },
         "list": {
           "type": "array",
           "items": {
@@ -19180,7 +19274,7 @@
         "DELETE"
       ],
       "default": "READ",
-      "title": "- READ: Can `fetch` record. [GET]\n - WRITE: Can `update` record. [PUT|PATCH]\n - DELETE: Can `delete` record. [DELETE]"
+      "description": "- READ: Can `fetch` record. [GET]\n - WRITE: Can `update` record. [PUT|PATCH]\n - DELETE: Can `delete` record. [DELETE]"
     },
     "contactsAddContactsToGroupRequest": {
       "type": "object",
@@ -20043,6 +20137,25 @@
         "emails_count": {
           "type": "string",
           "format": "int64"
+        }
+      }
+    },
+    "contactsGetTimelineItemInfoResponse": {
+      "type": "object",
+      "properties": {
+        "variables": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/contactsTimelineVariable"
+          }
+        },
+        "postprocessing": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/contactsTimelinePostprocessingResult"
+          }
         }
       }
     },
@@ -21263,6 +21376,32 @@
         "email"
       ],
       "default": "chat"
+    },
+    "contactsTimelinePostprocessingResult": {
+      "type": "object",
+      "properties": {
+        "agent": {
+          "$ref": "#/definitions/webitelContactsLookup"
+        },
+        "form": {
+          "title": "postprocessing form answers, saved by the agent"
+        },
+        "reporting_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "contactsTimelineVariable": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
     },
     "contactsTimezone": {
       "type": "object",

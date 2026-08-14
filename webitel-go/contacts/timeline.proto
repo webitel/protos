@@ -5,6 +5,7 @@ package webitel.contacts;
 option go_package = "webitel.go/api/contacts;contacts";
 
 import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
 import "contacts/fields.proto";
 
 service Timeline {
@@ -16,6 +17,13 @@ service Timeline {
   rpc GetTimelineCounter(GetTimelineCounterRequest) returns (GetTimelineCounterResponse) {
     option (google.api.http) = {
       get: "/contacts/{contact_id}/timeline/counter"
+    };
+  }
+  // Show info: variables + postprocessing results, saved for a single
+  // timeline communication (call | chat | email), fetched on-demand.
+  rpc GetTimelineItemInfo(GetTimelineItemInfoRequest) returns (GetTimelineItemInfoResponse) {
+    option (google.api.http) = {
+      get: "/contacts/{contact_id}/timeline/{type}/{id}/info"
     };
   }
 }
@@ -56,6 +64,28 @@ message GetTimelineCounterResponse {
   int64 chats_count = 3;
   int64 calls_count = 4;
   int64 emails_count = 5;
+}
+
+message GetTimelineItemInfoRequest {
+  string contact_id = 1;
+  TimelineEventType type = 2;
+  string id = 3;
+}
+
+message TimelineVariable {
+  string key = 1;
+  string value = 2;
+}
+
+message TimelinePostprocessingResult {
+  Lookup agent = 1;
+  google.protobuf.Value form = 2; // postprocessing form answers, saved by the agent
+  int64 reporting_at = 3;
+}
+
+message GetTimelineItemInfoResponse {
+  repeated TimelineVariable variables = 1;
+  repeated TimelinePostprocessingResult postprocessing = 2;
 }
 
 message CallEvent {
