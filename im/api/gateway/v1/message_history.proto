@@ -308,6 +308,27 @@ message HistoryMessage {
   // was never edited or deleted; otherwise GetMessageRevisions returns that
   // many entries.
   int32 revision_count = 23;
+
+  // Emoji reactions currently held on the message, aggregated per emoji.
+  repeated MessageReaction reactions = 25;
+}
+
+// MessageReaction is one emoji aggregate on a history message.
+message MessageReaction {
+  // Unicode emoji this reaction aggregates.
+  string emoji = 1;
+
+  // Number of members currently holding this reaction.
+  int32 count = 2;
+
+  // True when the requesting caller is one of the reactors.
+  bool reacted_by_me = 3;
+
+  // Capped sample of reactor contact ids (for UI); not necessarily all of them.
+  repeated string reactor_ids = 4;
+
+  // Unix time in milliseconds of the most recent reaction with this emoji.
+  int64 last_reacted_at = 5;
 }
 
 // What happened to a message at one point of its history.

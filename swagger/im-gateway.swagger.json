@@ -4673,6 +4673,14 @@
           "type": "integer",
           "format": "int32",
           "description": "Number of entries in the message's change history. Zero means the message\nwas never edited or deleted; otherwise GetMessageRevisions returns that\nmany entries."
+        },
+        "reactions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageReaction"
+          },
+          "description": "Emoji reactions currently held on the message, aggregated per emoji."
         }
       },
       "description": "HistoryMessage represents a single message\nin thread history."
@@ -5179,6 +5187,37 @@
           "type": "string"
         }
       }
+    },
+    "webitel.im.api.gateway.v1.MessageReaction": {
+      "type": "object",
+      "properties": {
+        "emoji": {
+          "type": "string",
+          "description": "Unicode emoji this reaction aggregates."
+        },
+        "count": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of members currently holding this reaction."
+        },
+        "reacted_by_me": {
+          "type": "boolean",
+          "description": "True when the requesting caller is one of the reactors."
+        },
+        "reactor_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Capped sample of reactor contact ids (for UI); not necessarily all of them."
+        },
+        "last_reacted_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Unix time in milliseconds of the most recent reaction with this emoji."
+        }
+      },
+      "description": "MessageReaction is one emoji aggregate on a history message."
     },
     "webitel.im.api.gateway.v1.MessageRecipientStatus": {
       "type": "object",

@@ -21,6 +21,47 @@ service MessageHistory {
   // Returns the edit and deletion history of a single message, oldest first.
   // Readable by every member of the thread the message belongs to.
   rpc GetMessageRevisions(GetMessageRevisionsRequest) returns (GetMessageRevisionsResponse);
+
+  // GetThreadUpdates returns the journal delta for a thread since the caller's
+  // cursor — the mutations (edits, reactions, deletions, status changes) a
+  // returning client missed while offline. When the cursor fell outside the
+  // retained window, resync=true tells the client to re-pull history instead.
+  rpc GetThreadUpdates(GetThreadUpdatesRequest) returns (GetThreadUpdatesResponse);
+}
+
+message GetThreadUpdatesRequest {
+  string thread_id = 1 [(buf.validate.field).string.uuid = true];
+
+  // Opaque journal cursor from a previous response; empty = from the oldest
+  // retained entry.
+  string cursor = 2;
+
+  // Max updates to return; the server caps this.
+  uint32 limit = 3;
+}
+
+message ThreadUpdate {
+  // Opaque cursor identifying this entry; advance the client cursor to the last
+  // one applied.
+  string cursor = 1;
+
+  // Mutation kind: message.new | message.edited | message.deleted |
+  // message.reaction | status.advanced | member.changed.
+  string kind = 2;
+
+  // Kind-specific fields (msg_id, emoji, actor, ...).
+  map<string, string> fields = 3;
+}
+
+message GetThreadUpdatesResponse {
+  repeated ThreadUpdate updates = 1;
+
+  // Cursor to resume from on the next call.
+  string cursor = 2;
+
+  // True when the caller's cursor was older than the retained window: the
+  // client must re-pull history instead of applying deltas.
+  bool resync = 3;
 }
 
 message HistoryMessageCursorResponse {
