@@ -27,6 +27,14 @@ service MessageHistory {
     option (google.api.http) = {get: "/v1/threads/{thread_id}/left_threads/messages"};
   }
 
+  // Full-text search over message bodies. Scoped to a single thread when
+  // thread_id is set, otherwise it spans every thread the caller belongs to.
+  // Each hit carries its thread_id, so a client can open that dialog and jump
+  // to the message by passing its id as the history cursor.
+  rpc SearchMessages(SearchMessagesRequest) returns (SearchMessageHistoryResponse) {
+    option (google.api.http) = {get: "/v1/messages/search"};
+  }
+
   // Returns the edit and deletion history of a single message, oldest first.
   // Readable by every member of the thread the message belongs to.
   rpc GetMessageRevisions(GetMessageRevisionsRequest) returns (GetMessageRevisionsResponse) {
@@ -52,14 +60,15 @@ message HistoryMessageCursorResponse {
 //   - The result set is always ordered consistently (e.g., by creation time).
 //   - The `before` flag controls the direction of traversal in the message history.
 //
-// Direction behavior:
-//   - before = true:
-//       Fetch messages that come *before* the given message in history
-//       (i.e., older messages).
-//
+// Direction behavior — note the flag reads inverted, because it maps onto the
+// keyset direction over an id-descending order:
 //   - before = false:
-//       Fetch messages that come *after* the given message
-//       (i.e., newer messages, moving toward the present).
+//       Fetch messages *older* than the given one, walking back into history.
+//       This is the direction a chat uses when scrolling up.
+//
+//   - before = true:
+//       Fetch messages *newer* than the given one, moving toward the present.
+//       Returns nothing when the cursor is already the newest message.
 //
 // Notes:
 //   - This approach avoids offset-based pagination issues such as skipping
@@ -75,8 +84,8 @@ message HistoryMessageCursorRequest {
 
   // Pagination direction flag.
   //
-  // true  -> fetch newer messages (back before history)
-  // false -> fetch older messages (back to older history)
+  // false -> fetch messages older than the cursor (scrolling up the chat)
+  // true  -> fetch messages newer than the cursor (moving toward the present)
   bool before = 2;
 }
 
@@ -115,6 +124,50 @@ message SearchMessageHistoryRequest {
   optional HistoryMessageCursorRequest cursor = 6;
 
   // Maximum number of messages to return.
+  uint32 size = 7 [
+    (buf.validate.field).uint32 = {
+      gte: 1
+      lte: 100
+    },
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+}
+
+// SearchMessagesRequest defines the text query, filters and pagination
+// options for searching message bodies.
+message SearchMessagesRequest {
+  // List of message fields to be returned.
+  // Used to reduce payload size.
+  repeated string fields = 1;
+
+  // Text to look for. Matched case-insensitively against any part of the
+  // message body.
+  string q = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 256
+  }];
+
+  // Narrows the search to a single dialog.
+  // Empty spans every thread the caller is a member of.
+  string thread_id = 3 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+
+  // Filter matches by sender contact IDs.
+  repeated string sender_ids = 4 [
+    (buf.validate.field).repeated.items.string.uuid = true,
+    (buf.validate.field).repeated.max_items = 50
+  ];
+
+  // Filter matches by message types.
+  repeated int32 types = 5 [(buf.validate.field).repeated.max_items = 8];
+
+  // Cursor for cursor-based pagination.
+  // If omitted, search starts from the most recent match.
+  optional HistoryMessageCursorRequest cursor = 6;
+
+  // Maximum number of matches to return.
   uint32 size = 7 [
     (buf.validate.field).uint32 = {
       gte: 1

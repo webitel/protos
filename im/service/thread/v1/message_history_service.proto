@@ -18,6 +18,10 @@ service MessageHistory {
 
   rpc SearchLeftThreadsMessageHistory(SearchLeftThreadsMessageHistoryRequest) returns (SearchMessageHistoryResponse);
 
+  // Full-text search over message bodies. Scoped to a single thread when
+  // thread_id is set, otherwise it spans every thread the caller belongs to.
+  rpc SearchMessages(SearchMessagesRequest) returns (SearchMessageHistoryResponse);
+
   // Returns the edit and deletion history of a single message, oldest first.
   // Readable by every member of the thread the message belongs to.
   rpc GetMessageRevisions(GetMessageRevisionsRequest) returns (GetMessageRevisionsResponse);
@@ -86,6 +90,49 @@ message SearchMessageHistoryRequest {
   optional HistoryMessageCursorRequest cursor = 7;
   uint32 size = 8;
   string caller_id = 9;
+}
+
+// Looks for messages whose body contains the given text. Results are ordered
+// newest first and every item carries its thread_id, so a caller can open the
+// dialog and re-enter the history at the matched message.
+message SearchMessagesRequest {
+  repeated string fields = 1;
+
+  // Text to look for. Matched case-insensitively against any part of the body.
+  string q = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 256
+  }];
+
+  // Narrows the search to a single dialog. Empty spans every thread the caller
+  // is a member of.
+  string thread_id = 3 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+
+  repeated string sender_ids = 4 [
+    (buf.validate.field).repeated.items.string.uuid = true,
+    (buf.validate.field).repeated.max_items = 50
+  ];
+
+  repeated int32 types = 5;
+
+  int32 domain_id = 6;
+
+  // Member running the search. Results never leave the threads this member
+  // belongs to, bounded by the periods of their membership.
+  string caller_id = 7 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  optional HistoryMessageCursorRequest cursor = 8;
+
+  uint32 size = 9 [
+    (buf.validate.field).uint32 = {lte: 100},
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
 }
 
 message Document {
