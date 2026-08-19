@@ -6601,6 +6601,176 @@
         }
       }
     },
+    "/call_center/queues/{queue_id}/members/export": {
+      "get": {
+        "tags": [
+          "MemberService"
+        ],
+        "summary": "Export Members of a queue as CSV or XLSX, streamed in chunks",
+        "operationId": "ExportMembers",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "queue_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "name": "id",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "collectionFormat": "multi",
+            "name": "bucket_id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "destination",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "created_at.from",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "created_at.to",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "offering_at.from",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "offering_at.to",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "stop_cause",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "priority.from",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "priority.to",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "attempts.from",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "attempts.to",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "collectionFormat": "multi",
+            "name": "agent_id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
+            "name": "variables[string]",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Export format: csv or xlsx",
+            "name": "format",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Column separator, used only when format is csv",
+            "name": "separator",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "title": "Stream result of engine.ExportMembersResponse",
+              "properties": {
+                "error": {
+                  "$ref": "#/definitions/google.rpc.Status"
+                },
+                "result": {
+                  "$ref": "#/definitions/engine.ExportMembersResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/call_center/queues/{queue_id}/members/reset": {
       "patch": {
         "tags": [
@@ -56173,6 +56343,16 @@
         },
         "working": {
           "type": "boolean"
+        }
+      }
+    },
+    "engine.ExportMembersResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "string",
+          "format": "byte",
+          "title": "File data chunk"
         }
       }
     },
