@@ -40,6 +40,11 @@ service MemberService {
   rpc SearchMemberInQueue(SearchMemberInQueueRequest) returns (ListMember) {
     option (google.api.http) = {get: "/call_center/queues/{queue_id}/members"};
   }
+
+  // Export Members of a queue as CSV or XLSX, streamed in chunks
+  rpc ExportMembers(ExportMembersRequest) returns (stream ExportMembersResponse) {
+    option (google.api.http) = {get: "/call_center/queues/{queue_id}/members/export"};
+  }
   // ReadQueueRouting
   rpc ReadMember(ReadMemberRequest) returns (MemberInQueue) {
     option (google.api.http) = {get: "/call_center/queues/{queue_id}/members/{id}"};
@@ -634,6 +639,35 @@ message SearchMemberInQueueRequest {
 message ListMember {
   bool next = 1;
   repeated MemberInQueue items = 2;
+}
+
+message ExportMembersRequest {
+  int32 queue_id = 1;
+  string q = 2;
+  repeated string fields = 3;
+
+  repeated int64 id = 4;
+  repeated int32 bucket_id = 5;
+  string destination = 6;
+
+  FilterBetween created_at = 7;
+  FilterBetween offering_at = 8;
+  repeated string stop_cause = 9;
+  FilterBetween priority = 10;
+  string name = 11;
+  FilterBetween attempts = 12;
+  repeated int32 agent_id = 13;
+  map<string, string> variables = 14;
+
+  // Export format: csv or xlsx
+  string format = 15;
+  // Column separator, used only when format is csv
+  string separator = 16;
+}
+
+message ExportMembersResponse {
+  // File data chunk
+  bytes data = 1;
 }
 
 message CreateMemberRequest {
