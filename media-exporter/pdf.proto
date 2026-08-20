@@ -2,15 +2,13 @@ syntax = "proto3";
 
 package webitel_media_exporter;
 
-option go_package = "github.com/webitel/pdf/api/pdf;pdf";
-
 import "google/api/annotations.proto";
 
+option go_package = "github.com/webitel/pdf/api/pdf;pdf";
 
 // PdfService provides methods to asynchronously generate, list,
 // and manage PDF exports from different media sources.
 service PdfService {
-
   // --- Screenrecording Exports ---
 
   // Creates a new task to generate a PDF export for an agent's screen recordings.
@@ -24,9 +22,7 @@ service PdfService {
 
   // Lists the history of PDF exports for a specific agent.
   rpc ListScreenrecordingExports(ListScreenrecordingHistoryRequest) returns (ListExportsResponse) {
-    option (google.api.http) = {
-      get: "/agents/{agent_id}/exports/pdf/screenrecordings"
-    };
+    option (google.api.http) = {get: "/agents/{agent_id}/exports/pdf/screenrecordings"};
   }
 
   // --- Call Exports ---
@@ -42,27 +38,27 @@ service PdfService {
 
   // Lists the history of PDF exports for a specific call ID.
   rpc ListCallExports(ListCallHistoryRequest) returns (ListExportsResponse) {
-    option (google.api.http) = {
-      get: "/calls/{call_id}/exports/pdf"
-    };
+    option (google.api.http) = {get: "/calls/{call_id}/exports/pdf"};
   }
 
   // Streams a ZIP archive bundling the given, already-uploaded call files (e.g. PDFs).
   // Synchronous: the archive is assembled on the fly and streamed back chunk by chunk,
   // so the caller does not need to poll for completion.
   rpc DownloadCallArchive(DownloadCallArchiveRequest) returns (stream DownloadCallArchiveResponse) {
-    option (google.api.http) = {
-      get: "/calls/{call_id}/exports/archive"
-    };
+    option (google.api.http) = {get: "/calls/{call_id}/exports/archive"};
+  }
+
+  // Streams original screen recording videos packed into a ZIP archive.
+  // The archive is assembled on the fly without creating a temporary file.
+  rpc DownloadScreenrecordingArchive(DownloadScreenrecordingArchiveRequest) returns (stream DownloadScreenrecordingArchiveResponse) {
+    option (google.api.http) = {get: "/agents/{agent_id}/exports/archive/screenrecordings"};
   }
 
   // --- General Operations ---
 
   // Deletes a specific export record from the history.
   rpc DeleteExport(DeleteExportRequest) returns (DeleteExportResponse) {
-    option (google.api.http) = {
-      delete: "/exports/pdf/history/{id}"
-    };
+    option (google.api.http) = {delete: "/exports/pdf/history/{id}"};
   }
 }
 
@@ -162,4 +158,18 @@ enum ExportStatus {
   PROCESSING = 2; // PDF is currently being rendered.
   DONE = 3; // Export finished successfully.
   FAILED = 4; // Export failed during generation.
+}
+
+// Request for streaming screen recording videos of one agent as a ZIP archive.
+message DownloadScreenrecordingArchiveRequest {
+  int64 agent_id = 1; // Unique identifier of the agent.
+  repeated int64 file_ids = 2; // Optional IDs of selected recordings.
+  int64 from = 3; // Start of the uploaded_at range (Unix millis).
+  int64 to = 4; // End of the uploaded_at range (Unix millis).
+}
+
+// One frame of a streamed ZIP archive.
+// The archive name is sent through the "filename" gRPC response header.
+message DownloadScreenrecordingArchiveResponse {
+  bytes data = 1;
 }
