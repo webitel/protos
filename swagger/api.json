@@ -42530,6 +42530,93 @@
         }
       }
     },
+    "/v1/messages/search": {
+      "get": {
+        "tags": [
+          "webitel.im.api.gateway.v1.MessageHistory"
+        ],
+        "summary": "Full-text search over message bodies. Scoped to a single thread when\nthread_id is set, otherwise it spans every thread the caller belongs to.\nEach hit carries its thread_id, so a client can open that dialog and jump\nto the message by passing its id as the history cursor.",
+        "operationId": "MessageHistory_SearchMessages",
+        "parameters": [
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "List of message fields to be returned.\nUsed to reduce payload size.",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Text to look for. Matched case-insensitively against any part of the\nmessage body.",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Narrows the search to a single dialog.\nEmpty spans every thread the caller is a member of.",
+            "name": "thread_id",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Filter matches by sender contact IDs.",
+            "name": "sender_ids",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "collectionFormat": "multi",
+            "description": "Filter matches by message types.",
+            "name": "types",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Cursor identifier.\nMust be a valid UUID referencing an existing message.\nDefines the starting point for pagination.",
+            "name": "cursor.id",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Pagination direction flag.\n\nfalse -\u003e fetch messages older than the cursor (scrolling up the chat)\ntrue  -\u003e fetch messages newer than the cursor (moving toward the present)",
+            "name": "cursor.before",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "description": "Maximum number of matches to return.",
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SearchMessageHistoryResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/v1/messages/text": {
       "post": {
         "tags": [
@@ -42757,7 +42844,7 @@
           },
           {
             "type": "string",
-            "description": "Full-text search query.\nTypically applied to subject.",
+            "description": "Full-text search query, matched case-insensitively against any part of\nthe thread subject (or the direct title), the name or username of any of\nits members, and the values of the thread variables — so a chat can be\nfound by who is in it or by data collected with it (phone number, tax id,\nany custom variable).",
             "name": "q",
             "in": "query"
           },
@@ -43043,7 +43130,7 @@
           },
           {
             "type": "boolean",
-            "description": "Pagination direction flag.\n\ntrue  -\u003e fetch newer messages (back before history)\nfalse -\u003e fetch older messages (back to older history)",
+            "description": "Pagination direction flag.\n\nfalse -\u003e fetch messages older than the cursor (scrolling up the chat)\ntrue  -\u003e fetch messages newer than the cursor (moving toward the present)",
             "name": "cursor.before",
             "in": "query"
           },
@@ -43561,7 +43648,7 @@
           },
           {
             "type": "boolean",
-            "description": "Pagination direction flag.\n\ntrue  -\u003e fetch newer messages (back before history)\nfalse -\u003e fetch older messages (back to older history)",
+            "description": "Pagination direction flag.\n\nfalse -\u003e fetch messages older than the cursor (scrolling up the chat)\ntrue  -\u003e fetch messages newer than the cursor (moving toward the present)",
             "name": "cursor.before",
             "in": "query"
           },
@@ -69487,6 +69574,11 @@
         },
         "id": {
           "type": "string"
+        },
+        "version": {
+          "description": "Position of the new body in the message's change history — the version\nGetMessageRevisions reports for it, so 2 right after the first edit\n(version 1 is the original text).",
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -69578,8 +69670,15 @@
           "type": "string",
           "format": "int64"
         },
+        "sender_iss": {
+          "description": "Identity of the original author as the external channel reports it: iss\nnames the issuing channel, sub the author's id inside it. Kept so the\norigin can be matched against a real contact. Both empty when the platform\nhides the author, which is reported without any id.",
+          "type": "string"
+        },
         "sender_name": {
           "description": "Display name of the original author. Empty when the platform hides it.",
+          "type": "string"
+        },
+        "sender_sub": {
           "type": "string"
         }
       }
@@ -69766,11 +69865,11 @@
       }
     },
     "webitel.im.api.gateway.v1.HistoryMessageCursorRequest": {
-      "description": "HistoryMessageCursorRequest represents a cursor-based pagination request\nfor retrieving messages relative to a specific message ID.\n\nThis request is used in keyset pagination, where the `id` field acts as a\ncursor pointing to a reference message in the history. The server returns\nmessages either before or after this cursor depending on the `before` flag.\n\nPagination semantics:\n  - The `id` must be a valid UUID of an existing message.\n  - The result set is always ordered consistently (e.g., by creation time).\n  - The `before` flag controls the direction of traversal in the message history.\n\nDirection behavior:\n  - before = true:\n      Fetch messages that come *before* the given message in history\n      (i.e., older messages).\n\n  - before = false:\n      Fetch messages that come *after* the given message\n      (i.e., newer messages, moving toward the present).\n\nNotes:\n  - This approach avoids offset-based pagination issues such as skipping\n    or duplicating records when data changes.\n  - Typically used for chat/message history scrolling.\n  - The number of returned messages is controlled separately (e.g., via limit).",
+      "description": "HistoryMessageCursorRequest represents a cursor-based pagination request\nfor retrieving messages relative to a specific message ID.\n\nThis request is used in keyset pagination, where the `id` field acts as a\ncursor pointing to a reference message in the history. The server returns\nmessages either before or after this cursor depending on the `before` flag.\n\nPagination semantics:\n  - The `id` must be a valid UUID of an existing message.\n  - The result set is always ordered consistently (e.g., by creation time).\n  - The `before` flag controls the direction of traversal in the message history.\n\nDirection behavior — note the flag reads inverted, because it maps onto the\nkeyset direction over an id-descending order:\n  - before = false:\n      Fetch messages *older* than the given one, walking back into history.\n      This is the direction a chat uses when scrolling up.\n\n  - before = true:\n      Fetch messages *newer* than the given one, moving toward the present.\n      Returns nothing when the cursor is already the newest message.\n\nNotes:\n  - This approach avoids offset-based pagination issues such as skipping\n    or duplicating records when data changes.\n  - Typically used for chat/message history scrolling.\n  - The number of returned messages is controlled separately (e.g., via limit).",
       "type": "object",
       "properties": {
         "before": {
-          "description": "Pagination direction flag.\n\ntrue  -\u003e fetch newer messages (back before history)\nfalse -\u003e fetch older messages (back to older history)",
+          "description": "Pagination direction flag.\n\nfalse -\u003e fetch messages older than the cursor (scrolling up the chat)\ntrue  -\u003e fetch messages newer than the cursor (moving toward the present)",
           "type": "boolean"
         },
         "id": {
@@ -70770,9 +70869,11 @@
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardOriginInput"
         },
         "reply_to_external_id": {
+          "description": "ID of the message this is a reply to, as reported by the external channel (Telegram, Viber, etc.).",
           "type": "string"
         },
         "reply_to_message_id": {
+          "description": "ID of the message this is a reply to.",
           "type": "string"
         },
         "send_as": {
