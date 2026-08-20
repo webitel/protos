@@ -76,6 +76,9 @@ message ServerEvent {
 
     // A member set or cleared an emoji reaction on a message.
     MessageReactionEvent message_reaction_event = 13;
+
+    // A message's content was edited by its author and must be replaced.
+    MessageEditedEvent message_edited_event = 14;
   }
 }
 
@@ -137,6 +140,38 @@ message TypingEvent {
   // Participant who is typing, carrying id and identity (name, etc.).
   // Mirrors the sender structure of NewMessageEvent for consistent client rendering.
   Peer member = 5;
+}
+
+// MessageEditedEvent notifies thread participants that a message's content was
+// changed by its author. Clients match the message by id and replace its text.
+// An edit never changes attachments or reply context, so neither is repeated
+// here.
+message MessageEditedEvent {
+  // Identifier of the edited message.
+  string id = 1;
+
+  // Thread the message belongs to.
+  string thread_id = 2;
+
+  // Participant who edited the message.
+  Peer edited_by = 3;
+
+  // Content after the edit.
+  string text = 4;
+
+  // Content type of the message.
+  MessageType type = 5;
+
+  // Unix time in milliseconds when the message was originally sent.
+  int64 created_at = 6;
+
+  // Unix time in milliseconds when the message was edited.
+  int64 edited_at = 7;
+
+  // Position of this body in the message's change history — the version
+  // GetMessageRevisions reports for it, so 2 right after the first edit
+  // (version 1 is the original text). Clients order concurrent edits by it.
+  int32 version = 8;
 }
 
 // MessageDeletedEvent notifies thread participants that a message was deleted

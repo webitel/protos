@@ -134,6 +134,13 @@ message ForwardOriginInput {
   // When the message was originally sent, Unix time in milliseconds.
   // Zero when the platform does not report it.
   int64 original_sent_at = 3;
+
+  // Identity of the original author as the external channel reports it: iss
+  // names the issuing channel, sub the author's id inside it. Kept so the
+  // origin can be matched against a real contact. Both empty when the platform
+  // hides the author, which is reported without any id.
+  string sender_iss = 4 [(buf.validate.field).string.max_len = 64];
+  string sender_sub = 5 [(buf.validate.field).string.max_len = 64];
 }
 
 // SendInternalNoteRequest posts an internal comment into the thread. It mirrors
@@ -675,6 +682,11 @@ message EditMessageResponse {
 
   // Unix time in milliseconds when the message was edited.
   int64 edited_at = 2;
+
+  // Position of the new body in the message's change history — the version
+  // GetMessageRevisions reports for it, so 2 right after the first edit
+  // (version 1 is the original text).
+  int32 version = 3;
 }
 
 message DeleteMessagesRequest {
