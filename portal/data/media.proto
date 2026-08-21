@@ -1,0 +1,122 @@
+syntax = "proto3";
+
+package webitel.portal;
+
+option go_package = "webitel.go/api/portal;portal";
+
+import "messages/message.proto";
+import "data/connect.proto";
+
+// Media (file) storage
+service MediaStorage {
+
+  // Upload new media content.
+  // Continue incomplete upload.
+  rpc Upload(stream UploadRequest) returns (stream UploadProgress);
+
+  // Upload a file (without actually sending it to the chat)
+  // Deprecated: Use [MediaStorage.Upload] instead.
+  rpc UploadFile(stream UploadMedia) returns (webitel.chat.File);
+
+  // Returns content of a whole file
+  rpc GetFile(GetFileRequest) returns (stream MediaFile);
+
+}
+
+message InputFile {
+  // MIME type
+  string type = 4;
+  // Filename
+  string name = 5;
+}
+
+message UploadRequest {
+  // Start Request
+  message Start {
+    // Fileinfo header.
+    InputFile file = 1;
+    // Confirm receipt ?
+    //
+    // If true, in response to the transfer of each part,
+    // you will receive an acknowledgement of receipt
+    // in the form of the total size of the stored data.
+    //
+    // This setting will be associated with upload process
+    // and cannot be changed later.
+    bool progress = 2;
+  }
+  // Abort Request
+  message Abort {
+    // No Options
+  }
+  // Input
+  oneof data {
+    // Continue upload ...
+    string pid = 1;
+    // Start NEW upload ...
+    Start new = 2;
+    // Multipart(s) data ...
+    bytes part = 3;
+    // Abort upload progress !?
+    Abort kill = 4;
+  }
+}
+
+message UploadProgress {
+  // Partial state
+  message Partial {
+    // Upload process unique ID.
+    // You can use this ID to continue an interrupted upload
+    string pid = 1;
+    // Total size of saved data.
+    int64 size = 2;
+  }
+  // Uploaded file info.
+  message Complete {
+    // Saved document metadata.
+    webitel.chat.File file = 1;
+    // Hashsum variants of stored data. map[algo]hash
+    map<string,string> hash = 2;
+  }
+  // Output
+  oneof data {
+    // Partial progress. Start/ACK.
+    Partial part = 1;
+    // Upload complete. Result.
+    Complete stat = 2;
+    // Early notification about
+    // upstream disconnect init.
+    UpdateDisconnect end = 3;
+  }
+}
+
+message UploadMedia {
+  // Input media type
+  oneof media_type {
+    // File metadata info
+    InputFile file = 1;
+    // File content part
+    bytes data = 2;
+  }
+}
+
+message GetFileRequest {
+
+  // File location
+  string file_id = 1;
+  // Range: bytes=<start>
+  int64 offset = 2;
+}
+
+message MediaFile {
+  // Output media type
+  oneof media_type {
+    // File metadata info
+    webitel.chat.File file = 1;
+    // File content part
+    bytes data = 2;
+    // Early notification about
+    // upstream disconnect init.
+    UpdateDisconnect end = 3;
+  }
+}
