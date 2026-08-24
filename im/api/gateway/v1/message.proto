@@ -688,16 +688,45 @@ message DeleteMessagesRequest {
   }];
 }
 
+// SkippedMessage is one requested message DeleteMessages left untouched, with
+// the reason it did.
+message SkippedMessage {
+  string id = 1;
+
+  // Was a free-form string; replaced by the Reason enum on field 3.
+  reserved 2;
+
+  enum Reason {
+    REASON_UNSPECIFIED = 0;
+
+    REASON_NOT_FOUND = 1;
+
+    REASON_NOT_AUTHOR = 2;
+
+    REASON_ALREADY_DELETED = 3;
+
+    REASON_CHAT_CLOSED = 4;
+
+    REASON_NOT_ALLOWED = 5;
+  }
+
+  Reason reason = 3;
+}
+
 message DeleteMessagesResponse {
   // Messages that were actually deleted by this call.
   repeated string deleted_ids = 1;
 
-  // Requested messages left untouched: not found, already deleted,
-  // not authored by the caller, or the chat is closed.
-  repeated string skipped_ids = 2;
+  // Was skipped_ids: a bare id list, replaced by [skipped] below, which
+  // carries the same ids plus the reason for each one.
+  reserved 2;
+  reserved "skipped_ids";
 
-  // Unix time in milliseconds when the messages were deleted.
+  // Unix time in milliseconds when the messages were deleted. Zero when this
+  // call deleted nothing.
   int64 deleted_at = 3;
+
+  repeated SkippedMessage skipped = 4;
 }
 
 message SetReactionRequest {
