@@ -96,6 +96,10 @@
       "description": "GateService provides methods to list and manage all registered messaging gateways across different providers (Telegram, Facebook, etc.) within the current domain. It serves as a unified interface for gateway management, abstracting away provider-specific details."
     },
     {
+      "name": "webitel.im.provider.v1.InstagramService",
+      "description": "/ InstagramService defines the RPC methods for managing Instagram Business Account gateways."
+    },
+    {
       "name": "webitel.im.provider.v1.ProviderMessageService",
       "description": "InboundMessageService handles incoming messages from external platforms."
     },
@@ -722,6 +726,137 @@
         ],
         "tags": [
           "webitel.im.api.provider.v1.FacebookService"
+        ]
+      }
+    },
+    "/im/gates/instagram": {
+      "post": {
+        "summary": "/ CreateInstagramGate activates an Instagram Business Account gateway.",
+        "operationId": "InstagramService_CreateInstagramGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderCreateInstagramGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "/ ProviderCreateInstagramGateRequest links a specific Instagram Business Account as a messaging gateway.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderCreateInstagramGateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.InstagramService"
+        ]
+      }
+    },
+    "/im/gates/instagram/{id}": {
+      "get": {
+        "summary": "/ GetInstagramGate retrieves details of a specific Instagram gateway.",
+        "operationId": "InstagramService_GetInstagramGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderGetInstagramGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.InstagramService"
+        ]
+      },
+      "delete": {
+        "summary": "/ DeleteInstagramGate deactivates the gateway.",
+        "operationId": "InstagramService_DeleteInstagramGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderDeleteInstagramGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.InstagramService"
+        ]
+      },
+      "patch": {
+        "summary": "/ UpdateInstagramGate modifies Instagram gateway settings.",
+        "operationId": "InstagramService_UpdateInstagramGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderUpdateInstagramGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.InstagramService.UpdateInstagramGateBody"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.InstagramService"
         ]
       }
     },
@@ -4373,17 +4508,17 @@
           },
           "description": "Messages that were actually deleted by this call."
         },
-        "skipped_ids": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Requested messages left untouched: not found, already deleted,\nnot authored by the caller, or the chat is closed."
-        },
         "deleted_at": {
           "type": "string",
           "format": "int64",
-          "description": "Unix time in milliseconds when the messages were deleted."
+          "description": "Unix time in milliseconds when the messages were deleted. Zero when this\ncall deleted nothing."
+        },
+        "skipped": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.SkippedMessage"
+          }
         }
       }
     },
@@ -4590,7 +4725,8 @@
       "type": "object",
       "properties": {
         "kind": {
-          "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardOriginKind"
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardOriginKind",
+          "description": "How the message was forwarded, which determines what other fields are set."
         },
         "sender_name": {
           "type": "string",
@@ -5848,6 +5984,30 @@
           "description": "Unix time in milliseconds when the reaction was set; zero when removed."
         }
       }
+    },
+    "webitel.im.api.gateway.v1.SkippedMessage": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "reason": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.SkippedMessage.Reason"
+        }
+      },
+      "description": "SkippedMessage is one requested message DeleteMessages left untouched, with\nthe reason it did."
+    },
+    "webitel.im.api.gateway.v1.SkippedMessage.Reason": {
+      "type": "string",
+      "enum": [
+        "REASON_UNSPECIFIED",
+        "REASON_NOT_FOUND",
+        "REASON_NOT_AUTHOR",
+        "REASON_ALREADY_DELETED",
+        "REASON_CHAT_CLOSED",
+        "REASON_NOT_ALLOWED"
+      ],
+      "default": "REASON_UNSPECIFIED"
     },
     "webitel.im.api.gateway.v1.System": {
       "type": "object",
@@ -7244,6 +7404,26 @@
       "default": "INPUT_FIELD_STATE_UNSPECIFIED",
       "description": "InputFieldState controls whether the recipient can type free text while a menu is\ndisplayed. Not every channel can enforce it (Telegram cannot).\n\n - INPUT_FIELD_STATE_HIDDEN: Free text is not possible: the recipient can only press a button."
     },
+    "webitel.im.provider.v1.InstagramService.UpdateInstagramGateBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "peer": {
+          "$ref": "#/definitions/webitel.im.provider.v1.Peer",
+          "title": "Identity details (sub and iss)"
+        },
+        "business_account_token": {
+          "type": "string",
+          "title": "Used for refreshing the access token"
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      },
+      "description": "/ ProviderUpdateInstagramGateRequest updates the operational settings of an Instagram provider."
+    },
     "webitel.im.provider.v1.MenuPlacement": {
       "type": "string",
       "enum": [
@@ -7359,6 +7539,44 @@
       },
       "description": "/ ProviderCreateFacebookGateResponse returns the newly activated Facebook provider."
     },
+    "webitel.im.provider.v1.ProviderCreateInstagramGateRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name of the gateway in Webitel"
+        },
+        "meta_app_id": {
+          "type": "string",
+          "title": "Reference to the parent MetaApp"
+        },
+        "peer": {
+          "$ref": "#/definitions/webitel.im.provider.v1.Peer",
+          "title": "Identity details (sub and iss)"
+        },
+        "business_account_id": {
+          "type": "string",
+          "title": "The Instagram Business Account ID"
+        },
+        "business_account_token": {
+          "type": "string",
+          "title": "Long-lived Business Account Access Token"
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      },
+      "description": "/ ProviderCreateInstagramGateRequest links a specific Instagram Business Account as a messaging gateway."
+    },
+    "webitel.im.provider.v1.ProviderCreateInstagramGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderInstagramGate"
+        }
+      },
+      "description": "/ ProviderCreateInstagramGateResponse returns the newly activated Instagram provider."
+    },
     "webitel.im.provider.v1.ProviderCreateMetaAppRequest": {
       "type": "object",
       "properties": {
@@ -7455,6 +7673,14 @@
     },
     "webitel.im.provider.v1.ProviderDeleteGetStartedResponse": {
       "type": "object"
+    },
+    "webitel.im.provider.v1.ProviderDeleteInstagramGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderInstagramGate"
+        }
+      }
     },
     "webitel.im.provider.v1.ProviderDeleteMetaAppResponse": {
       "type": "object",
@@ -7569,6 +7795,14 @@
         }
       }
     },
+    "webitel.im.provider.v1.ProviderGetInstagramGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderInstagramGate"
+        }
+      }
+    },
     "webitel.im.provider.v1.ProviderGetMetaAppResponse": {
       "type": "object",
       "properties": {
@@ -7591,6 +7825,39 @@
       "properties": {
         "item": {
           "$ref": "#/definitions/webitel.im.provider.v1.ProviderWhatsAppGate"
+        }
+      }
+    },
+    "webitel.im.provider.v1.ProviderInstagramGate": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "meta_app_id": {
+          "type": "string"
+        },
+        "business_account_id": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderStatus"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "Unix timestamp in milliseconds"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "Unix timestamp in milliseconds"
+        },
+        "enabled": {
+          "type": "boolean"
         }
       }
     },
@@ -8409,6 +8676,15 @@
         }
       },
       "description": "/ ProviderUpdateFacebookGateResponse returns the updated Facebook provider."
+    },
+    "webitel.im.provider.v1.ProviderUpdateInstagramGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderInstagramGate"
+        }
+      },
+      "description": "/ ProviderUpdateInstagramGateResponse returns the updated Instagram provider."
     },
     "webitel.im.provider.v1.ProviderUpdateMetaAppResponse": {
       "type": "object",
