@@ -52,6 +52,10 @@
       "description": "GateService provides a unified interface for listing all registered messaging gateways."
     },
     {
+      "name": "webitel.im.api.provider.v1.InstagramService",
+      "description": "InstagramService defines RPC methods for managing Instagram Business Account gateways."
+    },
+    {
       "name": "webitel.im.api.provider.v1.ProviderMessageService",
       "description": "ProviderMessageService delivers outbound messages to external chat partners."
     },
@@ -763,7 +767,7 @@
         ]
       }
     },
-    "/im/gates/instagram/{id}": {
+    "/im/gates/instagram/{id_1}": {
       "get": {
         "summary": "/ GetInstagramGate retrieves details of a specific Instagram gateway.",
         "operationId": "InstagramService_GetInstagramGate",
@@ -783,7 +787,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "id_1",
             "in": "path",
             "required": true,
             "type": "string"
@@ -812,7 +816,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "id_1",
             "in": "path",
             "required": true,
             "type": "string"
@@ -841,7 +845,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "id_1",
             "in": "path",
             "required": true,
             "type": "string"
@@ -857,6 +861,100 @@
         ],
         "tags": [
           "webitel.im.provider.v1.InstagramService"
+        ]
+      }
+    },
+    "/im/gates/instagram/{id}": {
+      "get": {
+        "operationId": "InstagramService_GetInstagramGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderGetInstagramGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.provider.v1.InstagramService"
+        ]
+      },
+      "delete": {
+        "operationId": "InstagramService_DeleteInstagramGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderDeleteInstagramGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.provider.v1.InstagramService"
+        ]
+      },
+      "patch": {
+        "operationId": "InstagramService_UpdateInstagramGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderUpdateInstagramGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.InstagramService.UpdateInstagramGateBody"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.provider.v1.InstagramService"
         ]
       }
     },
@@ -6518,6 +6616,23 @@
         }
       }
     },
+    "webitel.im.api.provider.v1.InstagramService.UpdateInstagramGateBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "peer": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.Peer"
+        },
+        "business_account_token": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
     "webitel.im.api.provider.v1.MetaAppService.UpdateMetaAppBody": {
       "type": "object",
       "properties": {
@@ -6605,6 +6720,37 @@
         }
       }
     },
+    "webitel.im.api.provider.v1.ProviderCreateInstagramGateRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "meta_app_id": {
+          "type": "string"
+        },
+        "peer": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.Peer"
+        },
+        "business_account_id": {
+          "type": "string"
+        },
+        "business_account_token": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderCreateInstagramGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderInstagramGate"
+        }
+      }
+    },
     "webitel.im.api.provider.v1.ProviderCreateMetaAppRequest": {
       "type": "object",
       "properties": {
@@ -6680,6 +6826,14 @@
     },
     "webitel.im.api.provider.v1.ProviderDeleteGetStartedResponse": {
       "type": "object"
+    },
+    "webitel.im.api.provider.v1.ProviderDeleteInstagramGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderInstagramGate"
+        }
+      }
     },
     "webitel.im.api.provider.v1.ProviderDeleteMetaAppResponse": {
       "type": "object",
@@ -6763,6 +6917,14 @@
         }
       }
     },
+    "webitel.im.api.provider.v1.ProviderGetInstagramGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderInstagramGate"
+        }
+      }
+    },
     "webitel.im.api.provider.v1.ProviderGetMetaAppResponse": {
       "type": "object",
       "properties": {
@@ -6776,6 +6938,37 @@
       "properties": {
         "item": {
           "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderWhatsAppGate"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderInstagramGate": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "meta_app_id": {
+          "type": "string"
+        },
+        "business_account_id": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderStatus"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "enabled": {
+          "type": "boolean"
         }
       }
     },
@@ -7198,6 +7391,14 @@
       "properties": {
         "item": {
           "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderFacebookGate"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderUpdateInstagramGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderInstagramGate"
         }
       }
     },
