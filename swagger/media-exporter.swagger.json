@@ -6,7 +6,8 @@
   },
   "tags": [
     {
-      "name": "PdfService"
+      "name": "PdfService",
+      "description": "PdfService provides methods to asynchronously generate, list,\nand manage PDF exports from different media sources.\n\n--- Screenrecording Exports ---"
     }
   ],
   "consumes": [
@@ -16,6 +17,76 @@
     "application/json"
   ],
   "paths": {
+    "/agents/{agent_id}/exports/archive/screenrecordings": {
+      "get": {
+        "summary": "Streams original screen recording videos packed into a ZIP archive.\nThe archive is assembled on the fly without creating a temporary file.",
+        "operationId": "DownloadScreenrecordingArchive",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "$ref": "#/definitions/webitel_media_exporter.DownloadScreenrecordingArchiveResponse"
+                },
+                "error": {
+                  "$ref": "#/definitions/google.rpc.Status"
+                }
+              },
+              "title": "Stream result of webitel_media_exporter.DownloadScreenrecordingArchiveResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "agent_id",
+            "description": "Unique identifier of the agent.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "file_ids",
+            "description": "Optional IDs of selected recordings.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "from",
+            "description": "Start of the uploaded_at range (Unix millis).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "to",
+            "description": "End of the uploaded_at range (Unix millis).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "PdfService"
+        ]
+      }
+    },
     "/agents/{agent_id}/exports/pdf/screenrecordings": {
       "get": {
         "summary": "Lists the history of PDF exports for a specific agent.",
@@ -339,6 +410,16 @@
       },
       "title": "One frame of a streamed ZIP archive download. The file name is carried via the \"filename\"\ngRPC response header (set before the first frame)"
     },
+    "webitel_media_exporter.DownloadScreenrecordingArchiveResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "string",
+          "format": "byte"
+        }
+      },
+      "description": "One frame of a streamed ZIP archive.\nThe archive name is sent through the \"filename\" gRPC response header."
+    },
     "webitel_media_exporter.ExportRecord": {
       "type": "object",
       "properties": {
@@ -493,6 +574,10 @@
             "format": "int64"
           },
           "description": "Optional: specific file IDs to include in the PDF."
+        },
+        "sort": {
+          "type": "string",
+          "title": "sorting criteria, e.g. \"+view_name\" or \"-uploaded_at\""
         }
       },
       "description": "Request for generating a screen recording PDF."
