@@ -264,8 +264,12 @@ message HistoryMessage {
   // client never receives it; present only in operator-facing history.
   bool internal = 24;
 
-  // Contact id of the member who deleted the message; empty when it is live.
-  string deleted_by = 25;
+  reserved 25;
+
+  // Membership that deleted the message; unset while the message is live.
+  // Carries the deleter's contact_id and role, so the caller resolves the
+  // contact and renders it exactly like sender.
+  ThreadMember deleted_by = 28;
 
   // Number of entries in the message's change history. Zero means the message
   // was never edited or deleted; otherwise GetMessageRevisions returns that
@@ -300,8 +304,11 @@ message MessageRevision {
   // reconstructed even though the timeline only shows a tombstone.
   string body = 3;
 
-  // Contact id of the member who made the change.
-  string changed_by = 4;
+  reserved 4;
+
+  // Membership that made the change; id is empty when they are no longer a
+  // member of the thread.
+  ThreadMember changed_by = 6;
 
   // Unix time in milliseconds when the change was made.
   int64 changed_at = 5;
