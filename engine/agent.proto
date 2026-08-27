@@ -2,730 +2,693 @@ syntax = "proto3";
 
 package engine;
 
-option go_package = "github.com/webitel/protos/engine";
-
 import "const.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/wrappers.proto";
 
+option go_package = "github.com/webitel/protos/engine";
+
 /*
-add sip & web field
+   add sip & web field
 */
 
 service AgentService {
-    // Create Agent
-    rpc CreateAgent(CreateAgentRequest) returns (Agent) {
-        option (google.api.http) = {
-            post: "/call_center/agents"
-            body: "*"
-        };
-    }
-    // List of Agent
-    rpc SearchAgent(SearchAgentRequest) returns (ListAgent) {
-        option (google.api.http) = {
-            get: "/call_center/agents"
-        };
-    }
-    // Agent item
-    rpc ReadAgent(ReadAgentRequest) returns (Agent) {
-        option (google.api.http) = {
-            get: "/call_center/agents/{id}"
-        };
-    }
-    // Update Agent
-    rpc UpdateAgent(UpdateAgentRequest) returns (Agent) {
-        option (google.api.http) = {
-            put: "/call_center/agents/{id}"
-            body: "*"
-        };
-    }
-    // Update Agent
-    rpc PatchAgent(PatchAgentRequest) returns (Agent) {
-        option (google.api.http) = {
-            patch: "/call_center/agents/{id}"
-            body: "*"
-        };
-    }
-    // Remove Agent
-    rpc DeleteAgent(DeleteAgentRequest) returns (Agent) {
-        option (google.api.http) = {
-            delete: "/call_center/agents/{id}"
-        };
-    }
-    // Change agent status
-    rpc UpdateAgentStatus(AgentStatusRequest) returns (Response) {
-        option (google.api.http) = {
-            patch: "/call_center/agents/{id}/status"
-            body: "*"
-        };
-    }
+  // Create Agent
+  rpc CreateAgent(CreateAgentRequest) returns (Agent) {
+    option (google.api.http) = {
+      post: "/call_center/agents"
+      body: "*"
+    };
+  }
+  // List of Agent
+  rpc SearchAgent(SearchAgentRequest) returns (ListAgent) {
+    option (google.api.http) = {get: "/call_center/agents"};
+  }
+  // Agent item
+  rpc ReadAgent(ReadAgentRequest) returns (Agent) {
+    option (google.api.http) = {get: "/call_center/agents/{id}"};
+  }
+  // Update Agent
+  rpc UpdateAgent(UpdateAgentRequest) returns (Agent) {
+    option (google.api.http) = {
+      put: "/call_center/agents/{id}"
+      body: "*"
+    };
+  }
+  // Update Agent
+  rpc PatchAgent(PatchAgentRequest) returns (Agent) {
+    option (google.api.http) = {
+      patch: "/call_center/agents/{id}"
+      body: "*"
+    };
+  }
+  // Remove Agent
+  rpc DeleteAgent(DeleteAgentRequest) returns (Agent) {
+    option (google.api.http) = {delete: "/call_center/agents/{id}"};
+  }
+  // Change agent status
+  rpc UpdateAgentStatus(AgentStatusRequest) returns (Response) {
+    option (google.api.http) = {
+      patch: "/call_center/agents/{id}/status"
+      body: "*"
+    };
+  }
 
-    rpc AgentSetState(AgentSetStateRequest) returns (AgentSetStateResponse) {
-        option (google.api.http) = {
-            patch: "/call_center/agents/{agent_id}/states/waiting"
-            body: "*"
-        };
-    }
+  rpc AgentSetState(AgentSetStateRequest) returns (AgentSetStateResponse) {
+    option (google.api.http) = {
+      patch: "/call_center/agents/{agent_id}/states/waiting"
+      body: "*"
+    };
+  }
 
-    rpc AgentStateHistory(AgentStateHistoryRequest) returns (ListAgentStateHistory) {
-        option (google.api.http) = {
-            get: "/call_center/agents/{agent_id}/states/history"
-        };
-    }
+  rpc AgentStateHistory(AgentStateHistoryRequest) returns (ListAgentStateHistory) {
+    option (google.api.http) = {get: "/call_center/agents/{agent_id}/states/history"};
+  }
 
-    rpc SearchAgentStateHistory(SearchAgentStateHistoryRequest) returns (ListAgentStateHistory) {
-        option (google.api.http) = {
-            get: "/call_center/agents/states/history"
-        };
-    }
+  rpc SearchAgentStateHistory(SearchAgentStateHistoryRequest) returns (ListAgentStateHistory) {
+    option (google.api.http) = {get: "/call_center/agents/states/history"};
+  }
 
-    // todo deprecated ?
-    rpc SearchAgentInTeam(SearchAgentInTeamRequest) returns (ListAgentInTeam) {
-        option (google.api.http) = {
-            get: "/call_center/agents/{id}/teams"
-        };
-    }
+  // todo deprecated ?
+  rpc SearchAgentInTeam(SearchAgentInTeamRequest) returns (ListAgentInTeam) {
+    option (google.api.http) = {get: "/call_center/agents/{id}/teams"};
+  }
 
-    // Searches queues where the specified agent is assigned.
-    // Supports pagination, sorting and free-text search.
-    rpc SearchAgentInQueue(SearchAgentInQueueRequest) returns (ListAgentInQueue) {
-        option (google.api.http) = {
-            get: "/call_center/agents/{id}/queues"
-        };
-    }
+  // Searches queues where the specified agent is assigned.
+  // Supports pagination, sorting and free-text search.
+  rpc SearchAgentInQueue(SearchAgentInQueueRequest) returns (ListAgentInQueue) {
+    option (google.api.http) = {get: "/call_center/agents/{id}/queues"};
+  }
 
-    rpc SearchPauseCauseForAgent(SearchPauseCauseForAgentRequest) returns (ForAgentPauseCauseList) {
-        option (google.api.http) = {
-            get: "/call_center/agents/{agent_id}/pause_causes"
-        };
-    }
+  rpc SearchPauseCauseForAgent(SearchPauseCauseForAgentRequest) returns (ForAgentPauseCauseList) {
+    option (google.api.http) = {get: "/call_center/agents/{agent_id}/pause_causes"};
+  }
 
-    rpc SearchAgentInQueueStatistics(SearchAgentInQueueStatisticsRequest) returns (AgentInQueueStatisticsList) {
-        option (google.api.http) = {
-            get: "/call_center/agents/{agent_id}/statistics/queues"
-        };
-    }
+  rpc SearchAgentInQueueStatistics(SearchAgentInQueueStatisticsRequest) returns (AgentInQueueStatisticsList) {
+    option (google.api.http) = {get: "/call_center/agents/{agent_id}/statistics/queues"};
+  }
 
-    rpc AgentTodayStatistics(AgentTodayStatisticsRequest) returns (AgentTodayStatisticsResponse) {
-        option (google.api.http) = {
-            get: "/call_center/agents/{agent_id}/statistics/today"
-        };
-    }
+  rpc AgentTodayStatistics(AgentTodayStatisticsRequest) returns (AgentTodayStatisticsResponse) {
+    option (google.api.http) = {get: "/call_center/agents/{agent_id}/statistics/today"};
+  }
 
-    rpc SearchAgentCallStatistics(SearchAgentCallStatisticsRequest) returns (AgentCallStatisticsList) {
-        option (google.api.http) = {
-            get: "/call_center/agents/reports/call"
-        };
-    }
+  rpc SearchAgentCallStatistics(SearchAgentCallStatisticsRequest) returns (AgentCallStatisticsList) {
+    option (google.api.http) = {get: "/call_center/agents/reports/call"};
+  }
 
-    rpc SearchAgentStatusStatistic(SearchAgentStatusStatisticRequest) returns (ListAgentStatsStatistic) {
-        option (google.api.http) = {
-            get: "/call_center/agents/reports/status"
-        };
-    }
+  rpc SearchAgentStatusStatistic(SearchAgentStatusStatisticRequest) returns (ListAgentStatsStatistic) {
+    option (google.api.http) = {get: "/call_center/agents/reports/status"};
+  }
 
-    rpc SearchAgentStatusStatisticItem(SearchAgentStatusStatisticItemRequest) returns (AgentStatusStatisticItem) {
-        option (google.api.http) = {
-            get: "/call_center/agents/reports/status/{agent_id}"
-        };
-    }
+  rpc SearchAgentStatusStatisticItem(SearchAgentStatusStatisticItemRequest) returns (AgentStatusStatisticItem) {
+    option (google.api.http) = {get: "/call_center/agents/reports/status/{agent_id}"};
+  }
 
-    // SearchLookupAgentNotExistsUser
-    rpc SearchLookupUsersAgentNotExists(SearchLookupUsersAgentNotExistsRequest) returns (ListAgentUser) {
-        option (google.api.http) = {
-            get: "/call_center/lookups/agents/users"
-        };
-    }
+  // SearchLookupAgentNotExistsUser
+  rpc SearchLookupUsersAgentNotExists(SearchLookupUsersAgentNotExistsRequest) returns (ListAgentUser) {
+    option (google.api.http) = {get: "/call_center/lookups/agents/users"};
+  }
 
-    // List of UserStatus
-    rpc SearchUserStatus(SearchUserStatusRequest) returns (ListUserStatus) {
-        option (google.api.http) = {
-            get: "/call_center/users"
-        };
-    }
-
+  // List of UserStatus
+  rpc SearchUserStatus(SearchUserStatusRequest) returns (ListUserStatus) {
+    option (google.api.http) = {get: "/call_center/users"};
+  }
 }
 
 message UserStatus {
-    message UserPresence {
-        string status = 1;
-    }
-    int64 id = 1;
-    string name = 2;
-    string extension = 3;
-    UserPresence presence = 4;
-    string status = 5;
+  message UserPresence {
+    string status = 1;
+  }
+  int64 id = 1;
+  string name = 2;
+  string extension = 3;
+  UserPresence presence = 4;
+  string status = 5;
 }
 
 message SearchUserStatusRequest {
-    int32 page = 1;
-    int32 size = 2;
-    string q = 3;
+  int32 page = 1;
+  int32 size = 2;
+  string q = 3;
 
-    string sort = 5;
-    repeated string fields = 6;
-    repeated int64 not_user_id = 7;
+  string sort = 5;
+  repeated string fields = 6;
+  repeated int64 not_user_id = 7;
 }
 
 message ListUserStatus {
-    repeated UserStatus items = 1;
-    bool next = 2;
+  repeated UserStatus items = 1;
+  bool next = 2;
 }
 
 message AgentTodayStatisticsRequest {
-    int64 agent_id = 1;
-    repeated string fields = 2;
+  int64 agent_id = 1;
+  repeated string fields = 2;
 }
 
 message AgentTodayStatisticsResponse {
-    float utilization = 1;
-    float occupancy = 2;
+  float utilization = 1;
+  float occupancy = 2;
 
-    int32 call_abandoned = 3;
-    int32 call_handled = 4;
-    float avg_talk_sec = 5;
-    float avg_hold_sec = 6;
+  int32 call_abandoned = 3;
+  int32 call_handled = 4;
+  float avg_talk_sec = 5;
+  float avg_hold_sec = 6;
 
-    int32 chat_accepts = 7;
-    float chat_aht = 8;
+  int32 chat_accepts = 7;
+  float chat_aht = 8;
 
-    int32 call_missed = 9;
-    int32 call_inbound = 10;
+  int32 call_missed = 9;
+  int32 call_inbound = 10;
 
-    float score_required_avg = 11;
-    float score_optional_avg = 12;
-    int64 score_count = 13;
-    float score_required_sum = 14;
-    float score_optional_sum = 15;
+  float score_required_avg = 11;
+  float score_optional_avg = 12;
+  int64 score_count = 13;
+  float score_required_sum = 14;
+  float score_optional_sum = 15;
 
-    int64 sum_talk_sec = 16;
-    int32 voice_mail = 17;
-    int32 available = 18;
-    int32 online = 19;
-    int32 processing = 20;
-    int32 task_accepts = 21;
-    int32 queue_talk_sec = 22;
+  int64 sum_talk_sec = 16;
+  int32 voice_mail = 17;
+  int32 available = 18;
+  int32 online = 19;
+  int32 processing = 20;
+  int32 task_accepts = 21;
+  int32 queue_talk_sec = 22;
 
-    int32 call_queue_missed = 23;
-    int32 call_inbound_queue = 24;
-    int32 call_dialer_queue = 25;
-    int32 call_manual = 26;
+  int32 call_queue_missed = 23;
+  int32 call_inbound_queue = 24;
+  int32 call_dialer_queue = 25;
+  int32 call_manual = 26;
 }
 
 message SearchAgentStatusStatisticItemRequest {
-    int64 agent_id = 1;
-    FilterBetween time = 2;
+  int64 agent_id = 1;
+  FilterBetween time = 2;
 }
 
 message AgentStatusStatisticItem {
-    int32 agent_id = 1;
-    string name = 2;
-    string status = 3;
-    int64 status_duration = 4;
-    Lookup user = 5;
-    string extension = 6;
+  int32 agent_id = 1;
+  string name = 2;
+  string status = 3;
+  int64 status_duration = 4;
+  Lookup user = 5;
+  string extension = 6;
 
-    Lookup team = 7;
-    repeated Lookup supervisor = 8;
-    repeated Lookup auditor = 9;
-    Lookup region = 10;
-    uint32 progressive_count = 11;
-    uint32 chat_count = 12;
+  Lookup team = 7;
+  repeated Lookup supervisor = 8;
+  repeated Lookup auditor = 9;
+  Lookup region = 10;
+  uint32 progressive_count = 11;
+  uint32 chat_count = 12;
 
-    string pause_cause = 13;
+  string pause_cause = 13;
 
-    int64 online = 14;
-    int64 offline = 15;
-    int64 pause = 16;
+  int64 online = 14;
+  int64 offline = 15;
+  int64 pause = 16;
 
-    float score_required_avg = 17;
-    float score_optional_avg = 18;
-    int64 score_count = 19;
-    bool desc_track = 20;
-    string status_comment = 21;
-    bool screen_control = 22;
+  float score_required_avg = 17;
+  float score_optional_avg = 18;
+  int64 score_count = 19;
+  bool desc_track = 20;
+  string status_comment = 21;
+  bool screen_control = 22;
 }
 
 message SearchPauseCauseForAgentRequest {
-    int64 agent_id = 1;
-    bool allow_change = 2;
+  int64 agent_id = 1;
+  bool allow_change = 2;
 }
 
 message ForAgentPauseCause {
-    uint32 id = 1;
-    string name = 2;
-    uint32 limit_min = 3;
-    uint32 duration_min = 4;
+  uint32 id = 1;
+  string name = 2;
+  uint32 limit_min = 3;
+  uint32 duration_min = 4;
 }
 
 message ForAgentPauseCauseList {
-    repeated ForAgentPauseCause items = 1;
+  repeated ForAgentPauseCause items = 1;
 }
 
 message AgentSetStateRequest {
-    int32 agent_id = 1;
+  int32 agent_id = 1;
 }
 
-message AgentSetStateResponse {
-
-}
+message AgentSetStateResponse {}
 
 message AgentStatsStatistic {
-    int32 agent_id = 1;
-    string name = 2;
-    string status = 3;
-    int64 status_duration = 4;
-    Lookup user = 5;
-    string extension = 6;
-    Lookup team = 7;
-    repeated Lookup queues = 8;
-    int64 online = 9;
-    int64 offline = 10;
-    int64 pause = 11;
+  int32 agent_id = 1;
+  string name = 2;
+  string status = 3;
+  int64 status_duration = 4;
+  Lookup user = 5;
+  string extension = 6;
+  Lookup team = 7;
+  repeated Lookup queues = 8;
+  int64 online = 9;
+  int64 offline = 10;
+  int64 pause = 11;
 
-    float utilization = 12;
-    int64 call_time = 13;
-    int32 handles = 14;
-    int32 missed = 15;
-    int32 chat_count = 16;
-    int64 max_bridged_at = 17;
-    int64 max_offering_at = 18;
-    string active_call_id = 19;
+  float utilization = 12;
+  int64 call_time = 13;
+  int32 handles = 14;
+  int32 missed = 15;
+  int32 chat_count = 16;
+  int64 max_bridged_at = 17;
+  int64 max_offering_at = 18;
+  string active_call_id = 19;
 
-    uint32 transferred = 20;
-    repeated Lookup skills = 21;
-    repeated Lookup supervisor = 22;
-    repeated Lookup auditor = 23;
+  uint32 transferred = 20;
+  repeated Lookup skills = 21;
+  repeated Lookup supervisor = 22;
+  repeated Lookup auditor = 23;
 
-    string pause_cause = 24;
+  string pause_cause = 24;
 
-    float occupancy = 25;
-    bool desc_track = 26;
-    string status_comment = 27;
-    bool screen_control = 28;
-    int64 chat_time = 29;
+  float occupancy = 25;
+  bool desc_track = 26;
+  string status_comment = 27;
+  bool screen_control = 28;
+  int64 chat_time = 29;
 }
 
 message ListAgentStatsStatistic {
-    bool next = 1;
-    repeated AgentStatsStatistic items = 2;
+  bool next = 1;
+  repeated AgentStatsStatistic items = 2;
 }
 
-
 message SearchAgentStatusStatisticRequest {
-    int32 page = 1;
-    int32 size = 2;
+  int32 page = 1;
+  int32 size = 2;
 
-    string q = 3;
-    string sort = 4;
-    repeated string fields = 5;
+  string q = 3;
+  string sort = 4;
+  repeated string fields = 5;
 
-    repeated int64 agent_id = 6;
-    FilterBetween time = 7;
+  repeated int64 agent_id = 6;
+  FilterBetween time = 7;
 
-    repeated string status = 8;
-    repeated int32 queue_id = 9;
-    repeated int32 team_id = 10;
+  repeated string status = 8;
+  repeated int32 queue_id = 9;
+  repeated int32 team_id = 10;
 
-    FilterBetween utilization = 11;
-    bool has_call = 12;
-    repeated uint32 skill_id = 13;
-    repeated uint32 region_id = 14;
-    repeated uint32 supervisor_id = 15;
-    repeated int64 auditor_id = 16;
+  FilterBetween utilization = 11;
+  bool has_call = 12;
+  repeated uint32 skill_id = 13;
+  repeated uint32 region_id = 14;
+  repeated uint32 supervisor_id = 15;
+  repeated int64 auditor_id = 16;
 }
 
 message SearchAgentStateHistoryRequest {
-    int32 page = 1;
-    int32 size = 2;
-    FilterBetween joined_at = 3;
-    repeated int64 agent_id = 4;
+  int32 page = 1;
+  int32 size = 2;
+  FilterBetween joined_at = 3;
+  repeated int64 agent_id = 4;
 
-    string sort = 5;
+  string sort = 5;
 
-    int64 domain_id = 6;
+  int64 domain_id = 6;
 
-    int64 from_id = 7;
+  int64 from_id = 7;
 }
 
 message AgentCallStatistics {
-    string name = 1;
-    int32 count = 2;
-    int32 abandoned = 3;
-    int32 handles = 4;
+  string name = 1;
+  int32 count = 2;
+  int32 abandoned = 3;
+  int32 handles = 4;
 
-    float sum_talk_sec = 5;
-    float avg_talk_sec = 6;
-    float min_talk_sec = 7;
-    float max_talk_sec = 8;
+  float sum_talk_sec = 5;
+  float avg_talk_sec = 6;
+  float min_talk_sec = 7;
+  float max_talk_sec = 8;
 
-    float sum_hold_sec = 9;
-    float avg_hold_sec = 10;
-    float min_hold_sec = 11;
-    float max_hold_sec = 12;
+  float sum_hold_sec = 9;
+  float avg_hold_sec = 10;
+  float min_hold_sec = 11;
+  float max_hold_sec = 12;
 
-    float utilization = 13;
-    float occupancy = 14;
+  float utilization = 13;
+  float occupancy = 14;
 
-    int32 chat_accepts = 15;
-    int32 chat_aht = 16;
+  int32 chat_accepts = 15;
+  int32 chat_aht = 16;
 }
 
 message SearchAgentCallStatisticsRequest {
-    int32 page = 1;
-    int32 size = 2;
+  int32 page = 1;
+  int32 size = 2;
 
-    FilterBetween time = 3;
-    repeated int32 agent_id = 4;
+  FilterBetween time = 3;
+  repeated int32 agent_id = 4;
 
-    int64 domain_id = 5;
+  int64 domain_id = 5;
 
-    string q = 6;
-    repeated string fields = 7;
-    string sort = 8;
+  string q = 6;
+  repeated string fields = 7;
+  string sort = 8;
 }
 
 message AgentCallStatisticsList {
-    bool next = 1;
-    repeated AgentCallStatistics items = 2;
+  bool next = 1;
+  repeated AgentCallStatistics items = 2;
 }
 
 message SearchAgentInQueueStatisticsRequest {
-    int64 agent_id = 1;
-    int64 domain_id = 2;
+  int64 agent_id = 1;
+  int64 domain_id = 2;
 }
 
 message AgentInQueueStatistics {
-    message AgentInQueueStatisticsItem {
-        Lookup bucket = 1;
-        Lookup skill = 2;
-        int32 member_waiting = 3;
-    }
+  message AgentInQueueStatisticsItem {
+    Lookup bucket = 1;
+    Lookup skill = 2;
+    int32 member_waiting = 3;
+  }
 
-    Lookup queue = 1;
-    repeated AgentInQueueStatisticsItem statistics = 2;
+  Lookup queue = 1;
+  repeated AgentInQueueStatisticsItem statistics = 2;
 }
 
 message AgentInQueueStatisticsList {
-    repeated AgentInQueueStatistics items = 1;
+  repeated AgentInQueueStatistics items = 1;
 }
 
 message ListAgentUser {
-    bool next = 1;
-    repeated AgentUser items = 2;
+  bool next = 1;
+  repeated AgentUser items = 2;
 }
 
 message AgentUser {
-    int64 id = 1;
-    string name = 2;
+  int64 id = 1;
+  string name = 2;
 }
 
 message SearchLookupUsersAgentNotExistsRequest {
-    int32 page = 1;
-    int32 size = 2;
-    string q = 3;
+  int32 page = 1;
+  int32 size = 2;
+  string q = 3;
 
-    int64 domain_id = 4;
+  int64 domain_id = 4;
 }
 
 message AgentStateHistoryRequest {
-    int64 agent_id = 1;
-    int32 page = 2;
-    int32 size = 3;
-    int64 time_from = 4;
-    int64 time_to = 5;
-    string q = 6;
+  int64 agent_id = 1;
+  int32 page = 2;
+  int32 size = 3;
+  int64 time_from = 4;
+  int64 time_to = 5;
+  string q = 6;
 
-    int64 domain_id = 7;
+  int64 domain_id = 7;
 }
 
 message AgentState {
-    int64 id = 1;
-    string channel = 2;
-    int64 joined_at = 3;
-    string state = 4;
-    string payload = 5;
-    int64 duration = 6;
-    Lookup queue = 7;
-    Lookup agent = 8;
-    string pause_cause = 9;
-    int64 leaved_at = 10;
+  int64 id = 1;
+  string channel = 2;
+  int64 joined_at = 3;
+  string state = 4;
+  string payload = 5;
+  int64 duration = 6;
+  Lookup queue = 7;
+  Lookup agent = 8;
+  string pause_cause = 9;
+  int64 leaved_at = 10;
 }
 
 message ListAgentStateHistory {
-    bool next = 1;
-    repeated AgentState items = 2;
+  bool next = 1;
+  repeated AgentState items = 2;
 }
 
 // AgentInQueue represents agent assignment
 // and configuration within a specific queue.
 message AgentInQueue {
+  // AgentsInQueue contains aggregated statistics
+  // about agents assigned to queue.
+  message AgentsInQueue {
+    // Number of agents currently online.
+    uint32 online = 1;
 
-    // AgentsInQueue contains aggregated statistics
-    // about agents assigned to queue.
-    message AgentsInQueue {
+    // Number of agents currently in pause state.
+    uint32 pause = 2;
 
-        // Number of agents currently online.
-        uint32 online = 1;
+    // Number of agents currently offline.
+    uint32 offline = 3;
 
-        // Number of agents currently in pause state.
-        uint32 pause = 2;
+    // Number of agents that are online and in 'waiting' (idle) state.
+    uint32 free = 4;
 
-        // Number of agents currently offline.
-        uint32 offline = 3;
+    // Total number of agents assigned to the queue.
+    uint32 total = 5;
 
-        // Number of agents that are online and in 'waiting' (idle) state.
-        uint32 free = 4;
+    // Indicates whether pause is allowed for agents.
+    // If unset, pause availability is not defined.
+    google.protobuf.Int32Value allow_pause = 6;
 
-        // Total number of agents assigned to the queue.
-        uint32 total =  5;
+    // Number of agents currently on call.
+    uint32 busy = 7;
+  }
 
-        // Indicates whether pause is allowed for agents.
-        // If unset, pause availability is not defined.
-        google.protobuf.Int32Value allow_pause = 6;
+  // Queue reference.
+  Lookup queue = 1;
 
-        // Number of agents currently on call.
-        uint32 busy = 7;
-    }
+  // Agent priority within the queue.
+  int32 priority = 2;
 
-    // Queue reference.
-    Lookup queue = 1;
+  // Queue type.
+  int32 type = 3;
 
-    // Agent priority within the queue.
-    int32 priority = 2;
+  // Call distribution strategy used by the queue.
+  string strategy = 4;
 
-    // Queue type.
-    int32 type = 3;
+  // Indicates whether the queue is enabled.
+  bool enabled = 5;
 
-    // Call distribution strategy used by the queue.
-    string strategy = 4;
+  // Total number of members assigned to the queue.
+  int32 count_members = 6;
 
-    // Indicates whether the queue is enabled.
-    bool enabled = 5;
+  // Number of members currently waiting in the queue.
+  int32 waiting_members = 7;
 
-    // Total number of members assigned to the queue.
-    int32 count_members = 6;
+  // Number of members currently active in the queue.
+  int32 active_members = 8;
 
-    // Number of members currently waiting in the queue.
-    int32 waiting_members = 7;
+  // Aggregated agent statistics for the queue.
+  AgentsInQueue agents = 9;
 
-    // Number of members currently active in the queue.
-    int32 active_members = 8;
-
-    // Aggregated agent statistics for the queue.
-    AgentsInQueue agents = 9;
-
-    // Maximum number of members allowed in the queue.
-    int32 max_member_limit = 10;
+  // Maximum number of members allowed in the queue.
+  int32 max_member_limit = 10;
 }
 
 // ListAgentInQueue contains search results
 // and pagination metadata.
 message ListAgentInQueue {
+  // Indicates weather more records are available.
+  bool next = 1;
 
-    // Indicates weather more records are available.
-    bool next = 1;
-
-    // List of agent-to-queue assignments.
-    repeated AgentInQueue items = 2;
+  // List of agent-to-queue assignments.
+  repeated AgentInQueue items = 2;
 }
 
 // SearchAgentInQueueRequest defines parameters
 // for searching queues associated with an agent.
 message SearchAgentInQueueRequest {
+  // Unique identifier of the agent.
+  int64 id = 1;
 
-    // Unique identifier of the agent.
-    int64 id = 1;
+  // Page number (1-based).
+  int32 page = 2;
 
-    // Page number (1-based).
-    int32 page = 2;
+  // Maximum number of records per page.
+  int32 size = 3;
 
-    // Maximum number of records per page.
-    int32 size = 3;
+  // Free-text search query.
+  // Typically applied to queue name.
+  string q = 4;
 
-    // Free-text search query.
-    // Typically applied to queue name.
-    string q = 4;
+  // Sorting expression.
+  string sort = 5;
 
-    // Sorting expression.
-    string sort = 5;
-
-    // List of fields to be returned in the response.
-    // Used for response projection and payload optimization.
-    repeated string fields = 6;
+  // List of fields to be returned in the response.
+  // Used for response projection and payload optimization.
+  repeated string fields = 6;
 }
 
 message SearchAgentInTeamRequest {
-    int64 id = 1;
-    int32 page = 2;
-    int32 size = 3;
-    string q = 4;
+  int64 id = 1;
+  int32 page = 2;
+  int32 size = 3;
+  string q = 4;
 
-    int64 domain_id = 5;
+  int64 domain_id = 5;
 }
 
 message AgentInTeam {
-    Lookup team = 1;
-    string strategy = 2;
+  Lookup team = 1;
+  string strategy = 2;
 }
 
 message ListAgentInTeam {
-    bool next = 1;
-    repeated AgentInTeam items = 2;
+  bool next = 1;
+  repeated AgentInTeam items = 2;
 }
 
 message UpdateAgentRequest {
-    int64 id = 1;
-    Lookup user = 2;
-    string description = 3;
-    int32 progressive_count = 4;
-    Lookup greeting_media = 5;
-    int64 domain_id = 6;
+  int64 id = 1;
+  Lookup user = 2;
+  string description = 3;
+  int32 progressive_count = 4;
+  Lookup greeting_media = 5;
+  int64 domain_id = 6;
 
-    repeated string allow_channels = 7;
-    uint32 chat_count = 8;
-    repeated Lookup supervisor = 9;
-    Lookup team = 10;
-    Lookup region = 11;
-    repeated Lookup auditor = 12;
-    bool is_supervisor = 13;
-    uint32 task_count = 14;
-    bool screen_control = 15;
-    uint32 extra_chat_count = 16;
+  repeated string allow_channels = 7;
+  uint32 chat_count = 8;
+  repeated Lookup supervisor = 9;
+  Lookup team = 10;
+  Lookup region = 11;
+  repeated Lookup auditor = 12;
+  bool is_supervisor = 13;
+  uint32 task_count = 14;
+  bool screen_control = 15;
+  uint32 extra_chat_count = 16;
 }
 
 message PatchAgentRequest {
-    repeated string fields = 1;
-    int64 id = 2;
-    Lookup user = 3;
-    string description = 4;
-    int32 progressive_count = 5;
-    Lookup greeting_media = 6;
+  repeated string fields = 1;
+  int64 id = 2;
+  Lookup user = 3;
+  string description = 4;
+  int32 progressive_count = 5;
+  Lookup greeting_media = 6;
 
-    repeated string allow_channels = 7;
-    uint32 chat_count = 8;
-    repeated Lookup supervisor = 9;
-    Lookup team = 10;
-    Lookup region = 11;
-    repeated Lookup auditor = 12;
-    bool is_supervisor = 13;
-    bool screen_control = 14;
-    uint32 extra_chat_count = 15;
+  repeated string allow_channels = 7;
+  uint32 chat_count = 8;
+  repeated Lookup supervisor = 9;
+  Lookup team = 10;
+  Lookup region = 11;
+  repeated Lookup auditor = 12;
+  bool is_supervisor = 13;
+  bool screen_control = 14;
+  uint32 extra_chat_count = 15;
 }
 
 message ReadAgentRequest {
-    int64 id = 1;
-    int64 domain_id = 2;
+  int64 id = 1;
+  int64 domain_id = 2;
 }
 
 message DeleteAgentRequest {
-    int64 id = 1;
-    int64 domain_id = 2;
+  int64 id = 1;
+  int64 domain_id = 2;
 }
 
 message SearchAgentRequest {
-    int32 page = 1;
-    int32 size = 2;
-    string q = 3;
+  int32 page = 1;
+  int32 size = 2;
+  string q = 3;
 
-    string sort = 5;
-    repeated string fields = 6;
+  string sort = 5;
+  repeated string fields = 6;
 
-    repeated string id = 7;
-    repeated string allow_channels = 8;
+  repeated string id = 7;
+  repeated string allow_channels = 8;
 
-    repeated uint32 supervisor_id = 9;
-    repeated uint32 team_id = 10;
-    repeated uint32 region_id = 11;
-    repeated uint32 auditor_id = 12;
-    bool is_supervisor = 13;
-    repeated uint32 skill_id = 14;
-    repeated uint32 queue_id = 15;
-    bool not_supervisor = 16;
-    repeated int64 user_id = 17;
-    repeated string extension = 18;
-    repeated uint32 not_team_id = 19;
-    repeated uint32 not_skill_id = 20;
-    repeated int64 not_user_id = 21;
+  repeated uint32 supervisor_id = 9;
+  repeated uint32 team_id = 10;
+  repeated uint32 region_id = 11;
+  repeated uint32 auditor_id = 12;
+  bool is_supervisor = 13;
+  repeated uint32 skill_id = 14;
+  repeated uint32 queue_id = 15;
+  bool not_supervisor = 16;
+  repeated int64 user_id = 17;
+  repeated string extension = 18;
+  repeated uint32 not_team_id = 19;
+  repeated uint32 not_skill_id = 20;
+  repeated int64 not_user_id = 21;
 }
 
 message CreateAgentRequest {
-    Lookup user = 1;
-    string description = 2;
-    int32 progressive_count = 3;
-    Lookup greeting_media = 4;
-    int64 domain_id = 5;
+  Lookup user = 1;
+  string description = 2;
+  int32 progressive_count = 3;
+  Lookup greeting_media = 4;
+  int64 domain_id = 5;
 
-    repeated string allow_channels = 6;
-    uint32 chat_count = 7;
-    repeated Lookup supervisor = 8;
-    Lookup team = 9;
-    Lookup region = 10;
-    repeated Lookup auditor = 11;
-    bool is_supervisor = 12;
-    uint32 task_count = 13;
-    bool screen_control = 14;
-    uint32 extra_chat_count = 15;
+  repeated string allow_channels = 6;
+  uint32 chat_count = 7;
+  repeated Lookup supervisor = 8;
+  Lookup team = 9;
+  Lookup region = 10;
+  repeated Lookup auditor = 11;
+  bool is_supervisor = 12;
+  uint32 task_count = 13;
+  bool screen_control = 14;
+  uint32 extra_chat_count = 15;
 }
 
 message SkillAgent {
-    int64 id = 1;
-    Lookup skill = 2;
-    Lookup agent = 3;
-    google.protobuf.Int32Value capacity = 4;
+  int64 id = 1;
+  Lookup skill = 2;
+  Lookup agent = 3;
+  google.protobuf.Int32Value capacity = 4;
 }
 
 message AgentStatusRequest {
-    int64 id = 1;
-    string status = 2; //FIXME enumerate
-    bool on_demand = 3;
-    repeated string channels = 4;
-    string payload = 5;
-    int64 domain_id = 6;
-    string status_comment = 7;
-    Lookup online_skill = 8;
+  int64 id = 1;
+  string status = 2; //FIXME enumerate
+  bool on_demand = 3;
+  repeated string channels = 4;
+  string payload = 5;
+  int64 domain_id = 6;
+  string status_comment = 7;
+  Lookup online_skill = 8;
 }
 
 message AgentChannel {
-    string channel = 1;
-    string state = 2;
-    int64 joined_at = 3;
-    int64 timeout = 4;
+  string channel = 1;
+  string state = 2;
+  int64 joined_at = 3;
+  int64 timeout = 4;
 }
 
 message Agent {
-    int64 id = 1;
-    Lookup user = 2;
-    string status = 3;
-    string description = 4;
-    int64 last_status_change = 5;
-    int32 progressive_count = 6;
-    string name = 7;
-    repeated AgentChannel channel = 8;
-    int64 status_duration = 9;
-    Lookup greeting_media = 10;
+  int64 id = 1;
+  Lookup user = 2;
+  string status = 3;
+  string description = 4;
+  int64 last_status_change = 5;
+  int32 progressive_count = 6;
+  string name = 7;
+  repeated AgentChannel channel = 8;
+  int64 status_duration = 9;
+  Lookup greeting_media = 10;
 
-    repeated string allow_channels = 11;
-    uint32 chat_count = 12;
-    repeated Lookup supervisor = 13;
-    Lookup team = 14;
-    Lookup region = 15;
-    repeated Lookup auditor = 16;
-    bool is_supervisor = 17;
-    repeated Lookup skills = 18;
-    string extension = 19;
-    uint32 task_count = 20;
-    bool screen_control = 21;
-    bool allow_set_screen_control = 22;
+  repeated string allow_channels = 11;
+  uint32 chat_count = 12;
+  repeated Lookup supervisor = 13;
+  Lookup team = 14;
+  Lookup region = 15;
+  repeated Lookup auditor = 16;
+  bool is_supervisor = 17;
+  repeated Lookup skills = 18;
+  string extension = 19;
+  uint32 task_count = 20;
+  bool screen_control = 21;
+  bool allow_set_screen_control = 22;
 
-    message UserPresence {
-        string status = 1;
-    }
-    UserPresence user_presence_status = 23;
-    uint32 extra_chat_count = 24;
+  message UserPresence {
+    string status = 1;
+  }
+  UserPresence user_presence_status = 23;
+  uint32 extra_chat_count = 24;
+  string activity_type = 25;
 }
 
 message ListAgent {
-    bool next = 1;
-    repeated Agent items = 2;
+  bool next = 1;
+  repeated Agent items = 2;
 }
