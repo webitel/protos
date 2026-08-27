@@ -45,6 +45,13 @@ const collection = await new Promise((resolve, reject) => {
       requestParametersResolution: "Example",
       exampleParametersResolution: "Example",
       collapseFolders: false,
+      // Our protos generate deeply nested schemas (message -> Lookup -> ...).
+      // The default stackLimit (10) makes the schema faker bail out and emit
+      // "<Error: Too many levels of nesting to fake this schema>" as example
+      // values. Raise it so bodies are faked in full. optimizeConversion MUST
+      // be false for stackLimit to take effect (documented library caveat).
+      stackLimit: 30,
+      optimizeConversion: false,
     },
     (err, res) => {
       if (err) return reject(err);
