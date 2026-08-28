@@ -54,12 +54,16 @@ service PdfService {
     option (google.api.http) = {get: "/agents/{agent_id}/exports/archive/screenrecordings"};
   }
 
+  // Streams original screenshots packed into a ZIP archive.
+  // The archive is assembled on the fly without creating a temporary file.
+  rpc DownloadScreenshotArchive(DownloadScreenshotArchiveRequest) returns (stream DownloadScreenshotArchiveResponse) {
+    option (google.api.http) = {get: "/agents/{agent_id}/exports/archive/screenshots"};
+  }
+
   // Streams original screen recording videos associated with a specific call
   // as a ZIP archive assembled on the fly.
   rpc DownloadCallScreenrecordingArchive(DownloadCallScreenrecordingArchiveRequest) returns (stream DownloadCallScreenrecordingArchiveResponse) {
-    option (google.api.http) = {
-      get: "/calls/{call_id}/exports/archive/screenrecordings"
-    };
+    option (google.api.http) = {get: "/calls/{call_id}/exports/archive/screenrecordings"};
   }
 
   // --- General Operations ---
@@ -201,5 +205,19 @@ message DownloadScreenrecordingArchiveRequest {
 // One frame of a streamed ZIP archive.
 // The archive name is sent through the "filename" gRPC response header.
 message DownloadScreenrecordingArchiveResponse {
+  bytes data = 1;
+}
+
+// Request for streaming screenshots of one agent as a ZIP archive.
+message DownloadScreenshotArchiveRequest {
+  int64 agent_id = 1; // Unique identifier of the agent.
+  repeated int64 file_ids = 2; // Optional IDs of selected screenshots.
+  int64 from = 3; // Start of the uploaded_at range (Unix millis).
+  int64 to = 4; // End of the uploaded_at range (Unix millis).
+}
+
+// One frame of a streamed screenshot ZIP archive.
+// The archive name is sent through the "filename" gRPC response header.
+message DownloadScreenshotArchiveResponse {
   bytes data = 1;
 }
