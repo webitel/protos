@@ -248,6 +248,75 @@
         ]
       }
     },
+    "/calls/{call_id}/exports/archive/screenrecordings": {
+      "get": {
+        "summary": "Streams original screen recording videos associated with a specific call\nas a ZIP archive assembled on the fly.",
+        "operationId": "DownloadCallScreenrecordingArchive",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "$ref": "#/definitions/webitel_media_exporter.DownloadCallScreenrecordingArchiveResponse"
+                },
+                "error": {
+                  "$ref": "#/definitions/google.rpc.Status"
+                }
+              },
+              "title": "Stream result of webitel_media_exporter.DownloadCallScreenrecordingArchiveResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "call_id",
+            "description": "Unique identifier of the call.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "file_ids",
+            "description": "Optional IDs of selected screen recordings.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "from",
+            "description": "Start of the uploaded_at range (Unix millis).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "to",
+            "description": "End of the uploaded_at range (Unix millis).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "PdfService"
+        ]
+      }
+    },
     "/calls/{call_id}/exports/pdf": {
       "get": {
         "summary": "Lists the history of PDF exports for a specific call ID.",
@@ -437,6 +506,16 @@
         }
       },
       "title": "One frame of a streamed ZIP archive download. The file name is carried via the \"filename\"\ngRPC response header (set before the first frame)"
+    },
+    "webitel_media_exporter.DownloadCallScreenrecordingArchiveResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "string",
+          "format": "byte"
+        }
+      },
+      "description": "One frame of a streamed screen recording ZIP archive. The archive name is\ncarried via the \"filename\" gRPC response header set before the first frame."
     },
     "webitel_media_exporter.DownloadScreenrecordingArchiveResponse": {
       "type": "object",

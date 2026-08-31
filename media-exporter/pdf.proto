@@ -54,6 +54,14 @@ service PdfService {
     option (google.api.http) = {get: "/agents/{agent_id}/exports/archive/screenrecordings"};
   }
 
+  // Streams original screen recording videos associated with a specific call
+  // as a ZIP archive assembled on the fly.
+  rpc DownloadCallScreenrecordingArchive(DownloadCallScreenrecordingArchiveRequest) returns (stream DownloadCallScreenrecordingArchiveResponse) {
+    option (google.api.http) = {
+      get: "/calls/{call_id}/exports/archive/screenrecordings"
+    };
+  }
+
   // --- General Operations ---
 
   // Deletes a specific export record from the history.
@@ -91,6 +99,20 @@ message DownloadCallArchiveRequest {
 // One frame of a streamed ZIP archive download. The file name is carried via the "filename"
 // gRPC response header (set before the first frame)
 message DownloadCallArchiveResponse {
+  bytes data = 1;
+}
+
+// Request for streaming screen recording videos associated with a call as a ZIP archive.
+message DownloadCallScreenrecordingArchiveRequest {
+  string call_id = 1; // Unique identifier of the call.
+  repeated int64 file_ids = 2; // Optional IDs of selected screen recordings.
+  int64 from = 3; // Start of the uploaded_at range (Unix millis).
+  int64 to = 4; // End of the uploaded_at range (Unix millis).
+}
+
+// One frame of a streamed screen recording ZIP archive. The archive name is
+// carried via the "filename" gRPC response header set before the first frame.
+message DownloadCallScreenrecordingArchiveResponse {
   bytes data = 1;
 }
 
