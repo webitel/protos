@@ -372,6 +372,73 @@
         }
       }
     },
+    "/agents/{agent_id}/exports/archive/screenshots": {
+      "get": {
+        "tags": [
+          "PdfService"
+        ],
+        "summary": "Streams original screenshots packed into a ZIP archive.\nThe archive is assembled on the fly without creating a temporary file.",
+        "operationId": "DownloadScreenshotArchive",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Unique identifier of the agent.",
+            "name": "agent_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "description": "Optional IDs of selected screenshots.",
+            "name": "file_ids",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Start of the uploaded_at range (Unix millis).",
+            "name": "from",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "End of the uploaded_at range (Unix millis).",
+            "name": "to",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "title": "Stream result of webitel_media_exporter.DownloadScreenshotArchiveResponse",
+              "properties": {
+                "error": {
+                  "$ref": "#/definitions/google.rpc.Status"
+                },
+                "result": {
+                  "$ref": "#/definitions/webitel_media_exporter.DownloadScreenshotArchiveResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/agents/{agent_id}/exports/pdf/screenrecordings": {
       "get": {
         "tags": [
@@ -76172,6 +76239,16 @@
     },
     "webitel_media_exporter.DownloadScreenrecordingArchiveResponse": {
       "description": "One frame of a streamed ZIP archive.\nThe archive name is sent through the \"filename\" gRPC response header.",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "webitel_media_exporter.DownloadScreenshotArchiveResponse": {
+      "description": "One frame of a streamed screenshot ZIP archive.\nThe archive name is sent through the \"filename\" gRPC response header.",
       "type": "object",
       "properties": {
         "data": {
