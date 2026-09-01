@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+package engine;
+
+option go_package = "github.com/webitel/protos/engine";
+
+import "google/api/annotations.proto";
+
+service TeamChatTagService {
+  rpc CreateChatTag (CreateChatTagRequest) returns (ChatTag) {
+    option (google.api.http) = {
+      post: "/call_center/teams/{team_id}/chat_tags"
+      body: "*"
+    };
+  }
+
+  rpc SearchChatTag (SearchChatTagRequest) returns (ListChatTag) {
+    option (google.api.http) = {
+      get: "/call_center/teams/{team_id}/chat_tags"
+    };
+  }
+
+  rpc UpdateChatTag (UpdateChatTagRequest) returns (ChatTag) {
+    option (google.api.http) = {
+      put: "/call_center/teams/{team_id}/chat_tags/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteChatTag(DeleteChatTagRequest) returns (ChatTag) {
+    option (google.api.http) = {
+      delete: "/call_center/teams/{team_id}/chat_tags/{id}"
+    };
+  }
+}
+
+message DeleteChatTagRequest {
+  int64 team_id = 1;
+  uint32 id = 2;
+}
+
+message UpdateChatTagRequest {
+  int64 team_id = 1;
+  uint32 id = 2;
+  string tag = 3;
+}
+
+message SearchChatTagRequest {
+  int64 team_id = 1;
+  int32 page = 2;
+  int32 size = 3;
+  string q = 4;
+
+  string sort = 5;
+  repeated string fields = 6;
+
+  repeated uint32 id = 7;
+}
+
+message CreateChatTagRequest {
+  int64 team_id = 1;
+  string tag = 2;
+}
+
+message ChatTag {
+  uint32 id = 1;
+  string tag = 2;
+}
+
+message ListChatTag {
+  bool next = 1;
+  repeated ChatTag items = 2;
+}
