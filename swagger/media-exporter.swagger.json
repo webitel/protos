@@ -87,6 +87,76 @@
         ]
       }
     },
+    "/agents/{agent_id}/exports/archive/screenshots": {
+      "get": {
+        "summary": "Streams original screenshots packed into a ZIP archive.\nThe archive is assembled on the fly without creating a temporary file.",
+        "operationId": "DownloadScreenshotArchive",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "$ref": "#/definitions/webitel_media_exporter.DownloadScreenshotArchiveResponse"
+                },
+                "error": {
+                  "$ref": "#/definitions/google.rpc.Status"
+                }
+              },
+              "title": "Stream result of webitel_media_exporter.DownloadScreenshotArchiveResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "agent_id",
+            "description": "Unique identifier of the agent.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "file_ids",
+            "description": "Optional IDs of selected screenshots.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "from",
+            "description": "Start of the uploaded_at range (Unix millis).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "to",
+            "description": "End of the uploaded_at range (Unix millis).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "PdfService"
+        ]
+      }
+    },
     "/agents/{agent_id}/exports/pdf/screenrecordings": {
       "get": {
         "summary": "Lists the history of PDF exports for a specific agent.",
@@ -526,6 +596,16 @@
         }
       },
       "description": "One frame of a streamed ZIP archive.\nThe archive name is sent through the \"filename\" gRPC response header."
+    },
+    "webitel_media_exporter.DownloadScreenshotArchiveResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "string",
+          "format": "byte"
+        }
+      },
+      "description": "One frame of a streamed screenshot ZIP archive.\nThe archive name is sent through the \"filename\" gRPC response header."
     },
     "webitel_media_exporter.ExportRecord": {
       "type": "object",
