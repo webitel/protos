@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package webitel.im.service.thread.v1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/webitel/im-thread-service/gen/go/thread/v1;thread";
+
+service ThreadTagManagement {
+  rpc AddTag(AddThreadTagRequest) returns (ChatTag);
+  rpc RemoveTag(RemoveThreadTagRequest) returns (RemoveThreadTagResponse);
+  rpc Search(SearchThreadTagsRequest) returns (SearchThreadTagsResponse);
+}
+
+message ChatTag {
+  string id = 1;
+  string thread_id = 2;
+  string contact_id = 3;
+  string tag = 4;
+  int64 created_at = 5;
+}
+
+message AddThreadTagRequest {
+  string contact_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+  string thread_id = 2 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+  string tag = 3 [
+    (buf.validate.field).string = {
+      min_len: 1,
+      max_len: 64,
+      pattern: "^[\\p{L}\\p{N}_-]+$"
+    }
+  ];
+}
+
+message RemoveThreadTagRequest {
+  string id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+  string contact_id = 2 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+}
+
+message RemoveThreadTagResponse {}
+
+message SearchThreadTagsRequest {
+  string contact_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+  // Page number (1-based).
+  int32 page = 2 [
+    (buf.validate.field).int32.gte = 1,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+  // Maximum number of tags to return per page. Must be > 0 and <= 100.
+  int32 size = 3 [
+    (buf.validate.field).int32 = {
+      gt: 0
+      lte: 100
+    },
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+}
+
+message SearchThreadTagsResponse {
+  repeated string tags = 1;
+  bool next = 2;
+}

@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+package webitel.im.api.gateway.v1;
+
+import "google/api/annotations.proto";
+import "buf/validate/validate.proto";
+
+// ThreadTagManagement defines the gRPC service for managing tags on threads.
+service ThreadTagManagement {
+  // AddTag adds a tag to a thread.
+  rpc AddTag(AddThreadTagRequest) returns (ChatTag) {
+    option (google.api.http) = {
+      post: "/v1/threads/{thread_id}/tags"
+      body: "*"
+    };
+  };
+  // RemoveTag removes a tag from a thread.
+  rpc RemoveTag(RemoveThreadTagRequest) returns (RemoveThreadTagResponse) {
+    option (google.api.http) = {
+      delete: "/v1/tags/{id}"
+    };
+  };
+  // Search searches for tags.
+  rpc Search(SearchThreadTagsRequest) returns (SearchThreadTagsResponse) {
+    option (google.api.http) = {
+      get: "/v1/tags"
+    };
+  };
+}
+
+message ChatTag {
+  string id = 1;
+  string thread_id = 2;
+  string tag = 3;
+  int64 created_at = 4;
+}
+
+message AddThreadTagRequest {
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+  string tag = 2 [
+    (buf.validate.field).string = {
+      min_len: 1,
+      max_len: 64,
+      pattern: "^[\\p{L}\\p{N}_-]+$"
+    }
+  ];
+}
+
+message RemoveThreadTagRequest {
+  string id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+}
+
+message RemoveThreadTagResponse {}
+
+message SearchThreadTagsRequest {
+  int32 page = 1 [
+    (buf.validate.field).int32.gte = 1,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+  int32 size = 2 [
+    (buf.validate.field).int32 = {
+      gt: 0
+      lte: 100
+    },
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+}
+
+message SearchThreadTagsResponse {
+  repeated string tags = 1;
+  bool next = 2;
+}

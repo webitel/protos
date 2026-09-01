@@ -8,6 +8,7 @@ import "service/thread/v1/message_history_service.proto";
 import "service/thread/v1/peer.proto";
 import "service/thread/v1/shared.proto";
 import "service/thread/v1/thread_permission.proto";
+import "service/thread/v1/thread_tag_service.proto";
 
 option go_package = "github.com/webitel/im-thread-service/gen/go/api/v1;impb";
 
@@ -149,6 +150,9 @@ message Thread {
   // not read yet; the participant's own messages and system messages are
   // excluded. Zero when self_id is not provided.
   int32 unread_count = 16;
+
+  // The caller's own tags on this thread. Empty if the caller hasn't tagged it.
+  repeated ChatTag tags = 17;
 }
 
 //#endregion
@@ -226,6 +230,10 @@ message ThreadSearchRequest {
   // identities are members. Identities are resolved to contacts inside
   // the query, so no contact UUID is required from the caller.
   repeated ContactIdentity participants = 12;
+
+  // Restrict results to threads the caller (self_id) has tagged with every one of these tags (AND semantics).
+  // Ignored when empty.
+  repeated string tags = 13;
 }
 
 // ContactIdentity addresses a contact by its external identity (issuer + subject)
@@ -331,6 +339,10 @@ message SearchLeftRequest {
     (buf.validate.field).int32.gte = 1,
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
+
+  // Restrict results to threads the member has tagged with every one of these tags (AND semantics).
+  // Ignored when empty.
+  repeated string tags = 8;
 }
 
 message SearchLeftResponse {
