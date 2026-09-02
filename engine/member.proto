@@ -5,6 +5,7 @@ package engine;
 import "const.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/struct.proto";
+import "google/api/visibility.proto";
 
 option go_package = "github.com/webitel/protos/engine";
 
@@ -156,6 +157,13 @@ service MemberService {
       patch: "/call_center/queues/attempts/{attempt_id}/assign"
       body: "*"
     };
+  }
+
+  rpc MutateHistoryAttemptResult(MutateHistoryAttemptResultRequest) returns (MutateHistoryAttemptResultResponse) {
+      option (google.api.http) = {
+          patch: "/call_center/attempts/history/mutate"
+          body: "*"
+      };
   }
 }
 
@@ -736,4 +744,17 @@ message MemberCommunicationCreateRequest {
   string display = 6;
   int64 stop_at = 7;
   string dtmf = 8;
+}
+
+message MutateHistoryAttemptResultRequest {
+    int64 id = 1;
+    string member_call_id = 2;
+    string agent_call_id = 3;
+    repeated string fields = 4[(google.api.field_visibility) = {restriction: "PREVIEW"}];
+    string description = 5;
+    map<string, string> variables = 6;
+}
+
+message MutateHistoryAttemptResultResponse {
+    AttemptHistory item = 1;
 }
