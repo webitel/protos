@@ -1041,6 +1041,71 @@
         }
       }
     },
+    "/call_center/agents/chat_tags": {
+      "get": {
+        "tags": [
+          "AgentChatTagService"
+        ],
+        "operationId": "SearchAgentChatTag",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "name": "id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.ListChatTag"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/call_center/agents/reports/call": {
       "get": {
         "tags": [
@@ -2349,6 +2414,38 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/engine.ListAgentInTeam"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/call_center/attempts/history/mutate": {
+      "patch": {
+        "tags": [
+          "MemberService"
+        ],
+        "operationId": "MutateHistoryAttemptResult",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engine.MutateHistoryAttemptResultRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.MutateHistoryAttemptResultResponse"
             }
           },
           "default": {
@@ -9999,6 +10096,197 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/engine.AgentTeam"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/call_center/teams/{team_id}/chat_tags": {
+      "get": {
+        "tags": [
+          "TeamChatTagService"
+        ],
+        "operationId": "SearchChatTag",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "team_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "name": "id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.ListChatTag"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "TeamChatTagService"
+        ],
+        "operationId": "CreateChatTag",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "team_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engine.TeamChatTagService.CreateChatTagBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.ChatTag"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/call_center/teams/{team_id}/chat_tags/{id}": {
+      "put": {
+        "tags": [
+          "TeamChatTagService"
+        ],
+        "operationId": "UpdateChatTag",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "team_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engine.TeamChatTagService.UpdateChatTagBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.ChatTag"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "TeamChatTagService"
+        ],
+        "operationId": "DeleteChatTag",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "team_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.ChatTag"
             }
           },
           "default": {
@@ -55544,6 +55832,18 @@
         }
       }
     },
+    "engine.ChatTag": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "tag": {
+          "type": "string"
+        }
+      }
+    },
     "engine.CommunicationChannels": {
       "type": "string",
       "default": "Undefined",
@@ -57982,6 +58282,21 @@
         }
       }
     },
+    "engine.ListChatTag": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/engine.ChatTag"
+          }
+        },
+        "next": {
+          "type": "boolean"
+        }
+      }
+    },
     "engine.ListCommunication": {
       "type": "object",
       "properties": {
@@ -59423,6 +59738,38 @@
       "properties": {
         "success": {
           "type": "boolean"
+        }
+      }
+    },
+    "engine.MutateHistoryAttemptResultRequest": {
+      "type": "object",
+      "properties": {
+        "agent_call_id": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "member_call_id": {
+          "type": "string"
+        },
+        "variables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "engine.MutateHistoryAttemptResultResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/engine.AttemptHistory"
         }
       }
     },
@@ -62212,6 +62559,22 @@
         "repeats_number": {
           "type": "integer",
           "format": "int64"
+        }
+      }
+    },
+    "engine.TeamChatTagService.CreateChatTagBody": {
+      "type": "object",
+      "properties": {
+        "tag": {
+          "type": "string"
+        }
+      }
+    },
+    "engine.TeamChatTagService.UpdateChatTagBody": {
+      "type": "object",
+      "properties": {
+        "tag": {
+          "type": "string"
         }
       }
     },
@@ -77571,6 +77934,12 @@
     },
     {
       "name": "AgentService"
+    },
+    {
+      "name": "TeamChatTagService"
+    },
+    {
+      "name": "AgentChatTagService"
     },
     {
       "name": "SkillService"
