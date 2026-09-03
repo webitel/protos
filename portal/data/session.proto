@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package webitel.portal;
+
+option go_package = "webitel.go/api/portal;portal";
+
+// import "block.proto";
+// import "lookup.proto";
+import "data/account.proto";
+import "data/device.proto"; // PUSH+
+// import "google/protobuf/struct.proto";
+
+
+// Session / access_token details
+message Session {
+
+  // [Admin]:
+  // - id; if omitted ( offline / inactive ) is considered
+  //       otherwise ( online / recent / ( now - seen ) < ttl_idle )
+  //
+  // [Customer]:
+  // - id; always present
+
+  // session unique id
+  string id = 1;
+  // the timestamp when the access_token was last used
+  int64 date = 2;
+  // the timestamp when the access_token will be revoked
+  int64 expires_at = 3;
+  // the timestamp when the access_token was last rotated
+  int64 rotated_at = 4;
+  // the timestamp when the access token session was initiated
+  int64 created_at = 5;
+  // Account is registered customer(end-user) profile
+  UserAccount account = 6; // user
+  // Device ( user-agent / app-client ) registration
+  Device device = 8;
+
+  // // PUSH Notifications registration
+  // PushAccount push = 7;
+  // // Network (device) registration
+  // NetAccount net = 8;
+
+  // // VoIP/SIP endpoint + credentials
+  // AccountVoIP voip = 9;
+  // // [I]nstant[M]essaging linking URLs
+  // AccountIM im = 10;
+}

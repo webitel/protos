@@ -1,0 +1,136 @@
+syntax = "proto3";
+package webitel.portal;
+option go_package = "webitel.go/api/portal;portal";
+
+import "data/block.proto";
+import "data/lookup.proto";
+
+import "data/app.proto";
+// import "user.proto";
+import "data/account.proto";
+
+// import "google/api/visibility.proto";
+// import "protoc-gen-openapiv2/options/annotations.proto";
+
+// Portal Service Configuration
+message Service {
+
+  // Portal unique id
+  string id = 1;
+  // Meaningful name
+  string name = 2;
+  // Short description
+  string about = 3;
+  // [P]rimary [D]omain [C]omponent
+  Lookup domain = 4;
+  // Disabled; The reason
+  Block block = 5;
+
+  // REQUIRED.
+  // Authorization settings.
+  ServiceAuth auth = 6;
+  // VoIP/SIP settings
+  // Omitted means NO calls support.
+  ServiceCall call = 7;
+  // IM chat settings
+  // Omitted means NO chat support.
+  ServiceChat chat = 8;
+
+  // Timestamp last updated. Epochtme, milli.
+  int64 updated_at = 21;
+  // Portal admin who last made changes.
+  Lookup updated_by = 22;
+  // Timestamp when created. Epochtme, milli.
+  int64 created_at = 23;
+  // Portal admin. Service owner.
+  Lookup created_by = 24;
+
+
+  // ----- READONLY ----- //
+
+  // Apps associated with this portal
+  repeated App apps = 31; //
+  // Users ever signed into this portal
+  // repeated User users = 32;
+  repeated UserAccount users = 32;
+}
+
+// Authorization service options
+message ServiceAuth {
+
+  // REQUIRED. License product GRANT scope.
+  // **NOTE**: Used to limit the number of concurrent unique users online.
+  Lookup product = 1;
+
+  // OPTIONAL. Limit the number of concurrent users online.
+  // Can be used to distribute the load of a joint product between individual portals.
+  // The maximum value is limited by the license `product` number.
+  // The default value corresponds to maximum.
+  int32 max_online = 2;
+
+  // Idle session timeout (in: minutes)
+  // **NOTE**: The user will be forcibly logged out after minutes of inactivity.
+  // Default: 10. Minimum: 1. Maximum: 1440. 24h
+  int32 max_idle = 3;
+
+  // Maximum session lifetime period. (in: minutes)
+  // ( -0 ) NO limit. Awaits for user logout action ..
+  // ( +1 ) Forbids refreshing an access token after ( issued + max_age )
+  int32 max_age = 4;
+
+}
+
+// [V]oice [o]ver [IP] service configuration
+message ServiceCall {
+
+  // Inbound routing schema.
+  Lookup schema = 1;
+
+  // SIP host/proxy URI.
+  string proxy = 2;
+
+  // Video is allowed ?
+  bool video = 3;
+
+}
+
+// [I]nstant [M]essaging service configuration
+message ServiceChat {
+
+  // Inbox chatflow schema.
+  Lookup schema = 1;
+  // OPTIONAL. Title of the chat for Customer end-User.
+  string title = 2;
+}
+
+message ServiceList {
+  repeated Service data = 1;
+  int32 page = 2;
+  bool next = 3;
+}
+
+// InputService changes
+message InputService {
+
+  // // Portal unique id
+  // string id = 1;
+
+  // Meaningful name
+  string name = 2;
+  // Short description
+  string about = 3;
+  // [P]rimary [D]omain [C]omponent
+  Lookup domain = 4;
+  // Disabled; Block status
+  Block block = 5;
+
+  // REQUIRED.
+  // Authorization settings.
+  ServiceAuth auth = 6;
+  // VoIP/SIP settings
+  // Omitted means NO calls support.
+  ServiceCall voip = 7;
+  // IM chat settings
+  // Omitted means NO chat support.
+  ServiceChat chat = 8;
+}
