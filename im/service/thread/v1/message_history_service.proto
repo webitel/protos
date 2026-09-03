@@ -41,6 +41,79 @@ message SearchMessageHistoryRequest {
   optional HistoryMessageCursorRequest cursor = 7;
   uint32 size = 8;
   string caller_id = 9;
+
+  // Allow-list of Message.System.Type subtype values (e.g. "user_joined",
+  // "user_left") to include in results.
+  //  - unset                              : no restriction, all system
+  //    messages visible (back-compat default).
+  //  - set, with an empty `types` list     : hide ALL system messages.
+  //  - set, with a non-empty `types` list  : show ONLY system messages whose
+  //    subtype is in this list; every other subtype is hidden, including any
+  //    not yet known to the caller (fail-closed for unknown/future
+  //    subtypes).
+  // Mirrors im-account-service's Application.allow_system_messages 1:1, so a
+  // caller (im-gateway-service) can forward that resolved policy value
+  // through unchanged. Independent of, and AND-combined with, the coarse
+  // `types` (int32) filter above.
+  optional SystemMessageAllowList system_message_allow_list = 10;
+}
+
+// Looks for messages whose body contains the given text. Results are ordered
+// newest first and every item carries its thread_id, so a caller can open the
+// dialog and re-enter the history at the matched message.
+message SearchMessagesRequest {
+  repeated string fields = 1;
+
+  // Text to look for. Matched case-insensitively against any part of the body.
+  string q = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 256
+  }];
+
+  // Narrows the search to a single dialog. Empty spans every thread the caller
+  // is a member of.
+  string thread_id = 3 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+
+  repeated string sender_ids = 4 [
+    (buf.validate.field).repeated.items.string.uuid = true,
+    (buf.validate.field).repeated.max_items = 50
+  ];
+
+  repeated int32 types = 5;
+
+  int32 domain_id = 6;
+
+  // Member running the search. Results never leave the threads this member
+  // belongs to, bounded by the periods of their membership.
+  string caller_id = 7 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  optional HistoryMessageCursorRequest cursor = 8;
+
+  uint32 size = 9 [
+    (buf.validate.field).uint32 = {lte: 100},
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+
+  // Allow-list of Message.System.Type subtype values (e.g. "user_joined",
+  // "user_left") to include in results.
+  //  - unset                              : no restriction, all system
+  //    messages visible (back-compat default).
+  //  - set, with an empty `types` list     : hide ALL system messages.
+  //  - set, with a non-empty `types` list  : show ONLY system messages whose
+  //    subtype is in this list; every other subtype is hidden, including any
+  //    not yet known to the caller (fail-closed for unknown/future
+  //    subtypes).
+  // Mirrors im-account-service's Application.allow_system_messages 1:1, so a
+  // caller (im-gateway-service) can forward that resolved policy value
+  // through unchanged. Independent of, and AND-combined with, the coarse
+  // `types` (int32) filter above.
+  optional SystemMessageAllowList system_message_allow_list = 10;
 }
 
 message Document {
@@ -84,6 +157,23 @@ message System {
   string type = 1;
   google.protobuf.Struct metadata = 2;
   string message_id = 3;
+}
+
+// SystemMessageAllowList is im-thread-service's per-request policy for which
+// "system" message subtypes (Message.System.Type, e.g. "user_joined",
+// "user_left") are included in history results. Mirrors im-account-service's
+// Application.allow_system_messages 1:1 (see
+// im/service/admin/v1/application.proto) so im-gateway-service can forward an
+// already-resolved policy value through without any transformation. Wrapped
+// in its own message (rather than a bare `repeated string`) so field
+// presence can distinguish "not restricted" (the field itself unset) from
+// "restricted to allow nothing" (field set, `types` empty) -- a plain
+// repeated scalar field cannot represent that distinction, since an absent
+// and an explicitly-empty repeated field are indistinguishable on the wire.
+message SystemMessageAllowList {
+  // Allow-listed Message.System.Type subtype values (e.g. "user_joined",
+  // "user_left"). Empty means block ALL system-type messages.
+  repeated string types = 1;
 }
 
 message ReplyToMessage {
@@ -153,6 +243,21 @@ message SearchLeftThreadsMessageHistoryRequest {
     (buf.validate.field).uint32 = {lte: 100},
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
+
+  // Allow-list of Message.System.Type subtype values (e.g. "user_joined",
+  // "user_left") to include in results.
+  //  - unset                              : no restriction, all system
+  //    messages visible (back-compat default).
+  //  - set, with an empty `types` list     : hide ALL system messages.
+  //  - set, with a non-empty `types` list  : show ONLY system messages whose
+  //    subtype is in this list; every other subtype is hidden, including any
+  //    not yet known to the caller (fail-closed for unknown/future
+  //    subtypes).
+  // Mirrors im-account-service's Application.allow_system_messages 1:1, so a
+  // caller (im-gateway-service) can forward that resolved policy value
+  // through unchanged. Independent of, and AND-combined with, the coarse
+  // `types` (int32) filter above.
+  optional SystemMessageAllowList system_message_allow_list = 11;
 }
 
 message InteractiveCallback {
