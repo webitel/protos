@@ -3684,6 +3684,47 @@
               "type": "string"
             },
             "collectionFormat": "multi"
+          },
+          {
+            "name": "q",
+            "description": "filters for next/prev case",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "qin",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "filters_v1",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "contact_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -3725,6 +3766,103 @@
               "type": "string"
             },
             "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Cases"
+        ]
+      }
+    },
+    "/cases/{etag}/neighbor": {
+      "get": {
+        "summary": "RPC method to step one case forward or backward through the list.",
+        "operationId": "LocateCaseNeighbor",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.cases.Case"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "etag",
+            "description": "Etag of the case currently open, to step away from.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "direction",
+            "description": "Required: which way to step.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "CASE_NAV_DIRECTION_UNSPECIFIED",
+              "NEXT",
+              "PREV"
+            ],
+            "default": "CASE_NAV_DIRECTION_UNSPECIFIED"
+          },
+          {
+            "name": "fields",
+            "description": "List of fields to include in the response.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "q",
+            "description": "Same list context as LocateCaseRequest, and it must match what that call used.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "qin",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "filters_v1",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "contact_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -5891,6 +6029,13 @@
           "format": "int64",
           "title": "System field"
         },
+        "has_prev": {
+          "type": "boolean",
+          "description": "Whether a case exists before/after this one in the list it is being viewed in."
+        },
+        "has_next": {
+          "type": "boolean"
+        },
         "custom": {
           "type": "object",
           "description": "Custom data extension fields .."
@@ -6124,6 +6269,16 @@
         }
       },
       "description": "Response message containing a list of cases."
+    },
+    "webitel.cases.CaseNavDirection": {
+      "type": "string",
+      "enum": [
+        "CASE_NAV_DIRECTION_UNSPECIFIED",
+        "NEXT",
+        "PREV"
+      ],
+      "default": "CASE_NAV_DIRECTION_UNSPECIFIED",
+      "description": "Which way to step through the filtered+sorted case list, for the prev/next arrows on a case page."
     },
     "webitel.cases.CaseTimelineEventType": {
       "type": "string",

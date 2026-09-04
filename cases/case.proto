@@ -55,6 +55,14 @@ service Cases {
     };
   }
 
+  // RPC method to step one case forward or backward through the list.
+  rpc LocateCaseNeighbor(LocateCaseNeighborRequest) returns (Case) {
+    option (option.access) = ACTION_READ;
+    option (google.api.http) = {
+      get: "/cases/{etag}/neighbor"
+    };
+  }
+
   // RPC method for creating a new case.
   rpc CreateCase(CreateCaseRequest) returns (Case) {
     option (option.access) = ACTION_CREATE;
@@ -99,6 +107,13 @@ message UpdateCaseResponse {
 
 
 
+// Which way to step through the filtered+sorted case list, for the prev/next arrows on a case page.
+enum CaseNavDirection {
+  CASE_NAV_DIRECTION_UNSPECIFIED = 0;
+  NEXT = 1;
+  PREV = 2;
+}
+
 message SearchCasesRequest {
   int32 page = 1;                       // Page number for pagination.
   int32 size = 2;                       // Number of results per page.
@@ -118,6 +133,29 @@ message SearchCasesRequest {
 message LocateCaseRequest {
   string etag = 1;                      // Unique etag identifier of the case.
   repeated string fields = 2;           // List of fields to include in the response.
+
+//filters for next/prev case
+  string q = 3;
+  string qin = 4;
+  string sort = 5;
+  repeated string filters = 6;
+  string filters_v1 = 7;
+  string contact_id = 8;
+}
+
+
+message LocateCaseNeighborRequest {
+  string etag = 1;                      // Etag of the case currently open, to step away from.
+  CaseNavDirection direction = 2;       // Required: which way to step.
+  repeated string fields = 3;           // List of fields to include in the response.
+
+  // Same list context as LocateCaseRequest, and it must match what that call used.
+  string q = 4;
+  string qin = 5;
+  string sort = 6;
+  repeated string filters = 7;
+  string filters_v1 = 8;
+  string contact_id = 9;
 }
 
 // Input structure for creating a new case.
@@ -257,6 +295,10 @@ message Case {
   general.Lookup sla = 39;              // SLA associated with the case.
   repeated int64 role_ids = 40;         // System field
   int64 dc = 41;                        // System field
+
+  // Whether a case exists before/after this one in the list it is being viewed in.
+  bool has_prev = 42;
+  bool has_next = 43;
 
   // Custom data extension fields ..
   google.protobuf.Struct custom = 100;
