@@ -2425,38 +2425,6 @@
         }
       }
     },
-    "/call_center/attempts/history/mutate": {
-      "patch": {
-        "tags": [
-          "MemberService"
-        ],
-        "operationId": "MutateHistoryAttemptResult",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/engine.MutateHistoryAttemptResultRequest"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/engine.MutateHistoryAttemptResultResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/google.rpc.Status"
-            }
-          }
-        }
-      }
-    },
     "/call_center/attempts/{attempt_id}": {
       "patch": {
         "tags": [
@@ -12209,6 +12177,45 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/engine.HistoryCall"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/calls/history/{id}/attempt": {
+      "patch": {
+        "tags": [
+          "CallService"
+        ],
+        "summary": "PatchHistoryCallAttempt performs update of history attempt binded to call.",
+        "operationId": "PatchHistoryCallAttempt",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engine.CallService.PatchHistoryCallAttemptBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.PatchHistoryCallAttemptResponse"
             }
           },
           "default": {
@@ -55986,6 +55993,20 @@
         }
       }
     },
+    "engine.CallService.PatchHistoryCallAttemptBody": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "variables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "engine.CallService.PatchHistoryCallBody": {
       "type": "object",
       "properties": {
@@ -59972,38 +59993,6 @@
         }
       }
     },
-    "engine.MutateHistoryAttemptResultRequest": {
-      "type": "object",
-      "properties": {
-        "agent_call_id": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string",
-          "format": "int64"
-        },
-        "member_call_id": {
-          "type": "string"
-        },
-        "variables": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "engine.MutateHistoryAttemptResultResponse": {
-      "type": "object",
-      "properties": {
-        "item": {
-          "$ref": "#/definitions/engine.AttemptHistory"
-        }
-      }
-    },
     "engine.OnlineSkills": {
       "description": "OnlineSkills represents a reusable collection\nof skills that can be assigned within the Call Center.",
       "type": "object",
@@ -60553,6 +60542,24 @@
         },
         "strategy": {
           "type": "string"
+        }
+      }
+    },
+    "engine.PatchHistoryCallAttemptResponse": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "variables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
         }
       }
     },
