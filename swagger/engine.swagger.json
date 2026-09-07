@@ -2137,38 +2137,6 @@
         ]
       }
     },
-    "/call_center/attempts/history/mutate": {
-      "patch": {
-        "operationId": "MutateHistoryAttemptResult",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/engine.MutateHistoryAttemptResultResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/google.rpc.Status"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/engine.MutateHistoryAttemptResultRequest"
-            }
-          }
-        ],
-        "tags": [
-          "MemberService"
-        ]
-      }
-    },
     "/call_center/attempts/{attempt_id}": {
       "patch": {
         "operationId": "AttemptCallback",
@@ -12388,6 +12356,45 @@
         ]
       }
     },
+    "/calls/history/{id}/attempt": {
+      "patch": {
+        "summary": "PatchHistoryCallAttempt performs update of history attempt binded to call.",
+        "operationId": "PatchHistoryCallAttempt",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.PatchHistoryCallAttemptResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engine.CallService.PatchHistoryCallAttemptBody"
+            }
+          }
+        ],
+        "tags": [
+          "CallService"
+        ]
+      }
+    },
     "/email/profile": {
       "get": {
         "summary": "Search EmailProfile",
@@ -18189,6 +18196,20 @@
         }
       }
     },
+    "engine.CallService.PatchHistoryCallAttemptBody": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "variables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "engine.CallService.PatchHistoryCallBody": {
       "type": "object",
       "properties": {
@@ -22175,38 +22196,6 @@
         }
       }
     },
-    "engine.MutateHistoryAttemptResultRequest": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "int64"
-        },
-        "member_call_id": {
-          "type": "string"
-        },
-        "agent_call_id": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "variables": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "engine.MutateHistoryAttemptResultResponse": {
-      "type": "object",
-      "properties": {
-        "item": {
-          "$ref": "#/definitions/engine.AttemptHistory"
-        }
-      }
-    },
     "engine.OnlineSkills": {
       "type": "object",
       "properties": {
@@ -22756,6 +22745,24 @@
         },
         "communication": {
           "$ref": "#/definitions/engine.Lookup"
+        }
+      }
+    },
+    "engine.PatchHistoryCallAttemptResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "description": {
+          "type": "string"
+        },
+        "variables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
         }
       }
     },
