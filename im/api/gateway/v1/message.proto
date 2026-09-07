@@ -277,6 +277,8 @@ message SendTextRequest {
 
   // Set by providers when the channel reports this message was forwarded to us.
   optional ForwardOriginInput forward_origin = 23;
+
+  map<string, string> variables = 24;
 }
 
 // Represents a response to send a text message.
@@ -312,6 +314,11 @@ message SendDocumentRequest {
 
   // Set by providers when the channel reports this message was forwarded to us.
   optional ForwardOriginInput forward_origin = 23;
+
+  // Variables seeded onto the thread when this message is the one that creates
+  // it; ignored on every later message. Providers fill it from the channel's
+  // first-message payload so a flow schema can route on the caller's own data.
+  map<string, string> variables = 24;
 }
 
 // Represents a response to send message with document.
@@ -374,6 +381,12 @@ message SendLocationRequest {
 
   // Set by providers when the channel reports this message was forwarded to us.
   optional ForwardOriginInput forward_origin = 10;
+
+  // Platform message id, when the channel reports one.
+  string external_id = 11;
+
+  // ID of the message this is a reply to, as reported by the external channel.
+  string reply_to_external_id = 12;
 }
 
 // SendContactRequest sends contact information.
@@ -405,6 +418,12 @@ message SendContactRequest {
 
   // Set by providers when the channel reports this message was forwarded to us.
   optional ForwardOriginInput forward_origin = 9;
+
+  // Platform message id, when the channel reports one.
+  string external_id = 10;
+
+  // ID of the message this is a reply to, as reported by the external channel.
+  string reply_to_external_id = 11;
 }
 
 // SendInteractiveMessageRequest sends a structured interactive message.

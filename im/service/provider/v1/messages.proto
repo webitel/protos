@@ -297,6 +297,48 @@ message ProviderUpdateViberGateResponse {
 message ProviderDeleteViberGateRequest { string id = 1; }
 message ProviderDeleteViberGateResponse { webitel.im.provider.v1.ProviderViberGate item = 1; }
 
+message ProviderCreateCustomGateRequest {
+  string name = 1; // Name of the gateway in Webitel
+  Peer peer = 2; // Webitel bot identity (sub and iss) the channel routes inbound messages to
+  string callback_url = 3; // Customer-side webhook; must be an absolute https URL
+  string app_secret = 4; // Shared signing secret; generated when empty
+  repeated string allowed_ips = 5; // Optional CIDR allowlist
+  int32 request_timeout_ms = 6; // Timeout of a single callback attempt; defaults when zero
+  int32 retry_attempts = 7; // Retries before a message is marked failed; defaults when zero
+  bool enabled = 8;
+}
+
+/// ProviderCreateCustomGateResponse returns the newly activated custom provider.
+message ProviderCreateCustomGateResponse {
+  webitel.im.provider.v1.ProviderCustomGate item = 1;
+}
+
+/// ProviderGetCustomGateRequest fetches a custom provider configuration.
+message ProviderGetCustomGateRequest { string id = 1; }
+message ProviderGetCustomGateResponse { webitel.im.provider.v1.ProviderCustomGate item = 1; }
+
+/// ProviderUpdateCustomGateRequest updates custom gateway settings.
+message ProviderUpdateCustomGateRequest {
+  string id = 1;
+  string name = 2;
+  Peer peer = 3; // Webitel bot identity (sub and iss)
+  string callback_url = 4;
+  string app_secret = 5; // New signing secret, if rotated
+  repeated string allowed_ips = 6;
+  int32 request_timeout_ms = 7;
+  int32 retry_attempts = 8;
+  bool enabled = 9;
+}
+
+/// ProviderUpdateCustomGateResponse returns the updated custom provider.
+message ProviderUpdateCustomGateResponse {
+  webitel.im.provider.v1.ProviderCustomGate item = 1;
+}
+
+/// ProviderDeleteCustomGateRequest removes the custom integration.
+message ProviderDeleteCustomGateRequest { string id = 1; }
+message ProviderDeleteCustomGateResponse { webitel.im.provider.v1.ProviderCustomGate item = 1; }
+
 // --- Generic Discovery & Resource Management ---
 
 /// ProviderListGatesRequest contains pagination and filtering logic for discovering providers.
