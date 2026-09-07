@@ -43826,6 +43826,74 @@
         }
       }
     },
+    "/v1/tags": {
+      "get": {
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadTagManagement"
+        ],
+        "summary": "Search searches for tags.",
+        "operationId": "ThreadTagManagement_Search",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SearchThreadTagsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/tags/{id}": {
+      "delete": {
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadTagManagement"
+        ],
+        "summary": "RemoveTag removes a tag from a thread.",
+        "operationId": "ThreadTagManagement_RemoveTag",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.RemoveThreadTagResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/v1/threads": {
       "get": {
         "tags": [
@@ -44353,6 +44421,45 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/webitel.im.api.gateway.v1.UpdateThreadPermissionsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/threads/{thread_id}/tags": {
+      "post": {
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadTagManagement"
+        ],
+        "summary": "AddTag adds a tag to a thread.",
+        "operationId": "ThreadTagManagement_AddTag",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "thread_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadTagManagement.AddTagBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ChatTag"
             }
           },
           "default": {
@@ -70493,6 +70600,24 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.ChatTag": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "id": {
+          "type": "string"
+        },
+        "tag": {
+          "type": "string"
+        },
+        "thread_id": {
+          "type": "string"
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.Contact": {
       "description": "Contact represents an external messaging identity.",
       "type": "object",
@@ -71735,6 +71860,9 @@
     "webitel.im.api.gateway.v1.RemoveMemberResponse": {
       "type": "object"
     },
+    "webitel.im.api.gateway.v1.RemoveThreadTagResponse": {
+      "type": "object"
+    },
     "webitel.im.api.gateway.v1.ReplyToMessage": {
       "type": "object",
       "properties": {
@@ -71757,11 +71885,11 @@
           "type": "string",
           "format": "int64"
         },
-        "id": {
-          "type": "string"
-        },
         "is_deleted": {
           "type": "boolean"
+        },
+        "message_id": {
+          "type": "string"
         },
         "sender": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadMember"
@@ -71829,6 +71957,20 @@
         "next": {
           "description": "Indicates whether there is a next page available.",
           "type": "boolean"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.SearchThreadTagsResponse": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "boolean"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -72389,6 +72531,14 @@
           "description": "Last update timestamp (Unix time, milliseconds).",
           "type": "string",
           "format": "int64"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.ThreadTagManagement.AddTagBody": {
+      "type": "object",
+      "properties": {
+        "tag": {
+          "type": "string"
         }
       }
     },
@@ -78288,6 +78438,10 @@
       "name": "webitel.im.api.gateway.v1.ThreadManagement"
     },
     {
+      "description": "ThreadTagManagement defines the gRPC service for managing tags on threads.",
+      "name": "webitel.im.api.gateway.v1.ThreadTagManagement"
+    },
+    {
       "description": "FacebookService defines RPC methods for managing Facebook Messenger gateways.",
       "name": "webitel.im.api.provider.v1.FacebookService"
     },
@@ -78388,6 +78542,9 @@
     {
       "description": "MessageStatus is an internal service-to-service API for reporting\nper-recipient message delivery confirmations. Called by im-delivery\n(stream ACKs, pushes) and im-providers (provider webhooks receipts).\n\nAll RPCs accept batches and are idempotent: status transitions are\nmonotonic (SENT -\u003e DELIVERED -\u003e READ; FAILED only from SENT, and may be\nsuperseded by a later DELIVERED), so duplicate and out-of-order receipts\nare safely ignored.",
       "name": "webitel.im.service.thread.v1.MessageStatus"
+    },
+    {
+      "name": "webitel.im.service.thread.v1.ThreadTagManagement"
     },
     {
       "description": "Thread service provides operations for managing\nand interacting with threads.",
