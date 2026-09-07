@@ -44,6 +44,10 @@
       "description": "ThreadManagement service provides access to group threads manipulating\nand read-only access for direct threads."
     },
     {
+      "name": "webitel.im.api.gateway.v1.ThreadTagManagement",
+      "description": "ThreadTagManagement defines the gRPC service for managing tags on threads."
+    },
+    {
       "name": "webitel.im.api.provider.v1.FacebookService",
       "description": "FacebookService defines RPC methods for managing Facebook Messenger gateways."
     },
@@ -144,6 +148,9 @@
     {
       "name": "webitel.im.service.thread.v1.MessageStatus",
       "description": "MessageStatus is an internal service-to-service API for reporting\nper-recipient message delivery confirmations. Called by im-delivery\n(stream ACKs, pushes) and im-providers (provider webhooks receipts).\n\nAll RPCs accept batches and are idempotent: status transitions are\nmonotonic (SENT -\u003e DELIVERED -\u003e READ; FAILED only from SENT, and may be\nsuperseded by a later DELIVERED), so duplicate and out-of-order receipts\nare safely ignored."
+    },
+    {
+      "name": "webitel.im.service.thread.v1.ThreadTagManagement"
     },
     {
       "name": "webitel.im.service.thread.v1.ThreadManagement",
@@ -3202,6 +3209,76 @@
         ]
       }
     },
+    "/v1/tags": {
+      "get": {
+        "summary": "Search searches for tags.",
+        "operationId": "ThreadTagManagement_Search",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SearchThreadTagsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadTagManagement"
+        ]
+      }
+    },
+    "/v1/tags/{id}": {
+      "delete": {
+        "summary": "RemoveTag removes a tag from a thread.",
+        "operationId": "ThreadTagManagement_RemoveTag",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.RemoveThreadTagResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadTagManagement"
+        ]
+      }
+    },
     "/v1/threads": {
       "get": {
         "summary": "Search threads with filters",
@@ -3765,6 +3842,45 @@
         ],
         "tags": [
           "webitel.im.api.gateway.v1.ThreadPermission"
+        ]
+      }
+    },
+    "/v1/threads/{thread_id}/tags": {
+      "post": {
+        "summary": "AddTag adds a tag to a thread.",
+        "operationId": "ThreadTagManagement_AddTag",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ChatTag"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadTagManagement.AddTagBody"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadTagManagement"
         ]
       }
     },
@@ -4460,6 +4576,24 @@
           "additionalProperties": {
             "type": "string"
           }
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.ChatTag": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "thread_id": {
+          "type": "string"
+        },
+        "tag": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -5705,10 +5839,13 @@
     "webitel.im.api.gateway.v1.RemoveMemberResponse": {
       "type": "object"
     },
+    "webitel.im.api.gateway.v1.RemoveThreadTagResponse": {
+      "type": "object"
+    },
     "webitel.im.api.gateway.v1.ReplyToMessage": {
       "type": "object",
       "properties": {
-        "id": {
+        "message_id": {
           "type": "string"
         },
         "sender": {
@@ -5801,6 +5938,20 @@
         }
       },
       "description": "SearchThreadResponse contains the list of threads\nand pagination metadata."
+    },
+    "webitel.im.api.gateway.v1.SearchThreadTagsResponse": {
+      "type": "object",
+      "properties": {
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "next": {
+          "type": "boolean"
+        }
+      }
     },
     "webitel.im.api.gateway.v1.SearchVariablesResponse": {
       "type": "object",
@@ -6361,6 +6512,14 @@
         }
       },
       "description": "ThreadDirectSettings defines settings\nspecific to direct (one-to-one) threads."
+    },
+    "webitel.im.api.gateway.v1.ThreadTagManagement.AddTagBody": {
+      "type": "object",
+      "properties": {
+        "tag": {
+          "type": "string"
+        }
+      }
     },
     "webitel.im.api.gateway.v1.ThreadVariables": {
       "type": "object",
