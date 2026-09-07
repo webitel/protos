@@ -44,6 +44,10 @@
       "description": "ThreadManagement service provides access to group threads manipulating\nand read-only access for direct threads."
     },
     {
+      "name": "webitel.im.api.gateway.v1.ThreadTagManagement",
+      "description": "ThreadTagManagement defines the gRPC service for managing tags on threads."
+    },
+    {
       "name": "webitel.im.api.provider.v1.FacebookService",
       "description": "FacebookService defines RPC methods for managing Facebook Messenger gateways."
     },
@@ -90,6 +94,10 @@
     },
     {
       "name": "webitel.im.service.contact.v1.Vias"
+    },
+    {
+      "name": "webitel.im.provider.v1.CustomService",
+      "description": "/ CustomService defines the RPC methods for managing custom chat gateways —\n/ arbitrary external communication systems connected as a chat channel."
     },
     {
       "name": "webitel.im.provider.v1.FacebookService",
@@ -144,6 +152,9 @@
     {
       "name": "webitel.im.service.thread.v1.MessageStatus",
       "description": "MessageStatus is an internal service-to-service API for reporting\nper-recipient message delivery confirmations. Called by im-delivery\n(stream ACKs, pushes) and im-providers (provider webhooks receipts).\n\nAll RPCs accept batches and are idempotent: status transitions are\nmonotonic (SENT -\u003e DELIVERED -\u003e READ; FAILED only from SENT, and may be\nsuperseded by a later DELIVERED), so duplicate and out-of-order receipts\nare safely ignored."
+    },
+    {
+      "name": "webitel.im.service.thread.v1.ThreadTagManagement"
     },
     {
       "name": "webitel.im.service.thread.v1.ThreadManagement",
@@ -208,7 +219,8 @@
                 "PROVIDER_TYPE_META_APP",
                 "PROVIDER_TYPE_FACEBOOK",
                 "PROVIDER_TYPE_INSTAGRAM",
-                "PROVIDER_TYPE_WHATSAPP"
+                "PROVIDER_TYPE_WHATSAPP",
+                "PROVIDER_TYPE_CUSTOM"
               ]
             },
             "collectionFormat": "multi"
@@ -237,6 +249,137 @@
         ],
         "tags": [
           "webitel.im.provider.v1.GateService"
+        ]
+      }
+    },
+    "/im/gates/custom": {
+      "post": {
+        "summary": "/ CreateCustomGate registers an external system as a messaging gateway.",
+        "operationId": "CustomService_CreateCustomGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderCreateCustomGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "/ ProviderCreateCustomGateRequest registers an arbitrary external communication\n/ system as a chat channel. Only configuration is required on the Webitel side:\n/ the external system posts signed updates to the generated webhook_url and\n/ receives operator replies on callback_url.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderCreateCustomGateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.CustomService"
+        ]
+      }
+    },
+    "/im/gates/custom/{id}": {
+      "get": {
+        "summary": "/ GetCustomGate retrieves configuration and status for a custom gateway.",
+        "operationId": "CustomService_GetCustomGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderGetCustomGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.CustomService"
+        ]
+      },
+      "delete": {
+        "summary": "/ DeleteCustomGate removes the custom gateway integration.",
+        "operationId": "CustomService_DeleteCustomGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderDeleteCustomGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.CustomService"
+        ]
+      },
+      "patch": {
+        "summary": "/ UpdateCustomGate updates custom gateway settings.",
+        "operationId": "CustomService_UpdateCustomGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderUpdateCustomGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.CustomService.UpdateCustomGateBody"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.provider.v1.CustomService"
         ]
       }
     },
@@ -3202,6 +3345,76 @@
         ]
       }
     },
+    "/v1/tags": {
+      "get": {
+        "summary": "Search searches for tags.",
+        "operationId": "ThreadTagManagement_Search",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SearchThreadTagsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadTagManagement"
+        ]
+      }
+    },
+    "/v1/tags/{id}": {
+      "delete": {
+        "summary": "RemoveTag removes a tag from a thread.",
+        "operationId": "ThreadTagManagement_RemoveTag",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.RemoveThreadTagResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadTagManagement"
+        ]
+      }
+    },
     "/v1/threads": {
       "get": {
         "summary": "Search threads with filters",
@@ -3473,6 +3686,46 @@
               "type": "string"
             },
             "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadManagement"
+        ]
+      }
+    },
+    "/v1/threads/{thread_id}/close": {
+      "post": {
+        "summary": "Close ends the conversation. Called by a provider when the external side\nreports the chat was closed on its own end; thread_id may be omitted, and\nis then resolved from the authenticated caller's active direct thread.",
+        "operationId": "ThreadManagement_Close",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.CloseThreadResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "thread_id",
+            "description": "Thread to close. When empty the caller's active direct thread is used.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadManagement.CloseBody"
+            }
           }
         ],
         "tags": [
@@ -3765,6 +4018,45 @@
         ],
         "tags": [
           "webitel.im.api.gateway.v1.ThreadPermission"
+        ]
+      }
+    },
+    "/v1/threads/{thread_id}/tags": {
+      "post": {
+        "summary": "AddTag adds a tag to a thread.",
+        "operationId": "ThreadTagManagement_AddTag",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ChatTag"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadTagManagement.AddTagBody"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadTagManagement"
         ]
       }
     },
@@ -4460,6 +4752,33 @@
           "additionalProperties": {
             "type": "string"
           }
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.ChatTag": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "thread_id": {
+          "type": "string"
+        },
+        "tag": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.CloseThreadResponse": {
+      "type": "object",
+      "properties": {
+        "thread_id": {
+          "type": "string",
+          "description": "Thread that was closed. Empty when there was nothing left to close."
         }
       }
     },
@@ -5705,10 +6024,13 @@
     "webitel.im.api.gateway.v1.RemoveMemberResponse": {
       "type": "object"
     },
+    "webitel.im.api.gateway.v1.RemoveThreadTagResponse": {
+      "type": "object"
+    },
     "webitel.im.api.gateway.v1.ReplyToMessage": {
       "type": "object",
       "properties": {
-        "id": {
+        "message_id": {
           "type": "string"
         },
         "sender": {
@@ -5741,7 +6063,8 @@
           "type": "string"
         },
         "is_deleted": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Body and attachment are blanked once this is true. In group threads a\ncaller whose thread role is ADMIN or above still receives them; in direct\nthreads nobody does."
         }
       }
     },
@@ -5802,6 +6125,20 @@
       },
       "description": "SearchThreadResponse contains the list of threads\nand pagination metadata."
     },
+    "webitel.im.api.gateway.v1.SearchThreadTagsResponse": {
+      "type": "object",
+      "properties": {
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "next": {
+          "type": "boolean"
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.SearchVariablesResponse": {
       "type": "object",
       "properties": {
@@ -5856,6 +6193,14 @@
         "forward_origin": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardOriginInput",
           "description": "Set by providers when the channel reports this message was forwarded to us."
+        },
+        "external_id": {
+          "type": "string",
+          "description": "Platform message id, when the channel reports one."
+        },
+        "reply_to_external_id": {
+          "type": "string",
+          "description": "ID of the message this is a reply to, as reported by the external channel."
         }
       },
       "description": "SendContactRequest sends contact information."
@@ -5895,6 +6240,13 @@
         "forward_origin": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardOriginInput",
           "description": "Set by providers when the channel reports this message was forwarded to us."
+        },
+        "variables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Variables seeded onto the thread when this message is the one that creates\nit; ignored on every later message. Providers fill it from the channel's\nfirst-message payload so a flow schema can route on the caller's own data."
         }
       },
       "description": "Represents a request to send a message with document."
@@ -6004,6 +6356,14 @@
         "forward_origin": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardOriginInput",
           "description": "Set by providers when the channel reports this message was forwarded to us."
+        },
+        "external_id": {
+          "type": "string",
+          "description": "Platform message id, when the channel reports one."
+        },
+        "reply_to_external_id": {
+          "type": "string",
+          "description": "ID of the message this is a reply to, as reported by the external channel."
         }
       },
       "description": "SendLocationRequest sends a geographic location message."
@@ -6052,6 +6412,13 @@
         "forward_origin": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardOriginInput",
           "description": "Set by providers when the channel reports this message was forwarded to us."
+        },
+        "variables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Variables seeded onto the thread when this message is the one that creates\nit; ignored on every later message. Providers fill it from the channel's\nfirst-message payload so a flow schema can route on the caller's own data."
         }
       },
       "description": "Represents a request to send a text message."
@@ -6210,6 +6577,15 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.ThreadManagement.CloseBody": {
+      "type": "object",
+      "properties": {
+        "reason": {
+          "type": "string",
+          "description": "Free-form reason recorded on the closed dialogs, e.g. \"client_closed\"."
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.ThreadManagement.FlushVariablesBody": {
       "type": "object",
       "properties": {
@@ -6361,6 +6737,14 @@
         }
       },
       "description": "ThreadDirectSettings defines settings\nspecific to direct (one-to-one) threads."
+    },
+    "webitel.im.api.gateway.v1.ThreadTagManagement.AddTagBody": {
+      "type": "object",
+      "properties": {
+        "tag": {
+          "type": "string"
+        }
+      }
     },
     "webitel.im.api.gateway.v1.ThreadVariables": {
       "type": "object",
@@ -7509,6 +7893,43 @@
         }
       }
     },
+    "webitel.im.provider.v1.CustomService.UpdateCustomGateBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "peer": {
+          "$ref": "#/definitions/webitel.im.provider.v1.Peer",
+          "title": "Webitel bot identity (sub and iss)"
+        },
+        "callback_url": {
+          "type": "string"
+        },
+        "app_secret": {
+          "type": "string",
+          "title": "New signing secret, if rotated"
+        },
+        "allowed_ips": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "request_timeout_ms": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "retry_attempts": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      },
+      "description": "/ ProviderUpdateCustomGateRequest updates custom gateway settings. A non-empty\n/ app_secret rotates the signing secret and breaks the integration until the\n/ external system is updated too."
+    },
     "webitel.im.provider.v1.FacebookService.SetGetStartedBody": {
       "type": "object",
       "properties": {
@@ -7708,6 +8129,57 @@
         }
       }
     },
+    "webitel.im.provider.v1.ProviderCreateCustomGateRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name of the gateway in Webitel"
+        },
+        "peer": {
+          "$ref": "#/definitions/webitel.im.provider.v1.Peer",
+          "title": "Webitel bot identity (sub and iss) the channel routes inbound messages to"
+        },
+        "callback_url": {
+          "type": "string",
+          "title": "Customer-side webhook; must be an absolute https URL"
+        },
+        "app_secret": {
+          "type": "string",
+          "title": "Shared signing secret; generated when empty"
+        },
+        "allowed_ips": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Optional CIDR allowlist"
+        },
+        "request_timeout_ms": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Timeout of a single callback attempt; defaults when zero"
+        },
+        "retry_attempts": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Retries before a message is marked failed; defaults when zero"
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      },
+      "description": "/ ProviderCreateCustomGateRequest registers an arbitrary external communication\n/ system as a chat channel. Only configuration is required on the Webitel side:\n/ the external system posts signed updates to the generated webhook_url and\n/ receives operator replies on callback_url."
+    },
+    "webitel.im.provider.v1.ProviderCreateCustomGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderCustomGate"
+        }
+      },
+      "description": "/ ProviderCreateCustomGateResponse returns the newly activated custom provider."
+    },
     "webitel.im.provider.v1.ProviderCreateFacebookGateRequest": {
       "type": "object",
       "properties": {
@@ -7867,6 +8339,70 @@
       },
       "description": "/ ProviderCreateViberGateResponse returns the newly activated Viber provider."
     },
+    "webitel.im.provider.v1.ProviderCustomGate": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "webhook_url": {
+          "type": "string",
+          "description": "Webitel-side webhook the external system posts updates to."
+        },
+        "callback_url": {
+          "type": "string",
+          "description": "Customer-side webhook Webitel posts operator replies and events to."
+        },
+        "app_secret": {
+          "type": "string",
+          "description": "Shared secret used to sign and verify X-Webitel-Sign in both directions; handled as sensitive."
+        },
+        "allowed_ips": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional CIDR allowlist; an empty list accepts any source address."
+        },
+        "request_timeout_ms": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Timeout of a single outbound callback attempt, in milliseconds."
+        },
+        "retry_attempts": {
+          "type": "integer",
+          "format": "int32",
+          "description": "How many times an outbound callback is retried before the message is marked failed."
+        },
+        "status": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderStatus"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "Unix timestamp in milliseconds"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "Unix timestamp in milliseconds"
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "webitel.im.provider.v1.ProviderDeleteCustomGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderCustomGate"
+        }
+      }
+    },
     "webitel.im.provider.v1.ProviderDeleteFacebookGateResponse": {
       "type": "object",
       "properties": {
@@ -7991,6 +8527,14 @@
         },
         "template": {
           "type": "string"
+        }
+      }
+    },
+    "webitel.im.provider.v1.ProviderGetCustomGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderCustomGate"
         }
       }
     },
@@ -8870,10 +9414,20 @@
         "PROVIDER_TYPE_META_APP",
         "PROVIDER_TYPE_FACEBOOK",
         "PROVIDER_TYPE_INSTAGRAM",
-        "PROVIDER_TYPE_WHATSAPP"
+        "PROVIDER_TYPE_WHATSAPP",
+        "PROVIDER_TYPE_CUSTOM"
       ],
       "default": "PROVIDER_TYPE_UNSPECIFIED",
       "description": "/ ProviderType defines the specific provider or protocol used for messaging."
+    },
+    "webitel.im.provider.v1.ProviderUpdateCustomGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderCustomGate"
+        }
+      },
+      "description": "/ ProviderUpdateCustomGateResponse returns the updated custom provider."
     },
     "webitel.im.provider.v1.ProviderUpdateFacebookGateResponse": {
       "type": "object",
