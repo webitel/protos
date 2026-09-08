@@ -196,10 +196,6 @@ message ForwardMessagesRequest {
   optional PeerIdentity send_as = 3;
 
   string send_id = 20; // optional client-generated id for deduplication
-
-  // Optional internal note posted alongside the forward — visible only to
-  // Webitel users, never delivered to the client.
-  optional string internal_note = 4 [(buf.validate.field).string.max_len = 4096];
 }
 
 message ForwardMessagesResponse {
@@ -209,9 +205,8 @@ message ForwardMessagesResponse {
   // Ids of the created copies, in forwarded order.
   repeated string ids = 2;
 
-  // Sources that were not forwarded: unknown id, no read access to the source
-  // chat, already deleted, or a type that cannot be forwarded.
-  repeated string skipped_ids = 3;
+  // Sources left unforwarded, one entry per skipped id.
+  repeated SkippedMessage skipped = 3;
 }
 
 message ReadMessageRequest {
@@ -688,8 +683,8 @@ message DeleteMessagesRequest {
   }];
 }
 
-// SkippedMessage is one requested message DeleteMessages left untouched, with
-// the reason it did.
+// SkippedMessage is one requested message DeleteMessages or ForwardMessages
+// left untouched, with the reason it did.
 message SkippedMessage {
   string id = 1;
 
