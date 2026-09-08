@@ -181,10 +181,6 @@ message ForwardMessagesRequest {
   optional string send_as = 5;
 
   string send_id = 20; // optional client-generated id for deduplication
-
-  // Optional internal note posted into the destination thread alongside the
-  // forward — visible only to Webitel users, never delivered to the client.
-  optional string internal_note = 6 [(buf.validate.field).string.max_len = 4096];
 }
 
 message ForwardMessagesResponse {
@@ -194,9 +190,8 @@ message ForwardMessagesResponse {
   // Ids of the created copies, in forwarded order.
   repeated string ids = 2;
 
-  // Sources that were not forwarded: unknown id, no read access to the source
-  // thread, already deleted, or a type that cannot be forwarded.
-  repeated string skipped_ids = 3;
+  // Sources left unforwarded, one entry per skipped id.
+  repeated SkippedMessage skipped = 3;
 }
 
 // SendTypingRequest carries an ephemeral typing indicator for a thread.
@@ -707,8 +702,8 @@ message DeleteMessagesRequest {
   int32 domain_id = 3;
 }
 
-// SkippedMessage is one requested message DeleteMessages left untouched, with
-// the reason it did.
+// SkippedMessage is one requested message DeleteMessages or ForwardMessages
+// left untouched, with the reason it did.
 message SkippedMessage {
   // Requested message id.
   string id = 1;
@@ -716,8 +711,8 @@ message SkippedMessage {
   // Was a free-form string; replaced by the Reason enum on field 3.
   reserved 2;
 
-  // Reason tells the caller why one requested message survived. New members
-  // may be added, so treat an unrecognized value as REASON_UNSPECIFIED.
+  // Reason tells the caller why one requested message was left untouched. New
+  // members may be added, so treat an unrecognized value as REASON_UNSPECIFIED.
   enum Reason {
     REASON_UNSPECIFIED = 0;
 

@@ -4897,10 +4897,6 @@
         "send_id": {
           "type": "string",
           "title": "optional client-generated id for deduplication"
-        },
-        "internal_note": {
-          "type": "string",
-          "description": "Optional internal note posted alongside the forward — visible only to\nWebitel users, never delivered to the client."
         }
       }
     },
@@ -4918,12 +4914,13 @@
           },
           "description": "Ids of the created copies, in forwarded order."
         },
-        "skipped_ids": {
+        "skipped": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.SkippedMessage"
           },
-          "description": "Sources that were not forwarded: unknown id, no read access to the source\nchat, already deleted, or a type that cannot be forwarded."
+          "description": "Sources left unforwarded, one entry per skipped id."
         }
       }
     },
@@ -6250,7 +6247,7 @@
           "$ref": "#/definitions/webitel.im.api.gateway.v1.SkippedMessage.Reason"
         }
       },
-      "description": "SkippedMessage is one requested message DeleteMessages left untouched, with\nthe reason it did."
+      "description": "SkippedMessage is one requested message DeleteMessages or ForwardMessages\nleft untouched, with the reason it did."
     },
     "webitel.im.api.gateway.v1.SkippedMessage.Reason": {
       "type": "string",
