@@ -232,6 +232,40 @@ message ReadMessageRequest {
 
 message ReadMessageResponse {}
 
+// Entity is a single formatting span over a message's plain-text body.
+// im-gateway-service parses the original markdown exactly once and turns it
+// into a list of these canonical spans (the "parse-once-at-gateway" design);
+// im-thread-service, im-delivery-service and im-providers-service only store,
+// relay and render them -- none of them re-parses markdown.
+//
+// `type` is an open allow-list, not an enum, so new span kinds can be added
+// later without breaking readers that don't know them yet. Values in use
+// today: BOLD, ITALIC, STRIKETHROUGH, CODE, PRE, LINK.
+message Entity {
+  // Span kind. Open allow-list -- see message comment above.
+  string type = 1 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 32
+  }];
+
+  // Start of the span, as a UTF-8 byte offset into the associated
+  // plain-text field (`body`). Bounded to reject pathological payloads.
+  int32 offset = 2 [(buf.validate.field).int32 = {
+    gte: 0
+    lte: 1000000
+  }];
+
+  // Length of the span, in UTF-8 bytes, matching `offset`.
+  int32 length = 3 [(buf.validate.field).int32 = {
+    gte: 1
+    lte: 1000000
+  }];
+
+  // Extra data the span kind needs, e.g. the target URL for a LINK entity.
+  // Unset for kinds that don't need one (BOLD, ITALIC, STRIKETHROUGH, CODE, PRE).
+  optional string value = 4 [(buf.validate.field).string.max_len = 4096];
+}
+
 message SendTextRequest {
   Peer from = 1;
   Peer to = 2;
@@ -249,6 +283,11 @@ message SendTextRequest {
 
   // Set when the channel reports this message was forwarded to us.
   optional ForwardOriginInput forward_origin = 23;
+
+  // Formatting spans over `body`, produced once by im-gateway-service when it
+  // parses the original markdown (parse-once-at-gateway). Empty for
+  // plain-text messages with no formatting.
+  repeated Entity entities = 24 [(buf.validate.field).repeated = {max_items: 100}];
 }
 
 // Represents a response to send a text message.
@@ -287,6 +326,10 @@ message SendDocumentRequest {
 
   // Set when the channel reports this message was forwarded to us.
   optional ForwardOriginInput forward_origin = 23;
+
+  // Formatting spans over `body` (the document's caption), produced once by
+  // im-gateway-service (parse-once-at-gateway).
+  repeated Entity entities = 24 [(buf.validate.field).repeated = {max_items: 100}];
 }
 
 // Represents a response to send message with document.
