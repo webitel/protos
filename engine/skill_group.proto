@@ -1,0 +1,306 @@
+syntax = "proto3";
+
+package engine;
+
+option go_package = "github.com/webitel/protos/engine";
+
+import "const.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/wrappers.proto";
+
+service SkillGroupService {
+
+    rpc CreateSkillGroup(CreateSkillGroupRequest) returns (SkillGroup) {
+        option (google.api.http) = {
+            post: "/call_center/skill_groups"
+            body: "*"
+        };
+    }
+
+    rpc SearchSkillGroup(SearchSkillGroupRequest) returns (ListSkillGroup) {
+        option (google.api.http) = {
+            get: "/call_center/skill_groups"
+        };
+    }
+
+    rpc ReadSkillGroup(ReadSkillGroupRequest) returns (SkillGroup) {
+        option (google.api.http) = {
+            get: "/call_center/skill_groups/{id}"
+        };
+    }
+
+    rpc UpdateSkillGroup(UpdateSkillGroupRequest) returns (SkillGroup) {
+        option (google.api.http) = {
+            put: "/call_center/skill_groups/{id}"
+            body: "*"
+        };
+    }
+
+    rpc DeleteSkillGroup(DeleteSkillGroupRequest) returns (SkillGroup) {
+        option (google.api.http) = {
+            delete: "/call_center/skill_groups/{id}"
+        };
+    }
+
+    rpc SearchSkillGroupSkill(SearchSkillGroupSkillRequest) returns (ListSkillGroupSkill) {
+        option (google.api.http) = {
+            get: "/call_center/skill_groups/{skill_group_id}/skills"
+        };
+    }
+
+    rpc CreateSkillGroupSkill(CreateSkillGroupSkillRequest) returns (ListSkillGroupSkill) {
+        option (google.api.http) = {
+            post: "/call_center/skill_groups/{skill_group_id}/skills"
+            body: "*"
+        };
+    }
+
+    rpc UpdateSkillGroupSkill(UpdateSkillGroupSkillRequest) returns (SkillGroupSkillItem) {
+        option (google.api.http) = {
+            put: "/call_center/skill_groups/{skill_group_id}/skills/{id}"
+            body: "*"
+        };
+    }
+
+    rpc DeleteSkillGroupSkill(DeleteSkillGroupSkillRequest) returns (ListSkillGroupSkill) {
+        option (google.api.http) = {
+            delete: "/call_center/skill_groups/{skill_group_id}/skills"
+            body: "*"
+        };
+    }
+
+    rpc SearchSkillGroupAgent(SearchSkillGroupAgentRequest) returns (ListSkillGroupAgent) {
+        option (google.api.http) = {
+            get: "/call_center/skill_groups/{skill_group_id}/agents"
+        };
+    }
+
+    rpc CreateSkillGroupAgent(CreateSkillGroupAgentRequest) returns (ListSkillGroupAgent) {
+        option (google.api.http) = {
+            post: "/call_center/skill_groups/{skill_group_id}/agents"
+            body: "*"
+        };
+    }
+
+    rpc DeleteSkillGroupAgent(DeleteSkillGroupAgentRequest) returns (ListSkillGroupAgent) {
+        option (google.api.http) = {
+            delete: "/call_center/skill_groups/{skill_group_id}/agents"
+            body: "*"
+        };
+    }
+
+    rpc AssignSkillGroupAgents(AssignSkillGroupAgentsRequest) returns (ListSkillGroupAgent) {
+        option (google.api.http) = {
+            post: "/call_center/skill_groups/agents"
+            body: "*"
+        };
+    }
+
+    rpc SearchAgentSkillGroup(SearchAgentSkillGroupRequest) returns (ListAgentSkillGroup) {
+        option (google.api.http) = {
+            get: "/call_center/agents/{agent_id}/skill_groups"
+        };
+    }
+
+    rpc CreateAgentSkillGroup(CreateAgentSkillGroupRequest) returns (ListAgentSkillGroup) {
+        option (google.api.http) = {
+            post: "/call_center/agents/{agent_id}/skill_groups"
+            body: "*"
+        };
+    }
+
+    rpc DeleteAgentSkillGroup(DeleteAgentSkillGroupRequest) returns (ListAgentSkillGroup) {
+        option (google.api.http) = {
+            delete: "/call_center/agents/{agent_id}/skill_groups"
+            body: "*"
+        };
+    }
+}
+
+message ReadSkillGroupRequest {
+    int64 id = 1;
+    int64 domain_id = 2;
+}
+
+message DeleteSkillGroupRequest {
+    int64 id = 1;
+    int64 domain_id = 2;
+}
+
+message SearchSkillGroupRequest {
+    int32 page = 1;
+    int32 size = 2;
+    string q = 3;
+
+    string sort = 4;
+    repeated string fields = 5;
+
+    repeated uint32 id = 6;
+}
+
+message CreateSkillGroupRequest {
+    string name = 1;
+    string description = 2;
+    int64 domain_id = 3;
+}
+
+message UpdateSkillGroupRequest {
+    int64 id = 1;
+    string name = 2;
+    string description = 3;
+    int64 domain_id = 4;
+}
+
+message SkillGroup {
+    int64 id = 1;
+    int64 domain_id = 2;
+    string name = 3;
+    string description = 4;
+
+    repeated Lookup skills = 5;
+
+    int32 active_agents = 6;
+    int32 total_agents = 7;
+
+    int64 created_at = 8;
+    Lookup created_by = 9;
+    int64 updated_at = 10;
+    Lookup updated_by = 11;
+}
+
+message ListSkillGroup {
+    bool next = 1;
+    repeated SkillGroup items = 2;
+}
+
+message SkillGroupSkillItem {
+    int64 id = 1;
+    Lookup skill = 2;
+    google.protobuf.Int32Value capacity = 3;
+}
+
+message ListSkillGroupSkill {
+    bool next = 1;
+    repeated SkillGroupSkillItem items = 2;
+}
+
+message SearchSkillGroupSkillRequest {
+    int64 skill_group_id = 1;
+
+    int32 page = 2;
+    int32 size = 3;
+
+    string q = 4;
+
+    string sort = 5;
+    repeated string fields = 6;
+
+    repeated int64 id = 7;
+}
+
+message CreateSkillGroupSkillRequest {
+    int64 skill_group_id = 1;
+    repeated CreateSkillGroupSkillItem items = 2;
+}
+
+message CreateSkillGroupSkillItem {
+    Lookup skill = 1;
+    google.protobuf.Int32Value capacity = 2;
+}
+
+message UpdateSkillGroupSkillRequest {
+    int64 skill_group_id = 1;
+    int64 id = 2;
+    Lookup skill = 3;
+    google.protobuf.Int32Value capacity = 4;
+}
+
+message DeleteSkillGroupSkillRequest {
+    int64 skill_group_id = 1;
+    repeated int64 id = 2;
+    repeated int64 skill_id = 3;
+}
+
+message SkillGroupAgentItem {
+    int64 id = 1;
+    Lookup agent = 2;
+    Lookup team = 3;
+}
+
+message ListSkillGroupAgent {
+    bool next = 1;
+    repeated SkillGroupAgentItem items = 2;
+}
+
+message SearchSkillGroupAgentRequest {
+    int64 skill_group_id = 1;
+
+    int32 page = 2;
+    int32 size = 3;
+
+    string q = 4;
+
+    string sort = 5;
+    repeated string fields = 6;
+
+    repeated int64 id = 7;
+    repeated int64 agent_id = 8;
+}
+
+message CreateSkillGroupAgentRequest {
+    int64 skill_group_id = 1;
+    repeated Lookup agent = 2;
+}
+
+message DeleteSkillGroupAgentRequest {
+    int64 skill_group_id = 1;
+    repeated int64 id = 2;
+    repeated int64 agent_id = 3;
+}
+
+message AssignSkillGroupAgentsRequest {
+    repeated int64 skill_group_id = 1;
+    repeated int64 agent_id = 2;
+}
+
+message AgentSkillGroupItem {
+
+    int64 id = 1;
+
+    Lookup skill_group = 2;
+    string description = 3;
+
+    repeated Lookup skills = 4;
+}
+
+message ListAgentSkillGroup {
+    bool next = 1;
+    repeated AgentSkillGroupItem items = 2;
+}
+
+message SearchAgentSkillGroupRequest {
+    int64 agent_id = 1;
+
+    int32 page = 2;
+    int32 size = 3;
+
+    string q = 4;
+
+    string sort = 5;
+    repeated string fields = 6;
+
+    repeated int64 id = 7;
+}
+
+message CreateAgentSkillGroupRequest {
+    int64 agent_id = 1;
+    repeated int64 skill_group_id = 2;
+}
+
+message DeleteAgentSkillGroupRequest {
+    int64 agent_id = 1;
+
+    repeated int64 id = 2;
+
+    repeated int64 skill_group_id = 3;
+}
