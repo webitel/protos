@@ -50,6 +50,10 @@ service MemberService {
   rpc ReadMember(ReadMemberRequest) returns (MemberInQueue) {
     option (google.api.http) = {get: "/call_center/queues/{queue_id}/members/{id}"};
   }
+  // List of a member's communications
+  rpc SearchMemberCommunication(SearchMemberCommunicationRequest) returns (ListOfMemberCommunication) {
+    option (google.api.http) = {get: "/call_center/queues/{queue_id}/members/{member_id}/communications"};
+  }
   // UpdateMember
   rpc UpdateMember(UpdateMemberRequest) returns (MemberInQueue) {
     option (google.api.http) = {
@@ -588,6 +592,20 @@ message ReadMemberRequest {
   int64 id = 1;
   int64 queue_id = 2;
   int64 domain_id = 3;
+}
+
+message SearchMemberCommunicationRequest {
+  int64 queue_id = 1;
+  int64 member_id = 2;
+  int32 page = 3;
+  int32 size = 4;
+  string sort = 5;
+  repeated string fields = 6;
+}
+
+message ListOfMemberCommunication {
+  bool next = 1;
+  repeated MemberCommunication items = 2;
 }
 
 message CreateMemberBulkRequest {
