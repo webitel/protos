@@ -1,0 +1,138 @@
+syntax = "proto3";
+
+package webitel.kb;
+
+option go_package = "github.com/webitel/webitel-kb/api/kb;kb";
+
+import "general.proto";
+import "google/api/annotations.proto";
+import "proto/webitel/option.proto";
+
+// RelatedCases links articles with CRM cases.
+service RelatedCases {
+  option (option.objclass) = "kb_articles";
+
+  // ListArticleCases returns the cases linked to an article.
+  rpc ListArticleCases(ListArticleCasesRequest) returns (ArticleCaseList) {
+    option (google.api.http) = {
+      get: "/v1/kb/articles/{article_etag}/cases"
+    };
+    option (option.access) = ACTION_READ;
+  }
+
+  // LinkCase links a case to an article manually.
+  rpc LinkCase(LinkCaseRequest) returns (ArticleCase) {
+    option (google.api.http) = {
+      post: "/v1/kb/articles/{article_etag}/cases"
+      body: "*"
+    };
+    option (option.access) = ACTION_UPDATE;
+  }
+
+  // UnlinkCase removes a manual link.
+  rpc UnlinkCase(UnlinkCaseRequest) returns (ArticleCase) {
+    option (google.api.http) = {
+      delete: "/v1/kb/articles/{article_etag}/cases/{case_etag}"
+    };
+    option (option.access) = ACTION_UPDATE;
+  }
+
+  // ListCaseArticles returns the articles linked to a case.
+  rpc ListCaseArticles(ListCaseArticlesRequest) returns (ArticleCaseList) {
+    option (google.api.http) = {
+      get: "/v1/kb/cases/{case_etag}/articles"
+    };
+    option (option.access) = ACTION_READ;
+  }
+}
+
+// CaseLinkSource tells how a link was created.
+enum CaseLinkSource {
+  CASE_LINK_SOURCE_UNSPECIFIED = 0;
+  // Linked by an operator.
+  MANUAL = 1;
+  // The article was chosen as the close reason of the case.
+  RESOLUTION = 2;
+}
+
+// CaseLookup is a short reference to a case.
+message CaseLookup {
+  // Case id.
+  int64 id = 1;
+  // Case etag.
+  string etag = 2;
+  // Case name.
+  string name = 3;
+  // Case subject.
+  string subject = 4;
+}
+
+// ArticleCase is a link between an article and a case.
+message ArticleCase {
+  // Linked case.
+  CaseLookup case = 1;
+  // Linked article; name is the article subject.
+  general.Lookup article = 2;
+  // How the link was created.
+  CaseLinkSource source = 3;
+  // CreatedAt timestamp (epoch ms).
+  int64 created_at = 4;
+  // User who created the link.
+  general.Lookup created_by = 5;
+}
+
+// ArticleCaseList is a page of links.
+message ArticleCaseList {
+  // Links on this page.
+  repeated ArticleCase items = 1;
+  // Whether a next page exists.
+  bool next = 2;
+}
+
+// ListArticleCasesRequest selects the article and pages its links.
+message ListArticleCasesRequest {
+  // Article etag or id.
+  string article_etag = 1;
+  // Page number (1-based).
+  int32 page = 2;
+  // Page size.
+  int32 size = 3;
+  // Fields to return.
+  repeated string fields = 4;
+  // Sort order, e.g. "-created_at".
+  string sort = 5;
+  // Filter by link source; unspecified returns all.
+  CaseLinkSource source = 6;
+}
+
+// ListCaseArticlesRequest selects the case and pages its links.
+message ListCaseArticlesRequest {
+  // Case etag or id.
+  string case_etag = 1;
+  // Page number (1-based).
+  int32 page = 2;
+  // Page size.
+  int32 size = 3;
+  // Fields to return.
+  repeated string fields = 4;
+  // Sort order, e.g. "-created_at".
+  string sort = 5;
+  // Filter by link source; unspecified returns all.
+  CaseLinkSource source = 6;
+}
+
+// LinkCaseRequest links a case to an article.
+message LinkCaseRequest {
+  // Article etag or id.
+  string article_etag = 1;
+  // Case etag or id.
+  string case_etag = 2;
+}
+
+// UnlinkCaseRequest removes a manual link.
+message UnlinkCaseRequest {
+  // Article etag or id.
+  string article_etag = 1;
+  // Case etag or id.
+  string case_etag = 2;
+}
