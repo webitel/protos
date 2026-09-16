@@ -78,6 +78,14 @@ service ListService {
             delete: "/call_center/list/{list_id}/communication/{id}"
         };
     }
+
+    // Bulk create ListCommunication (CSV import); existing numbers are skipped
+    rpc CreateListCommunicationBulk(CreateListCommunicationBulkRequest) returns (ListCommunicationBulkResponse) {
+        option (google.api.http) = {
+            post: "/call_center/list/{list_id}/communication/bulk"
+            body: "*"
+        };
+    }
 }
 
 message DeleteListCommunicationRequest {
@@ -123,6 +131,23 @@ message CreateListCommunicationRequest {
     string description = 2;
     int64 list_id = 3;
     int64 expire_at = 4;
+}
+
+message CreateListCommunicationBulkRequest {
+    int64 list_id = 1;
+    repeated CreateListCommunicationBulkItem items = 2;
+}
+
+message CreateListCommunicationBulkItem {
+    string number = 1;
+    string description = 2;
+    int64 expire_at = 3;
+}
+
+message ListCommunicationBulkResponse {
+    repeated int64 ids = 1;
+    int64 imported = 2;
+    int64 skipped = 3;
 }
 
 message ListCommunication {
