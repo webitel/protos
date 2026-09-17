@@ -6,6 +6,7 @@ option go_package = "github.com/webitel/protos/engine";
 
 import "const.proto";
 import "google/api/annotations.proto";
+import "google/rpc/status.proto";
 
 service ListService {
     // Create List
@@ -145,9 +146,14 @@ message CreateListCommunicationBulkItem {
 }
 
 message ListCommunicationBulkResponse {
-    repeated int64 ids = 1;
-    int64 imported = 2;
-    int64 skipped = 3;
+    repeated ListCommunication data = 1;
+    repeated ListCommunicationBulkError failures = 2;
+}
+
+message ListCommunicationBulkError {
+    int32 index = 1;
+    ListCommunication item = 2;
+    google.rpc.Status error = 3;
 }
 
 message ListCommunication {
