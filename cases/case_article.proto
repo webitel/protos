@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package webitel.cases;
+option go_package = "github.com/webitel/cases/api/cases;cases";
+
+import "general.proto";
+import "related_case.proto";
+import "google/api/annotations.proto";
+import "proto/webitel/option.proto";
+
+// How a knowledge base article got linked to a case.
+enum CaseArticleSource {
+  CASE_ARTICLE_SOURCE_UNSPECIFIED = 0;
+  // Linked by an operator.
+  CASE_ARTICLE_SOURCE_MANUAL = 1;
+  // The close article of the case.
+  CASE_ARTICLE_SOURCE_RESOLUTION = 2;
+}
+
+// Knowledge base article linked to a case.
+message CaseArticle {
+  // Knowledge base article; id only.
+  general.Lookup article = 1;
+  // Linked case; set on the article side.
+  RelatedCaseLookup case = 2;
+  CaseArticleSource source = 3;
+  // Empty for the close article.
+  general.Lookup created_by = 4;
+  // Unixmilli; empty for the close article.
+  int64 created_at = 5;
+}
+
+message InputCaseArticle {
+  // Knowledge base article to link.
+  general.Lookup article = 1;
+}
+
+message CaseArticleList {
+  int64 page = 1;
+  bool next = 2;
+  repeated CaseArticle items = 3;
+}
+
+service CaseArticles {
+  option (option.objclass) = "cases";
+
+  // Articles of a case, the close article first.
+  rpc ListCaseArticles(ListCaseArticlesRequest) returns (CaseArticleList) {
+    option (option.access) = ACTION_READ;
+    option (google.api.http) = {
+      get: "/cases/{case_etag}/articles"
+    };
+  }
+  // Links an article to a case; linking it again returns the same link.
+  rpc LinkCaseArticle(LinkCaseArticleRequest) returns (CaseArticle) {
+    option (option.access) = ACTION_UPDATE;
+    option (google.api.http) = {
+      post: "/cases/{case_etag}/articles"
+      body: "input"
+    };
+  }
+  // Removes a manual link; the close article is changed on the case itself.
+  rpc UnlinkCaseArticle(UnlinkCaseArticleRequest) returns (CaseArticle) {
+    option (option.access) = ACTION_UPDATE;
+    option (google.api.http) = {
+      delete: "/cases/{case_etag}/articles/{article_id}"
+    };
+  }
+  // Cases of an article the user can read.
+  rpc ListArticleCases(ListArticleCasesRequest) returns (CaseArticleList) {
+    option (option.access) = ACTION_READ;
+    option (google.api.http) = {
+      get: "/cases/articles/{article_id}/cases"
+    };
+  }
+}
+
+message ListCaseArticlesRequest {
+  string case_etag = 1;
+  int32 page = 2;
+  int32 size = 3;
+}
+
+message LinkCaseArticleRequest {
+  string case_etag = 1;
+  InputCaseArticle input = 2;
+}
+
+message UnlinkCaseArticleRequest {
+  string case_etag = 1;
+  int64 article_id = 2;
+}
+
+message ListArticleCasesRequest {
+  int64 article_id = 1;
+  int32 page = 2;
+  int32 size = 3;
+}
