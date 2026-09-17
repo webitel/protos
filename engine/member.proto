@@ -158,6 +158,13 @@ service MemberService {
       body: "*"
     };
   }
+
+  rpc TransferAttempt(TransferAttemptRequest) returns (TransferAttemptResponse) {
+    option (google.api.http) = {
+      patch: "/call_center/queues/attempts/{attempt_id}/transfer"
+      body: "*"
+    };
+  }
 }
 
 message AssignAttemptRequest {
@@ -166,6 +173,14 @@ message AssignAttemptRequest {
 }
 
 message AssignAttemptResponse {}
+
+message TransferAttemptRequest {
+  int64 attempt_id = 1;
+  int64 agent_id = 2; // Exactly one of agent_id or queue_id must be set.
+  int64 queue_id = 3;
+}
+
+message TransferAttemptResponse {}
 
 message AttemptRenewalResultRequest {
   int64 attempt_id = 1;

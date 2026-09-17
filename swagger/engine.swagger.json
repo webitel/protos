@@ -5404,6 +5404,45 @@
         ]
       }
     },
+    "/call_center/queues/attempts/{attempt_id}/transfer": {
+      "patch": {
+        "operationId": "TransferAttempt",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.TransferAttemptResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "attempt_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engine.MemberService.TransferAttemptBody"
+            }
+          }
+        ],
+        "tags": [
+          "MemberService"
+        ]
+      }
+    },
     "/call_center/queues/members": {
       "delete": {
         "summary": "DeleteAllMembers",
@@ -22136,6 +22175,20 @@
         }
       }
     },
+    "engine.MemberService.TransferAttemptBody": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "type": "string",
+          "format": "int64",
+          "description": "Exactly one of agent_id or queue_id must be set."
+        },
+        "queue_id": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "engine.MemberService.UpdateMemberBody": {
       "type": "object",
       "properties": {
@@ -25248,6 +25301,9 @@
           "$ref": "#/definitions/engine.Lookup"
         }
       }
+    },
+    "engine.TransferAttemptResponse": {
+      "type": "object"
     },
     "engine.Trigger": {
       "type": "object",
