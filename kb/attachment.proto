@@ -8,7 +8,7 @@ import "general.proto";
 import "google/api/annotations.proto";
 import "proto/webitel/option.proto";
 
-// Attachments lists and removes files bound to an article.
+// Attachments binds files uploaded to Webitel Storage to articles.
 service Attachments {
   option (option.objclass) = "kb_articles";
 
@@ -18,6 +18,15 @@ service Attachments {
       get: "/v1/kb/articles/{article_etag}/files"
     };
     option (option.access) = ACTION_READ;
+  }
+
+  // AttachFile binds an uploaded file to an article.
+  rpc AttachFile(AttachFileRequest) returns (File) {
+    option (google.api.http) = {
+      post: "/v1/kb/articles/{article_etag}/files"
+      body: "*"
+    };
+    option (option.access) = ACTION_UPDATE;
   }
 
   // DeleteFile unbinds and removes a file from an article.
@@ -33,7 +42,7 @@ service Attachments {
 message File {
   // Storage file id.
   int64 id = 1;
-  // User who uploaded the file.
+  // User who attached the file.
   general.ExtendedLookup created_by = 2;
   // CreatedAt timestamp (epoch ms).
   int64 created_at = 3;
@@ -45,8 +54,8 @@ message File {
   string name = 6;
   // Download url.
   string url = 7;
-  // Storage source.
-  string source = 8;
+
+  reserved 8;  // was source, the Storage channel
 }
 
 // FileList is a page of files.
@@ -73,6 +82,14 @@ message ListFilesRequest {
   repeated int64 ids = 6;
   // Sorting criteria (e.g. field:asc).
   string sort = 7;
+}
+
+// AttachFileRequest binds a file already uploaded to Storage.
+message AttachFileRequest {
+  // Concurrency token / locator of the owning article.
+  string article_etag = 1;
+  // Storage file id, as the upload returned it.
+  int64 file_id = 2;
 }
 
 // DeleteFileRequest selects a file to remove from an article.

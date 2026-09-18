@@ -6,25 +6,36 @@
   },
   "tags": [
     {
-      "name": "Articles"
+      "name": "Articles",
+      "description": "Articles manages knowledge-base articles: CRUD, hierarchy (depth 1..5) and\nnavigation (move, children, ancestors, tree). Mutations use the etag for\noptimistic locking."
     },
     {
-      "name": "Attachments"
+      "name": "Attachments",
+      "description": "Attachments binds files uploaded to Webitel Storage to articles."
     },
     {
-      "name": "EmbeddingModels"
+      "name": "EmbeddingModels",
+      "description": "EmbeddingModels manages the registry of embedding and reranker models.\nThe encrypted provider credential is never returned; it is set via api_key\non input and validated by a test call before a space may select the model."
     },
     {
-      "name": "Retrieval"
+      "name": "Retrieval",
+      "description": "Retrieval serves read-only search and lookup over the knowledge base for\noperators (search/resolve/suggest) and bots (semantic_search/menu).\nAll endpoints return an empty list with HTTP 200 on no match, never an error."
     },
     {
-      "name": "Spaces"
+      "name": "Indexing",
+      "description": "Indexing serves the knowledge base indexer worker. Service to service: no\nobjclass, no HTTP bindings, a service token instead of a user session."
     },
     {
-      "name": "Tags"
+      "name": "Spaces",
+      "description": "Spaces manages knowledge-base spaces: top-level containers that fix language\nand retrieval configuration (embedding/reranker models, vector toggle)."
     },
     {
-      "name": "Versions"
+      "name": "Tags",
+      "description": "Tags provides tag auto-completion within a space."
+    },
+    {
+      "name": "Versions",
+      "description": "Versions exposes the immutable version history of an article and restore."
     }
   ],
   "consumes": [
@@ -441,6 +452,44 @@
             "in": "query",
             "required": false,
             "type": "string"
+          }
+        ],
+        "tags": [
+          "Attachments"
+        ]
+      },
+      "post": {
+        "summary": "AttachFile binds an uploaded file to an article.",
+        "operationId": "AttachFile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.File"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "article_etag",
+            "description": "Concurrency token / locator of the owning article.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.Attachments.AttachFileBody"
+            }
           }
         ],
         "tags": [
@@ -1795,7 +1844,7 @@
         "FAQ"
       ],
       "default": "ARTICLE_TYPE_UNSPECIFIED",
-      "description": "Article type."
+      "description": "Article kind."
     },
     "webitel.kb.ArticleVersion": {
       "type": "object",
@@ -1880,6 +1929,17 @@
         }
       },
       "description": "MoveArticleRequest reparents an article."
+    },
+    "webitel.kb.Attachments.AttachFileBody": {
+      "type": "object",
+      "properties": {
+        "file_id": {
+          "type": "string",
+          "format": "int64",
+          "description": "Storage file id, as the upload returned it."
+        }
+      },
+      "description": "AttachFileRequest binds a file already uploaded to Storage."
     },
     "webitel.kb.Chunk": {
       "type": "object",
@@ -2021,7 +2081,7 @@
         },
         "created_by": {
           "$ref": "#/definitions/general.ExtendedLookup",
-          "description": "User who uploaded the file."
+          "description": "User who attached the file."
         },
         "created_at": {
           "type": "string",
@@ -2044,10 +2104,6 @@
         "url": {
           "type": "string",
           "description": "Download url."
-        },
-        "source": {
-          "type": "string",
-          "description": "Storage source."
         }
       },
       "description": "File is metadata of a stored file bound to an article."
