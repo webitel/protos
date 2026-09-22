@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package webitel.im.provider.v1;
+
+import "google/api/annotations.proto";
+import "service/provider/v1/entities.proto";
+import "service/provider/v1/messages.proto";
+
+option go_package = "github.com/webitel/im-provider-service/gen/go/api/v1;impb";
+
+/// CustomService defines the RPC methods for managing custom chat gateways —
+/// arbitrary external communication systems connected as a chat channel.
+service CustomService {
+  /// CreateCustomGate registers an external system as a messaging gateway.
+  rpc CreateCustomGate (webitel.im.provider.v1.ProviderCreateCustomGateRequest) returns (webitel.im.provider.v1.ProviderCreateCustomGateResponse) {
+    option (google.api.http) = { post: "/im/gates/custom", body: "*" };
+  }
+
+  /// GetCustomGate retrieves configuration and status for a custom gateway.
+  rpc GetCustomGate (webitel.im.provider.v1.ProviderGetCustomGateRequest) returns (webitel.im.provider.v1.ProviderGetCustomGateResponse) {
+    option (google.api.http) = { get: "/im/gates/custom/{id}" };
+  }
+
+  /// UpdateCustomGate updates custom gateway settings.
+  rpc UpdateCustomGate (webitel.im.provider.v1.ProviderUpdateCustomGateRequest) returns (webitel.im.provider.v1.ProviderUpdateCustomGateResponse) {
+    option (google.api.http) = { patch: "/im/gates/custom/{id}", body: "*" };
+  }
+
+  /// DeleteCustomGate removes the custom gateway integration.
+  rpc DeleteCustomGate (webitel.im.provider.v1.ProviderDeleteCustomGateRequest) returns (webitel.im.provider.v1.ProviderDeleteCustomGateResponse) {
+    option (google.api.http) = { delete: "/im/gates/custom/{id}" };
+  }
+}
