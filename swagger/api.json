@@ -42217,6 +42217,44 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "Attachments"
+        ],
+        "summary": "AttachFile binds an uploaded file to an article.",
+        "operationId": "AttachFile",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Concurrency token / locator of the owning article.",
+            "name": "article_etag",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.Attachments.AttachFileBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.kb.File"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
       }
     },
     "/v1/kb/articles/{article_etag}/files/{id}": {
@@ -75433,7 +75471,7 @@
       }
     },
     "webitel.kb.ArticleType": {
-      "description": "Article type.",
+      "description": "Article kind.",
       "type": "string",
       "default": "ARTICLE_TYPE_UNSPECIFIED",
       "enum": [
@@ -75521,6 +75559,17 @@
       "properties": {
         "new_parent_id": {
           "description": "New parent id; 0 to move to top level.",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "webitel.kb.Attachments.AttachFileBody": {
+      "description": "AttachFileRequest binds a file already uploaded to Storage.",
+      "type": "object",
+      "properties": {
+        "file_id": {
+          "description": "Storage file id, as the upload returned it.",
           "type": "string",
           "format": "int64"
         }
@@ -75666,7 +75715,7 @@
           "format": "int64"
         },
         "created_by": {
-          "description": "User who uploaded the file.",
+          "description": "User who attached the file.",
           "$ref": "#/definitions/general.ExtendedLookup"
         },
         "id": {
@@ -75686,10 +75735,6 @@
           "description": "File size in bytes.",
           "type": "string",
           "format": "int64"
-        },
-        "source": {
-          "description": "Storage source.",
-          "type": "string"
         },
         "url": {
           "description": "Download url.",
@@ -78563,24 +78608,35 @@
       "name": "webitel.im.service.thread.v1.ThreadManagement"
     },
     {
+      "description": "Articles manages knowledge-base articles: CRUD, hierarchy (depth 1..5) and\nnavigation (move, children, ancestors, tree). Mutations use the etag for\noptimistic locking.",
       "name": "Articles"
     },
     {
+      "description": "Attachments binds files uploaded to Webitel Storage to articles.",
       "name": "Attachments"
     },
     {
+      "description": "EmbeddingModels manages the registry of embedding and reranker models.\nThe encrypted provider credential is never returned; it is set via api_key\non input and validated by a test call before a space may select the model.",
       "name": "EmbeddingModels"
     },
     {
+      "description": "Retrieval serves read-only search and lookup over the knowledge base for\noperators (search/resolve/suggest) and bots (semantic_search/menu).\nAll endpoints return an empty list with HTTP 200 on no match, never an error.",
       "name": "Retrieval"
     },
     {
+      "description": "Indexing serves the knowledge base indexer worker. Service to service: no\nobjclass, no HTTP bindings, a service token instead of a user session.",
+      "name": "Indexing"
+    },
+    {
+      "description": "Spaces manages knowledge-base spaces: top-level containers that fix language\nand retrieval configuration (embedding/reranker models, vector toggle).",
       "name": "Spaces"
     },
     {
+      "description": "Tags provides tag auto-completion within a space.",
       "name": "Tags"
     },
     {
+      "description": "Versions exposes the immutable version history of an article and restore.",
       "name": "Versions"
     },
     {
