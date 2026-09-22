@@ -44,6 +44,9 @@
       "description": "Service definition for managing cases."
     },
     {
+      "name": "CaseArticles"
+    },
+    {
       "name": "CaseCommunications",
       "description": "CaseCommunications service provides operations to manage communications within cases."
     },
@@ -234,6 +237,52 @@
         ],
         "tags": [
           "Cases"
+        ]
+      }
+    },
+    "/cases/articles/{article_id}/cases": {
+      "get": {
+        "summary": "Cases of an article the user can read.",
+        "operationId": "ListArticleCases",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.cases.CaseArticleList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "article_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "CaseArticles"
         ]
       }
     },
@@ -2715,6 +2764,126 @@
         ]
       }
     },
+    "/cases/{case_etag}/articles": {
+      "get": {
+        "summary": "Articles of a case, the close article first.",
+        "operationId": "ListCaseArticles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.cases.CaseArticleList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "case_etag",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "CaseArticles"
+        ]
+      },
+      "post": {
+        "summary": "Links an article to a case; linking it again returns the same link.",
+        "operationId": "LinkCaseArticle",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.cases.CaseArticle"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "case_etag",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.cases.InputCaseArticle"
+            }
+          }
+        ],
+        "tags": [
+          "CaseArticles"
+        ]
+      }
+    },
+    "/cases/{case_etag}/articles/{article_id}": {
+      "delete": {
+        "summary": "Removes a manual link; the close article is changed on the case itself.",
+        "operationId": "UnlinkCaseArticle",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.cases.CaseArticle"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "case_etag",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "article_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "CaseArticles"
+        ]
+      }
+    },
     "/cases/{case_etag}/comments": {
       "get": {
         "summary": "Retrieve a list of comments associated with a specific case",
@@ -3955,6 +4124,10 @@
                   "type": "string",
                   "title": "create: not required; update: required only when case status goes to the final state"
                 },
+                "close_article": {
+                  "$ref": "#/definitions/general.Lookup",
+                  "title": "create: not required; knowledge base article chosen as the close reason"
+                },
                 "rating": {
                   "type": "string",
                   "format": "int64"
@@ -4094,6 +4267,10 @@
                 "close_result": {
                   "type": "string",
                   "title": "create: not required; update: required only when case status goes to the final state"
+                },
+                "close_article": {
+                  "$ref": "#/definitions/general.Lookup",
+                  "title": "create: not required; knowledge base article chosen as the close reason"
                 },
                 "rating": {
                   "type": "string",
@@ -5963,6 +6140,10 @@
         "close_result": {
           "type": "string"
         },
+        "close_article": {
+          "$ref": "#/definitions/general.Lookup",
+          "description": "Knowledge base article chosen as the close reason; id only."
+        },
         "rating": {
           "type": "string",
           "format": "int64",
@@ -6042,6 +6223,61 @@
         }
       },
       "description": "Message representing a case."
+    },
+    "webitel.cases.CaseArticle": {
+      "type": "object",
+      "properties": {
+        "article": {
+          "$ref": "#/definitions/general.Lookup",
+          "description": "Knowledge base article; id only."
+        },
+        "case": {
+          "$ref": "#/definitions/webitel.cases.RelatedCaseLookup",
+          "description": "Linked case; set on the article side."
+        },
+        "source": {
+          "$ref": "#/definitions/webitel.cases.CaseArticleSource"
+        },
+        "created_by": {
+          "$ref": "#/definitions/general.Lookup",
+          "description": "Empty for the close article."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Unixmilli; empty for the close article."
+        }
+      },
+      "description": "Knowledge base article linked to a case."
+    },
+    "webitel.cases.CaseArticleList": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "string",
+          "format": "int64"
+        },
+        "next": {
+          "type": "boolean"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.cases.CaseArticle"
+          }
+        }
+      }
+    },
+    "webitel.cases.CaseArticleSource": {
+      "type": "string",
+      "enum": [
+        "CASE_ARTICLE_SOURCE_UNSPECIFIED",
+        "CASE_ARTICLE_SOURCE_MANUAL",
+        "CASE_ARTICLE_SOURCE_RESOLUTION"
+      ],
+      "default": "CASE_ARTICLE_SOURCE_UNSPECIFIED",
+      "description": "How a knowledge base article got linked to a case.\n\n - CASE_ARTICLE_SOURCE_MANUAL: Linked by an operator.\n - CASE_ARTICLE_SOURCE_RESOLUTION: The close article of the case."
     },
     "webitel.cases.CaseComment": {
       "type": "object",
@@ -6888,6 +7124,10 @@
           "type": "string",
           "title": "create: not required; update: required only when case status goes to the final state"
         },
+        "close_article": {
+          "$ref": "#/definitions/general.Lookup",
+          "title": "create: not required; knowledge base article chosen as the close reason"
+        },
         "rating": {
           "type": "string",
           "format": "int64"
@@ -6905,6 +7145,15 @@
         "custom": {
           "type": "object",
           "description": "Custom data extension fields .."
+        }
+      }
+    },
+    "webitel.cases.InputCaseArticle": {
+      "type": "object",
+      "properties": {
+        "article": {
+          "$ref": "#/definitions/general.Lookup",
+          "description": "Knowledge base article to link."
         }
       }
     },
@@ -7102,6 +7351,10 @@
         "close_result": {
           "type": "string",
           "description": "Optional close information."
+        },
+        "close_article": {
+          "$ref": "#/definitions/general.Lookup",
+          "description": "Optional knowledge base article chosen as the close reason."
         },
         "rating": {
           "type": "string",
