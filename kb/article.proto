@@ -71,6 +71,14 @@ service Articles {
     option (option.access) = ACTION_UPDATE;
   }
 
+  // ReindexArticle queues the latest version of an article for indexing again.
+  rpc ReindexArticle(ReindexArticleRequest) returns (Article) {
+    option (google.api.http) = {
+      post: "/v1/kb/articles/{etag}/reindex"
+    };
+    option (option.access) = ACTION_UPDATE;
+  }
+
   // ListChildren returns the direct children of an article.
   rpc ListChildren(ListChildrenRequest) returns (ArticleList) {
     option (google.api.http) = {
@@ -214,6 +222,12 @@ message MoveArticleRequest {
   string etag = 1;
   // New parent id; 0 to move to top level.
   int64 new_parent_id = 2;
+}
+
+// ReindexArticleRequest selects the article to index again.
+message ReindexArticleRequest {
+  // Concurrency token / locator of the article.
+  string etag = 1;
 }
 
 // ListChildrenRequest selects the parent article.
