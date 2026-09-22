@@ -297,6 +297,10 @@ message ProviderUpdateViberGateResponse {
 message ProviderDeleteViberGateRequest { string id = 1; }
 message ProviderDeleteViberGateResponse { webitel.im.provider.v1.ProviderViberGate item = 1; }
 
+/// ProviderCreateCustomGateRequest registers an arbitrary external communication
+/// system as a chat channel. Only configuration is required on the Webitel side:
+/// the external system posts signed updates to the generated webhook_url and
+/// receives operator replies on callback_url.
 message ProviderCreateCustomGateRequest {
   string name = 1; // Name of the gateway in Webitel
   Peer peer = 2; // Webitel bot identity (sub and iss) the channel routes inbound messages to
@@ -317,17 +321,19 @@ message ProviderCreateCustomGateResponse {
 message ProviderGetCustomGateRequest { string id = 1; }
 message ProviderGetCustomGateResponse { webitel.im.provider.v1.ProviderCustomGate item = 1; }
 
-/// ProviderUpdateCustomGateRequest updates custom gateway settings.
+/// ProviderUpdateCustomGateRequest updates custom gateway settings. A non-empty
+/// app_secret rotates the signing secret and breaks the integration until the
+/// external system is updated too.
 message ProviderUpdateCustomGateRequest {
   string id = 1;
-  string name = 2;
+  optional string name = 2;
   Peer peer = 3; // Webitel bot identity (sub and iss)
-  string callback_url = 4;
-  string app_secret = 5; // New signing secret, if rotated
+  optional string callback_url = 4;
+  optional string app_secret = 5; // New signing secret, if rotated
   repeated string allowed_ips = 6;
-  int32 request_timeout_ms = 7;
-  int32 retry_attempts = 8;
-  bool enabled = 9;
+  optional int32 request_timeout_ms = 7;
+  optional int32 retry_attempts = 8;
+  optional bool enabled = 9;
 }
 
 /// ProviderUpdateCustomGateResponse returns the updated custom provider.
