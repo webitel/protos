@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package webitel.kb.service;
+
+option go_package = "github.com/webitel/webitel-kb/api/kb/service;servicepb";
+
+// Indexing serves the knowledge base indexer worker. Service to service: no
+// objclass, no HTTP bindings, a service token instead of a user session.
+service Indexing {
+  // ResolveSpaceEmbedding returns the embedding model of a space with its credential.
+  rpc ResolveSpaceEmbedding(ResolveSpaceEmbeddingRequest) returns (SpaceEmbedding);
+}
+
+message ResolveSpaceEmbeddingRequest {
+  int64 space_id = 1;
+}
+
+// SpaceEmbedding is what the worker needs to embed the chunks of a space.
+message SpaceEmbedding {
+  // False when the space is not embedded; every field below is then unset.
+  bool vector_search_enabled = 1;
+  // Model the vectors are stored under (kb.chunk_embedding.model_id).
+  int64 model_id = 2;
+  string provider = 3;
+  string model_ref = 4;
+  int32 dimensions = 5;
+  // URL of a self-hosted service; empty for cloud providers.
+  string endpoint = 6;
+  // Provider credential in plaintext; empty for self-hosted providers.
+  string api_key = 7;
+  // Registration test call result; reported, not enforced.
+  bool validated = 8;
+}

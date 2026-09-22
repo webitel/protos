@@ -403,6 +403,11 @@ message AddMemberRequest {
   // When adding a bot contact, controls whether it automatically leaves after its schema completes.
   // Defaults to true if not set.
   optional bool auto_leave = 6;
+
+  // Set by trusted service orchestrators (schema/engine) to take the system path:
+  // membership/permission checks are skipped, yet initiator_contact_id is still
+  // recorded as the message sender. Decouples "who acted" from "enforce permissions".
+  optional bool system_call = 7;
 }
 
 message AddMemberResponse {
@@ -417,6 +422,10 @@ message RemoveMemberRequest {
     (buf.validate.field).required = true
   ];
   optional string reason = 3;
+
+  // See AddMemberRequest.system_call: skip permission checks while still
+  // recording initiator_contact_id as the message sender.
+  optional bool system_call = 4;
 }
 
 message RemoveMemberResponse {}

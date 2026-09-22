@@ -51,6 +51,27 @@ message Application {
   // Optional. Defines special rules for Contacts list selection (I/O).
   AppContacts contacts = 10;
 
+  // OPTIONAL. System event/message delivery policy for Contacts (End-Users) that
+  // are signed-in VIA this Application. Presence matters:
+  //  - unset (nil)                         : no restriction, all system message types delivered (default).
+  //  - set, with an empty `types` list     : NO system messages delivered at all.
+  //  - set, with a non-empty `types` list  : only the listed SystemMessage.type values are delivered.
+  optional SystemMessageAllowList allow_system_messages = 11;
+
+}
+
+// SystemMessageAllowList is the per-Application policy for which chat "system"
+// message types (e.g. "user_joined", "user_left") get delivered to Contacts
+// (End-Users) signed in via that Application. Wrapped in its own message (rather
+// than a bare `repeated string`) so presence can distinguish "not configured"
+// (the field itself is unset) from "explicitly configured to allow nothing"
+// (the field is set but `types` is empty) -- a plain repeated scalar field
+// cannot represent that distinction, since an absent and an explicitly-empty
+// repeated field are indistinguishable on the wire.
+message SystemMessageAllowList {
+  // Allowed SystemMessage.type value(s). Empty means no system message type
+  // is allowed (i.e. all system messages are suppressed for this Application).
+  repeated string types = 1;
 }
 
 // Application Service Configuration

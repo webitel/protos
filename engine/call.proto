@@ -2,772 +2,767 @@ syntax = "proto3";
 
 package engine;
 
-option go_package = "github.com/webitel/protos/engine";
-
 import "const.proto";
 import "google/api/annotations.proto";
+import "google/api/visibility.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/wrappers.proto";
+
+option go_package = "github.com/webitel/protos/engine";
 
 // CallService provides a comprehensive set of operations for managing
 // real-time telephony and analyzing historical call data.
 service CallService {
-    // --- History Calls ---
+  // --- History Calls ---
 
-    // SearchHistoryCall retrieves a list of completed calls using filters (GET).
-    // Supports advanced filtering by participants, duration, causes, and custom variables.
-    rpc SearchHistoryCall(SearchHistoryCallRequest) returns (ListHistoryCall) {
-        option (google.api.http) = {
-            get: "/calls/history"
-        };
-    }
+  // SearchHistoryCall retrieves a list of completed calls using filters (GET).
+  // Supports advanced filtering by participants, duration, causes, and custom variables.
+  rpc SearchHistoryCall(SearchHistoryCallRequest) returns (ListHistoryCall) {
+    option (google.api.http) = {get: "/calls/history"};
+  }
 
-    // SearchHistoryCallPost retrieves a list of completed calls using a complex filter body (POST).
-    // Ideal for large filter sets that exceed URL length limits.
-    rpc SearchHistoryCallPost(SearchHistoryCallRequest) returns (ListHistoryCall) {
-        option (google.api.http) = {
-            post: "/calls/history"
-            body: "*"
-        };
-    }
+  // SearchHistoryCallPost retrieves a list of completed calls using a complex filter body (POST).
+  // Ideal for large filter sets that exceed URL length limits.
+  rpc SearchHistoryCallPost(SearchHistoryCallRequest) returns (ListHistoryCall) {
+    option (google.api.http) = {
+      post: "/calls/history"
+      body: "*"
+    };
+  }
 
-    // PatchHistoryCall updates metadata for a completed call (e.g., variables or visibility).
-    rpc PatchHistoryCall(PatchHistoryCallRequest) returns (HistoryCall) {
-        option (google.api.http) = {
-            patch: "/calls/history/{id}"
-            body: "*"
-        };
-    }
+  // PatchHistoryCall updates metadata for a completed call (e.g., variables or visibility).
+  rpc PatchHistoryCall(PatchHistoryCallRequest) returns (HistoryCall) {
+    option (google.api.http) = {
+      patch: "/calls/history/{id}"
+      body: "*"
+    };
+  }
 
-    // AggregateHistoryCall performs statistical analysis on historical data.
-    // Group and aggregate metrics like average duration, call counts, or peak hours.
-    rpc AggregateHistoryCall(AggregateHistoryCallRequest) returns (ListAggregate) {
-        option (google.api.http) = {
-            post: "/calls/history/aggregate"
-            body: "*"
-        };
-    }
+  // AggregateHistoryCall performs statistical analysis on historical data.
+  // Group and aggregate metrics like average duration, call counts, or peak hours.
+  rpc AggregateHistoryCall(AggregateHistoryCallRequest) returns (ListAggregate) {
+    option (google.api.http) = {
+      post: "/calls/history/aggregate"
+      body: "*"
+    };
+  }
 
-    // --- Active Calls ---
+  // PatchHistoryCallAttempt performs update of history attempt binded to call.
+  rpc PatchHistoryCallAttempt(PatchHistoryCallAttemptRequest) returns (PatchHistoryCallAttemptResponse) {
+    option (google.api.http) = {
+      patch: "/calls/history/{id}/attempt"
+      body: "*"
+    };
+  }
 
-    // SearchActiveCall returns a list of all calls currently in progress.
-    rpc SearchActiveCall(SearchCallRequest) returns (ListCall) {
-        option (google.api.http) = {
-            get: "/calls/active"
-        };
-    }
+  // --- Active Calls ---
 
-    // ReadCall returns detailed real-time information for a specific active call.
-    rpc ReadCall(ReadCallRequest) returns (ActiveCall) {
-        option (google.api.http) = {
-            get: "/calls/active/{id}"
-        };
-    }
+  // SearchActiveCall returns a list of all calls currently in progress.
+  rpc SearchActiveCall(SearchCallRequest) returns (ListCall) {
+    option (google.api.http) = {get: "/calls/active"};
+  }
 
-    // CreateCall initiates a new outbound call with specified parameters.
-    rpc CreateCall (CreateCallRequest) returns (CreateCallResponse) {
-        option (google.api.http) = {
-            post: "/calls"
-            body: "*"
-        };
-    }
+  // ReadCall returns detailed real-time information for a specific active call.
+  rpc ReadCall(ReadCallRequest) returns (ActiveCall) {
+    option (google.api.http) = {get: "/calls/active/{id}"};
+  }
 
-    // CreateCallNA is an internal version of CreateCall without API annotation.
-    rpc CreateCallNA (CreateCallRequest) returns (CreateCallResponse) {}
+  // CreateCall initiates a new outbound call with specified parameters.
+  rpc CreateCall(CreateCallRequest) returns (CreateCallResponse) {
+    option (google.api.http) = {
+      post: "/calls"
+      body: "*"
+    };
+  }
 
-    // HangupCall terminates an active call session.
-    rpc HangupCall (HangupCallRequest) returns (HangupCallResponse) {
-        option (google.api.http) = {
-            delete: "/calls/active/{id}"
-            body: "*"
-        };
-    }
+  // CreateCallNA is an internal version of CreateCall without API annotation.
+  rpc CreateCallNA(CreateCallRequest) returns (CreateCallResponse) {}
 
-    // --- Call Control ---
+  // HangupCall terminates an active call session.
+  rpc HangupCall(HangupCallRequest) returns (HangupCallResponse) {
+    option (google.api.http) = {
+      delete: "/calls/active/{id}"
+      body: "*"
+    };
+  }
 
-    // HoldCall puts an active call on hold.
-    rpc HoldCall (UserCallRequest) returns (HoldCallResponse) {
-        option (google.api.http) = {
-            patch: "/calls/active/{id}/hold"
-            body: "*"
-        };
-    }
+  // --- Call Control ---
 
-    // UnHoldCall resumes a call from hold state.
-    rpc UnHoldCall (UserCallRequest) returns (HoldCallResponse) {
-        option (google.api.http) = {
-            patch: "/calls/active/{id}/unhold"
-            body: "*"
-        };
-    }
+  // HoldCall puts an active call on hold.
+  rpc HoldCall(UserCallRequest) returns (HoldCallResponse) {
+    option (google.api.http) = {
+      patch: "/calls/active/{id}/hold"
+      body: "*"
+    };
+  }
 
-    // DtmfCall sends DTMF digits to an active call.
-    rpc DtmfCall (DtmfCallRequest) returns (DtmfCallResponse) {
-        option (google.api.http) = {
-            patch: "/calls/active/{id}/dtmf"
-            body: "*"
-        };
-    }
+  // UnHoldCall resumes a call from hold state.
+  rpc UnHoldCall(UserCallRequest) returns (HoldCallResponse) {
+    option (google.api.http) = {
+      patch: "/calls/active/{id}/unhold"
+      body: "*"
+    };
+  }
 
-    // BlindTransferCall redirects an active call to another destination.
-    rpc BlindTransferCall (BlindTransferCallRequest) returns (BlindTransferCallResponse) {
-        option (google.api.http) = {
-            patch: "/calls/active/{id}/transfer"
-            body: "*"
-        };
-    }
+  // DtmfCall sends DTMF digits to an active call.
+  rpc DtmfCall(DtmfCallRequest) returns (DtmfCallResponse) {
+    option (google.api.http) = {
+      patch: "/calls/active/{id}/dtmf"
+      body: "*"
+    };
+  }
 
-    // EavesdropCall allows a supervisor to listen, whisper, or join an active call.
-    rpc EavesdropCall (EavesdropCallRequest) returns (CreateCallResponse) {
-        option (google.api.http) = {
-            post: "/calls/active/{id}/eavesdrop"
-            body: "*"
-        };
-    }
+  // BlindTransferCall redirects an active call to another destination.
+  rpc BlindTransferCall(BlindTransferCallRequest) returns (BlindTransferCallResponse) {
+    option (google.api.http) = {
+      patch: "/calls/active/{id}/transfer"
+      body: "*"
+    };
+  }
 
+  // EavesdropCall allows a supervisor to listen, whisper, or join an active call.
+  rpc EavesdropCall(EavesdropCallRequest) returns (CreateCallResponse) {
+    option (google.api.http) = {
+      post: "/calls/active/{id}/eavesdrop"
+      body: "*"
+    };
+  }
 
-    // ConfirmPush confirms receipt of a push notification for synchronization.
-    rpc ConfirmPush(ConfirmPushRequest) returns (ConfirmPushResponse) {
-        option (google.api.http) = {
-            patch: "/calls/active/{id}/confirm_push"
-        };
-    }
+  // ConfirmPush confirms receipt of a push notification for synchronization.
+  rpc ConfirmPush(ConfirmPushRequest) returns (ConfirmPushResponse) {
+    option (google.api.http) = {patch: "/calls/active/{id}/confirm_push"};
+  }
 
-    rpc SetVariablesCallNA (SetVariablesCallRequestNA) returns (SetVariablesCallResponse) {};
+  rpc SetVariablesCallNA(SetVariablesCallRequestNA) returns (SetVariablesCallResponse) {}
 
-    // SetVariablesCall updates call channel variables in real-time.
-    rpc SetVariablesCall (SetVariablesCallRequest) returns (SetVariablesCallResponse) {
-        option (google.api.http) = {
-            patch: "/calls/active/{id}/variables"
-            body: "*"
-        };
-    }
+  // SetVariablesCall updates call channel variables in real-time.
+  rpc SetVariablesCall(SetVariablesCallRequest) returns (SetVariablesCallResponse) {
+    option (google.api.http) = {
+      patch: "/calls/active/{id}/variables"
+      body: "*"
+    };
+  }
 
-    // CreateCallAnnotation adds a text note to a specific timeframe of a historical call.
-    rpc CreateCallAnnotation (CreateCallAnnotationRequest) returns (CallAnnotation) {
-        option (google.api.http) = {
-            post: "/calls/history/{call_id}/annotation"
-            body: "*"
-        };
-    }
+  // CreateCallAnnotation adds a text note to a specific timeframe of a historical call.
+  rpc CreateCallAnnotation(CreateCallAnnotationRequest) returns (CallAnnotation) {
+    option (google.api.http) = {
+      post: "/calls/history/{call_id}/annotation"
+      body: "*"
+    };
+  }
 
-    // UpdateCallAnnotation modifies an existing call note.
-    rpc UpdateCallAnnotation (UpdateCallAnnotationRequest) returns (CallAnnotation) {
-        option (google.api.http) = {
-            put: "/calls/history/{call_id}/annotation/{id}"
-            body: "*"
-        };
-    }
+  // UpdateCallAnnotation modifies an existing call note.
+  rpc UpdateCallAnnotation(UpdateCallAnnotationRequest) returns (CallAnnotation) {
+    option (google.api.http) = {
+      put: "/calls/history/{call_id}/annotation/{id}"
+      body: "*"
+    };
+  }
 
-    // DeleteCallAnnotation removes an annotation from a historical call.
-    rpc DeleteCallAnnotation (DeleteCallAnnotationRequest) returns (CallAnnotation) {
-        option (google.api.http) = {
-            delete: "/calls/history/{call_id}/annotation/{id}"
-        };
-    }
+  // DeleteCallAnnotation removes an annotation from a historical call.
+  rpc DeleteCallAnnotation(DeleteCallAnnotationRequest) returns (CallAnnotation) {
+    option (google.api.http) = {delete: "/calls/history/{call_id}/annotation/{id}"};
+  }
 
-    // RedialCall quickly initiates a new call using data from a previous history record.
-    rpc RedialCall (RedialCallRequest) returns (CreateCallResponse) {
-        option (google.api.http) = {
-            post: "/calls/history/{call_id}/redial"
-            body: "*"
-        };
-    }
+  // RedialCall quickly initiates a new call using data from a previous history record.
+  rpc RedialCall(RedialCallRequest) returns (CreateCallResponse) {
+    option (google.api.http) = {
+      post: "/calls/history/{call_id}/redial"
+      body: "*"
+    };
+  }
 }
 
 message RedialCallRequest {
-    string call_id = 1;
+  string call_id = 1;
 }
 
 message PatchHistoryCallRequest {
-    string id = 1;
-    map<string,string> variables = 2;
-    google.protobuf.BoolValue hide_missed = 3;
+  string id = 1;
+  map<string, string> variables = 2;
+  google.protobuf.BoolValue hide_missed = 3;
 }
 
 message SetVariablesCallRequest {
-    string id = 1;
-    map<string,string> variables = 2;
+  string id = 1;
+  map<string, string> variables = 2;
 }
 
 message SetVariablesCallRequestNA {
-    string id = 1;
-    int64 domain_id = 2;
-    map<string,string> variables = 3;
+  string id = 1;
+  int64 domain_id = 2;
+  map<string, string> variables = 3;
 }
 
-message SetVariablesCallResponse {
-
-}
+message SetVariablesCallResponse {}
 
 message ConfirmPushRequest {
-    string id = 1;
+  string id = 1;
 }
 
-message ConfirmPushResponse {
-
-}
+message ConfirmPushResponse {}
 
 message SearchHistoryCallRequest {
-    int32 page = 1;
-    int32 size = 2;
-    string q = 3;
-    string sort = 4;
-    repeated string fields = 5;
+  int32 page = 1;
+  int32 size = 2;
+  string q = 3;
+  string sort = 4;
+  repeated string fields = 5;
 
-    FilterBetween created_at = 6;
-    repeated int64 user_id = 7;
-    repeated int64 agent_id = 8;
-    repeated int64 queue_id = 9;
-    repeated int64 team_id = 10;
-    repeated int64 member_id = 11;
-    repeated int64 gateway_id = 12;
+  FilterBetween created_at = 6;
+  repeated int64 user_id = 7;
+  repeated int64 agent_id = 8;
+  repeated int64 queue_id = 9;
+  repeated int64 team_id = 10;
+  repeated int64 member_id = 11;
+  repeated int64 gateway_id = 12;
 
-    FilterBetween duration = 13;
-    bool skip_parent = 14;
-    string parent_id = 15;
-    repeated string cause = 16;
-    google.protobuf.BoolValue has_file = 17;
+  FilterBetween duration = 13;
+  bool skip_parent = 14;
+  string parent_id = 15;
+  repeated string cause = 16;
+  google.protobuf.BoolValue has_file = 17;
 
-    int64 domain_id = 18;
-    string number = 19;
-    string direction = 20;
-    FilterBetween answered_at = 21;
-    bool missed = 22;
-    FilterBetween stored_at = 23;
-    repeated string id = 24;
-    repeated string transfer_from = 25;
-    repeated string transfer_to = 26;
-    string dependency_id = 27;
-    repeated string tags = 28;
-    map<string,string> variables = 29;
-    repeated string amd_result = 30;
-    string fts = 31;
-    repeated string directions = 32;
-    google.protobuf.BoolValue has_transcript = 33;
-    string agent_description = 34;
-    repeated int64 owner_id = 35;
-    repeated int64 grantee_id = 36;
-    repeated string amd_ai_result = 37;
+  int64 domain_id = 18;
+  string number = 19;
+  string direction = 20;
+  FilterBetween answered_at = 21;
+  bool missed = 22;
+  FilterBetween stored_at = 23;
+  repeated string id = 24;
+  repeated string transfer_from = 25;
+  repeated string transfer_to = 26;
+  string dependency_id = 27;
+  repeated string tags = 28;
+  map<string, string> variables = 29;
+  repeated string amd_result = 30;
+  string fts = 31;
+  repeated string directions = 32;
+  google.protobuf.BoolValue has_transcript = 33;
+  string agent_description = 34;
+  repeated int64 owner_id = 35;
+  repeated int64 grantee_id = 36;
+  repeated string amd_ai_result = 37;
 
-    FilterBetween talk = 38;
+  FilterBetween talk = 38;
 
-    google.protobuf.BoolValue rated = 39;
-    repeated int64 rated_by = 40;
-    FilterBetween score_required = 41;
-    FilterBetween score_optional = 42;
-    repeated int64 rated_user = 43;
-    repeated int64 contact_id = 44;
-    repeated int32 schema_id = 45;
-    google.protobuf.BoolValue has_transfer = 46;
-    google.protobuf.BoolValue timeline = 47;
+  google.protobuf.BoolValue rated = 39;
+  repeated int64 rated_by = 40;
+  FilterBetween score_required = 41;
+  FilterBetween score_optional = 42;
+  repeated int64 rated_user = 43;
+  repeated int64 contact_id = 44;
+  repeated int32 schema_id = 45;
+  google.protobuf.BoolValue has_transfer = 46;
+  google.protobuf.BoolValue timeline = 47;
 }
 
 message AggregateRequest {
+  message Group {
+    string id = 1;
+    string interval = 2;
 
-    message Group {
-        string id = 1;
-        string interval = 2;
+    string aggregate = 3;
+    string field = 4;
+    int32 top = 5;
+    bool desc = 6;
+  }
 
-        string aggregate = 3;
-        string field = 4;
-        int32 top = 5;
-        bool desc = 6;
-    }
+  string name = 1;
+  repeated Group group = 2;
 
-    string name = 1;
-    repeated Group group = 2;
-
-    repeated string min = 3;
-    repeated string max = 4;
-    repeated string sum = 5;
-    repeated string avg = 6;
-    repeated string count = 7;
-    repeated string sort = 8;
-    int32 limit = 9;
+  repeated string min = 3;
+  repeated string max = 4;
+  repeated string sum = 5;
+  repeated string avg = 6;
+  repeated string count = 7;
+  repeated string sort = 8;
+  int32 limit = 9;
 }
 
 message AggregateHistoryCallRequest {
-    int32 page = 1;
-    int32 size = 2;
-    string q = 3;
-    repeated AggregateRequest aggs = 4;
+  int32 page = 1;
+  int32 size = 2;
+  string q = 3;
+  repeated AggregateRequest aggs = 4;
 
-    FilterBetween created_at = 5;
-    repeated int64 user_id = 6;
-    repeated int64 agent_id = 7;
-    repeated int64 queue_id = 8;
-    repeated int64 team_id = 9;
-    repeated int64 member_id = 10;
-    repeated int64 gateway_id = 11;
+  FilterBetween created_at = 5;
+  repeated int64 user_id = 6;
+  repeated int64 agent_id = 7;
+  repeated int64 queue_id = 8;
+  repeated int64 team_id = 9;
+  repeated int64 member_id = 10;
+  repeated int64 gateway_id = 11;
 
-    FilterBetween duration = 12;
-    bool skip_parent = 13;
-    string parent_id = 14;
-    repeated string cause = 15;
-    google.protobuf.BoolValue has_file = 16;
+  FilterBetween duration = 12;
+  bool skip_parent = 13;
+  string parent_id = 14;
+  repeated string cause = 15;
+  google.protobuf.BoolValue has_file = 16;
 
-    int64 domain_id = 17;
-    string number = 18;
-    string direction = 19;
-    FilterBetween answered_at = 20;
-    bool missed = 21;
-    FilterBetween stored_at = 22;
-    repeated string id = 23;
-    repeated string transfer_from = 24;
-    repeated string transfer_to = 25;
-    string dependency_id = 26;
-    repeated string tags = 27;
-    map<string,string> variables = 28;
-    repeated string amd_result = 29;
-    string fts = 30;
-    repeated string directions = 31;
-    google.protobuf.BoolValue has_transcript = 32;
-    string agent_description = 33;
-    repeated int64 contact_id = 34;
+  int64 domain_id = 17;
+  string number = 18;
+  string direction = 19;
+  FilterBetween answered_at = 20;
+  bool missed = 21;
+  FilterBetween stored_at = 22;
+  repeated string id = 23;
+  repeated string transfer_from = 24;
+  repeated string transfer_to = 25;
+  string dependency_id = 26;
+  repeated string tags = 27;
+  map<string, string> variables = 28;
+  repeated string amd_result = 29;
+  string fts = 30;
+  repeated string directions = 31;
+  google.protobuf.BoolValue has_transcript = 32;
+  string agent_description = 33;
+  repeated int64 contact_id = 34;
 }
 
 message AggregateResult {
-    string name = 1;
-    google.protobuf.Value data = 2;
+  string name = 1;
+  google.protobuf.Value data = 2;
 }
 
 message ListAggregate {
-    repeated AggregateResult items = 1;
+  repeated AggregateResult items = 1;
 }
 
 message ListHistoryCall {
-    bool next = 1;
-    repeated HistoryCall items = 2;
+  bool next = 1;
+  repeated HistoryCall items = 2;
 }
 
 message CallFile {
-    int64 id = 1;
-    string name = 2;
-    int64 size = 3;
-    string mime_type = 4;
-    int64 start_at = 5;
-    int64 stop_at = 6;
-    string start_record = 7;
-    string channel = 8;
-    CallFileType type = 9;
+  int64 id = 1;
+  string name = 2;
+  int64 size = 3;
+  string mime_type = 4;
+  int64 start_at = 5;
+  int64 stop_at = 6;
+  string start_record = 7;
+  string channel = 8;
+  CallFileType type = 9;
 }
 
 enum CallFileType {
-    file_type_empty = 0;
-    file_type_screenshot = 1;
-    file_type_screensharing = 2;
-    file_type_audio = 3;
-    file_type_video = 4;
-    file_type_pdf = 5;
+  file_type_empty = 0;
+  file_type_screenshot = 1;
+  file_type_screensharing = 2;
+  file_type_audio = 3;
+  file_type_video = 4;
+  file_type_pdf = 5;
 }
 
 message CallHold {
-    int64 start = 1;
-    int64 stop = 2;
-    float sec = 3;
+  int64 start = 1;
+  int64 stop = 2;
+  float sec = 3;
 }
 
 message CallAnnotation {
-    int64 id = 1;
-    string call_id = 2;
-    Lookup created_by = 3;
-    int64 created_at = 4;
-    Lookup updated_by = 5;
-    int64 updated_at = 6;
-    string note = 7;
-    int32 start_sec = 8;
-    int32 end_sec = 9;
-    int64 file_id = 10;
+  int64 id = 1;
+  string call_id = 2;
+  Lookup created_by = 3;
+  int64 created_at = 4;
+  Lookup updated_by = 5;
+  int64 updated_at = 6;
+  string note = 7;
+  int32 start_sec = 8;
+  int32 end_sec = 9;
+  int64 file_id = 10;
 }
 
 message CreateCallAnnotationRequest {
-    string call_id = 1;
-    string note = 2;
-    int32 start_sec = 3;
-    int32 end_sec = 4;
-    int64 file_id = 5;
+  string call_id = 1;
+  string note = 2;
+  int32 start_sec = 3;
+  int32 end_sec = 4;
+  int64 file_id = 5;
 }
 
 message UpdateCallAnnotationRequest {
-    int64 id = 1;
-    string call_id = 2;
-    string note = 3;
-    int32 start_sec = 4;
-    int32 end_sec = 5;
+  int64 id = 1;
+  string call_id = 2;
+  string note = 3;
+  int32 start_sec = 4;
+  int32 end_sec = 5;
 }
 
 message DeleteCallAnnotationRequest {
-    int64 id = 1;
-    string call_id = 2;
+  int64 id = 1;
+  string call_id = 2;
 }
 
 message HistoryFileJob {
-    enum HistoryFileJobAction {
-        undefined = 0;
-        STT = 1;
-        delete = 2;
-    }
-    enum HistoryFileJobState {
-        idle = 0;
-        active = 1;
-        finished = 2;
-        error = 3; // TODO
-    }
-    int64 id = 1;
-    int64 file_id = 2;
-    int64 created_at = 3;
-    HistoryFileJobAction action = 4;
-    HistoryFileJobState state = 5;
-    string error_detail = 6;
+  enum HistoryFileJobAction {
+    undefined = 0;
+    STT = 1;
+    delete = 2;
+  }
+  enum HistoryFileJobState {
+    idle = 0;
+    active = 1;
+    finished = 2;
+    error = 3; // TODO
+  }
+  int64 id = 1;
+  int64 file_id = 2;
+  int64 created_at = 3;
+  HistoryFileJobAction action = 4;
+  HistoryFileJobState state = 5;
+  string error_detail = 6;
 }
 
 message TranscriptLookup {
-    int64 id = 1;
-    string locale = 2;
-    int64 file_id = 3; // deprecated
-    Lookup file = 4;
+  int64 id = 1;
+  string locale = 2;
+  int64 file_id = 3; // deprecated
+  Lookup file = 4;
 }
 
 message HistoryCall {
-    message BlindTransfer {
-        string number = 1;
-        int64 time = 2;
-        Lookup user = 3;
-    }
+  message BlindTransfer {
+    string number = 1;
+    int64 time = 2;
+    Lookup user = 3;
+  }
 
-    message QualityMetrics {
-        // Унікальний ідентифікатор сесії
-        string sip_id = 1;
+  message QualityMetrics {
+    // Унікальний ідентифікатор сесії
+    string sip_id = 1;
 
-        // Mean Opinion Score (MOS) - оцінка якості передачі голосу
-        float mos_avg = 2;
-        float mos_min = 3;
-        float mos_max = 4;
-        int32 mos_min_at = 5;
-        int32 mos_max_at = 6;
+    // Mean Opinion Score (MOS) - оцінка якості передачі голосу
+    float mos_avg = 2;
+    float mos_min = 3;
+    float mos_max = 4;
+    int32 mos_min_at = 5;
+    int32 mos_max_at = 6;
 
-        // Jitter - показник коливання затримки пакетів
-        float jitter_avg = 7;
-        float jitter_min = 8;
-        float jitter_max = 9;
-        int32 jitter_min_at = 10;
-        int32 jitter_max_at = 11;
+    // Jitter - показник коливання затримки пакетів
+    float jitter_avg = 7;
+    float jitter_min = 8;
+    float jitter_max = 9;
+    int32 jitter_min_at = 10;
+    int32 jitter_max_at = 11;
 
-        // Packet Loss - відсоток втрачених пакетів
-        float packetloss_avg = 12;
-        float packetloss_min = 13;
-        float packetloss_max = 14;
-        int32 packetloss_min_at = 15;
-        int32 packetloss_max_at = 16;
+    // Packet Loss - відсоток втрачених пакетів
+    float packetloss_avg = 12;
+    float packetloss_min = 13;
+    float packetloss_max = 14;
+    int32 packetloss_min_at = 15;
+    int32 packetloss_max_at = 16;
 
-        // Round Trip Time (RTT) - час проходження сигналу в обидва боки (мс)
-        float roundtrip_avg = 17;
-        float roundtrip_min = 18;
-        float roundtrip_max = 19;
-        int32 roundtrip_min_at = 20;
-        int32 roundtrip_max_at = 21;
-    }
+    // Round Trip Time (RTT) - час проходження сигналу в обидва боки (мс)
+    float roundtrip_avg = 17;
+    float roundtrip_min = 18;
+    float roundtrip_max = 19;
+    int32 roundtrip_min_at = 20;
+    int32 roundtrip_max_at = 21;
+  }
 
-    string id = 1;
-    string app_id = 2;
-    string type = 3;
-    string parent_id = 4;
-    Lookup user = 5;
-    string extension = 6;
-    Lookup gateway = 7;
-    string direction = 8;
-    string destination = 9;
-    Endpoint from = 10;
-    Endpoint to = 11;
-    map<string,string> variables = 12;
+  string id = 1;
+  string app_id = 2;
+  string type = 3;
+  string parent_id = 4;
+  Lookup user = 5;
+  string extension = 6;
+  Lookup gateway = 7;
+  string direction = 8;
+  string destination = 9;
+  Endpoint from = 10;
+  Endpoint to = 11;
+  map<string, string> variables = 12;
 
-    int64 created_at = 13;
-    int64 answered_at = 14;
-    int64 bridged_at = 15;
-    int64 hangup_at = 16;
-    string hangup_by = 17;
-    string cause = 18;
+  int64 created_at = 13;
+  int64 answered_at = 14;
+  int64 bridged_at = 15;
+  int64 hangup_at = 16;
+  string hangup_by = 17;
+  string cause = 18;
 
-    int32 duration = 19;
-    int32 hold_sec = 20;
-    int32 wait_sec = 21;
-    int32 bill_sec = 22;
+  int32 duration = 19;
+  int32 hold_sec = 20;
+  int32 wait_sec = 21;
+  int32 bill_sec = 22;
 
-    int32 sip_code = 23;
-    repeated CallFile files = 24;
+  int32 sip_code = 23;
+  repeated CallFile files = 24;
 
-    Lookup queue = 25;
-    Lookup member = 26;
-    Lookup team = 27;
-    Lookup agent = 28;
+  Lookup queue = 25;
+  Lookup member = 26;
+  Lookup team = 27;
+  Lookup agent = 28;
 
-    int64 joined_at = 29;
-    int64 leaving_at = 30;
-    int64 reporting_at = 31;
-    int64 queue_bridged_at = 32;
-    int32 queue_wait_sec = 33;
-    int32 queue_duration_sec = 34;
-    int32 reporting_sec = 35;
-    string result = 36;
-    repeated string tags = 37;
-    string display = 38;
-    int64 stored_at = 39;
-    string transfer_from = 40;
-    string transfer_to = 41;
-    bool has_children = 42;
-    string agent_description = 43;
-    repeated CallHold hold = 44;
-    repeated CallAnnotation annotations = 45;
-    string amd_result = 46;
-    string hangup_disposition = 47;
-    string blind_transfer = 48;
+  int64 joined_at = 29;
+  int64 leaving_at = 30;
+  int64 reporting_at = 31;
+  int64 queue_bridged_at = 32;
+  int32 queue_wait_sec = 33;
+  int32 queue_duration_sec = 34;
+  int32 reporting_sec = 35;
+  string result = 36;
+  repeated string tags = 37;
+  string display = 38;
+  int64 stored_at = 39;
+  string transfer_from = 40;
+  string transfer_to = 41;
+  bool has_children = 42;
+  string agent_description = 43;
+  repeated CallHold hold = 44;
+  repeated CallAnnotation annotations = 45;
+  string amd_result = 46;
+  string hangup_disposition = 47;
+  string blind_transfer = 48;
 
-    repeated HistoryFileJob files_job = 49;
-    repeated TranscriptLookup transcripts = 50;
-    int32 talk_sec = 51;
-    Lookup grantee = 52;
-    string amd_ai_result = 53;
-    repeated string amd_ai_logs = 54;
+  repeated HistoryFileJob files_job = 49;
+  repeated TranscriptLookup transcripts = 50;
+  int32 talk_sec = 51;
+  Lookup grantee = 52;
+  string amd_ai_result = 53;
+  repeated string amd_ai_logs = 54;
 
-    int64 rate_id = 55;
-    Lookup rated_user = 56;
-    Lookup rated_by = 57;
-    float score_optional = 58;
-    float score_required = 59;
-    int64 attempt_id = 60;
-    bool allow_evaluation = 61;
-    google.protobuf.Value form_fields = 62;
-    string bridged_id = 63;
+  int64 rate_id = 55;
+  Lookup rated_user = 56;
+  Lookup rated_by = 57;
+  float score_optional = 58;
+  float score_required = 59;
+  int64 attempt_id = 60;
+  bool allow_evaluation = 61;
+  google.protobuf.Value form_fields = 62;
+  string bridged_id = 63;
 
-    Lookup contact = 64;
-    int64 member_id = 65;
-    repeated Lookup schemas = 67;
-    string hangup_phrase = 68;
-    repeated BlindTransfer blind_transfers = 69;
-    string from_number = 70;
-    string to_number = 71;
+  Lookup contact = 64;
+  int64 member_id = 65;
+  repeated Lookup schemas = 67;
+  string hangup_phrase = 68;
+  repeated BlindTransfer blind_transfers = 69;
+  string from_number = 70;
+  string to_number = 71;
 
-    string destination_name = 72;
+  string destination_name = 72;
 
+  message CallForm {
+    Lookup agent = 1;
+    google.protobuf.Value form_fields = 2;
+    int64 reporting_at = 3;
+  }
 
-    message CallForm {
-        Lookup agent = 1;
-        google.protobuf.Value form_fields = 2;
-        int64 reporting_at = 3;
-    }
-
-    repeated CallForm forms = 73;
-    string conversation_id = 74;
-    string meeting_id = 75;
-    QualityMetrics quality_metrics = 76;
+  repeated CallForm forms = 73;
+  string conversation_id = 74;
+  string meeting_id = 75;
+  QualityMetrics quality_metrics = 76;
 }
 
 message EavesdropCallRequest {
-    message EndpointRequest {
-        string app_id = 1;
-        string type = 2;
-        int64 id = 3;
-        string extension = 4;
-    }
+  message EndpointRequest {
+    string app_id = 1;
+    string type = 2;
+    int64 id = 3;
+    string extension = 4;
+  }
 
+  string id = 1;
+  string app_id = 2;
 
-    string id = 1;
-    string app_id = 2;
-
-    bool control = 3;
-    bool listen_a = 4;
-    bool listen_b = 5;
-    bool whisper_a = 6;
-    bool whisper_b = 7;
-    EndpointRequest from = 9;
+  bool control = 3;
+  bool listen_a = 4;
+  bool listen_b = 5;
+  bool whisper_a = 6;
+  bool whisper_b = 7;
+  EndpointRequest from = 9;
 }
 
 message BlindTransferCallRequest {
-    string id = 1;
-    string app_id = 2;
-    string destination = 3;
+  string id = 1;
+  string app_id = 2;
+  string destination = 3;
 
-    int64 domain_id = 4;
+  int64 domain_id = 4;
 }
 
-message BlindTransferCallResponse {
+message BlindTransferCallResponse {}
 
-}
-
-message DtmfCallResponse {
-
-}
+message DtmfCallResponse {}
 
 message DtmfCallRequest {
-    string id = 1;
-    string app_id = 2;
-    string digit = 3;
+  string id = 1;
+  string app_id = 2;
+  string digit = 3;
 
-    int64 domain_id = 4;
+  int64 domain_id = 4;
 }
 
 message UserCallRequest {
-    string id = 1;
-    string app_id = 2;
-    int64 domain_id  = 3;
+  string id = 1;
+  string app_id = 2;
+  int64 domain_id = 3;
 }
 
 message HoldCallResponse {
-    string state = 1;
+  string state = 1;
 }
 
 message CreateCallResponse {
-    string id = 1;
+  string id = 1;
 }
 
-
-message HangupCallResponse {
-
-}
-
+message HangupCallResponse {}
 
 message HangupCallRequest {
-    string id = 1;
-    string cause = 2;
-    string app_id = 3;
-    int64 domain_id = 4;
+  string id = 1;
+  string cause = 2;
+  string app_id = 3;
+  int64 domain_id = 4;
 }
 
-
 message ReadCallRequest {
-    string id = 1;
-    int64 domain_id = 2;
+  string id = 1;
+  int64 domain_id = 2;
 }
 
 message SearchCallRequest {
-    int32 page = 1;
-    int32 size = 2;
-    string q = 3;
-    string sort = 4;
-    repeated string fields = 5;
+  int32 page = 1;
+  int32 size = 2;
+  string q = 3;
+  string sort = 4;
+  repeated string fields = 5;
 
-    FilterBetween created_at = 6;
-    repeated int64 user_id = 7;
-    repeated int64 agent_id = 8;
-    repeated int64 queue_id = 9;
-    repeated int64 team_id = 10;
-    repeated int64 member_id = 11;
-    repeated int64 gateway_id = 12;
+  FilterBetween created_at = 6;
+  repeated int64 user_id = 7;
+  repeated int64 agent_id = 8;
+  repeated int64 queue_id = 9;
+  repeated int64 team_id = 10;
+  repeated int64 member_id = 11;
+  repeated int64 gateway_id = 12;
 
-    FilterBetween duration = 13;
-    bool skip_parent = 14;
-    string parent_id = 15;
-    repeated string cause = 16;
-    bool exists_file = 17;
+  FilterBetween duration = 13;
+  bool skip_parent = 14;
+  string parent_id = 15;
+  repeated string cause = 16;
+  bool exists_file = 17;
 
-    int64 domain_id = 18;
-    string number = 19;
+  int64 domain_id = 18;
+  string number = 19;
 
-    repeated string direction = 20;
-    FilterBetween answered_at = 21;
-    bool missed = 22;
-    FilterBetween stored_at = 23;
-    repeated int64 supervisor_id = 24;
-    repeated string state = 25;
+  repeated string direction = 20;
+  FilterBetween answered_at = 21;
+  bool missed = 22;
+  FilterBetween stored_at = 23;
+  repeated int64 supervisor_id = 24;
+  repeated string state = 25;
 }
 
 message ActiveCall {
-    string id = 1;
-    string app_id = 2;
-    string state = 3;
-    int64 timestamp = 4;
-    string type = 5;
-    string parent_id = 6;
-    Lookup user = 7;
-    string extension = 8;
-    Lookup gateway = 9;
-    string direction = 10;
-    string destination = 11;
-    Endpoint from = 12;
-    Endpoint to = 13;
-    map<string,string> variables = 14;
+  string id = 1;
+  string app_id = 2;
+  string state = 3;
+  int64 timestamp = 4;
+  string type = 5;
+  string parent_id = 6;
+  Lookup user = 7;
+  string extension = 8;
+  Lookup gateway = 9;
+  string direction = 10;
+  string destination = 11;
+  Endpoint from = 12;
+  Endpoint to = 13;
+  map<string, string> variables = 14;
 
-    int64 created_at = 15;
-    int64 answered_at = 16;
-    int64 bridged_at = 17;
+  int64 created_at = 15;
+  int64 answered_at = 16;
+  int64 bridged_at = 17;
 
-    int32 duration = 21;
-    int32 hold_sec = 22;
-    int32 wait_sec = 23;
-    int32 bill_sec = 24;
+  int32 duration = 21;
+  int32 hold_sec = 22;
+  int32 wait_sec = 23;
+  int32 bill_sec = 24;
 
-    Lookup queue = 25;
-    Lookup member = 26;
-    Lookup team = 27;
-    Lookup agent = 28;
+  Lookup queue = 25;
+  Lookup member = 26;
+  Lookup team = 27;
+  Lookup agent = 28;
 
-    int64 joined_at = 29;
-    int64 leaving_at = 30;
-    int64 reporting_at = 31;
-    int64 queue_bridged_at = 32;
-    int32 queue_wait_sec = 33;
-    int32 queue_duration_sec = 34;
-    int32 reporting_sec = 35;
-    string display = 36;
-    repeated Lookup supervisor = 37;
-    string blind_transfer = 38;
-    string bridged_id = 39;
+  int64 joined_at = 29;
+  int64 leaving_at = 30;
+  int64 reporting_at = 31;
+  int64 queue_bridged_at = 32;
+  int32 queue_wait_sec = 33;
+  int32 queue_duration_sec = 34;
+  int32 reporting_sec = 35;
+  string display = 36;
+  repeated Lookup supervisor = 37;
+  string blind_transfer = 38;
+  string bridged_id = 39;
 }
 
 message ListCall {
-    bool next = 1;
-    repeated ActiveCall items = 2;
+  bool next = 1;
+  repeated ActiveCall items = 2;
 }
 
 message CreateCallRequest {
-    message CallSettings {
-        int32 timeout = 1;
+  message CallSettings {
+    int32 timeout = 1;
 
-        map<string,string> variables = 6;
+    map<string, string> variables = 6;
 
-        string display = 8;
-        bool disable_stun = 9;
-        bool cancel_distribute = 10;
-        bool is_online = 11;
-        bool disable_auto_answer = 12;
-        bool hide_number = 13;
-        int64 contact_id = 14;
-    }
+    string display = 8;
+    bool disable_stun = 9;
+    bool cancel_distribute = 10;
+    bool is_online = 11;
+    bool disable_auto_answer = 12;
+    bool hide_number = 13;
+    int64 contact_id = 14;
+  }
 
-    message EndpointRequest {
-        string app_id = 1;
-        string type = 2;
-        int64 id = 3;
-        string extension = 4;
-    }
+  message EndpointRequest {
+    string app_id = 1;
+    string type = 2;
+    int64 id = 3;
+    string extension = 4;
+  }
 
-    EndpointRequest from = 1;
-    EndpointRequest to = 2;
-    string destination = 3;
+  EndpointRequest from = 1;
+  EndpointRequest to = 2;
+  string destination = 3;
 
-    CallSettings params = 4;
+  CallSettings params = 4;
 
-    int64 domain_id = 5;
+  int64 domain_id = 5;
 }
 
 message Endpoint {
-    string type = 1;
-    string number = 2;
-    string id = 3;
-    string name = 4;
+  string type = 1;
+  string number = 2;
+  string id = 3;
+  string name = 4;
 }
 
 message Call {
-    string id = 1;
-    int64 created_at = 2;
-    Lookup created_by = 3;
+  string id = 1;
+  int64 created_at = 2;
+  Lookup created_by = 3;
 
-    int64 timestamp = 4;
-    string parent_id = 5;
-    string app_id = 6;
-    string state = 7;
-    string direction = 8;
-    Endpoint from = 9;
-    Endpoint to = 10;
+  int64 timestamp = 4;
+  string parent_id = 5;
+  string app_id = 6;
+  string state = 7;
+  string direction = 8;
+  Endpoint from = 9;
+  Endpoint to = 10;
+}
+
+message PatchHistoryCallAttemptRequest {
+  string id = 1;
+  string description = 2;
+  map<string, string> variables = 3;
+  repeated string fields = 4 [(google.api.field_visibility) = {restriction: "PREVIEW"}];
+}
+
+message PatchHistoryCallAttemptResponse {
+  int64 id = 1;
+  string description = 2;
+  map<string, string> variables = 3;
 }
