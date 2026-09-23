@@ -27252,6 +27252,7 @@
         "operationId": "CustomService_CreateCustomGate",
         "parameters": [
           {
+            "description": "/ ProviderCreateCustomGateRequest registers an arbitrary external communication\n/ system as a chat channel. Only configuration is required on the Webitel side:\n/ the external system posts signed updates to the generated webhook_url and\n/ receives operator replies on callback_url.",
             "name": "body",
             "in": "body",
             "required": true,
@@ -28337,6 +28338,349 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/webitel.im.provider.v1.ProviderUpdateViberGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/im/gates/viber_bm": {
+      "get": {
+        "tags": [
+          "webitel.im.provider.v1.ViberBmService"
+        ],
+        "summary": "/ ListViberBm returns the Viber BM gateways configured for the caller's domain.",
+        "operationId": "ViberBmService_ListViberBm",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "q",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderListViberBmGatesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "webitel.im.provider.v1.ViberBmService"
+        ],
+        "summary": "/ CreateViberBm registers an InfoBip Viber BM account as a messaging gateway.",
+        "operationId": "ViberBmService_CreateViberBm",
+        "parameters": [
+          {
+            "description": "/ ProviderCreateViberBmGateRequest registers an InfoBip Viber BM account.",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderCreateViberBmGateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderCreateViberBmGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/im/gates/viber_bm/{gate_id_1}/template": {
+      "post": {
+        "tags": [
+          "webitel.im.provider.v1.ViberBmService"
+        ],
+        "summary": "/ SendViberBmTemplate sends an approved, business-initiated template message\n/ for cold-start outreach (no open 24h session). templateId must reference a\n/ registered, Viber-approved transactional template.",
+        "operationId": "ViberBmService_SendViberBmTemplate",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "gate_id_1",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ViberBmService.SendViberBmTemplateBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.SendViberBmTemplateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/im/gates/viber_bm/{gate_id}/template": {
+      "post": {
+        "tags": [
+          "webitel.im.api.provider.v1.ViberBmService"
+        ],
+        "summary": "SendViberBmTemplate sends an approved, business-initiated template message\nfor cold-start outreach (no open 24h session).",
+        "operationId": "ViberBmService_SendViberBmTemplate_webitel.im.api.provider.v1.ViberBmService",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "gate_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ViberBmService.SendViberBmTemplateBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.SendViberBmTemplateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/im/gates/viber_bm/{id_1}": {
+      "get": {
+        "tags": [
+          "webitel.im.provider.v1.ViberBmService"
+        ],
+        "summary": "/ GetViberBm retrieves configuration and status for a Viber BM gateway.",
+        "operationId": "ViberBmService_GetViberBm",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id_1",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderGetViberBmGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "webitel.im.provider.v1.ViberBmService"
+        ],
+        "summary": "/ DeleteViberBm removes the Viber BM gateway integration.",
+        "operationId": "ViberBmService_DeleteViberBm",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id_1",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderDeleteViberBmGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "webitel.im.provider.v1.ViberBmService"
+        ],
+        "summary": "/ UpdateViberBm updates Viber BM gateway settings.",
+        "operationId": "ViberBmService_UpdateViberBm",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id_1",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ViberBmService.UpdateViberBmBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.provider.v1.ProviderUpdateViberBmGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/im/gates/viber_bm/{id}": {
+      "get": {
+        "tags": [
+          "webitel.im.api.provider.v1.ViberBmService"
+        ],
+        "operationId": "ViberBmService_GetViberBm_webitel.im.api.provider.v1.ViberBmService",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderGetViberBmGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "webitel.im.api.provider.v1.ViberBmService"
+        ],
+        "operationId": "ViberBmService_DeleteViberBm_webitel.im.api.provider.v1.ViberBmService",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderDeleteViberBmGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "webitel.im.api.provider.v1.ViberBmService"
+        ],
+        "operationId": "ViberBmService_UpdateViberBm_webitel.im.api.provider.v1.ViberBmService",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ViberBmService.UpdateViberBmBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderUpdateViberBmGateResponse"
             }
           },
           "default": {
@@ -73430,6 +73774,40 @@
         }
       }
     },
+    "webitel.im.api.provider.v1.ProviderCreateViberBmGateRequest": {
+      "type": "object",
+      "properties": {
+        "api_key": {
+          "type": "string"
+        },
+        "base_url": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "peer": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.Peer"
+        },
+        "sender_name": {
+          "type": "string"
+        },
+        "webhook_secret": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderCreateViberBmGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderViberBmGate"
+        }
+      }
+    },
     "webitel.im.api.provider.v1.ProviderCreateWhatsAppGateRequest": {
       "type": "object",
       "properties": {
@@ -73487,6 +73865,14 @@
     },
     "webitel.im.api.provider.v1.ProviderDeletePersistentMenuResponse": {
       "type": "object"
+    },
+    "webitel.im.api.provider.v1.ProviderDeleteViberBmGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderViberBmGate"
+        }
+      }
     },
     "webitel.im.api.provider.v1.ProviderDeleteWhatsAppGateResponse": {
       "type": "object",
@@ -73572,6 +73958,14 @@
       "properties": {
         "item": {
           "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderMetaApp"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderGetViberBmGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderViberBmGate"
         }
       }
     },
@@ -73746,6 +74140,21 @@
         "size": {
           "type": "integer",
           "format": "int32"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderListViberBmGatesResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderViberBmGate"
+          }
+        },
+        "next": {
+          "type": "boolean"
         }
       }
     },
@@ -74052,11 +74461,53 @@
         }
       }
     },
+    "webitel.im.api.provider.v1.ProviderUpdateViberBmGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderViberBmGate"
+        }
+      }
+    },
     "webitel.im.api.provider.v1.ProviderUpdateWhatsAppGateResponse": {
       "type": "object",
       "properties": {
         "item": {
           "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderWhatsAppGate"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ProviderViberBmGate": {
+      "type": "object",
+      "properties": {
+        "base_url": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "sender_name": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.ProviderStatus"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "webhook_url": {
+          "type": "string"
         }
       }
     },
@@ -74090,6 +74541,63 @@
           "format": "int64"
         },
         "waba_id": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.SendViberBmTemplateResponse": {
+      "type": "object",
+      "properties": {
+        "bulk_id": {
+          "type": "string"
+        },
+        "message_id": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ViberBmService.SendViberBmTemplateBody": {
+      "type": "object",
+      "properties": {
+        "language": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "template_id": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.provider.v1.ViberBmService.UpdateViberBmBody": {
+      "type": "object",
+      "properties": {
+        "api_key": {
+          "type": "string"
+        },
+        "base_url": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "peer": {
+          "$ref": "#/definitions/webitel.im.api.provider.v1.Peer"
+        },
+        "sender_name": {
+          "type": "string"
+        },
+        "webhook_secret": {
           "type": "string"
         }
       }
@@ -74146,7 +74654,7 @@
       }
     },
     "webitel.im.provider.v1.CustomService.UpdateCustomGateBody": {
-      "description": "/ ProviderUpdateCustomGateRequest updates custom gateway settings.",
+      "description": "/ ProviderUpdateCustomGateRequest updates custom gateway settings. A non-empty\n/ app_secret rotates the signing secret and breaks the integration until the\n/ external system is updated too.",
       "type": "object",
       "properties": {
         "allowed_ips": {
@@ -74179,6 +74687,30 @@
         "retry_attempts": {
           "type": "integer",
           "format": "int32"
+        }
+      }
+    },
+    "webitel.im.provider.v1.Entity": {
+      "description": "Entity is a single formatting span over a message's plain-text content.\nim-gateway-service parses the original markdown exactly once and turns it\ninto a list of these canonical spans (the \"parse-once-at-gateway\" design);\nim-providers-service only relays and renders them for the destination\nchannel -- it does not re-parse markdown.\n\n`type` is an open allow-list, not an enum, so new span kinds can be added\nlater without breaking readers that don't know them yet. Values in use\ntoday: BOLD, ITALIC, STRIKETHROUGH, CODE, PRE, LINK.",
+      "type": "object",
+      "properties": {
+        "length": {
+          "description": "Length of the span, in UTF-8 bytes, matching `offset`.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "offset": {
+          "description": "Start of the span, as a UTF-8 byte offset into the message's text\n(`text` or `caption`). Bounded to reject pathological payloads.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "type": {
+          "description": "Span kind. Open allow-list -- see message comment above.",
+          "type": "string"
+        },
+        "value": {
+          "description": "Extra data the span kind needs, e.g. the target URL for a LINK entity.\nUnset for kinds that don't need one (BOLD, ITALIC, STRIKETHROUGH, CODE, PRE).",
+          "type": "string"
         }
       }
     },
@@ -74382,6 +74914,7 @@
       }
     },
     "webitel.im.provider.v1.ProviderCreateCustomGateRequest": {
+      "description": "/ ProviderCreateCustomGateRequest registers an arbitrary external communication\n/ system as a chat channel. Only configuration is required on the Webitel side:\n/ the external system posts signed updates to the generated webhook_url and\n/ receives operator replies on callback_url.",
       "type": "object",
       "properties": {
         "allowed_ips": {
@@ -74552,6 +75085,48 @@
         }
       }
     },
+    "webitel.im.provider.v1.ProviderCreateViberBmGateRequest": {
+      "description": "/ ProviderCreateViberBmGateRequest registers an InfoBip Viber BM account.",
+      "type": "object",
+      "properties": {
+        "api_key": {
+          "type": "string",
+          "title": "InfoBip App key; handled as sensitive"
+        },
+        "base_url": {
+          "type": "string",
+          "title": "per-account InfoBip host, e.g. https://xxxxx.api.infobip.com"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name of the gateway in Webitel"
+        },
+        "peer": {
+          "title": "Webitel bot identity (sub and iss)",
+          "$ref": "#/definitions/webitel.im.provider.v1.Peer"
+        },
+        "sender_name": {
+          "type": "string",
+          "title": "registered Viber sender name"
+        },
+        "webhook_secret": {
+          "type": "string",
+          "title": "static inbound Authorization credential; handled as sensitive"
+        }
+      }
+    },
+    "webitel.im.provider.v1.ProviderCreateViberBmGateResponse": {
+      "description": "/ ProviderCreateViberBmGateResponse returns the newly activated gateway.",
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderViberBmGate"
+        }
+      }
+    },
     "webitel.im.provider.v1.ProviderCreateViberGateRequest": {
       "description": "/ ProviderCreateViberGateRequest registers a Viber bot as a messaging gateway.",
       "type": "object",
@@ -74623,10 +75198,12 @@
           "type": "string"
         },
         "request_timeout_ms": {
+          "description": "Timeout of a single outbound callback attempt, in milliseconds.",
           "type": "integer",
           "format": "int32"
         },
         "retry_attempts": {
+          "description": "How many times an outbound callback is retried before the message is marked failed.",
           "type": "integer",
           "format": "int32"
         },
@@ -74639,6 +75216,7 @@
           "title": "Unix timestamp in milliseconds"
         },
         "webhook_url": {
+          "description": "Webitel-side webhook the external system posts updates to.",
           "type": "string"
         }
       }
@@ -74684,6 +75262,14 @@
     },
     "webitel.im.provider.v1.ProviderDeletePersistentMenuResponse": {
       "type": "object"
+    },
+    "webitel.im.provider.v1.ProviderDeleteViberBmGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderViberBmGate"
+        }
+      }
     },
     "webitel.im.provider.v1.ProviderDeleteViberGateResponse": {
       "type": "object",
@@ -74808,6 +75394,14 @@
       "properties": {
         "item": {
           "$ref": "#/definitions/webitel.im.provider.v1.ProviderMetaApp"
+        }
+      }
+    },
+    "webitel.im.provider.v1.ProviderGetViberBmGateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderViberBmGate"
         }
       }
     },
@@ -75032,6 +75626,22 @@
         }
       }
     },
+    "webitel.im.provider.v1.ProviderListViberBmGatesResponse": {
+      "description": "/ ProviderListViberBmGatesResponse returns the configured gateways.",
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.provider.v1.ProviderViberBmGate"
+          }
+        },
+        "next": {
+          "type": "boolean"
+        }
+      }
+    },
     "webitel.im.provider.v1.ProviderMenuItem": {
       "type": "object",
       "properties": {
@@ -75204,6 +75814,14 @@
         "domain_id": {
           "type": "integer",
           "format": "int32"
+        },
+        "entities": {
+          "description": "Formatting spans over `caption`, produced once by im-gateway-service when it\nparses the original markdown (parse-once-at-gateway). im-providers-service\nonly relays/renders them for the destination channel; it does not\nre-parse markdown.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.provider.v1.Entity"
+          }
         },
         "external_user_id": {
           "type": "string"
@@ -75466,6 +76084,14 @@
           "type": "integer",
           "format": "int32"
         },
+        "entities": {
+          "description": "Formatting spans over `text`, produced once by im-gateway-service when it\nparses the original markdown (parse-once-at-gateway). im-providers-service\nonly relays/renders them for the destination channel; it does not\nre-parse markdown.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.provider.v1.Entity"
+          }
+        },
         "external_user_id": {
           "type": "string",
           "title": "Recipient's platform-specific identifier"
@@ -75704,6 +76330,15 @@
         }
       }
     },
+    "webitel.im.provider.v1.ProviderUpdateViberBmGateResponse": {
+      "description": "/ ProviderUpdateViberBmGateResponse returns the updated gateway.",
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderViberBmGate"
+        }
+      }
+    },
     "webitel.im.provider.v1.ProviderUpdateViberGateResponse": {
       "description": "/ ProviderUpdateViberGateResponse returns the updated Viber provider.",
       "type": "object",
@@ -75719,6 +76354,46 @@
       "properties": {
         "item": {
           "$ref": "#/definitions/webitel.im.provider.v1.ProviderWhatsAppGate"
+        }
+      }
+    },
+    "webitel.im.provider.v1.ProviderViberBmGate": {
+      "description": "/ ProviderViberBmGate is a configured InfoBip Viber BM gateway.",
+      "type": "object",
+      "properties": {
+        "base_url": {
+          "type": "string",
+          "title": "per-account InfoBip host"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "Unix timestamp in milliseconds"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "sender_name": {
+          "type": "string",
+          "title": "registered Viber sender name (== inbound `to`)"
+        },
+        "status": {
+          "$ref": "#/definitions/webitel.im.provider.v1.ProviderStatus"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "Unix timestamp in milliseconds"
+        },
+        "webhook_url": {
+          "type": "string",
+          "title": "resolved inbound URL"
         }
       }
     },
@@ -75797,6 +76472,72 @@
         },
         "waba_id": {
           "type": "string"
+        }
+      }
+    },
+    "webitel.im.provider.v1.SendViberBmTemplateResponse": {
+      "description": "/ SendViberBmTemplateResponse confirms the template dispatch.",
+      "type": "object",
+      "properties": {
+        "bulk_id": {
+          "type": "string"
+        },
+        "message_id": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.provider.v1.ViberBmService.SendViberBmTemplateBody": {
+      "description": "/ SendViberBmTemplateRequest sends an approved cold-start template.",
+      "type": "object",
+      "properties": {
+        "language": {
+          "type": "string",
+          "title": "template language tag"
+        },
+        "parameters": {
+          "type": "object",
+          "title": "template placeholder values",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "template_id": {
+          "type": "string",
+          "title": "registered InfoBip/Viber template id"
+        },
+        "to": {
+          "type": "string",
+          "title": "recipient MSISDN or internal contact UUID"
+        }
+      }
+    },
+    "webitel.im.provider.v1.ViberBmService.UpdateViberBmBody": {
+      "description": "/ ProviderUpdateViberBmGateRequest updates settings. A non-empty api_key rotates the key.",
+      "type": "object",
+      "properties": {
+        "api_key": {
+          "type": "string",
+          "title": "New App key, if rotated"
+        },
+        "base_url": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "peer": {
+          "$ref": "#/definitions/webitel.im.provider.v1.Peer"
+        },
+        "sender_name": {
+          "type": "string"
+        },
+        "webhook_secret": {
+          "type": "string",
+          "title": "New inbound credential, if rotated"
         }
       }
     },
@@ -79098,6 +79839,10 @@
       "name": "webitel.im.api.provider.v1.MetaOAuthService"
     },
     {
+      "description": "ViberBmService defines RPC methods for managing InfoBip Viber Business\nMessages gateways. Distinct from the direct Viber Bot API.",
+      "name": "webitel.im.api.provider.v1.ViberBmService"
+    },
+    {
       "description": "WhatsAppService defines RPC methods for managing WhatsApp Business Account gateways.",
       "name": "webitel.im.api.provider.v1.WhatsAppService"
     },
@@ -79159,6 +79904,10 @@
     {
       "description": "/ ViberService defines the RPC methods for managing Viber bot gateways.",
       "name": "webitel.im.provider.v1.ViberService"
+    },
+    {
+      "description": "/ ViberBmService defines the RPC methods for managing InfoBip Viber Business\n/ Messages gateways. Distinct from ViberService, which drives the direct\n/ Viber Bot API.",
+      "name": "webitel.im.provider.v1.ViberBmService"
     },
     {
       "name": "webitel.im.provider.v1.WhatsAppService"
