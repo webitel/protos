@@ -1,0 +1,128 @@
+syntax = "proto3";
+
+package webitel.im.provider.v1;
+
+import "google/api/annotations.proto";
+import "service/provider/v1/enums.proto";
+import "service/provider/v1/messages.proto";
+
+option go_package = "github.com/webitel/im-provider-service/gen/go/api/v1;impb";
+
+/// ViberBmService defines the RPC methods for managing InfoBip Viber Business
+/// Messages gateways. Distinct from ViberService, which drives the direct
+/// Viber Bot API.
+service ViberBmService {
+  /// CreateViberBm registers an InfoBip Viber BM account as a messaging gateway.
+  rpc CreateViberBm (webitel.im.provider.v1.ProviderCreateViberBmGateRequest) returns (webitel.im.provider.v1.ProviderCreateViberBmGateResponse) {
+    option (google.api.http) = { post: "/im/gates/viber_bm", body: "*" };
+  }
+
+  /// GetViberBm retrieves configuration and status for a Viber BM gateway.
+  rpc GetViberBm (webitel.im.provider.v1.ProviderGetViberBmGateRequest) returns (webitel.im.provider.v1.ProviderGetViberBmGateResponse) {
+    option (google.api.http) = { get: "/im/gates/viber_bm/{id}" };
+  }
+
+  /// UpdateViberBm updates Viber BM gateway settings.
+  rpc UpdateViberBm (webitel.im.provider.v1.ProviderUpdateViberBmGateRequest) returns (webitel.im.provider.v1.ProviderUpdateViberBmGateResponse) {
+    option (google.api.http) = { patch: "/im/gates/viber_bm/{id}", body: "*" };
+  }
+
+  /// DeleteViberBm removes the Viber BM gateway integration.
+  rpc DeleteViberBm (webitel.im.provider.v1.ProviderDeleteViberBmGateRequest) returns (webitel.im.provider.v1.ProviderDeleteViberBmGateResponse) {
+    option (google.api.http) = { delete: "/im/gates/viber_bm/{id}" };
+  }
+
+  /// ListViberBm returns the Viber BM gateways configured for the caller's domain.
+  rpc ListViberBm (webitel.im.provider.v1.ProviderListViberBmGatesRequest) returns (webitel.im.provider.v1.ProviderListViberBmGatesResponse) {
+    option (google.api.http) = { get: "/im/gates/viber_bm" };
+  }
+
+  /// SendViberBmTemplate sends an approved, business-initiated template message
+  /// for cold-start outreach (no open 24h session). templateId must reference a
+  /// registered, Viber-approved transactional template.
+  rpc SendViberBmTemplate (webitel.im.provider.v1.SendViberBmTemplateRequest) returns (webitel.im.provider.v1.SendViberBmTemplateResponse) {
+    option (google.api.http) = { post: "/im/gates/viber_bm/{gate_id}/template", body: "*" };
+  }
+}
+
+/// ProviderViberBmGate is a configured InfoBip Viber BM gateway.
+message ProviderViberBmGate {
+  string id = 1;
+  string name = 2;
+  string base_url = 3;     // per-account InfoBip host
+  string sender_name = 4;  // registered Viber sender name (== inbound `to`)
+  string webhook_url = 5;  // resolved inbound URL
+  webitel.im.provider.v1.ProviderStatus status = 6;
+  int64 created_at = 7;    // Unix timestamp in milliseconds
+  int64 updated_at = 8;    // Unix timestamp in milliseconds
+  bool enabled = 9;
+}
+
+/// ProviderCreateViberBmGateRequest registers an InfoBip Viber BM account.
+message ProviderCreateViberBmGateRequest {
+  string name = 1;           // Name of the gateway in Webitel
+  Peer peer = 2;             // Webitel bot identity (sub and iss)
+  string base_url = 3;       // per-account InfoBip host, e.g. https://xxxxx.api.infobip.com
+  string sender_name = 4;    // registered Viber sender name
+  string api_key = 5;        // InfoBip App key; handled as sensitive
+  string webhook_secret = 6; // static inbound Authorization credential; handled as sensitive
+  bool enabled = 7;
+}
+
+/// ProviderCreateViberBmGateResponse returns the newly activated gateway.
+message ProviderCreateViberBmGateResponse {
+  webitel.im.provider.v1.ProviderViberBmGate item = 1;
+}
+
+/// ProviderGetViberBmGateRequest fetches a Viber BM configuration.
+message ProviderGetViberBmGateRequest { string id = 1; }
+message ProviderGetViberBmGateResponse { webitel.im.provider.v1.ProviderViberBmGate item = 1; }
+
+/// ProviderUpdateViberBmGateRequest updates settings. A non-empty api_key rotates the key.
+message ProviderUpdateViberBmGateRequest {
+  string id = 1;
+  string name = 2;
+  Peer peer = 3;
+  string base_url = 4;
+  string sender_name = 5;
+  string api_key = 6;        // New App key, if rotated
+  string webhook_secret = 7; // New inbound credential, if rotated
+  bool enabled = 8;
+}
+
+/// ProviderUpdateViberBmGateResponse returns the updated gateway.
+message ProviderUpdateViberBmGateResponse {
+  webitel.im.provider.v1.ProviderViberBmGate item = 1;
+}
+
+/// ProviderDeleteViberBmGateRequest removes the integration.
+message ProviderDeleteViberBmGateRequest { string id = 1; }
+message ProviderDeleteViberBmGateResponse { webitel.im.provider.v1.ProviderViberBmGate item = 1; }
+
+/// ProviderListViberBmGatesRequest lists gateways for the caller's domain.
+message ProviderListViberBmGatesRequest {
+  int32 page = 1;
+  int32 size = 2;
+  string q = 3;
+}
+
+/// ProviderListViberBmGatesResponse returns the configured gateways.
+message ProviderListViberBmGatesResponse {
+  repeated webitel.im.provider.v1.ProviderViberBmGate items = 1;
+  bool next = 2;
+}
+
+/// SendViberBmTemplateRequest sends an approved cold-start template.
+message SendViberBmTemplateRequest {
+  string gate_id = 1;
+  string to = 2;               // recipient MSISDN or internal contact UUID
+  string template_id = 3;      // registered InfoBip/Viber template id
+  string language = 4;         // template language tag
+  map<string, string> parameters = 5; // template placeholder values
+}
+
+/// SendViberBmTemplateResponse confirms the template dispatch.
+message SendViberBmTemplateResponse {
+  string message_id = 1;
+  string bulk_id = 2;
+}
