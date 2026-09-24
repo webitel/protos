@@ -6,6 +6,10 @@
   },
   "tags": [
     {
+      "name": "Versions",
+      "description": "Versions exposes the immutable version history of an article and restore."
+    },
+    {
       "name": "Articles",
       "description": "Articles manages knowledge-base articles: CRUD, hierarchy (depth 1..5) and\nnavigation (move, children, ancestors, tree). Mutations use the etag for\noptimistic locking."
     },
@@ -32,10 +36,6 @@
     {
       "name": "Tags",
       "description": "Tags provides tag auto-completion within a space."
-    },
-    {
-      "name": "Versions",
-      "description": "Versions exposes the immutable version history of an article and restore."
     }
   ],
   "consumes": [
@@ -274,15 +274,16 @@
           },
           {
             "name": "tag_match",
-            "description": "How to combine the tag filter.\n\n - TAG_MATCH_ALL: Default: match articles having ALL listed tags (AND).\n - TAG_MATCH_ANY: Match articles having ANY listed tag (OR).",
+            "description": "How to combine the tag filter; unspecified means any.\n\n - TAG_MATCH_UNSPECIFIED: Default mode: match articles having ANY listed tag (OR).\n - TAG_MATCH_ALL: Match articles having ALL listed tags (AND).\n - TAG_MATCH_ANY: Match articles having ANY listed tag (OR).",
             "in": "query",
             "required": false,
             "type": "string",
             "enum": [
+              "TAG_MATCH_UNSPECIFIED",
               "TAG_MATCH_ALL",
               "TAG_MATCH_ANY"
             ],
-            "default": "TAG_MATCH_ALL"
+            "default": "TAG_MATCH_UNSPECIFIED"
           },
           {
             "name": "size",
@@ -719,6 +720,17 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "fields",
+            "description": "Set of fields to return.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -1817,6 +1829,10 @@
           "format": "int32",
           "description": "Optimistic-lock counter."
         },
+        "published": {
+          "$ref": "#/definitions/webitel.kb.ArticleVersion",
+          "description": "Published version, only when requested in fields."
+        },
         "created_at": {
           "type": "string",
           "format": "int64",
@@ -2482,7 +2498,7 @@
         },
         "tag_match": {
           "$ref": "#/definitions/webitel.kb.TagMatch",
-          "description": "How to combine the tag filter."
+          "description": "How to combine the tag filter; unspecified means any."
         }
       },
       "description": "SemanticSearchRequest parameters for hybrid retrieval."
@@ -2678,11 +2694,12 @@
     "webitel.kb.TagMatch": {
       "type": "string",
       "enum": [
+        "TAG_MATCH_UNSPECIFIED",
         "TAG_MATCH_ALL",
         "TAG_MATCH_ANY"
       ],
-      "default": "TAG_MATCH_ALL",
-      "description": "Tag-filter combination mode.\n\n - TAG_MATCH_ALL: Default: match articles having ALL listed tags (AND).\n - TAG_MATCH_ANY: Match articles having ANY listed tag (OR)."
+      "default": "TAG_MATCH_UNSPECIFIED",
+      "description": "Tag-filter combination mode.\n\n - TAG_MATCH_UNSPECIFIED: Default mode: match articles having ANY listed tag (OR).\n - TAG_MATCH_ALL: Match articles having ALL listed tags (AND).\n - TAG_MATCH_ANY: Match articles having ANY listed tag (OR)."
     },
     "webitel.kb.TreeNode": {
       "type": "object",
