@@ -9,6 +9,7 @@ import "general.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/struct.proto";
 import "proto/webitel/option.proto";
+import "version.proto";
 
 // Articles manages knowledge-base articles: CRUD, hierarchy (depth 1..5) and
 // navigation (move, children, ancestors, tree). Mutations use the etag for
@@ -130,6 +131,8 @@ message Article {
   int64 published_version_id = 11;
   // Optimistic-lock counter.
   int32 ver = 12;
+  // Published version, only when requested in fields.
+  ArticleVersion published = 13;
   // CreatedAt timestamp (epoch ms).
   int64 created_at = 20;
   // UpdatedAt timestamp (epoch ms).
@@ -194,6 +197,8 @@ message ArticleList {
 message LocateArticleRequest {
   // Concurrency token / locator.
   string etag = 1;
+  // Set of fields to return.
+  repeated string fields = 2;
 }
 
 // CreateArticleRequest wraps the article to create.
