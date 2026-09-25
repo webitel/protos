@@ -170,6 +170,14 @@ message Thread {
   // Counts content messages not yet read; the caller's own messages and
   // system messages are excluded.
   int32 unread_count = 14;
+
+  // Per-member read horizons (snapshot, matches GetUpdates model).
+  // Client derives inbox/outbox watermarks: own_last_read = inbox; MIN over others = outbox.
+  repeated MemberReadState read_states = 15;
+
+  // The thread's latest update_seq at read time; client starts catch-up from this.
+  // Deltas are idempotent by msg_id (replaying extras is harmless, skipping is not).
+  int64 last_update_seq = 16;
 }
 
 //#endregion
