@@ -72891,11 +72891,6 @@
             "$ref": "#/definitions/webitel.im.api.gateway.v1.HistoryMessage"
           }
         },
-        "last_update_seq": {
-          "description": "The thread's update_seq read before this page: the thread's cursor for GetUpdates.\nSet when the request targets a single thread.",
-          "type": "string",
-          "format": "int64"
-        },
         "next_cursor": {
           "description": "Cursor that represents position to get older messages (used without 'before' param).",
           "$ref": "#/definitions/webitel.im.api.gateway.v1.HistoryMessageCursorResponse"
@@ -72903,6 +72898,10 @@
         "prev_cursor": {
           "description": "Cursor that represents position to get newest messages (used with 'before' param).",
           "$ref": "#/definitions/webitel.im.api.gateway.v1.HistoryMessageCursorResponse"
+        },
+        "updates_cursor": {
+          "description": "GetUpdates cursor read before this page: every later change comes from GetUpdates(updates_cursor).",
+          "type": "string"
         }
       }
     },
@@ -72921,6 +72920,10 @@
         "next": {
           "description": "Indicates whether there is a next page available.",
           "type": "boolean"
+        },
+        "updates_cursor": {
+          "description": "GetUpdates cursor read before this page: every later change comes from GetUpdates(updates_cursor).",
+          "type": "string"
         }
       }
     },
@@ -73317,11 +73320,6 @@
           "description": "Last message of the linked thread.",
           "$ref": "#/definitions/webitel.im.api.gateway.v1.HistoryMessage"
         },
-        "last_update_seq": {
-          "description": "The thread's latest update_seq at read time; client starts catch-up from this.\nDeltas are idempotent by msg_id (replaying extras is harmless, skipping is not).",
-          "type": "string",
-          "format": "int64"
-        },
         "members": {
           "description": "Detailed member information.",
           "type": "array",
@@ -73359,6 +73357,10 @@
           "description": "Last update timestamp (Unix time, milliseconds).",
           "type": "string",
           "format": "int64"
+        },
+        "updates_cursor": {
+          "description": "GetUpdates cursor read before this thread (set by Get; Search carries it on the response).",
+          "type": "string"
         },
         "variables": {
           "description": "Optional variables associated with the thread.",
@@ -73575,10 +73577,6 @@
     "webitel.im.api.gateway.v1.ThreadUpdates": {
       "type": "object",
       "properties": {
-        "cursor": {
-          "description": "The thread's update_seq after these changes: the base for the socket's +1 rule.",
-          "type": "string"
-        },
         "deleted_message_ids": {
           "type": "array",
           "items": {
