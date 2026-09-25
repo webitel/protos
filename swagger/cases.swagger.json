@@ -3817,6 +3817,53 @@
         ]
       }
     },
+    "/cases/{case_id}/timeline/{type}/{id}/info": {
+      "get": {
+        "operationId": "GetTimelineItemInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.cases.GetTimelineItemInfoResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "case_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "chat",
+              "call",
+              "email"
+            ]
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CaseTimeline"
+        ]
+      }
+    },
     "/cases/{etag}": {
       "get": {
         "summary": "RPC method to retrieve a specific case by its etag identifier.",
@@ -6525,6 +6572,32 @@
       ],
       "default": "chat"
     },
+    "webitel.cases.CaseTimelinePostprocessingResult": {
+      "type": "object",
+      "properties": {
+        "agent": {
+          "$ref": "#/definitions/general.Lookup"
+        },
+        "form": {
+          "title": "postprocessing form answers, saved by the agent"
+        },
+        "reporting_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "webitel.cases.CaseTimelineVariable": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
     "webitel.cases.Catalog": {
       "type": "object",
       "properties": {
@@ -7044,6 +7117,25 @@
         "emails_count": {
           "type": "string",
           "format": "int64"
+        }
+      }
+    },
+    "webitel.cases.GetTimelineItemInfoResponse": {
+      "type": "object",
+      "properties": {
+        "variables": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.cases.CaseTimelineVariable"
+          }
+        },
+        "postprocessing": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.cases.CaseTimelinePostprocessingResult"
+          }
         }
       }
     },
