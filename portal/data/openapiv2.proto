@@ -1,0 +1,109 @@
+syntax = "proto3";
+package webitel.portal;
+option go_package = "webitel.go/api/portal;portal";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  // Specifies the OpenAPI Specification version being used.
+  // The value MUST be "2.0".
+  swagger: "2.0",
+  // Provides metadata about the API.
+  info: {
+    // The title of the application.
+    title: "Webitel Customer Portal API",
+    contact: {
+      name: "Webitel LLC",
+      email: "support@webitel.com",
+      url: "https://www.webitel.com",
+    },
+    license: {
+      name: "MIT",
+      // url: "https://github.com/grpc-ecosystem/grpc-gateway/blob/main/LICENSE.txt",
+    },
+    version: "dev",
+    // version: "v23.12",
+  },
+  // The host (name or ip) serving the API. This MUST be the host only and does
+  // not include the scheme nor sub-paths. It MAY include a port.
+  schemes: HTTPS,
+  host: "nx.webitel.org",
+  base_path: "/api",
+
+  // schemes: HTTP,
+  // host: "10.10.10.8:2307",
+  
+  consumes: "application/json",
+  produces: "application/json",
+
+  security_definitions: {
+    security: {
+      key: "Device Id";
+      value: {
+        name: "X-Portal-Device";
+        description: "Webitel **portal** client **device** self identification"
+        type: TYPE_API_KEY;
+        in: IN_HEADER;
+      }
+    }
+    security: {
+      key: "Portal App";
+      value: {
+        name: "X-Portal-Client";
+        description: "Webitel **portal** client **app** authorization **token**"
+        type: TYPE_API_KEY;
+        in: IN_HEADER;
+      }
+    }
+    security: {
+      key: "Portal User";
+      value: {
+        name: "X-Portal-Access";
+        description: "Webitel **portal** end-user **customer** authorization"
+        type: TYPE_API_KEY;
+        in: IN_HEADER;
+      }
+    }
+    // security: {
+    //   key: "Portal Admin";
+    //   value: {
+    //     name: "X-Webitel-Access";
+    //     description: "Webitel **portal** end-user (**admin**) authorization"
+    //     type: TYPE_API_KEY;
+    //     in: IN_HEADER;
+    //   }
+    // }
+  },
+
+  // default: -OR-
+  security: {
+    security_requirement: {
+      key: "Portal Admin";
+      value: {}
+    }
+  }
+
+  // responses: {
+  //   key: "400";
+  //   value: {
+  //     description: "Returned when the client specified an invalid request arguments related.";
+  //   }
+  // }
+  // responses: {
+  //   key: "403";
+  //   value: {
+  //     description: "Returned when the user does not have enoght permissions to perform operation over resource.";
+  //   }
+  // }
+  // responses: {
+  //   key: "404";
+  //   value: {
+  //     description: "Returned when the resource does not exist.";
+  //     schema: {
+  //       json_schema: {
+  //         type: STRING;
+  //       }
+  //     }
+  //   }
+  // }
+};

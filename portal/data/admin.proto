@@ -1,0 +1,221 @@
+syntax = "proto3";
+package webitel.portal;
+option go_package = "webitel.go/api/portal;portal";
+
+import "data/app.proto";
+import "data/user.proto";
+import "data/service.proto";
+import "data/account.proto";
+
+// import "google/protobuf/struct.proto";
+
+import "google/api/visibility.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+// Portal admin service
+service Admin {
+
+  // ------------- Portal(s) ------------- //
+
+  // GET /portal
+  rpc SearchPortal(GetPortalRequest) returns (ServiceList) {
+    option (google.api.http) = {
+      get: "/portal"
+    };
+  }
+
+  // POST /portal
+  rpc CreatePortal(InputService) returns (Service) {
+    option (google.api.http) = {
+      post: "/portal"
+      response_body: "*"
+      body: "*"
+    };
+  }
+
+  // PATCH|PUT /portal
+  rpc UpdatePortal(UpdatePortalRequest) returns (Service) {
+    option (google.api.http) = {
+      patch: "/{id}"
+      response_body: "*"
+      body: "update"
+      additional_bindings: {
+        put: "/{id}"
+        response_body: "*"
+        body: "update"
+      }
+    };
+  }
+
+  // DELETE /portal
+  rpc DeletePortal(DeletePortalRequest) returns (ServiceList) {
+    option (google.api.http) = {
+      delete: "/{id}"
+      response_body: "*"
+      body: "*"
+    };
+  }
+
+  // ------------- Portal Apps ------------- //
+
+  // List portal apps registered
+  rpc SearchApp(SearchAppRequest) returns (AppList) {
+    option (google.api.http) = {
+      get: "/{portal.id}/apps"
+    };
+  }
+
+  // Register NEW application
+  rpc CreateApp(CreateAppRequest) returns (App) {
+    option (google.api.http) = {
+      post: "/{portal.id}/apps"
+      response_body: "*"
+      body: "input"
+    };
+  }
+
+  // Update application details
+  rpc UpdateApp(UpdateAppRequest) returns (App) {
+    option (google.api.http) = {
+      patch: "/{portal.id}/apps/{app.id}"
+      response_body: "*"
+      body: "input"
+      additional_bindings: {
+        put: "/{portal.id}/apps/{app.id}"
+        response_body: "*"
+        body: "input"
+      }
+    };
+  }
+
+  // Remove portal app(s)
+  rpc DeleteApp(DeleteAppRequest) returns (AppList) {
+    option (google.api.http) = {
+      delete: "/{portal.id}/apps/{id}"
+      response_body: "*"
+      additional_bindings: {
+        delete: "/{portal.id}/apps"
+        response_body: "*"
+      }
+    };
+  }
+
+  // // Generate application token
+  // rpc CreateAppToken(CreateAppTokenRequest) returns (AppToken) {
+  //   option (google.api.http) = {
+  //     post: "/{portal.id}/apps/{app.id}/tokens"
+  //     response_body: "*"
+  //     body: "input"
+  //   };
+  // }
+
+  // // Revoke application token
+  // rpc RevokeAppToken(RevokeAppTokenRequest) returns (AppToken) {
+  //   option (google.api.http) = {
+  //     delete: "/{portal.id}/apps/{app.id}/tokens/{id}"
+  //     response_body: "*"
+  //     // body: "*"
+  //   };
+  // }
+
+  // ------------- Portal Users ------------- //
+
+  // Search for portal users
+  rpc SearchUser(SearchUserRequest) returns (AccountList) { // (UserList) {
+    option (google.api.http) = {
+      get: "/{portal.id}/users"
+    };
+  }
+
+  // Create NEW user credentials
+  rpc CreateUser(CreateUserRequest) returns (UserAccount) { // (User) {
+    option (google.api.http) = {
+      post: "/{portal.id}/users"
+      response_body: "*"
+      body: "input"
+    };
+  }
+
+  // Update contact info
+  rpc UpdateUser(UpdateUserRequest) returns (UserAccount) { // (User) {
+    option (google.api.http) = {
+      patch: "/{portal.id}/users/{id}"
+      response_body: "*"
+      body: "input"
+    };
+  }
+
+  // Block portal user authentication
+  rpc BlockUser(BlockUserRequest) returns (UserAccount) { // (User) {
+    option (google.api.http) = {
+      post: "/{portal.id}/users/{id}/block"
+      response_body: "*"
+      body: "block"
+    };
+  }
+
+  // // Block portal user authentication
+  // rpc UnblockUser(BlockUserRequest) returns (User) {
+  //   option (google.api.http) = {
+  //     post: "/{portal.id}/users/{id}"
+  //     response_body: "*"
+  //     // body: "input"
+  //   };
+  // }
+
+  // Create and associate contact based on the user account info
+  rpc CreateContact(CreateContactRequest) returns (UserAccount) {
+    option (google.api.http) = {
+      post: "/{portal.id}/users/{id}/contact"
+      response_body: "*"
+      // body: "*"
+    };
+  }
+}
+
+
+message GetPortalRequest {
+  int32 page = 2;
+  int32 size = 1;
+  string q = 5;
+  repeated string sort = 3;
+  repeated string fields = 4;
+
+  repeated string id = 6;
+}
+
+message UpdatePortalRequest {
+  // ------- PATCH Options ------- //
+
+  // JSON PATCH fields mask.
+  // List of JPath fields specified in body(input).
+  repeated string x_json_mask = 1
+  [(google.api.field_visibility) = {
+    restriction: "PREVIEW" // "INTERNAL"
+  },
+  (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    read_only: true
+    pattern: "^$"
+  }];
+
+  // ------- Result Options ------- //
+
+  // Source Fields to return into result.
+  repeated string fields = 2;
+
+  // ------- Update Options ------- //
+
+  // Portal unique id
+  string id = 3;
+  // Update NEW changes
+  InputService update = 4;
+
+}
+
+message DeletePortalRequest {
+
+  repeated string fields = 4;
+
+  repeated string id = 6;
+}

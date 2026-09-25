@@ -1,0 +1,284 @@
+syntax = "proto3";
+package webitel.portal;
+option go_package = "webitel.go/api/portal;portal";
+
+import "data/lookup.proto";
+import "data/block.proto";
+import "data/push.proto";
+import "data/app_limit.proto";
+
+import "google/api/visibility.proto";
+// import "google/protobuf/struct.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+// Application; Portal Client Account.
+message App {
+  // Client ID
+  string id = 1;
+  // App meaningful name
+  string name = 2;
+  // About usage short description
+  string about = 3;
+  // [P]rimary [D]omain [C]omponent
+  Lookup domain = 5;
+  // Portal service authorization
+  Lookup portal = 6;
+
+  // Revocation reason
+  Block block = 10;
+  // Opaque client token; keep secret
+  string token = 11;
+  // token expiry date
+  int64 expires_at = 12;
+
+  // Authorization options
+
+  // Allowed client [User-Agent] pattern(s)
+  repeated string ua = 16;
+  // Allowed client [sub]net [FROM] addresses
+  ClientNet net = 17;
+  // Allowed client [Origin] pattern(s)
+  ClientWeb web = 18;
+  // Allowed client [OAuth] metadata
+  ClientOAuth oauth = 19;
+  // [PUSH] Service proxy configuration
+  ClientPush push = 20;
+  // [PUSH] Service proxy configuration
+  RateLimit limit = 25;
+
+  // timing
+
+  int64 updated_at = 21;
+  Lookup updated_by = 22;
+  int64 created_at = 23;
+  Lookup created_by = 24;
+
+}
+
+// Client [sub]network configuration
+message ClientNet {
+  // [FROM] IP address(es) subnet allowed
+  repeated string cidr = 1;
+}
+
+// Client Web configuration
+message ClientWeb {
+
+  // [FROM] Origin pattern(s) allowed
+  repeated string origin = 1;
+}
+
+// PUSH service(s) configuration
+message ClientPush {
+
+  // // Custom notification service client configuration.
+  // PushProxy proxy = 3;
+
+  // [F]irebase [C]loud [M]essaging service configuration.
+  FCMsClient FCM = 1;
+
+  // [A]pple [P]ush [N]otification service configuration.
+  APNsClient APN = 2;
+
+}
+
+// Client OAuth configuration
+// Inspired by: https://openid.net/specs/openid-connect-registration-1_0.html#ClientMetadata
+message ClientOAuth {
+
+  // Issuer Identifier(s) for the "identity" grant type.
+  // Value is a case sensitive URL using the https scheme that contains
+  // scheme, host, and optionally, port number and path components and no query or fragment components.
+  // Used for the grant_type "identity" of Token endpoint.
+  //
+  // If "identity" is allowed (exists within grant_types values),
+  // a list of known issuer(s) MUST be specified here.
+  // The combination of data of the profiles from different issuers
+  // is carried out according to the reverse priority of this specification:
+  // the primary issuer is the first, the following ones are secondary ..
+  //
+  // For each profile, the publisher must specify an unique issuer identifier.
+  // Any attempts by the publisher to use an unknown (not from this list) issuer will fail.
+  // This approach is used as an additional layer of security to establish trust in
+  // a client application that has gained access the portal application.
+  repeated string issuers = 1;
+
+  // Array of OAuth 2.0 grant type strings that the client can use at the token endpoint.
+  // These grant types are defined as follows:
+  //  - authorization_code ; The authorization code grant type defined in OAuth 2.0, Section 4.1.
+  //  - client_credentials ; The client credentials grant type defined in OAuth 2.0, Section 4.4.
+  //  - refresh_token      ; The refresh token grant type defined in OAuth 2.0, Section 6.
+  //  - password           ; The resource owner password credentials grant type defined in OAuth 2.0, Section 4.3.
+  // Extensions:
+  //  + identity           ; End-User public identity grant type
+  //  + jwt                ; JWT compact token from [IdP]rovider
+  repeated string grant_types = 2;
+
+  // Array of the OAuth 2.0 response type strings that the client can use at the authorization endpoint.
+  // These response types are defined as follows:
+  // - code  ; The authorization code response type defined in OAuth 2.0, Section 4.1.
+  // + token ; The implicit response type defined in OAuth 2.0, Section 4.2.
+  // Extensions
+  // + user  ; End-User account profile
+  // + chat  ; IM account dialog state
+  // + call  ; SIP account credentials
+  repeated string response_types = 3;
+
+  // OPTIONAL. URL for the Client's JWK Set [JWK] document, which MUST use the https scheme.
+  // If the Client signs requests to the Server, it contains the signing key(s) the Server uses to validate signatures from the Client.
+  // The JWK Set MAY also contain the Client's encryption keys(s), which are used by the Server to encrypt responses to the Client.
+  // When both signing and encryption keys are made available, a use (public key use) parameter value is REQUIRED for all keys in the referenced JWK Set to indicate each key's intended usage.
+  // Although some algorithms allow the same key to be used for both signatures and encryption, doing so is NOT RECOMMENDED, as it is less secure.
+  // The JWK x5c parameter MAY be used to provide X.509 representations of keys provided. When used, the bare key values MUST still be present and MUST match those in the certificate.
+  // The JWK Set MUST NOT contain private or symmetric key values.
+  string jwks_uri = 4;
+
+  // OPTIONAL. Client's JWK Set [JWK] document, passed by value.
+  // The semantics of the jwks parameter are the same as the jwks_uri parameter, other than that the JWK Set is passed by value, rather than by reference.
+  // This parameter is intended only to be used by Clients that, for some reason, are unable to use the jwks_uri parameter, for instance, by native applications that might not have a location to host the contents of the JWK Set.
+  // If a Client can use jwks_uri, it MUST NOT use jwks. One significant downside of jwks is that it does not enable key rotation (which jwks_uri does, as described in Section 10 of OpenID Connect Core 1.0 [OpenID.Core]).
+  // The jwks_uri and jwks parameters MUST NOT be used together. The JWK Set MUST NOT contain private or symmetric key values.
+  bytes jwks = 5;
+
+  // OPTIONAL. JWT claims of the end-User identity (mapping)
+  // Inspired: https://openid.net/specs/openid-connect-core-1_0.html#Claims
+  // map [jwt.claim] = identity.field ;
+  // STADARD claims:
+  // - iss
+  // - sub
+	// - name
+	// - given_name
+	// - middle_name
+	// - family_name
+	// - birthdate
+	// - gender
+	// - locale
+	// - zoneinfo
+	// - picture
+	// - profile
+	// - email
+	// - email_verified
+	// - phone_number
+	// - phone_number_verified
+  // REQUIRED:
+  // - iss
+  // - sub
+  // - [name|given_name|middle_name|family_name]
+  // FIXME: OPTIONAL.
+  // device_id: X-Portal-Device authorization from JWT claim
+  // client_token: X-Portal-Client authorization from JWT claim
+  map<string,string> jwt_identity = 6;
+
+  // google.protobuf.Struct jwt_identity = 6;
+}
+
+
+message AppList {
+  repeated App data = 1;
+  int32 page = 2;
+  bool next = 3;
+}
+
+message SearchAppRequest {
+
+  InputId portal = 1;
+  repeated string id = 2;
+  string q = 3;
+}
+
+message InputApp {
+  // [RE]Name App
+  string name = 2;
+  // Revocation reason
+  Block block = 10;
+  // OPTIONAL. Expires IN period:
+  // (-0) - never
+  // (+1) - days
+  int32 expires = 12;
+
+  // Allowed [sub]net addresses
+  ClientNet net = 16;
+  // Allowed [Origin] pattern(s)
+  ClientWeb web = 17;
+  // Allowed [User-Agent] pattern(s)
+  repeated string ua = 18;
+}
+
+message CreateAppRequest {
+  // Portal unique id
+  InputId portal = 2;
+  InputApp input = 4;
+}
+
+message UpdateAppRequest {
+
+  // ------- PATCH Options ------- //
+
+  // JSON PATCH fields mask.
+  // List of JPath fields specified in body(input).
+  repeated string x_json_mask = 1
+  [(google.api.field_visibility) = {
+    restriction: "PREVIEW" // "INTERNAL"
+  },
+  (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    read_only: true
+    pattern: "^$"
+  }];
+
+  // Portal unique id
+  InputId portal = 2;
+  // App unique id
+  InputId app = 3;
+  // Update App changes
+  InputApp input = 4;
+
+}
+
+message DeleteAppRequest {
+  // Portal unique id
+  InputId portal = 2;
+  // App unique id
+  repeated string id = 3;
+
+  // Delete permanently -or- just invalidate ?
+  bool permanent = 5;
+  // Also delete ALL users associated ?
+  bool users = 6;
+}
+
+// // GenerateAppToken request options
+// message GenerateAppToken {
+//   // REQUIRED. Meaningful custom App name.
+//   string name = 2;
+//   // OPTIONAL. Expires IN period:
+//   // (-0) - never
+//   // (+1) - days
+//   int32 expires = 12;
+
+//   // Allowed [User-Agent] pattern(s)
+//   repeated string ua = 16;
+//   // Allowed [sub]net addresses
+//   App.Net net = 17;
+//   // Allowed [Origin] pattern(s)
+//   App.Web web = 18;
+// }
+
+// // GenerateAppToken request options
+// message CreateAppTokenRequest {
+//   // Portal unique id
+//   InputId portal = 1;
+//   // App unique id
+//   InputId app = 2;
+//   // Generate token options
+//   GenerateAppToken input = 3;
+// }
+
+// // GenerateAppToken request options
+// message RevokeAppTokenRequest {
+//   // Portal unique id
+//   InputId portal = 1;
+//   // App unique id
+//   InputId app = 2;
+//   // Token unique id
+//   string id = 3;
+// }
