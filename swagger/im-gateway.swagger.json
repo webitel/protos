@@ -48,6 +48,10 @@
       "description": "ThreadTagManagement defines the gRPC service for managing tags on threads."
     },
     {
+      "name": "webitel.im.api.gateway.v1.Updates",
+      "description": "Updates serves catch-up across all of the caller's threads."
+    },
+    {
       "name": "webitel.im.api.provider.v1.FacebookService",
       "description": "FacebookService defines RPC methods for managing Facebook Messenger gateways."
     },
@@ -167,6 +171,10 @@
     {
       "name": "webitel.im.service.thread.v1.ThreadManagement",
       "description": "Thread service provides operations for managing\nand interacting with threads."
+    },
+    {
+      "name": "webitel.im.service.thread.v1.Updates",
+      "description": "Updates serves catch-up across all of the caller's threads."
     }
   ],
   "consumes": [
@@ -4563,6 +4571,39 @@
         ]
       }
     },
+    "/v1/updates": {
+      "post": {
+        "summary": "GetUpdates returns what changed across all of the caller's threads since cursor, as a\ndiff per thread the client applies on top of its UI.",
+        "operationId": "Updates_GetUpdates",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.GetUpdatesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.GetUpdatesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.Updates"
+        ]
+      }
+    },
     "/v1/variables": {
       "get": {
         "summary": "Searches thread variables across multiple threads.\nSupports pagination and field projection.",
@@ -5523,6 +5564,36 @@
       },
       "description": "GetUnreadSummaryResponse carries the caller's unread totals."
     },
+    "webitel.im.api.gateway.v1.GetUpdatesRequest": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "type": "string",
+          "description": "From the previous response; empty on the first sync."
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.GetUpdatesResponse": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "type": "string",
+          "description": "Pass back as cursor on the next call."
+        },
+        "resync": {
+          "type": "boolean",
+          "description": "Empty cursor, unusable cursor or more than 1000 changes: reload the thread list,\nthen continue from cursor."
+        },
+        "threads": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadUpdates"
+          },
+          "description": "Only threads that changed."
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.HistoryMessage": {
       "type": "object",
       "properties": {
@@ -5601,18 +5672,6 @@
         },
         "reply_to": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ReplyToMessage"
-        },
-        "delivery_status": {
-          "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageDeliveryStatus",
-          "description": "Aggregated delivery status across recipients: FAILED when every\nrecipient failed, otherwise the minimal status among non-failed ones.\nUNSPECIFIED for messages without per-recipient tracking (historical)."
-        },
-        "statuses": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageRecipientStatus"
-          },
-          "description": "Per-recipient delivery details."
         },
         "deleted": {
           "type": "boolean",
@@ -6045,6 +6104,27 @@
       "type": "object",
       "title": "No Data"
     },
+    "webitel.im.api.gateway.v1.MemberReadState": {
+      "type": "object",
+      "properties": {
+        "member_id": {
+          "type": "string"
+        },
+        "delivered_up_to_seq": {
+          "type": "string",
+          "format": "int64"
+        },
+        "read_up_to_seq": {
+          "type": "string",
+          "format": "int64"
+        },
+        "member": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadMember",
+          "description": "The member, in the same shape as history's sender; set by GetUpdates."
+        }
+      },
+      "description": "MemberReadState is one member's delivery/read horizon in a thread, as\nper-thread message seq (0 = nothing reached that state yet)."
+    },
     "webitel.im.api.gateway.v1.MenuPlacement": {
       "type": "string",
       "enum": [
@@ -6119,18 +6199,6 @@
         }
       }
     },
-    "webitel.im.api.gateway.v1.MessageDeliveryStatus": {
-      "type": "string",
-      "enum": [
-        "MESSAGE_DELIVERY_STATUS_UNSPECIFIED",
-        "MESSAGE_DELIVERY_STATUS_SENT",
-        "MESSAGE_DELIVERY_STATUS_DELIVERED",
-        "MESSAGE_DELIVERY_STATUS_READ",
-        "MESSAGE_DELIVERY_STATUS_FAILED"
-      ],
-      "default": "MESSAGE_DELIVERY_STATUS_UNSPECIFIED",
-      "description": "MessageDeliveryStatus is a per-recipient delivery state of a message.\nTransitions are monotonic: SENT -\u003e DELIVERED -\u003e READ.\nFAILED is terminal but may be superseded by a later DELIVERED (retry).\n\n - MESSAGE_DELIVERY_STATUS_SENT: Accepted by the system and queued for delivery.\n - MESSAGE_DELIVERY_STATUS_DELIVERED: Reached the recipient (stream ACK, push, provider receipt, bot dispatch).\n - MESSAGE_DELIVERY_STATUS_READ: Read by the recipient. Not applicable to bots.\n - MESSAGE_DELIVERY_STATUS_FAILED: Delivery failed (provider rejected, invalid contact, channel restriction)."
-    },
     "webitel.im.api.gateway.v1.MessageLocation": {
       "type": "object",
       "properties": {
@@ -6180,40 +6248,6 @@
         }
       },
       "description": "MessageReaction is one emoji aggregate on a history message."
-    },
-    "webitel.im.api.gateway.v1.MessageRecipientStatus": {
-      "type": "object",
-      "properties": {
-        "member_id": {
-          "type": "string",
-          "description": "Recipient contact id."
-        },
-        "status": {
-          "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageDeliveryStatus"
-        },
-        "delivered_at": {
-          "type": "string",
-          "format": "int64",
-          "description": "Unix time in milliseconds; zero when not reached."
-        },
-        "read_at": {
-          "type": "string",
-          "format": "int64"
-        },
-        "failed_at": {
-          "type": "string",
-          "format": "int64"
-        },
-        "via": {
-          "type": "string",
-          "description": "Confirmation source: ws|push|provider|bot."
-        },
-        "error": {
-          "type": "string",
-          "description": "JSON-encoded provider error details for FAILED."
-        }
-      },
-      "description": "MessageRecipientStatus is a per-recipient delivery state of a message."
     },
     "webitel.im.api.gateway.v1.MessageRevision": {
       "type": "object",
@@ -6404,6 +6438,11 @@
         "prev_cursor": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.HistoryMessageCursorResponse",
           "description": "Cursor that represents position to get newest messages (used with 'before' param)."
+        },
+        "last_update_seq": {
+          "type": "string",
+          "format": "int64",
+          "description": "The thread's update_seq read before this page: the thread's cursor for GetUpdates.\nSet when the request targets a single thread."
         }
       },
       "description": "SearchMessageHistoryResponse contains\nmessage history search results and pagination metadata."
@@ -6851,6 +6890,19 @@
           "type": "integer",
           "format": "int32",
           "description": "Number of unread messages in this thread for the calling participant.\nCounts content messages not yet read; the caller's own messages and\nsystem messages are excluded."
+        },
+        "read_states": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.MemberReadState"
+          },
+          "description": "Per-member read horizons (snapshot, matches GetUpdates model).\nClient derives inbox/outbox watermarks: own_last_read = inbox; MIN over others = outbox."
+        },
+        "last_update_seq": {
+          "type": "string",
+          "format": "int64",
+          "description": "The thread's latest update_seq at read time; client starts catch-up from this.\nDeltas are idempotent by msg_id (replaying extras is harmless, skipping is not)."
         }
       },
       "description": "Thread represents a thread (aka chat or conversation) entity."
@@ -6952,6 +7004,30 @@
       },
       "description": "ThreadMember represents a thread participant\nwith optional type-specific settings."
     },
+    "webitel.im.api.gateway.v1.ThreadMemberChange": {
+      "type": "object",
+      "properties": {
+        "member": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadMember"
+        },
+        "action": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadMemberChangeAction"
+        },
+        "by": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadMember",
+          "description": "Who made the change."
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.ThreadMemberChangeAction": {
+      "type": "string",
+      "enum": [
+        "THREAD_MEMBER_CHANGE_ACTION_UNSPECIFIED",
+        "THREAD_MEMBER_CHANGE_ACTION_JOINED",
+        "THREAD_MEMBER_CHANGE_ACTION_LEFT"
+      ],
+      "default": "THREAD_MEMBER_CHANGE_ACTION_UNSPECIFIED"
+    },
     "webitel.im.api.gateway.v1.ThreadPermissions": {
       "type": "object",
       "properties": {
@@ -7037,6 +7113,63 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.ThreadUpdates": {
+      "type": "object",
+      "properties": {
+        "thread_id": {
+          "type": "string"
+        },
+        "cursor": {
+          "type": "string",
+          "description": "The thread's update_seq after these changes: the base for the socket's +1 rule."
+        },
+        "left": {
+          "type": "boolean",
+          "description": "The caller is no longer a member: drop the thread."
+        },
+        "unread_count": {
+          "type": "string",
+          "format": "int64"
+        },
+        "dialog": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Thread",
+          "description": "The thread itself, set when it is new to the caller (created or joined since cursor)."
+        },
+        "top_message": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.UpdatedMessage",
+          "description": "Newest message for the list preview; set with dialog."
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.UpdatedMessage"
+          },
+          "description": "New or changed messages in their current state; upsert by id."
+        },
+        "deleted_message_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "member_changes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadMemberChange"
+          }
+        },
+        "read_states": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.MemberReadState"
+          },
+          "description": "Delivery/read horizons in message seq."
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.ThreadVariables": {
       "type": "object",
       "properties": {
@@ -7118,6 +7251,80 @@
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadPermissions"
         }
       }
+    },
+    "webitel.im.api.gateway.v1.UpdatedMessage": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "seq": {
+          "type": "string",
+          "format": "int64"
+        },
+        "sender": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadMember"
+        },
+        "type": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "body": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "edited_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Set when the message was edited."
+        },
+        "reply_to": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ReplyToMessage"
+        },
+        "forward_origin": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardOrigin"
+        },
+        "documents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.Document"
+          }
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.Image"
+          }
+        },
+        "location": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageLocation"
+        },
+        "contact": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageContact"
+        },
+        "interactive": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Interactive"
+        },
+        "system": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.System"
+        },
+        "reactions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageReaction"
+          }
+        }
+      },
+      "description": "UpdatedMessage is what a client needs to render or re-render a message bubble."
     },
     "webitel.im.api.gateway.v1.UserAgent": {
       "type": "object",
