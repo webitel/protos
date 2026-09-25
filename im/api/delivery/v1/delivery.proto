@@ -82,6 +82,9 @@ message ServerEvent {
 
     // A member joined or left the thread.
     MemberChangedEvent member_changed_event = 15;
+
+    // Some events for this connection were dropped: catch up via GetUpdates.
+    ResyncEvent resync_event = 16;
   }
 }
 
@@ -112,8 +115,8 @@ message MessageReactionEvent {
   // the reaction did not originate from a client that supplied one.
   string send_id = 7;
 
-  // Per-thread update_seq: apply if cursor+1, ignore if ≤cursor, else catch up via GetUpdates.
-  int64 update_seq = 8;
+  reserved 8;
+  reserved "update_seq";
 }
 
 // TypingEvent is an ephemeral, real-time "…is typing" indicator.
@@ -179,8 +182,8 @@ message MessageEditedEvent {
   // (version 1 is the original text). Clients order concurrent edits by it.
   int32 version = 8;
 
-  // Per-thread update_seq: apply if cursor+1, ignore if ≤cursor, else catch up via GetUpdates.
-  int64 update_seq = 9;
+  reserved 9;
+  reserved "update_seq";
 }
 
 // MessageDeletedEvent notifies thread participants that a message was deleted
@@ -198,12 +201,12 @@ message MessageDeletedEvent {
   // Unix time in milliseconds when the message was deleted.
   int64 deleted_at = 4;
 
-  // Per-thread update_seq: apply if cursor+1, ignore if ≤cursor, else catch up via GetUpdates.
-  int64 update_seq = 5;
+  reserved 5;
+  reserved "update_seq";
 }
 
-// MemberChangedEvent is sent to every participant so their update_seq stays
-// contiguous; who/why is in the accompanying system message.
+// MemberChangedEvent tells every participant a member joined or left;
+// who/why is in the accompanying system message.
 message MemberChangedEvent {
   // Thread the member joined or left.
   string thread_id = 1;
@@ -214,8 +217,8 @@ message MemberChangedEvent {
   // Action: "joined" or "left".
   string action = 3;
 
-  // Per-thread update_seq: apply if cursor+1, ignore if ≤cursor, else catch up via GetUpdates.
-  int64 update_seq = 4;
+  reserved 4;
+  reserved "update_seq";
 }
 
 //------------------------------------------------------------------------------
@@ -325,8 +328,8 @@ message NewMessageEvent {
     }
   ];
 
-  // Per-thread update_seq: apply if cursor+1, ignore if ≤cursor, else catch up via GetUpdates.
-  int64 update_seq = 3;
+  reserved 3;
+  reserved "update_seq";
 }
 
 message ThreadMessage {
@@ -466,6 +469,10 @@ message ErrorEvent {
     }
   ];
 }
+
+// ResyncEvent means the server dropped events for this connection (slow consumer);
+// the client calls GetUpdates with its saved cursor.
+message ResyncEvent {}
 
 // PingEvent is used to verify the connection is still active.
 message PingEvent {

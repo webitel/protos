@@ -6439,10 +6439,9 @@
           "$ref": "#/definitions/webitel.im.api.gateway.v1.HistoryMessageCursorResponse",
           "description": "Cursor that represents position to get newest messages (used with 'before' param)."
         },
-        "last_update_seq": {
+        "updates_cursor": {
           "type": "string",
-          "format": "int64",
-          "description": "The thread's update_seq read before this page: the thread's cursor for GetUpdates.\nSet when the request targets a single thread."
+          "description": "GetUpdates cursor read before this page: every later change comes from GetUpdates(updates_cursor)."
         }
       },
       "description": "SearchMessageHistoryResponse contains\nmessage history search results and pagination metadata."
@@ -6461,6 +6460,10 @@
         "next": {
           "type": "boolean",
           "description": "Indicates whether there is a next page available."
+        },
+        "updates_cursor": {
+          "type": "string",
+          "description": "GetUpdates cursor read before this page: every later change comes from GetUpdates(updates_cursor)."
         }
       },
       "description": "SearchThreadResponse contains the list of threads\nand pagination metadata."
@@ -6899,10 +6902,9 @@
           },
           "description": "Per-member read horizons (snapshot, matches GetUpdates model).\nClient derives inbox/outbox watermarks: own_last_read = inbox; MIN over others = outbox."
         },
-        "last_update_seq": {
+        "updates_cursor": {
           "type": "string",
-          "format": "int64",
-          "description": "The thread's latest update_seq at read time; client starts catch-up from this.\nDeltas are idempotent by msg_id (replaying extras is harmless, skipping is not)."
+          "description": "GetUpdates cursor read before this thread (set by Get; Search carries it on the response)."
         }
       },
       "description": "Thread represents a thread (aka chat or conversation) entity."
@@ -7118,10 +7120,6 @@
       "properties": {
         "thread_id": {
           "type": "string"
-        },
-        "cursor": {
-          "type": "string",
-          "description": "The thread's update_seq after these changes: the base for the socket's +1 rule."
         },
         "left": {
           "type": "boolean",

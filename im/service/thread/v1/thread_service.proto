@@ -158,9 +158,11 @@ message Thread {
   // Client derives inbox/outbox watermarks: own_last_read = inbox; MIN over others = outbox.
   repeated MemberReadState read_states = 18;
 
-  // The thread's latest update_seq at read time; client starts catch-up from this.
-  // Deltas are idempotent by msg_id (replaying extras is harmless, skipping is not).
-  int64 last_update_seq = 19;
+  reserved 19;
+  reserved "last_update_seq";
+
+  // GetUpdates cursor read before this thread (set by Get; Search carries it on the response).
+  string updates_cursor = 20;
 }
 
 //#endregion
@@ -281,6 +283,9 @@ message SearchThreadResponse {
 
   // Indicates whether there is a next page available.
   bool next = 2;
+
+  // GetUpdates cursor read before this page: every later change comes from GetUpdates(updates_cursor).
+  string updates_cursor = 3;
 }
 
 // GetUnreadSummaryRequest asks for the unread totals of a single participant.
