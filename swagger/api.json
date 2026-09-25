@@ -42752,12 +42752,13 @@
           },
           {
             "enum": [
+              "TAG_MATCH_UNSPECIFIED",
               "TAG_MATCH_ALL",
               "TAG_MATCH_ANY"
             ],
             "type": "string",
-            "default": "TAG_MATCH_ALL",
-            "description": "How to combine the tag filter.\n\n - TAG_MATCH_ALL: Default: match articles having ALL listed tags (AND).\n - TAG_MATCH_ANY: Match articles having ANY listed tag (OR).",
+            "default": "TAG_MATCH_UNSPECIFIED",
+            "description": "How to combine the tag filter; unspecified means any.\n\n - TAG_MATCH_UNSPECIFIED: Default mode: match articles having ANY listed tag (OR).\n - TAG_MATCH_ALL: Match articles having ALL listed tags (AND).\n - TAG_MATCH_ANY: Match articles having ANY listed tag (OR).",
             "name": "tag_match",
             "in": "query"
           },
@@ -43184,6 +43185,16 @@
             "name": "etag",
             "in": "path",
             "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Set of fields to return.",
+            "name": "fields",
+            "in": "query"
           }
         ],
         "responses": {
@@ -77098,6 +77109,10 @@
           "type": "string",
           "format": "int64"
         },
+        "published": {
+          "description": "Published version, only when requested in fields.",
+          "$ref": "#/definitions/webitel.kb.ArticleVersion"
+        },
         "published_version_id": {
           "description": "Published version id; 0 if not yet published.",
           "type": "string",
@@ -77770,7 +77785,7 @@
           }
         },
         "tag_match": {
-          "description": "How to combine the tag filter.",
+          "description": "How to combine the tag filter; unspecified means any.",
           "$ref": "#/definitions/webitel.kb.TagMatch"
         },
         "tags": {
@@ -77976,10 +77991,11 @@
       }
     },
     "webitel.kb.TagMatch": {
-      "description": "Tag-filter combination mode.\n\n - TAG_MATCH_ALL: Default: match articles having ALL listed tags (AND).\n - TAG_MATCH_ANY: Match articles having ANY listed tag (OR).",
+      "description": "Tag-filter combination mode.\n\n - TAG_MATCH_UNSPECIFIED: Default mode: match articles having ANY listed tag (OR).\n - TAG_MATCH_ALL: Match articles having ALL listed tags (AND).\n - TAG_MATCH_ANY: Match articles having ANY listed tag (OR).",
       "type": "string",
-      "default": "TAG_MATCH_ALL",
+      "default": "TAG_MATCH_UNSPECIFIED",
       "enum": [
+        "TAG_MATCH_UNSPECIFIED",
         "TAG_MATCH_ALL",
         "TAG_MATCH_ANY"
       ]
@@ -80395,6 +80411,10 @@
       "name": "webitel.im.service.thread.v1.Updates"
     },
     {
+      "description": "Versions exposes the immutable version history of an article and restore.",
+      "name": "Versions"
+    },
+    {
       "description": "Articles manages knowledge-base articles: CRUD, hierarchy (depth 1..5) and\nnavigation (move, children, ancestors, tree). Mutations use the etag for\noptimistic locking.",
       "name": "Articles"
     },
@@ -80421,10 +80441,6 @@
     {
       "description": "Tags provides tag auto-completion within a space.",
       "name": "Tags"
-    },
-    {
-      "description": "Versions exposes the immutable version history of an article and restore.",
-      "name": "Versions"
     },
     {
       "name": "ConfigService"
