@@ -79,6 +79,9 @@ message ServerEvent {
 
     // A message's content was edited by its author and must be replaced.
     MessageEditedEvent message_edited_event = 14;
+
+    // A member joined or left the thread.
+    MemberChangedEvent member_changed_event = 15;
   }
 }
 
@@ -108,6 +111,9 @@ message MessageReactionEvent {
   // the reactor's own devices can reconcile an optimistic update. Empty when
   // the reaction did not originate from a client that supplied one.
   string send_id = 7;
+
+  // Per-thread update_seq: apply if cursor+1, ignore if ≤cursor, else catch up via GetUpdates.
+  int64 update_seq = 8;
 }
 
 // TypingEvent is an ephemeral, real-time "…is typing" indicator.
@@ -172,6 +178,9 @@ message MessageEditedEvent {
   // GetMessageRevisions reports for it, so 2 right after the first edit
   // (version 1 is the original text). Clients order concurrent edits by it.
   int32 version = 8;
+
+  // Per-thread update_seq: apply if cursor+1, ignore if ≤cursor, else catch up via GetUpdates.
+  int64 update_seq = 9;
 }
 
 // MessageDeletedEvent notifies thread participants that a message was deleted
@@ -188,6 +197,25 @@ message MessageDeletedEvent {
 
   // Unix time in milliseconds when the message was deleted.
   int64 deleted_at = 4;
+
+  // Per-thread update_seq: apply if cursor+1, ignore if ≤cursor, else catch up via GetUpdates.
+  int64 update_seq = 5;
+}
+
+// MemberChangedEvent is sent to every participant so their update_seq stays
+// contiguous; who/why is in the accompanying system message.
+message MemberChangedEvent {
+  // Thread the member joined or left.
+  string thread_id = 1;
+
+  // Contact that joined or left.
+  string contact_id = 2;
+
+  // Action: "joined" or "left".
+  string action = 3;
+
+  // Per-thread update_seq: apply if cursor+1, ignore if ≤cursor, else catch up via GetUpdates.
+  int64 update_seq = 4;
 }
 
 //------------------------------------------------------------------------------
@@ -296,6 +324,9 @@ message NewMessageEvent {
       description: "Message delivered via the stream",
     }
   ];
+
+  // Per-thread update_seq: apply if cursor+1, ignore if ≤cursor, else catch up via GetUpdates.
+  int64 update_seq = 3;
 }
 
 message ThreadMessage {

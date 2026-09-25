@@ -153,6 +153,14 @@ message Thread {
 
   // The caller's own tags on this thread. Empty if the caller hasn't tagged it.
   repeated ChatTag tags = 17;
+
+  // Per-member read horizons (snapshot, matches GetUpdates model).
+  // Client derives inbox/outbox watermarks: own_last_read = inbox; MIN over others = outbox.
+  repeated MemberReadState read_states = 18;
+
+  // The thread's latest update_seq at read time; client starts catch-up from this.
+  // Deltas are idempotent by msg_id (replaying extras is harmless, skipping is not).
+  int64 last_update_seq = 19;
 }
 
 //#endregion

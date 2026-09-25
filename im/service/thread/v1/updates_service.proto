@@ -1,0 +1,113 @@
+syntax = "proto3";
+package webitel.im.service.thread.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/struct.proto";
+import "service/thread/v1/message_history_service.proto";
+import "service/thread/v1/message_service.proto";
+import "service/thread/v1/shared.proto";
+import "service/thread/v1/thread_service.proto";
+
+option go_package = "github.com/webitel/im-thread-service/gen/go/api/v1;impb";
+
+// Updates serves catch-up across all of the caller's threads.
+service Updates {
+  // GetUpdates returns what changed across all of the caller's threads since cursor, as a
+  // diff per thread the client applies on top of its UI.
+  rpc GetUpdates(GetUpdatesRequest) returns (GetUpdatesResponse);
+}
+
+message GetUpdatesRequest {
+  // Caller, injected by the gateway; only the caller's own threads are served.
+  string caller_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  // Caller's domain, injected by the gateway; scopes membership to the tenant.
+  int32 domain_id = 2;
+
+  // From the previous response; empty on the first sync.
+  string cursor = 3;
+
+  // Same visibility policy as SearchMessageHistoryRequest, applied to returned messages.
+  optional SystemMessageAllowList system_message_allow_list = 4;
+}
+
+message GetUpdatesResponse {
+  // Pass back as cursor on the next call.
+  string cursor = 1;
+
+  // Empty cursor, unusable cursor or more than 1000 changes: reload the thread list,
+  // then continue from cursor.
+  bool resync = 2;
+
+  // Only threads that changed.
+  repeated ThreadUpdates threads = 3;
+}
+
+message ThreadUpdates {
+  string thread_id = 1;
+
+  // The thread's update_seq after these changes: the base for the socket's +1 rule.
+  string cursor = 2;
+
+  // The caller is no longer a member: drop the thread.
+  bool left = 3;
+
+  int64 unread_count = 4;
+
+  // The thread itself, set when it is new to the caller (created or joined since cursor).
+  Thread dialog = 5;
+
+  // Newest message for the list preview; set with dialog.
+  UpdatedMessage top_message = 6;
+
+  // New or changed messages in their current state; upsert by id.
+  repeated UpdatedMessage messages = 7;
+
+  repeated string deleted_message_ids = 8;
+
+  repeated ThreadMemberChange member_changes = 9;
+
+  // Delivery/read horizons in message seq.
+  repeated MemberReadState read_states = 10;
+  // Every member referenced in this entry, once.
+  repeated ThreadMember members = 12;
+}
+
+// UpdatedMessage is what a client needs to render or re-render a message bubble.
+message UpdatedMessage {
+  string id = 1;
+  int64 seq = 2;
+  string sender_id = 3;
+  int32 type = 4;
+  string body = 5;
+  google.protobuf.Struct metadata = 6;
+  int64 created_at = 7;
+  // Set when the message was edited.
+  int64 edited_at = 8;
+  ReplyToMessage reply_to = 9;
+  ForwardOrigin forward_origin = 10;
+  repeated Document documents = 11;
+  repeated Image images = 12;
+  Location location = 13;
+  Contact contact = 14;
+  Interactive interactive = 15;
+  System system = 16;
+  repeated MessageReaction reactions = 17;
+  bool internal = 18;
+}
+
+message ThreadMemberChange {
+  string contact_id = 1;
+  ThreadMemberChangeAction action = 2;
+  // Contact id of who made the change.
+  string by_id = 3;
+}
+
+enum ThreadMemberChangeAction {
+  THREAD_MEMBER_CHANGE_ACTION_UNSPECIFIED = 0;
+  THREAD_MEMBER_CHANGE_ACTION_JOINED = 1;
+  THREAD_MEMBER_CHANGE_ACTION_LEFT = 2;
+}

@@ -40,6 +40,18 @@ service MessageHistory {
   rpc GetMessageRevisions(GetMessageRevisionsRequest) returns (GetMessageRevisionsResponse) {
     option (google.api.http) = {get: "/v1/messages/{message_id}/revisions"};
   }
+
+}
+
+// MemberReadState is one member's delivery/read horizon in a thread, as
+// per-thread message seq (0 = nothing reached that state yet).
+message MemberReadState {
+  string member_id = 1;
+  int64 delivered_up_to_seq = 2;
+  int64 read_up_to_seq = 3;
+
+  // The member, in the same shape as history's sender; set by GetUpdates.
+  ThreadMember member = 4;
 }
 
 // HistoryMessageCursorResponse defines next/prev id for keyset-pagination.
@@ -274,28 +286,12 @@ message ForwardOrigin {
   string source_message_id = 5;
 }
 
-// MessageRecipientStatus is a per-recipient delivery state of a message.
-message MessageRecipientStatus {
-  // Recipient contact id.
-  string member_id = 1;
-
-  MessageDeliveryStatus status = 2;
-
-  // Unix time in milliseconds; zero when not reached.
-  int64 delivered_at = 3;
-  int64 read_at = 4;
-  int64 failed_at = 5;
-
-  // Confirmation source: ws|push|provider|bot.
-  string via = 6;
-
-  // JSON-encoded provider error details for FAILED.
-  string error = 7;
-}
-
 // HistoryMessage represents a single message
 // in thread history.
 message HistoryMessage {
+  reserved 17, 18;
+  reserved "delivery_status", "statuses";
+
   // Unique message identifier.
   string id = 1;
 
@@ -341,14 +337,6 @@ message HistoryMessage {
   InteractiveCallback reacted_metadata = 15;
 
   ReplyToMessage reply_to = 16;
-
-  // Aggregated delivery status across recipients: FAILED when every
-  // recipient failed, otherwise the minimal status among non-failed ones.
-  // UNSPECIFIED for messages without per-recipient tracking (historical).
-  MessageDeliveryStatus delivery_status = 17;
-
-  // Per-recipient delivery details.
-  repeated MessageRecipientStatus statuses = 18;
 
   // True when the message was deleted by its author. Every content field
   // (body, attachments, contact, location, interactive, metadata) is cleared,
@@ -486,6 +474,10 @@ message SearchMessageHistoryResponse {
 
   // Cursor that represents position to get newest messages (used with 'before' param).
   HistoryMessageCursorResponse prev_cursor = 3;
+
+  // The thread's update_seq read before this page: the thread's cursor for GetUpdates.
+  // Set when the request targets a single thread.
+  int64 last_update_seq = 4;
 }
 
 // SearchLeftThreadsMessageHistoryRequest defines filtering,
