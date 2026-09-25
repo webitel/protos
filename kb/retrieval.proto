@@ -63,10 +63,12 @@ service Retrieval {
 
 // Tag-filter combination mode.
 enum TagMatch {
-  // Default: match articles having ALL listed tags (AND).
-  TAG_MATCH_ALL = 0;
+  // Default mode: match articles having ANY listed tag (OR).
+  TAG_MATCH_UNSPECIFIED = 0;
+  // Match articles having ALL listed tags (AND).
+  TAG_MATCH_ALL = 1;
   // Match articles having ANY listed tag (OR).
-  TAG_MATCH_ANY = 1;
+  TAG_MATCH_ANY = 2;
 }
 
 // SearchRequest parameters for full-text search.
@@ -77,7 +79,7 @@ message SearchRequest {
   repeated int64 space_ids = 2;
   // Optional tag filter.
   repeated string tags = 3;
-  // How to combine the tag filter.
+  // How to combine the tag filter; unspecified means any.
   TagMatch tag_match = 4;
   // Page size.
   int32 size = 5;
@@ -119,7 +121,7 @@ message SemanticSearchRequest {
   bool include_citations = 4;
   // Optional tag filter.
   repeated string tags = 5;
-  // How to combine the tag filter.
+  // How to combine the tag filter; unspecified means any.
   TagMatch tag_match = 6;
 }
 
