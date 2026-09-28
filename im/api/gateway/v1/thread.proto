@@ -61,6 +61,22 @@ service ThreadManagement {
     };
   }
 
+  // Hands the conversation to the thread's bot; the operator stays in the thread.
+  rpc HandBackToBot(HandBackToBotRequest) returns (HandBackToBotResponse) {
+    option (google.api.http) = {
+      post: "/v1/threads/{thread_id}/bot/handback"
+      body: "*"
+    };
+  }
+
+  // Takes the conversation from the thread's bot back to the operator.
+  rpc TakeOverFromBot(TakeOverFromBotRequest) returns (TakeOverFromBotResponse) {
+    option (google.api.http) = {
+      post: "/v1/threads/{thread_id}/bot/takeover"
+      body: "*"
+    };
+  }
+
   // Sets or updates variables for a specific thread.
   // Existing variables with the same keys will be overwritten if were setted by the caller.
   // New variables will be created if they do not exist.
@@ -356,6 +372,24 @@ message RemoveMemberRequest {
 }
 
 message RemoveMemberResponse {}
+
+message HandBackToBotRequest {
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+}
+
+message HandBackToBotResponse {}
+
+message TakeOverFromBotRequest {
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+}
+
+message TakeOverFromBotResponse {}
 
 message TransferRequest {
   string thread_id = 1 [

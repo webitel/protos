@@ -50,6 +50,12 @@ service ThreadManagement {
   // Releases bot control and returns it to the previous controller in the stack.
   rpc CompleteBotControl(CompleteBotControlRequest) returns (CompleteBotControlResponse);
 
+  // Hands the conversation to the thread's bot; the operator stays in the thread.
+  rpc HandBackToBot(HandBackToBotRequest) returns (HandBackToBotResponse);
+
+  // Takes the conversation from the thread's bot back to the operator.
+  rpc TakeOverFromBot(TakeOverFromBotRequest) returns (TakeOverFromBotResponse);
+
   rpc SetVariables(SetVariablesRequest) returns (ThreadVariables);
 
   rpc SearchVariables(SearchVariablesRequest) returns (SearchVariablesResponse);
@@ -484,6 +490,40 @@ message CompleteBotControlRequest {
 }
 
 message CompleteBotControlResponse {}
+
+message HandBackToBotRequest {
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  // Operator's contact.
+  string initiator_contact_id = 2 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  int32 domain_id = 3 [(buf.validate.field).int32.gt = 0];
+}
+
+message HandBackToBotResponse {}
+
+message TakeOverFromBotRequest {
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  // Operator's contact.
+  string initiator_contact_id = 2 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  int32 domain_id = 3 [(buf.validate.field).int32.gt = 0];
+}
+
+message TakeOverFromBotResponse {}
 
 // #region Thread Variables
 
