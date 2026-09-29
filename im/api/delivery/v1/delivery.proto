@@ -118,7 +118,7 @@ message MessageReactionEvent {
   reserved 8;
   reserved "update_seq";
 
-  // GetUpdates position just before this change; save the latest one received.
+  // The recipient's GetUpdates cursor after this change; save the latest one received.
   string updates_cursor = 9;
 }
 
@@ -188,7 +188,7 @@ message MessageEditedEvent {
   reserved 9;
   reserved "update_seq";
 
-  // GetUpdates position just before this change; save the latest one received.
+  // The recipient's GetUpdates cursor after this change; save the latest one received.
   string updates_cursor = 10;
 }
 
@@ -210,7 +210,7 @@ message MessageDeletedEvent {
   reserved 5;
   reserved "update_seq";
 
-  // GetUpdates position just before this change; save the latest one received.
+  // The recipient's GetUpdates cursor after this change; save the latest one received.
   string updates_cursor = 6;
 }
 
@@ -229,7 +229,7 @@ message MemberChangedEvent {
   reserved 4;
   reserved "update_seq";
 
-  // GetUpdates position just before this change; save the latest one received.
+  // The recipient's GetUpdates cursor after this change; save the latest one received.
   string updates_cursor = 5;
 }
 
@@ -310,6 +310,9 @@ message ConnectedEvent {
 
   // Current server version. Useful for feature detection and troubleshooting.
   string server_version = 3;
+
+  // The user's GetUpdates cursor now: equal to the saved one means nothing was missed.
+  string updates_cursor = 4;
 }
 
 
@@ -343,7 +346,7 @@ message NewMessageEvent {
   reserved 3;
   reserved "update_seq";
 
-  // GetUpdates position just before this change; save the latest one received.
+  // The recipient's GetUpdates cursor after this change; save the latest one received.
   string updates_cursor = 4;
 }
 
@@ -491,7 +494,7 @@ message ErrorEvent {
 // ResyncEvent means the server dropped events for this connection (slow consumer);
 // the client calls GetUpdates with this cursor.
 message ResyncEvent {
-  // GetUpdates position just before the first dropped change.
+  // GetUpdates cursor of the first dropped change.
   string cursor = 1;
 }
 

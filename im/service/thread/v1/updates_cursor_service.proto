@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package webitel.im.service.thread.v1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/webitel/im-thread-service/gen/go/api/v1;impb";
+
+// UpdatesCursor hands out a contact's GetUpdates cursor without loading any data,
+// e.g. for the socket's connected event.
+service UpdatesCursor {
+  rpc Get(GetUpdatesCursorRequest) returns (GetUpdatesCursorResponse);
+}
+
+message GetUpdatesCursorRequest {
+  string caller_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+}
+
+message GetUpdatesCursorResponse {
+  // The contact's latest settled change; equal to their saved cursor when nothing was missed.
+  string cursor = 1;
+}
