@@ -161,7 +161,7 @@ message Thread {
   reserved 19;
   reserved "last_update_seq";
 
-  // GetUpdates cursor read before this thread (set by Get; Search carries it on the response).
+  // The caller's GetUpdates cursor as of this read (set by Get; Search carries it on the response).
   string updates_cursor = 20;
 }
 
@@ -273,6 +273,9 @@ message GetThreadRequest {
 
   // List of fields to include in the response.
   repeated string fields = 3;
+
+  // Caller contact id; when set, the thread carries the caller's updates_cursor.
+  string caller_id = 4;
 }
 
 // SearchThreadResponse contains the list of threads
@@ -284,7 +287,7 @@ message SearchThreadResponse {
   // Indicates whether there is a next page available.
   bool next = 2;
 
-  // GetUpdates cursor read before this page: every later change comes from GetUpdates(updates_cursor).
+  // The caller's GetUpdates cursor as of this read: every later change comes from GetUpdates(updates_cursor).
   string updates_cursor = 3;
 }
 
