@@ -117,6 +117,9 @@ message MessageReactionEvent {
 
   reserved 8;
   reserved "update_seq";
+
+  // GetUpdates position just before this change; save the latest one received.
+  string updates_cursor = 9;
 }
 
 // TypingEvent is an ephemeral, real-time "…is typing" indicator.
@@ -184,6 +187,9 @@ message MessageEditedEvent {
 
   reserved 9;
   reserved "update_seq";
+
+  // GetUpdates position just before this change; save the latest one received.
+  string updates_cursor = 10;
 }
 
 // MessageDeletedEvent notifies thread participants that a message was deleted
@@ -203,6 +209,9 @@ message MessageDeletedEvent {
 
   reserved 5;
   reserved "update_seq";
+
+  // GetUpdates position just before this change; save the latest one received.
+  string updates_cursor = 6;
 }
 
 // MemberChangedEvent tells every participant a member joined or left;
@@ -219,6 +228,9 @@ message MemberChangedEvent {
 
   reserved 4;
   reserved "update_seq";
+
+  // GetUpdates position just before this change; save the latest one received.
+  string updates_cursor = 5;
 }
 
 //------------------------------------------------------------------------------
@@ -330,6 +342,9 @@ message NewMessageEvent {
 
   reserved 3;
   reserved "update_seq";
+
+  // GetUpdates position just before this change; save the latest one received.
+  string updates_cursor = 4;
 }
 
 message ThreadMessage {
@@ -350,6 +365,9 @@ message ThreadMessage {
     QuotedMessage reply_to = 11;
 
     ForwardOrigin forward_origin = 12;
+
+    // Per-thread message seq: compare with read_up_to_seq / delivered_up_to_seq for status ticks.
+    int64 seq = 13;
 }
 
 message QuotedMessage {
@@ -471,8 +489,11 @@ message ErrorEvent {
 }
 
 // ResyncEvent means the server dropped events for this connection (slow consumer);
-// the client calls GetUpdates with its saved cursor.
-message ResyncEvent {}
+// the client calls GetUpdates with this cursor.
+message ResyncEvent {
+  // GetUpdates position just before the first dropped change.
+  string cursor = 1;
+}
 
 // PingEvent is used to verify the connection is still active.
 message PingEvent {
