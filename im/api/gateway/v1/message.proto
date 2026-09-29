@@ -28,10 +28,15 @@ service Message {
     };
   }
 
-  // Marks the thread as read up to the given message (inclusive):
-  // every earlier unread message of the caller in the thread is covered.
+  // Marks the thread as read up to the given message (inclusive): every earlier unread
+  // message of the caller in the thread is covered. Prefer the thread route with up_to_seq;
+  // the read horizon only moves forward.
   rpc Read(ReadMessageRequest) returns (ReadMessageResponse) {
-    option (google.api.http) = {post: "/v1/messages/{id}/read"};
+    option (google.api.http) = {
+      post: "/v1/threads/{thread_id}/read"
+      body: "*"
+      additional_bindings {post: "/v1/messages/{id}/read"}
+    };
   }
 
   // Sends an interactive message (buttons, lists, CTA).
@@ -210,8 +215,11 @@ message ForwardMessagesResponse {
 }
 
 message ReadMessageRequest {
+  // Message to read up to; resolved to its seq. Ignored when up_to_seq is set.
   string id = 1;
   string thread_id = 2;
+  // Read up to this per-thread message seq (inclusive).
+  int64 up_to_seq = 3;
 }
 message ReadMessageResponse {}
 
