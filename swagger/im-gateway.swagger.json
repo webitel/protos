@@ -3605,8 +3605,8 @@
     },
     "/v1/messages/{id}/read": {
       "post": {
-        "summary": "Marks the thread as read up to the given message (inclusive):\nevery earlier unread message of the caller in the thread is covered.",
-        "operationId": "Message_Read",
+        "summary": "Marks the thread as read up to the given message (inclusive): every earlier unread\nmessage of the caller in the thread is covered. Prefer the thread route with up_to_seq;\nthe read horizon only moves forward.",
+        "operationId": "Message_Read2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -3624,6 +3624,7 @@
         "parameters": [
           {
             "name": "id",
+            "description": "Message to read up to; resolved to its seq. Ignored when up_to_seq is set.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -3633,6 +3634,14 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "up_to_seq",
+            "description": "Read up to this per-thread message seq (inclusive).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
           }
         ],
         "tags": [
@@ -4059,6 +4068,84 @@
         ]
       }
     },
+    "/v1/threads/{thread_id}/bot/handback": {
+      "post": {
+        "summary": "Hands the conversation to the thread's bot; the operator stays in the thread.",
+        "operationId": "ThreadManagement_HandBackToBot",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.HandBackToBotResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadManagement.HandBackToBotBody"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadManagement"
+        ]
+      }
+    },
+    "/v1/threads/{thread_id}/bot/takeover": {
+      "post": {
+        "summary": "Takes the conversation from the thread's bot back to the operator.",
+        "operationId": "ThreadManagement_TakeOverFromBot",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.TakeOverFromBotResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadManagement.TakeOverFromBotBody"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadManagement"
+        ]
+      }
+    },
     "/v1/threads/{thread_id}/left_threads/messages": {
       "get": {
         "summary": "Searches messages grouped by the user's closed membership periods\nwithin a thread. Active memberships are excluded — their\nmessages are available via SearchThreadMessagesHistory.",
@@ -4344,6 +4431,45 @@
         ],
         "tags": [
           "webitel.im.api.gateway.v1.ThreadPermission"
+        ]
+      }
+    },
+    "/v1/threads/{thread_id}/read": {
+      "post": {
+        "summary": "Marks the thread as read up to the given message (inclusive): every earlier unread\nmessage of the caller in the thread is covered. Prefer the thread route with up_to_seq;\nthe read horizon only moves forward.",
+        "operationId": "Message_Read",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ReadMessageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.Message.ReadBody"
+            }
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.Message"
         ]
       }
     },
@@ -5598,6 +5724,9 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.HandBackToBotResponse": {
+      "type": "object"
+    },
     "webitel.im.api.gateway.v1.HistoryMessage": {
       "type": "object",
       "properties": {
@@ -6145,6 +6274,20 @@
         "body": {
           "type": "string",
           "description": "New content for the message. Must not be empty."
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.Message.ReadBody": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Message to read up to; resolved to its seq. Ignored when up_to_seq is set."
+        },
+        "up_to_seq": {
+          "type": "string",
+          "format": "int64",
+          "description": "Read up to this per-thread message seq (inclusive)."
         }
       }
     },
@@ -6844,6 +6987,9 @@
       },
       "description": "System represents domain structure for system event messages."
     },
+    "webitel.im.api.gateway.v1.TakeOverFromBotResponse": {
+      "type": "object"
+    },
     "webitel.im.api.gateway.v1.Thread": {
       "type": "object",
       "properties": {
@@ -6948,6 +7094,9 @@
       },
       "description": "FlushVariablesRequest defines parameters\nfor flushing thread variables by thread ID."
     },
+    "webitel.im.api.gateway.v1.ThreadManagement.HandBackToBotBody": {
+      "type": "object"
+    },
     "webitel.im.api.gateway.v1.ThreadManagement.SetVariablesBody": {
       "type": "object",
       "properties": {
@@ -6961,6 +7110,9 @@
         }
       },
       "description": "SetVariablesRequest defines parameters\nfor setting or updating thread variables."
+    },
+    "webitel.im.api.gateway.v1.ThreadManagement.TakeOverFromBotBody": {
+      "type": "object"
     },
     "webitel.im.api.gateway.v1.ThreadManagement.TransferBody": {
       "type": "object",
