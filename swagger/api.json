@@ -7481,6 +7481,71 @@
         }
       }
     },
+    "/call_center/queues/{queue_id}/members/{member_id}/communications": {
+      "get": {
+        "tags": [
+          "MemberService"
+        ],
+        "summary": "List of a member's communications",
+        "operationId": "SearchMemberCommunication",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "queue_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "member_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.ListOfMemberCommunication"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/call_center/queues/{queue_id}/resource_groups": {
       "get": {
         "tags": [
@@ -59734,6 +59799,21 @@
         }
       }
     },
+    "engine.ListOfMemberCommunication": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/engine.MemberCommunication"
+          }
+        },
+        "next": {
+          "type": "boolean"
+        }
+      }
+    },
     "engine.ListOpenedWebSocket": {
       "type": "object",
       "properties": {
@@ -64569,7 +64649,7 @@
       "additionalProperties": {}
     },
     "google.protobuf.NullValue": {
-      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value.",
+      "description": "Represents a JSON `null`.\n\n`NullValue` is a sentinel, using an enum with only one value to represent\nthe null value for the `Value` type union.\n\nA field of type `NullValue` with any value other than `0` is considered\ninvalid. Most ProtoJSON serializers will emit a Value with a `null_value` set\nas a JSON `null` regardless of the integer value, and so will round trip to\na `0` value.\n\n - NULL_VALUE: Null value.",
       "type": "string",
       "default": "NULL_VALUE",
       "enum": [
