@@ -264,14 +264,11 @@ message MessageStatusEvent {
   // Thread the messages belong to.
   string thread_id = 1;
 
-  reserved 2, 6;
-  reserved "member_id";
+  reserved 2, 3, 6, 8;
+  reserved "member_id", "message_ids", "up_to_message_id";
 
   // The member whose statuses changed, in the same shape as a message sender.
   Peer member = 11;
-
-  // Messages whose status changed for the recipient.
-  repeated string message_ids = 3;
 
   // The new delivery state.
   MessageDeliveryStatus status = 4;
@@ -282,13 +279,7 @@ message MessageStatusEvent {
   // Unix time in milliseconds when the status changed.
   int64 occurred_at = 7;
 
-  // Read/delivered-up-to watermark: the highest message id covered by this
-  // status change. A client advances its local peer-horizon in O(1) from this
-  // instead of iterating message_ids (which stays populated for older clients).
-  string up_to_message_id = 8;
-
-  // Same watermark expressed as the per-thread seq (preferred): the client
-  // advances its local peer-horizon to this integer.
+  // Delivered/read up to this per-thread message seq (inclusive).
   int64 up_to_seq = 9;
 
   // The recipients' GetUpdates cursor after this change.
@@ -296,6 +287,9 @@ message MessageStatusEvent {
 
   // Why delivery failed; set for FAILED only.
   MessageStatusError error = 12;
+
+  // The message that could not be delivered; set for FAILED only (delivered/read use up_to_seq).
+  string message_id = 13;
 }
 
 // MessageStatusError is a provider's delivery failure, e.g. {code: "131047", message: "re-engagement window expired"}.
