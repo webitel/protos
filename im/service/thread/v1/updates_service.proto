@@ -75,7 +75,24 @@ message ThreadUpdates {
   repeated MemberReadState read_states = 10;
   // Every member referenced in this entry, once.
   repeated ThreadMember members = 12;
+
+  // Messages that failed to reach a member since the cursor.
+  repeated MessageFailure failures = 13;
 }
+
+// MessageFailure is a message that could not be delivered to a member.
+message MessageFailure {
+  string message_id = 1;
+  // Recipient contact id; resolved through members.
+  string member_id = 2;
+  MessageFailureError error = 3;
+}
+
+message MessageFailureError {
+  string code = 1;
+  string message = 2;
+}
+
 
 // UpdatedMessage is what a client needs to render or re-render a message bubble.
 message UpdatedMessage {

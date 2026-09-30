@@ -264,8 +264,11 @@ message MessageStatusEvent {
   // Thread the messages belong to.
   string thread_id = 1;
 
-  // Recipient contact id whose statuses changed.
-  string member_id = 2;
+  reserved 2, 6;
+  reserved "member_id";
+
+  // The member whose statuses changed, in the same shape as a message sender.
+  Peer member = 11;
 
   // Messages whose status changed for the recipient.
   repeated string message_ids = 3;
@@ -275,9 +278,6 @@ message MessageStatusEvent {
 
   // Confirmation source: ws|push|provider|bot.
   string via = 5;
-
-  // JSON-encoded provider error details for FAILED.
-  string error = 6;
 
   // Unix time in milliseconds when the status changed.
   int64 occurred_at = 7;
@@ -291,8 +291,17 @@ message MessageStatusEvent {
   // advances its local peer-horizon to this integer.
   int64 up_to_seq = 9;
 
-  // The recipient's GetUpdates cursor after this change; set for reads only.
+  // The recipients' GetUpdates cursor after this change.
   string updates_cursor = 10;
+
+  // Why delivery failed; set for FAILED only.
+  MessageStatusError error = 12;
+}
+
+// MessageStatusError is a provider's delivery failure, e.g. {code: "131047", message: "re-engagement window expired"}.
+message MessageStatusError {
+  string code = 1;
+  string message = 2;
 }
 
 //------------------------------------------------------------------------------
