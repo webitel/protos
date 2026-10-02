@@ -11701,7 +11701,8 @@
     },
     "/calls/history": {
       "get": {
-        "summary": "SearchHistoryCall retrieves a list of completed calls using filters (GET).\nSupports advanced filtering by participants, duration, causes, and custom variables.",
+        "summary": "Search call history (GET)",
+        "description": "Returns a page of completed calls (CDR). Filters are passed as query parameters and are AND-combined; array filters are repeated query parameters combined with OR. Timestamps are Unix epoch milliseconds (UTC); ranges are inclusive. Results are limited to the caller's domain and to calls visible under RBAC (own calls, supervised users, permitted queues and groups). Use the POST variant for large filter sets.",
         "operationId": "SearchHistoryCall",
         "responses": {
           "200": {
@@ -11720,6 +11721,7 @@
         "parameters": [
           {
             "name": "page",
+            "description": "Page number, 1-based. Combined with `size` to compute the offset. If omitted or 0, the first page is returned. The response field `next` indicates whether another page exists.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -11727,6 +11729,7 @@
           },
           {
             "name": "size",
+            "description": "Maximum number of calls returned per page. If omitted or 0, the server default page size is used (40); server maximum supported limit is 20000.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -11734,18 +11737,21 @@
           },
           {
             "name": "q",
+            "description": "Quick search. Case-insensitive pattern match (ILIKE) against the dialed destination, the caller number (from_number) and the callee number (to_number), OR an exact match against the call ID (UUID). If omitted or empty, no text filtering is applied.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "sort",
+            "description": "Sort expression: a response field name, optionally prefixed with `-` for descending order (e.g. `-created_at`). If omitted, the server default ordering is used (newest first).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "fields",
+            "description": "Response field projection: names of HistoryCall fields to return. If omitted or empty, all fields are returned. Requesting fewer fields reduces payload size and query cost.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -11770,6 +11776,7 @@
           },
           {
             "name": "user_id",
+            "description": "Array of user IDs (OR logic). Matches calls where the user is the owner of the leg (`user_id`) OR participated in any leg of the call (`user_ids`). Use `owner_id` to match the leg owner only. Empty array = no filter.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -11781,6 +11788,7 @@
           },
           {
             "name": "agent_id",
+            "description": "Array of agent IDs (OR logic). Matches calls handled by at least one of the given agents on any leg (`agent_ids`). Empty array = no filter.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -11792,6 +11800,7 @@
           },
           {
             "name": "queue_id",
+            "description": "Array of queue IDs (OR logic). Matches calls whose leg queue (`queue_id`) or any queue the call passed through (`queue_ids`) is in the list. Empty array = no filter.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -11803,6 +11812,7 @@
           },
           {
             "name": "team_id",
+            "description": "Array of team IDs (OR logic). Matches calls whose leg team (`team_id`) or any team involved in the call (`team_ids`) is in the list. Empty array = no filter.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -11814,6 +11824,7 @@
           },
           {
             "name": "member_id",
+            "description": "Array of queue member (contact/lead) IDs (OR logic). Exact match on the call's `member_id`. Empty array = no filter.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -11825,6 +11836,7 @@
           },
           {
             "name": "gateway_id",
+            "description": "Array of SIP gateway (trunk) IDs (OR logic). Matches calls whose leg gateway (`gateway_id`) or any gateway used in the call (`gateway_ids`) is in the list. Empty array = no filter.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -11850,18 +11862,22 @@
           },
           {
             "name": "skip_parent",
+            "description": "If true, only top-level calls (Leg A, `parent_id` is null) are returned and child legs (Leg B) are hidden. If false or omitted, all legs are returned.",
             "in": "query",
             "required": false,
             "type": "boolean"
           },
           {
             "name": "parent_id",
+            "description": "Exact match on the parent call ID. Returns the direct child legs (Leg B) of the given call. If omitted or empty, no filter is applied.",
             "in": "query",
             "required": false,
-            "type": "string"
+            "type": "string",
+            "format": "uuid"
           },
           {
             "name": "cause",
+            "description": "Array of hangup causes (OR logic), exact match on `cause` (e.g. NORMAL_CLEARING, USER_BUSY, NO_ANSWER, ORIGINATOR_CANCEL). Empty array = no filter.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -11872,12 +11888,14 @@
           },
           {
             "name": "has_file",
+            "description": "Tri-state filter by attached files (recordings, screen captures). true = only calls that have files; false = only calls without files; omitted/null = no filter.",
             "in": "query",
             "required": false,
             "type": "boolean"
           },
           {
             "name": "domain_id",
+            "description": "Tenant (domain) ID. Normally derived from the caller's authentication context; the server always restricts results to the caller's domain.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -11885,12 +11903,14 @@
           },
           {
             "name": "number",
+            "description": "Phone number search. The value is converted to a regular expression and matched (`~`) against the pre-computed search number, or against destination, from_number and to_number when it is not available. Matches the number on either side of the call. If omitted or empty, no filter is applied.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "direction",
+            "description": "Call direction, exact match: `inbound` or `outbound`. If omitted or empty, both directions are returned.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -11911,6 +11931,7 @@
           },
           {
             "name": "missed",
+            "description": "If true, returns only missed calls: inbound, never bridged to an operator (`bridged_at` is null), not hidden from the missed list, and whose parent call was not bridged. Omit for no filter; do not send an explicit false.",
             "in": "query",
             "required": false,
             "type": "boolean"
@@ -11931,6 +11952,7 @@
           },
           {
             "name": "id",
+            "description": "Array of call IDs (UUID, OR logic). Exact match on `id`. Empty array = no filter.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -11941,6 +11963,7 @@
           },
           {
             "name": "transfer_from",
+            "description": "Array of call IDs (UUID, OR logic). Returns calls that were created by a transfer FROM one of the given calls (`transfer_from`). Empty array = no filter.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -11951,6 +11974,7 @@
           },
           {
             "name": "transfer_to",
+            "description": "Array of call IDs (UUID, OR logic). Returns calls that were transferred TO one of the given calls (`transfer_to`). Empty array = no filter.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -11961,12 +11985,15 @@
           },
           {
             "name": "dependency_id",
+            "description": "Root call ID (UUID). Returns the full dependency tree of the call: all descendants reachable recursively through `parent_id` (child legs) or `transfer_from` (transfers). The root call itself is excluded. Required when `timeline` is true. If omitted, no filter is applied.",
             "in": "query",
             "required": false,
-            "type": "string"
+            "type": "string",
+            "format": "uuid"
           },
           {
             "name": "tags",
+            "description": "Array of tags (OR logic). Matches calls having at least one of the given tags (array overlap). Empty array = no filter.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -11984,6 +12011,7 @@
           },
           {
             "name": "amd_result",
+            "description": "Array of answering machine detection (AMD) results (OR logic). Matches either the classic AMD result or the AI AMD result. Passing an empty string element (\"\") additionally matches calls without a detection result. Empty array = no filter.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -11994,12 +12022,14 @@
           },
           {
             "name": "fts",
+            "description": "Full-text search over call transcripts (PostgreSQL plainto_tsquery semantics: all words must be present, order-insensitive). Implicitly requires the call to have a transcript. Ignored when `has_transcript` is false. If omitted or empty, no filter is applied.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "directions",
+            "description": "Array of call directions (`inbound`, `outbound`). Not applied by the GetHistoryByGroups query; use the singular `direction` field for direction filtering.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -12010,18 +12040,21 @@
           },
           {
             "name": "has_transcript",
+            "description": "Tri-state filter by transcript presence. true = only calls with a transcript (further narrowed by `fts` if set); false = only calls without a transcript; omitted/null = no filter (unless `fts` is set).",
             "in": "query",
             "required": false,
             "type": "boolean"
           },
           {
             "name": "agent_description",
+            "description": "Case-insensitive pattern search (ILIKE) in the agent's wrap-up description of the queue attempt OR in any call annotation note. If omitted or empty, no filter is applied.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "owner_id",
+            "description": "Array of user IDs (OR logic). Matches calls where the given user is the direct owner of the leg (`user_id`) only; unlike `user_id`, participation in other legs is not considered. Empty array = no filter.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -12033,6 +12066,7 @@
           },
           {
             "name": "grantee_id",
+            "description": "Array of grantee IDs (OR logic): the authorization subject (user/role/gateway identity) that the call was placed on behalf of. Exact match on `grantee_id`. Empty array = no filter.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -12044,6 +12078,7 @@
           },
           {
             "name": "amd_ai_result",
+            "description": "Array of AI-based answering machine detection results (OR logic). Matched against `amd_ai_result` in lowercase. Empty array = no filter.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -12068,12 +12103,14 @@
           },
           {
             "name": "rated",
+            "description": "Tri-state filter by quality evaluation. false = only calls that have NOT been evaluated; true = only evaluated calls, optionally narrowed by `rated_user`, `rated_by`, `score_required` and `score_optional`. Setting any of those filters without `rated` also restricts results to evaluated calls. Omitted/null = no filter.",
             "in": "query",
             "required": false,
             "type": "boolean"
           },
           {
             "name": "rated_by",
+            "description": "Array of user IDs of evaluators (supervisors/QA) who created the evaluation (OR logic). Restricts to evaluated calls. Empty array = no filter.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -12113,6 +12150,7 @@
           },
           {
             "name": "rated_user",
+            "description": "Array of user IDs of the evaluated agents/operators (OR logic). Restricts to evaluated calls. Empty array = no filter.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -12124,6 +12162,7 @@
           },
           {
             "name": "contact_id",
+            "description": "Array of CRM contact IDs (OR logic). Exact match on the call's linked contact (`contact_id`). Empty array = no filter.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -12135,6 +12174,7 @@
           },
           {
             "name": "schema_id",
+            "description": "Array of routing schema (call flow / IVR) IDs (OR logic). Matches calls that executed at least one of the given schemas (array overlap on `schema_ids`). Empty array = no filter.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -12146,18 +12186,21 @@
           },
           {
             "name": "has_transfer",
+            "description": "Tri-state filter by transfers. true = only calls involved in a blind or attended transfer; false = only calls with no transfer; omitted/null = no filter.",
             "in": "query",
             "required": false,
             "type": "boolean"
           },
           {
             "name": "timeline",
+            "description": "If true, returns only the legs relevant for building a call timeline of the call tree given by `dependency_id`: transferred legs handled by a user, blind transfer legs, and legs whose parent differs from the root. REQUIRES `dependency_id`; without it the result is empty. Omitted/null = no filter.",
             "in": "query",
             "required": false,
             "type": "boolean"
           },
           {
             "name": "excluded_queue_types",
+            "description": "Array of queue types to EXCLUDE from the result. Calls whose queue type is in the list are hidden; calls that did not pass through a queue are always kept. Empty array = nothing excluded.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -12182,11 +12225,12 @@
           }
         ],
         "tags": [
-          "CallService"
+          "Call History"
         ]
       },
       "post": {
-        "summary": "SearchHistoryCallPost retrieves a list of completed calls using a complex filter body (POST).\nIdeal for large filter sets that exceed URL length limits.",
+        "summary": "Search call history (POST)",
+        "description": "Same semantics as the GET variant, but filters are sent in the JSON body. Recommended for large ID lists, variables maps and other filter sets that may exceed URL length limits.",
         "operationId": "SearchHistoryCallPost",
         "responses": {
           "200": {
@@ -12205,6 +12249,7 @@
         "parameters": [
           {
             "name": "body",
+            "description": "Filter, sort and pagination parameters for searching completed calls (CDR). Filters are AND-combined; array filters are OR-combined internally. Timestamps are Unix epoch milliseconds (UTC); ranges are inclusive.",
             "in": "body",
             "required": true,
             "schema": {
@@ -12213,7 +12258,7 @@
           }
         ],
         "tags": [
-          "CallService"
+          "Call History"
         ]
       }
     },
@@ -20071,419 +20116,631 @@
     },
     "engine.HistoryCall": {
       "type": "object",
+      "example": {
+        "id": "0e6f8f3a-5b1c-4c1e-9a55-3f0f2b6c9d10",
+        "direction": "inbound",
+        "destination": "0800123456",
+        "created_at": 1790676900000,
+        "answered_at": 1790676903000,
+        "bridged_at": 1790676905000,
+        "hangup_at": 1790677020000,
+        "hangup_by": "A",
+        "cause": "NORMAL_CLEARING",
+        "duration": 120,
+        "wait_sec": 3,
+        "bill_sec": 117,
+        "talk_sec": 115
+      },
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "format": "uuid",
+          "example": "0e6f8f3a-5b1c-4c1e-9a55-3f0f2b6c9d10",
+          "description": "Unique call (leg) identifier."
         },
         "app_id": {
-          "type": "string"
+          "type": "string",
+          "example": "call-center-node-01",
+          "description": "Identifier of the application/node that handled the call."
         },
         "type": {
-          "type": "string"
+          "type": "string",
+          "example": "call",
+          "description": "Record type. Always `call` for this resource."
         },
         "parent_id": {
-          "type": "string"
+          "type": "string",
+          "format": "uuid",
+          "example": "7a1d2c44-9f30-4f0b-8c6e-1b2a3c4d5e6f",
+          "description": "ID of the parent leg (Leg A). Empty for a top-level call."
         },
         "user": {
-          "$ref": "#/definitions/engine.Lookup"
+          "$ref": "#/definitions/engine.Lookup",
+          "description": "// User (operator) on this leg; falls back to the queue agent's user if the leg has no direct user."
         },
         "extension": {
-          "type": "string"
+          "type": "string",
+          "example": "1001",
+          "description": "SIP extension of the user. For agent-driven queue types the agent's extension is used."
         },
         "gateway": {
-          "$ref": "#/definitions/engine.Lookup"
+          "$ref": "#/definitions/engine.Lookup",
+          "description": "SIP gateway (trunk) used by the leg."
         },
         "direction": {
-          "type": "string"
+          "type": "string",
+          "example": "inbound",
+          "description": "Call direction: `inbound` or `outbound`."
         },
         "destination": {
-          "type": "string"
+          "type": "string",
+          "example": "0800123456",
+          "description": "Dialed destination number (DID or dialed digits)."
         },
         "from": {
-          "$ref": "#/definitions/engine.Endpoint"
+          "$ref": "#/definitions/engine.Endpoint",
+          "description": "Caller endpoint (type, number, id, name)."
         },
         "to": {
-          "$ref": "#/definitions/engine.Endpoint"
+          "$ref": "#/definitions/engine.Endpoint",
+          "description": "Callee endpoint (type, number, id, name)."
         },
         "variables": {
           "type": "object",
+          "example": {
+            "campaign": "autumn_sale"
+          },
           "additionalProperties": {
             "type": "string"
-          }
+          },
+          "description": "Custom call variables (channel payload) set by the dialplan, flow, API or integrations."
         },
         "created_at": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "example": 1790676900000,
+          "description": "Call creation time (Unix epoch ms, UTC)."
         },
         "answered_at": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "example": 1790676903000,
+          "description": "Time the call was answered (Unix epoch ms, UTC). 0 if never answered."
         },
         "bridged_at": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "example": 1790676905000,
+          "description": "Time the leg was bridged to the other party (Unix epoch ms, UTC). 0 if never bridged."
         },
         "hangup_at": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "example": 1790677020000,
+          "description": "Hangup time (Unix epoch ms, UTC)."
         },
         "hangup_by": {
-          "type": "string"
+          "type": "string",
+          "description": "Party that terminated the call: `A` = caller, `B` = callee, `F` = terminated by the platform (mapped to disposition `ended`)."
         },
         "cause": {
-          "type": "string"
+          "type": "string",
+          "example": "NORMAL_CLEARING",
+          "description": "Hangup cause (Q.850/FreeSWITCH style)."
         },
         "duration": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "example": 120,
+          "description": "Total duration in seconds (hangup - creation), including ringing and wait."
         },
         "hold_sec": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "example": 4,
+          "description": "Total hold time in seconds."
         },
         "wait_sec": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "example": 3,
+          "description": "Wait time in seconds: creation to answer (or to hangup if never answered)."
         },
         "bill_sec": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "example": 117,
+          "description": "Billable seconds: answer to hangup. 0 if never answered."
         },
         "sip_code": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "example": 200,
+          "description": "Final SIP response code of the leg."
         },
         "files": {
           "type": "array",
           "items": {
             "type": "object",
             "$ref": "#/definitions/engine.CallFile"
-          }
+          },
+          "description": "Recordings and other files attached to this call or to its parent call."
         },
         "queue": {
-          "$ref": "#/definitions/engine.Lookup"
+          "$ref": "#/definitions/engine.Lookup",
+          "description": "Queue the call was processed in."
         },
         "member": {
-          "$ref": "#/definitions/engine.Lookup"
+          "$ref": "#/definitions/engine.Lookup",
+          "description": "Queue member associated with the call."
         },
         "team": {
-          "$ref": "#/definitions/engine.Lookup"
+          "$ref": "#/definitions/engine.Lookup",
+          "description": "Team of the handling agent."
         },
         "agent": {
-          "$ref": "#/definitions/engine.Lookup"
+          "$ref": "#/definitions/engine.Lookup",
+          "description": "Agent who handled the queue attempt."
         },
         "joined_at": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "example": 1790676901000,
+          "description": "Time the call joined the queue (Unix epoch ms, UTC)."
         },
         "leaving_at": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "example": 1790677020000,
+          "description": "Time the call left the queue (Unix epoch ms, UTC)."
         },
         "reporting_at": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "example": 1790677050000,
+          "description": "Time the agent finished post-call reporting/wrap-up (Unix epoch ms, UTC)."
         },
         "queue_bridged_at": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "example": 1790676905000,
+          "description": "Time the call was bridged to the agent within the queue (Unix epoch ms, UTC)."
         },
         "queue_wait_sec": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "example": 119,
+          "description": "Time in queue before being bridged (or before leaving if never bridged), seconds."
         },
         "queue_duration_sec": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "example": 30,
+          "description": "Total time spent in the queue (leaving - joined), seconds."
         },
         "reporting_sec": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "example": 30,
+          "description": "Post-call reporting (wrap-up) time in seconds. 0 if no reporting occurred."
         },
         "result": {
-          "type": "string"
+          "type": "string",
+          "example": "success",
+          "description": "Queue attempt result (disposition set by the system or the agent)."
         },
         "tags": {
           "type": "array",
+          "example": [
+            "vip"
+          ],
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Tags assigned to the call."
         },
         "display": {
-          "type": "string"
+          "type": "string",
+          "example": "380501234567",
+          "description": "Display label/number of the queue member for this attempt."
         },
         "stored_at": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "example": 1790677030000,
+          "description": "Time the record was persisted to history (Unix epoch ms, UTC)."
         },
         "transfer_from": {
-          "type": "string"
+          "type": "string",
+          "format": "uuid",
+          "example": "7a1d2c44-9f30-4f0b-8c6e-1b2a3c4d5e6f",
+          "description": "ID of the call this leg was transferred from. Empty if not a transfer."
         },
         "transfer_to": {
-          "type": "string"
+          "type": "string",
+          "format": "uuid",
+          "example": "b3c4d5e6-1a2b-4c3d-8e9f-0a1b2c3d4e5f",
+          "description": "ID of the call this leg was transferred to. For child legs without an explicit value, derived from the parent's bridged leg."
         },
         "has_children": {
-          "type": "boolean"
+          "type": "boolean",
+          "example": true,
+          "description": "True if the call has child legs (Leg B) or blind-transfer legs."
         },
         "agent_description": {
-          "type": "string"
+          "type": "string",
+          "example": "Customer asked for a callback tomorrow",
+          "description": "Agent's wrap-up note for the queue attempt (leading/trailing whitespace trimmed)."
         },
         "hold": {
           "type": "array",
           "items": {
             "type": "object",
             "$ref": "#/definitions/engine.CallHold"
-          }
+          },
+          "description": "Hold intervals of this call and its child legs, ordered by start time."
         },
         "annotations": {
           "type": "array",
           "items": {
             "type": "object",
             "$ref": "#/definitions/engine.CallAnnotation"
-          }
+          },
+          "description": "Operator annotations (notes on recording segments), newest first."
         },
         "amd_result": {
-          "type": "string"
+          "type": "string",
+          "description": "Answering machine detection result (classic AMD, falls back to AI AMD)."
         },
         "hangup_disposition": {
-          "type": "string"
+          "type": "string",
+          "example": "client_dropped",
+          "description": "Derived call outcome. One of: empty (child leg), `not_answered`, `cancelled`, `ended`, `agent_dropped`, `client_dropped`, `error`."
         },
         "blind_transfer": {
-          "type": "string"
+          "type": "string",
+          "example": "1002",
+          "description": "Destination number of a blind transfer performed on this call. Empty if none."
         },
         "files_job": {
           "type": "array",
           "items": {
             "type": "object",
             "$ref": "#/definitions/engine.HistoryFileJob"
-          }
+          },
+          "description": "Background jobs (e.g. transcription, retention, upload) related to the call's files."
         },
         "transcripts": {
           "type": "array",
           "items": {
             "type": "object",
             "$ref": "#/definitions/engine.TranscriptLookup"
-          }
+          },
+          "description": "Available transcripts of the call recording."
         },
         "talk_sec": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "example": 115,
+          "description": "Talk time in seconds: the time parties were connected, excluding ringing and hold."
         },
         "grantee": {
-          "$ref": "#/definitions/engine.Lookup"
+          "$ref": "#/definitions/engine.Lookup",
+          "description": "Grantee (authorization subject) the call was placed on behalf of."
         },
         "amd_ai_result": {
-          "type": "string"
+          "type": "string",
+          "example": "human",
+          "description": "AI-based answering machine detection result."
         },
         "amd_ai_logs": {
           "type": "array",
+          "example": [
+            "greeting detected"
+          ],
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Diagnostic logs produced by the AI answering machine detection."
         },
         "rate_id": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "example": 3021,
+          "description": "ID of the quality evaluation (audit rate) of this call. 0 if not evaluated."
         },
         "rated_user": {
-          "$ref": "#/definitions/engine.Lookup"
+          "$ref": "#/definitions/engine.Lookup",
+          "description": "User who was evaluated."
         },
         "rated_by": {
-          "$ref": "#/definitions/engine.Lookup"
+          "$ref": "#/definitions/engine.Lookup",
+          "description": "User (supervisor/QA) who performed the evaluation."
         },
         "score_optional": {
           "type": "number",
-          "format": "float"
+          "format": "float",
+          "example": 85.5,
+          "description": "Evaluation score of optional questions."
         },
         "score_required": {
           "type": "number",
-          "format": "float"
+          "format": "float",
+          "example": 92.0,
+          "description": "Evaluation score of required (mandatory) questions."
         },
         "attempt_id": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "example": 550012,
+          "description": "ID of the queue attempt linked to this call."
         },
         "allow_evaluation": {
-          "type": "boolean"
+          "type": "boolean",
+          "example": true,
+          "description": "True if the call can currently be evaluated (answered queue call, or a bridged leg without transfers involving a user)."
         },
-        "form_fields": {},
+        "form_fields": {
+          "example": {
+            "reason": "refund",
+            "resolved": true
+          },
+          "description": "Wrap-up form field values filled in by the agent (arbitrary JSON)."
+        },
         "bridged_id": {
-          "type": "string"
+          "type": "string",
+          "format": "uuid",
+          "example": "c5d6e7f8-2b3c-4d4e-9f0a-1b2c3d4e5f60",
+          "description": "ID of the leg this call is bridged with."
         },
         "contact": {
-          "$ref": "#/definitions/engine.Lookup"
+          "$ref": "#/definitions/engine.Lookup",
+          "description": "CRM contact linked to the call."
         },
         "member_id": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "example": 900123,
+          "description": "ID of the queue member associated with the call."
         },
         "schemas": {
           "type": "array",
           "items": {
             "type": "object",
             "$ref": "#/definitions/engine.Lookup"
-          }
+          },
+          "description": "Routing schemas (call flows/IVR) executed during the call."
         },
         "hangup_phrase": {
-          "type": "string"
+          "type": "string",
+          "description": "Phrase that triggered the hangup, if any."
         },
         "blind_transfers": {
           "type": "array",
           "items": {
             "type": "object",
             "$ref": "#/definitions/engine.HistoryCall.BlindTransfer"
-          }
+          },
+          "description": "All blind transfers performed during the call, in chronological order."
         },
         "from_number": {
-          "type": "string"
+          "type": "string",
+          "example": "380501234567",
+          "description": "Caller number (A-number)."
         },
         "to_number": {
-          "type": "string"
+          "type": "string",
+          "example": "0800123456",
+          "description": "Callee number (B-number)."
         },
         "destination_name": {
-          "type": "string"
+          "type": "string",
+          "example": "Support hotline",
+          "description": "Human-readable name of the destination (e.g. DID or queue label)."
         },
         "forms": {
           "type": "array",
           "items": {
             "type": "object",
             "$ref": "#/definitions/engine.HistoryCall.CallForm"
-          }
+          },
+          "description": "Forms submitted across all queue attempts of the call (up to 20 entries)."
         },
         "conversation_id": {
-          "type": "string"
+          "type": "string",
+          "example": "d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f60",
+          "description": "ID of the chat conversation linked to the call (video meeting/chat)."
         },
         "meeting_id": {
-          "type": "string"
+          "type": "string",
+          "example": "meet-8f31c2",
+          "description": "ID of the WebRTC meeting associated with the call."
         },
         "quality_metrics": {
-          "$ref": "#/definitions/engine.HistoryCall.QualityMetrics"
+          "$ref": "#/definitions/engine.HistoryCall.QualityMetrics",
+          "description": "Media quality (MOS, jitter, packet loss, RTT) statistics of the call."
         },
         "user_agent": {
-          "type": "string"
+          "type": "string",
+          "example": "Webitel-Phone/1.4 (Chrome 129)",
+          "description": "User-Agent of the client/softphone that made or received the call."
         }
-      }
+      },
+      "description": "Completed call leg (CDR) enriched with queue, agent, recording, transcript, evaluation and transfer information. Timestamps are Unix epoch milliseconds (UTC); durations are seconds.",
+      "title": "HistoryCall"
     },
     "engine.HistoryCall.BlindTransfer": {
       "type": "object",
       "properties": {
         "number": {
-          "type": "string"
+          "type": "string",
+          "example": "1002",
+          "description": "Destination number the call was blind-transferred to."
         },
         "time": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "example": 1790676960000,
+          "description": "Time of the transfer, Unix epoch milliseconds (UTC)."
         },
         "user": {
-          "$ref": "#/definitions/engine.Lookup"
+          "$ref": "#/definitions/engine.Lookup",
+          "description": "User who initiated the blind transfer."
         }
-      }
+      },
+      "description": "Blind transfer record."
     },
     "engine.HistoryCall.CallForm": {
       "type": "object",
       "properties": {
         "agent": {
-          "$ref": "#/definitions/engine.Lookup"
+          "$ref": "#/definitions/engine.Lookup",
+          "description": "Agent who submitted the form."
         },
-        "form_fields": {},
+        "form_fields": {
+          "example": {
+            "reason": "refund"
+          },
+          "description": "Form field values (arbitrary JSON)."
+        },
         "reporting_at": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "example": 1790677050000,
+          "description": "Time the form was submitted (Unix epoch ms, UTC)."
         }
-      }
+      },
+      "description": "Wrap-up form submitted by an agent for a queue attempt."
     },
     "engine.HistoryCall.QualityMetrics": {
       "type": "object",
       "properties": {
         "sip_id": {
           "type": "string",
-          "title": "Унікальний ідентифікатор сесії"
+          "description": "Unique SIP session identifier the statistics belong to."
         },
         "mos_avg": {
           "type": "number",
           "format": "float",
-          "title": "Mean Opinion Score (MOS) - оцінка якості передачі голосу"
+          "example": 4.3,
+          "description": "Mean Opinion Score (MOS): voice quality estimate, scale 1.0 (bad) to 5.0 (excellent)."
         },
         "mos_min": {
           "type": "number",
-          "format": "float"
+          "format": "float",
+          "example": 3.8,
+          "description": "Minimum MOS during the call."
         },
         "mos_max": {
           "type": "number",
-          "format": "float"
+          "format": "float",
+          "example": 4.4,
+          "description": "Maximum MOS during the call."
         },
         "mos_min_at": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "example": 42,
+          "description": "Offset (seconds from call start) of the minimum MOS."
         },
         "mos_max_at": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "example": 5,
+          "description": "Offset (seconds from call start) of the maximum MOS."
         },
         "jitter_avg": {
           "type": "number",
           "format": "float",
-          "title": "Jitter - показник коливання затримки пакетів"
+          "example": 6.2,
+          "description": "Jitter: packet delay variation, in milliseconds. Average value."
         },
         "jitter_min": {
           "type": "number",
-          "format": "float"
+          "format": "float",
+          "example": 1.1,
+          "description": "Minimum jitter (ms)."
         },
         "jitter_max": {
           "type": "number",
-          "format": "float"
+          "format": "float",
+          "example": 23.5,
+          "description": "Maximum jitter (ms)."
         },
         "jitter_min_at": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "example": 12,
+          "description": "Offset (seconds from call start) of the minimum jitter."
         },
         "jitter_max_at": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "example": 77,
+          "description": "Offset (seconds from call start) of the maximum jitter."
         },
         "packetloss_avg": {
           "type": "number",
           "format": "float",
-          "title": "Packet Loss - відсоток втрачених пакетів"
+          "example": 0.4,
+          "description": "Packet loss: percentage of lost RTP packets. Average value."
         },
         "packetloss_min": {
           "type": "number",
-          "format": "float"
+          "format": "float",
+          "example": 0,
+          "description": "Minimum packet loss (%)."
         },
         "packetloss_max": {
           "type": "number",
-          "format": "float"
+          "format": "float",
+          "example": 2.1,
+          "description": "Maximum packet loss (%)."
         },
         "packetloss_min_at": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "example": 3,
+          "description": "Offset (seconds from call start) of the minimum packet loss."
         },
         "packetloss_max_at": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "example": 90,
+          "description": "Offset (seconds from call start) of the maximum packet loss."
         },
         "roundtrip_avg": {
           "type": "number",
           "format": "float",
-          "title": "Round Trip Time (RTT) - час проходження сигналу в обидва боки (мс)"
+          "example": 48.7,
+          "description": "Round Trip Time (RTT): signal round-trip delay, in milliseconds. Average value."
         },
         "roundtrip_min": {
           "type": "number",
-          "format": "float"
+          "format": "float",
+          "example": 31.0,
+          "description": "Minimum RTT (ms)."
         },
         "roundtrip_max": {
           "type": "number",
-          "format": "float"
+          "format": "float",
+          "example": 120.3,
+          "description": "Maximum RTT (ms)."
         },
         "roundtrip_min_at": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "example": 8,
+          "description": "Offset (seconds from call start) of the minimum RTT."
         },
         "roundtrip_max_at": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "example": 64,
+          "description": "Offset (seconds from call start) of the maximum RTT."
         }
-      }
+      },
+      "description": "Media quality statistics (RTP/RTCP) of the call session.\nEach metric has avg/min/max values and the offsets (from call start) at\nwhich the min/max occurred."
     },
     "engine.HistoryFileJob": {
       "type": "object",
@@ -20933,16 +21190,21 @@
       "type": "object",
       "properties": {
         "next": {
-          "type": "boolean"
+          "type": "boolean",
+          "example": true,
+          "description": "True if more records are available on the next page."
         },
         "items": {
           "type": "array",
           "items": {
             "type": "object",
             "$ref": "#/definitions/engine.HistoryCall"
-          }
+          },
+          "description": "Call history records for the requested page."
         }
-      }
+      },
+      "description": "Page of call history records.",
+      "title": "ListHistoryCall"
     },
     "engine.ListMember": {
       "type": "object",
@@ -24555,236 +24817,428 @@
     },
     "engine.SearchHistoryCallRequest": {
       "type": "object",
+      "example": {
+        "page": 1,
+        "size": 20,
+        "sort": "-created_at",
+        "created_at": {
+          "from": 1790640000000,
+          "to": 1790726399999
+        },
+        "direction": "inbound",
+        "queue_id": [
+          12
+        ],
+        "missed": true
+      },
       "properties": {
         "page": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "example": 1,
+          "description": "Page number, 1-based. Combined with `size` to compute the offset. If omitted or 0, the first page is returned. The response field `next` indicates whether another page exists.",
+          "minimum": 1
         },
         "size": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "example": 20,
+          "description": "Maximum number of calls returned per page. If omitted or 0, the server default page size is used (40); server maximum supported limit is 20000.",
+          "minimum": 1
         },
         "q": {
-          "type": "string"
+          "type": "string",
+          "example": "380441234567",
+          "description": "Quick search. Case-insensitive pattern match (ILIKE) against the dialed destination, the caller number (from_number) and the callee number (to_number), OR an exact match against the call ID (UUID). If omitted or empty, no text filtering is applied."
         },
         "sort": {
-          "type": "string"
+          "type": "string",
+          "example": "-created_at",
+          "description": "Sort expression: a response field name, optionally prefixed with `-` for descending order (e.g. `-created_at`). If omitted, the server default ordering is used (newest first)."
         },
         "fields": {
           "type": "array",
+          "example": [
+            "id",
+            "created_at",
+            "duration",
+            "queue",
+            "agent"
+          ],
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Response field projection: names of HistoryCall fields to return. If omitted or empty, all fields are returned. Requesting fewer fields reduces payload size and query cost."
         },
         "created_at": {
-          "$ref": "#/definitions/engine.FilterBetween"
+          "$ref": "#/definitions/engine.FilterBetween",
+          "example": {
+            "from": 1790640000000,
+            "to": 1790726399999
+          },
+          "description": "Range filter (inclusive) on call creation time (`created_at`), Unix epoch milliseconds (UTC). Either bound may be omitted for an open-ended range. Strongly recommended for performance on large datasets."
         },
         "user_id": {
           "type": "array",
+          "example": [
+            101,
+            102
+          ],
           "items": {
             "type": "string",
             "format": "int64"
-          }
+          },
+          "description": "Array of user IDs (OR logic). Matches calls where the user is the owner of the leg (`user_id`) OR participated in any leg of the call (`user_ids`). Use `owner_id` to match the leg owner only. Empty array = no filter."
         },
         "agent_id": {
           "type": "array",
+          "example": [
+            45
+          ],
           "items": {
             "type": "string",
             "format": "int64"
-          }
+          },
+          "description": "Array of agent IDs (OR logic). Matches calls handled by at least one of the given agents on any leg (`agent_ids`). Empty array = no filter."
         },
         "queue_id": {
           "type": "array",
+          "example": [
+            12,
+            13
+          ],
           "items": {
             "type": "string",
             "format": "int64"
-          }
+          },
+          "description": "Array of queue IDs (OR logic). Matches calls whose leg queue (`queue_id`) or any queue the call passed through (`queue_ids`) is in the list. Empty array = no filter."
         },
         "team_id": {
           "type": "array",
+          "example": [
+            3
+          ],
           "items": {
             "type": "string",
             "format": "int64"
-          }
+          },
+          "description": "Array of team IDs (OR logic). Matches calls whose leg team (`team_id`) or any team involved in the call (`team_ids`) is in the list. Empty array = no filter."
         },
         "member_id": {
           "type": "array",
+          "example": [
+            900123
+          ],
           "items": {
             "type": "string",
             "format": "int64"
-          }
+          },
+          "description": "Array of queue member (contact/lead) IDs (OR logic). Exact match on the call's `member_id`. Empty array = no filter."
         },
         "gateway_id": {
           "type": "array",
+          "example": [
+            7
+          ],
           "items": {
             "type": "string",
             "format": "int64"
-          }
+          },
+          "description": "Array of SIP gateway (trunk) IDs (OR logic). Matches calls whose leg gateway (`gateway_id`) or any gateway used in the call (`gateway_ids`) is in the list. Empty array = no filter."
         },
         "duration": {
-          "$ref": "#/definitions/engine.FilterBetween"
+          "$ref": "#/definitions/engine.FilterBetween",
+          "example": {
+            "from": 30,
+            "to": 600
+          },
+          "description": "Range filter (inclusive) on total call duration in SECONDS (hangup time minus creation time, includes ringing/wait). A bound that is omitted or 0 is ignored."
         },
         "skip_parent": {
-          "type": "boolean"
+          "type": "boolean",
+          "example": true,
+          "description": "If true, only top-level calls (Leg A, `parent_id` is null) are returned and child legs (Leg B) are hidden. If false or omitted, all legs are returned."
         },
         "parent_id": {
-          "type": "string"
+          "type": "string",
+          "format": "uuid",
+          "example": "0e6f8f3a-5b1c-4c1e-9a55-3f0f2b6c9d10",
+          "description": "Exact match on the parent call ID. Returns the direct child legs (Leg B) of the given call. If omitted or empty, no filter is applied."
         },
         "cause": {
           "type": "array",
+          "example": [
+            "NORMAL_CLEARING",
+            "NO_ANSWER"
+          ],
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Array of hangup causes (OR logic), exact match on `cause` (e.g. NORMAL_CLEARING, USER_BUSY, NO_ANSWER, ORIGINATOR_CANCEL). Empty array = no filter."
         },
         "has_file": {
-          "type": "boolean"
+          "type": "boolean",
+          "example": true,
+          "description": "Tri-state filter by attached files (recordings, screen captures). true = only calls that have files; false = only calls without files; omitted/null = no filter."
         },
         "domain_id": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "example": 1,
+          "description": "Tenant (domain) ID. Normally derived from the caller's authentication context; the server always restricts results to the caller's domain."
         },
         "number": {
-          "type": "string"
+          "type": "string",
+          "example": "380441234567",
+          "description": "Phone number search. The value is converted to a regular expression and matched (`~`) against the pre-computed search number, or against destination, from_number and to_number when it is not available. Matches the number on either side of the call. If omitted or empty, no filter is applied."
         },
         "direction": {
-          "type": "string"
+          "type": "string",
+          "example": "inbound",
+          "description": "Call direction, exact match: `inbound` or `outbound`. If omitted or empty, both directions are returned."
         },
         "answered_at": {
-          "$ref": "#/definitions/engine.FilterBetween"
+          "$ref": "#/definitions/engine.FilterBetween",
+          "example": {
+            "from": 1790640000000,
+            "to": 1790726399999
+          },
+          "description": "Range filter (inclusive) on answer time (`answered_at`), Unix epoch milliseconds (UTC). IMPORTANT: applied only when BOTH `from` and `to` are provided; otherwise ignored. Unanswered calls are excluded when active."
         },
         "missed": {
-          "type": "boolean"
+          "type": "boolean",
+          "example": true,
+          "description": "If true, returns only missed calls: inbound, never bridged to an operator (`bridged_at` is null), not hidden from the missed list, and whose parent call was not bridged. Omit for no filter; do not send an explicit false."
         },
         "stored_at": {
-          "$ref": "#/definitions/engine.FilterBetween"
+          "$ref": "#/definitions/engine.FilterBetween",
+          "example": {
+            "from": 1790640000000,
+            "to": 1790726399999
+          },
+          "description": "Range filter (inclusive) on the time the call record was persisted to history (`stored_at`), Unix epoch milliseconds (UTC). IMPORTANT: applied only when BOTH `from` and `to` are provided; otherwise ignored. Useful for incremental synchronization."
         },
         "id": {
           "type": "array",
+          "example": [
+            "0e6f8f3a-5b1c-4c1e-9a55-3f0f2b6c9d10"
+          ],
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Array of call IDs (UUID, OR logic). Exact match on `id`. Empty array = no filter."
         },
         "transfer_from": {
           "type": "array",
+          "example": [
+            "0e6f8f3a-5b1c-4c1e-9a55-3f0f2b6c9d10"
+          ],
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Array of call IDs (UUID, OR logic). Returns calls that were created by a transfer FROM one of the given calls (`transfer_from`). Empty array = no filter."
         },
         "transfer_to": {
           "type": "array",
+          "example": [
+            "7a1d2c44-9f30-4f0b-8c6e-1b2a3c4d5e6f"
+          ],
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Array of call IDs (UUID, OR logic). Returns calls that were transferred TO one of the given calls (`transfer_to`). Empty array = no filter."
         },
         "dependency_id": {
-          "type": "string"
+          "type": "string",
+          "format": "uuid",
+          "example": "0e6f8f3a-5b1c-4c1e-9a55-3f0f2b6c9d10",
+          "description": "Root call ID (UUID). Returns the full dependency tree of the call: all descendants reachable recursively through `parent_id` (child legs) or `transfer_from` (transfers). The root call itself is excluded. Required when `timeline` is true. If omitted, no filter is applied."
         },
         "tags": {
           "type": "array",
+          "example": [
+            "vip",
+            "complaint"
+          ],
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Array of tags (OR logic). Matches calls having at least one of the given tags (array overlap). Empty array = no filter."
         },
         "variables[string]": {
           "type": "object",
+          "example": {
+            "campaign": "autumn_sale",
+            "lang": "uk"
+          },
           "additionalProperties": {
             "type": "string"
-          }
+          },
+          "description": "Custom call variables filter. Matches calls whose stored variables (JSONB payload) contain ALL given key/value pairs (containment, AND logic between pairs; exact, case-sensitive values). Empty map = no filter."
         },
         "amd_result": {
           "type": "array",
+          "example": [
+            "HUMAN",
+            "MACHINE"
+          ],
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Array of answering machine detection (AMD) results (OR logic). Matches either the classic AMD result or the AI AMD result. Passing an empty string element (\"\") additionally matches calls without a detection result. Empty array = no filter."
         },
         "fts": {
-          "type": "string"
+          "type": "string",
+          "example": "refund order delivery",
+          "description": "Full-text search over call transcripts (PostgreSQL plainto_tsquery semantics: all words must be present, order-insensitive). Implicitly requires the call to have a transcript. Ignored when `has_transcript` is false. If omitted or empty, no filter is applied."
         },
         "directions": {
           "type": "array",
+          "example": [
+            "inbound"
+          ],
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Array of call directions (`inbound`, `outbound`). Not applied by the GetHistoryByGroups query; use the singular `direction` field for direction filtering."
         },
         "has_transcript": {
-          "type": "boolean"
+          "type": "boolean",
+          "example": true,
+          "description": "Tri-state filter by transcript presence. true = only calls with a transcript (further narrowed by `fts` if set); false = only calls without a transcript; omitted/null = no filter (unless `fts` is set)."
         },
         "agent_description": {
-          "type": "string"
+          "type": "string",
+          "example": "callback requested",
+          "description": "Case-insensitive pattern search (ILIKE) in the agent's wrap-up description of the queue attempt OR in any call annotation note. If omitted or empty, no filter is applied."
         },
         "owner_id": {
           "type": "array",
+          "example": [
+            101
+          ],
           "items": {
             "type": "string",
             "format": "int64"
-          }
+          },
+          "description": "Array of user IDs (OR logic). Matches calls where the given user is the direct owner of the leg (`user_id`) only; unlike `user_id`, participation in other legs is not considered. Empty array = no filter."
         },
         "grantee_id": {
           "type": "array",
+          "example": [
+            55
+          ],
           "items": {
             "type": "string",
             "format": "int64"
-          }
+          },
+          "description": "Array of grantee IDs (OR logic): the authorization subject (user/role/gateway identity) that the call was placed on behalf of. Exact match on `grantee_id`. Empty array = no filter."
         },
         "amd_ai_result": {
           "type": "array",
+          "example": [
+            "human",
+            "voicemail"
+          ],
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Array of AI-based answering machine detection results (OR logic). Matched against `amd_ai_result` in lowercase. Empty array = no filter."
         },
         "talk": {
-          "$ref": "#/definitions/engine.FilterBetween"
+          "$ref": "#/definitions/engine.FilterBetween",
+          "example": {
+            "from": 10,
+            "to": 300
+          },
+          "description": "Range filter (inclusive) on talk time (`talk_sec`) in SECONDS, i.e. the time the parties were actually connected, excluding ringing and hold. Omitted bound = open-ended."
         },
         "rated": {
-          "type": "boolean"
+          "type": "boolean",
+          "example": true,
+          "description": "Tri-state filter by quality evaluation. false = only calls that have NOT been evaluated; true = only evaluated calls, optionally narrowed by `rated_user`, `rated_by`, `score_required` and `score_optional`. Setting any of those filters without `rated` also restricts results to evaluated calls. Omitted/null = no filter."
         },
         "rated_by": {
           "type": "array",
+          "example": [
+            12
+          ],
           "items": {
             "type": "string",
             "format": "int64"
-          }
+          },
+          "description": "Array of user IDs of evaluators (supervisors/QA) who created the evaluation (OR logic). Restricts to evaluated calls. Empty array = no filter."
         },
         "score_required": {
-          "$ref": "#/definitions/engine.FilterBetween"
+          "$ref": "#/definitions/engine.FilterBetween",
+          "example": {
+            "from": 70,
+            "to": 100
+          },
+          "description": "Range filter (inclusive) on the evaluation score of REQUIRED (mandatory) questions (`score_required`). Restricts to evaluated calls. Omitted bound = open-ended."
         },
         "score_optional": {
-          "$ref": "#/definitions/engine.FilterBetween"
+          "$ref": "#/definitions/engine.FilterBetween",
+          "example": {
+            "from": 0,
+            "to": 100
+          },
+          "description": "Range filter (inclusive) on the evaluation score of OPTIONAL questions (`score_optional`). Restricts to evaluated calls. Omitted bound = open-ended."
         },
         "rated_user": {
           "type": "array",
+          "example": [
+            101
+          ],
           "items": {
             "type": "string",
             "format": "int64"
-          }
+          },
+          "description": "Array of user IDs of the evaluated agents/operators (OR logic). Restricts to evaluated calls. Empty array = no filter."
         },
         "contact_id": {
           "type": "array",
+          "example": [
+            88001
+          ],
           "items": {
             "type": "string",
             "format": "int64"
-          }
+          },
+          "description": "Array of CRM contact IDs (OR logic). Exact match on the call's linked contact (`contact_id`). Empty array = no filter."
         },
         "schema_id": {
           "type": "array",
+          "example": [
+            4,
+            9
+          ],
           "items": {
             "type": "integer",
             "format": "int32"
-          }
+          },
+          "description": "Array of routing schema (call flow / IVR) IDs (OR logic). Matches calls that executed at least one of the given schemas (array overlap on `schema_ids`). Empty array = no filter."
         },
         "has_transfer": {
-          "type": "boolean"
+          "type": "boolean",
+          "example": true,
+          "description": "Tri-state filter by transfers. true = only calls involved in a blind or attended transfer; false = only calls with no transfer; omitted/null = no filter."
         },
         "timeline": {
-          "type": "boolean"
+          "type": "boolean",
+          "example": true,
+          "description": "If true, returns only the legs relevant for building a call timeline of the call tree given by `dependency_id`: transferred legs handled by a user, blind transfer legs, and legs whose parent differs from the root. REQUIRES `dependency_id`; without it the result is empty. Omitted/null = no filter."
         },
         "excluded_queue_types": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/engine.QueueType"
-          }
+          },
+          "description": "Array of queue types to EXCLUDE from the result. Calls whose queue type is in the list are hidden; calls that did not pass through a queue are always kept. Empty array = nothing excluded."
         }
-      }
+      },
+      "description": "Filter, sort and pagination parameters for searching completed calls (CDR). Filters are AND-combined; array filters are OR-combined internally. Timestamps are Unix epoch milliseconds (UTC); ranges are inclusive.",
+      "title": "SearchHistoryCallRequest"
     },
     "engine.SearchOnlineSkillsResponse": {
       "type": "object",

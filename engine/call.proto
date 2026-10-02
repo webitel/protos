@@ -8,18 +8,23 @@ import "google/api/visibility.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/wrappers.proto";
 import "queue_domain.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/api/field_behavior.proto";
 
 option go_package = "github.com/webitel/protos/engine";
 
 // CallService provides a comprehensive set of operations for managing
 // real-time telephony and analyzing historical call data.
 service CallService {
-  // --- History Calls ---
-
-  // SearchHistoryCall retrieves a list of completed calls using filters (GET).
-  // Supports advanced filtering by participants, duration, causes, and custom variables.
+    // SearchHistoryCall retrieves a list of completed calls using filters (GET).
+    // Supports advanced filtering by participants, duration, causes, and custom variables.
   rpc SearchHistoryCall(SearchHistoryCallRequest) returns (ListHistoryCall) {
     option (google.api.http) = {get: "/calls/history"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Search call history (GET)"
+      description: "Returns a page of completed calls (CDR). Filters are passed as query parameters and are AND-combined; array filters are repeated query parameters combined with OR. Timestamps are Unix epoch milliseconds (UTC); ranges are inclusive. Results are limited to the caller's domain and to calls visible under RBAC (own calls, supervised users, permitted queues and groups). Use the POST variant for large filter sets."
+      tags: "Call History"
+    };
   }
 
   // SearchHistoryCallPost retrieves a list of completed calls using a complex filter body (POST).
@@ -28,6 +33,11 @@ service CallService {
     option (google.api.http) = {
       post: "/calls/history"
       body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Search call history (POST)"
+      description: "Same semantics as the GET variant, but filters are sent in the JSON body. Recommended for large ID lists, variables maps and other filter sets that may exceed URL length limits."
+      tags: "Call History"
     };
   }
 
@@ -203,60 +213,411 @@ message ConfirmPushRequest {
 
 message ConfirmPushResponse {}
 
+// Search request for the call history store.
+//
+// One of CreatedAt, StoredAt, Number, Q, DependencyID or ID filters are required
+// others are optional.
+// All filters are combined with logical AND. Array filters us OR logic between their elements.
+// Results are always restricted to the caller`s domain and to calls calls visible to the caller under
+// RBAC rules (own calls, supervised users, permitted queues and groups).
+//
+// Time conventions: every timestamp/range is Unix epoch in MILLISECONDS (UTC).
+// Every FilterBetween range is INCLUSIVE on both bounds (from <= value <= to).
 message SearchHistoryCallRequest {
-  int32 page = 1;
-  int32 size = 2;
-  string q = 3;
-  string sort = 4;
-  repeated string fields = 5;
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+      json_schema: {
+        title: "SearchHistoryCallRequest"
+        description: "Filter, sort and pagination parameters for searching completed calls (CDR). Filters are AND-combined; array filters are OR-combined internally. Timestamps are Unix epoch milliseconds (UTC); ranges are inclusive."
+      }
+      example: "{\"page\": 1, \"size\": 20, \"sort\": \"-created_at\", \"created_at\": {\"from\": 1790640000000, \"to\": 1790726399999}, \"direction\": \"inbound\", \"queue_id\": [12], \"missed\": true}"
+    };
 
-  FilterBetween created_at = 6;
-  repeated int64 user_id = 7;
-  repeated int64 agent_id = 8;
-  repeated int64 queue_id = 9;
-  repeated int64 team_id = 10;
-  repeated int64 member_id = 11;
-  repeated int64 gateway_id = 12;
+  // Page number (1-based).
+  int32 page = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Page number, 1-based. Combined with `size` to compute the offset. If omitted or 0, the first page is returned. The response field `next` indicates whether another page exists."
+        example: "1"
+        minimum: 1
+      }
+  ];
 
-  FilterBetween duration = 13;
-  bool skip_parent = 14;
-  string parent_id = 15;
-  repeated string cause = 16;
-  google.protobuf.BoolValue has_file = 17;
+  // Page size.
+  int32 size = 2 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Maximum number of calls returned per page. If omitted or 0, the server default page size is used (40); server maximum supported limit is 20000."
+        example: "20"
+        minimum: 1
+      }
+  ];
 
-  int64 domain_id = 18;
-  string number = 19;
-  string direction = 20;
-  FilterBetween answered_at = 21;
-  bool missed = 22;
-  FilterBetween stored_at = 23;
-  repeated string id = 24;
-  repeated string transfer_from = 25;
-  repeated string transfer_to = 26;
-  string dependency_id = 27;
-  repeated string tags = 28;
-  map<string, string> variables = 29;
-  repeated string amd_result = 30;
-  string fts = 31;
-  repeated string directions = 32;
-  google.protobuf.BoolValue has_transcript = 33;
-  string agent_description = 34;
-  repeated int64 owner_id = 35;
-  repeated int64 grantee_id = 36;
-  repeated string amd_ai_result = 37;
+  // Free-text search.
+  string q = 3 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Quick search. Case-insensitive pattern match (ILIKE) against the dialed destination, the caller number (from_number) and the callee number (to_number), OR an exact match against the call ID (UUID). If omitted or empty, no text filtering is applied."
+        example: "\"380441234567\""
+      }
+  ];
 
-  FilterBetween talk = 38;
+  // Sort expression.
+  string sort = 4 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Sort expression: a response field name, optionally prefixed with `-` for descending order (e.g. `-created_at`). If omitted, the server default ordering is used (newest first)."
+        example: "\"-created_at\""
+      }
+  ];
 
-  google.protobuf.BoolValue rated = 39;
-  repeated int64 rated_by = 40;
-  FilterBetween score_required = 41;
-  FilterBetween score_optional = 42;
-  repeated int64 rated_user = 43;
-  repeated int64 contact_id = 44;
-  repeated int32 schema_id = 45;
-  google.protobuf.BoolValue has_transfer = 46;
-  google.protobuf.BoolValue timeline = 47;
-  repeated engine.QueueType excluded_queue_types = 48;
+  // Response field projection.
+  repeated string fields = 5 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Response field projection: names of HistoryCall fields to return. If omitted or empty, all fields are returned. Requesting fewer fields reduces payload size and query cost."
+        example: "[\"id\", \"created_at\", \"duration\", \"queue\", \"agent\"]"
+      }
+  ];
+
+  // Call creation time range.
+  FilterBetween created_at = 6 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Range filter (inclusive) on call creation time (`created_at`), Unix epoch milliseconds (UTC). Either bound may be omitted for an open-ended range. Strongly recommended for performance on large datasets."
+        example: "{\"from\": 1790640000000, \"to\": 1790726399999}"
+      }
+  ];
+
+  // Users (operators) on any leg.
+  repeated int64 user_id = 7 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Array of user IDs (OR logic). Matches calls where the user is the owner of the leg (`user_id`) OR participated in any leg of the call (`user_ids`). Use `owner_id` to match the leg owner only. Empty array = no filter."
+        example: "[101, 102]"
+      }
+  ];
+
+  // Agents.
+  repeated int64 agent_id = 8 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Array of agent IDs (OR logic). Matches calls handled by at least one of the given agents on any leg (`agent_ids`). Empty array = no filter."
+        example: "[45]"
+      }
+  ];
+
+  // Queues.
+  repeated int64 queue_id = 9 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Array of queue IDs (OR logic). Matches calls whose leg queue (`queue_id`) or any queue the call passed through (`queue_ids`) is in the list. Empty array = no filter."
+        example: "[12, 13]"
+      }
+  ];
+
+  // Teams.
+  repeated int64 team_id = 10 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Array of team IDs (OR logic). Matches calls whose leg team (`team_id`) or any team involved in the call (`team_ids`) is in the list. Empty array = no filter."
+        example: "[3]"
+      }
+  ];
+
+  // Dialer members.
+  repeated int64 member_id = 11 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Array of queue member (contact/lead) IDs (OR logic). Exact match on the call's `member_id`. Empty array = no filter."
+        example: "[900123]"
+      }
+  ];
+
+  // SIP gateways (trunks).
+  repeated int64 gateway_id = 12 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Array of SIP gateway (trunk) IDs (OR logic). Matches calls whose leg gateway (`gateway_id`) or any gateway used in the call (`gateway_ids`) is in the list. Empty array = no filter."
+        example: "[7]"
+      }
+  ];
+
+  // Total call duration range.
+  FilterBetween duration = 13 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Range filter (inclusive) on total call duration in SECONDS (hangup time minus creation time, includes ringing/wait). A bound that is omitted or 0 is ignored."
+        example: "{\"from\": 30, \"to\": 600}"
+      }
+  ];
+
+  // Hide child legs.
+  bool skip_parent = 14 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "If true, only top-level calls (Leg A, `parent_id` is null) are returned and child legs (Leg B) are hidden. If false or omitted, all legs are returned."
+        example: "true"
+      }
+  ];
+
+  // Parent call.
+  string parent_id = 15 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Exact match on the parent call ID. Returns the direct child legs (Leg B) of the given call. If omitted or empty, no filter is applied."
+        format: "uuid"
+        example: "\"0e6f8f3a-5b1c-4c1e-9a55-3f0f2b6c9d10\""
+      }
+  ];
+
+  // Hangup causes.
+  repeated string cause = 16 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Array of hangup causes (OR logic), exact match on `cause` (e.g. NORMAL_CLEARING, USER_BUSY, NO_ANSWER, ORIGINATOR_CANCEL). Empty array = no filter."
+        example: "[\"NORMAL_CLEARING\", \"NO_ANSWER\"]"
+      }
+  ];
+
+  // Has recordings/files.
+  google.protobuf.BoolValue has_file = 17 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Tri-state filter by attached files (recordings, screen captures). true = only calls that have files; false = only calls without files; omitted/null = no filter."
+        example: "true"
+      }
+  ];
+
+  // Domain.
+  int64 domain_id = 18 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Tenant (domain) ID. Normally derived from the caller's authentication context; the server always restricts results to the caller's domain."
+        example: "1"
+      }
+  ];
+
+  // Phone number (regexp).
+  string number = 19 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Phone number search. The value is converted to a regular expression and matched (`~`) against the pre-computed search number, or against destination, from_number and to_number when it is not available. Matches the number on either side of the call. If omitted or empty, no filter is applied."
+        example: "\"380441234567\""
+      }
+  ];
+
+  // Direction.
+  string direction = 20 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Call direction, exact match: `inbound` or `outbound`. If omitted or empty, both directions are returned."
+        example: "\"inbound\""
+      }
+  ];
+
+  // Answer time range.
+  FilterBetween answered_at = 21 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Range filter (inclusive) on answer time (`answered_at`), Unix epoch milliseconds (UTC). IMPORTANT: applied only when BOTH `from` and `to` are provided; otherwise ignored. Unanswered calls are excluded when active."
+        example: "{\"from\": 1790640000000, \"to\": 1790726399999}"
+      }
+  ];
+
+  // Missed inbound calls.
+  bool missed = 22 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "If true, returns only missed calls: inbound, never bridged to an operator (`bridged_at` is null), not hidden from the missed list, and whose parent call was not bridged. Omit for no filter; do not send an explicit false."
+        example: "true"
+      }
+  ];
+
+  // Storage time range.
+  FilterBetween stored_at = 23 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Range filter (inclusive) on the time the call record was persisted to history (`stored_at`), Unix epoch milliseconds (UTC). IMPORTANT: applied only when BOTH `from` and `to` are provided; otherwise ignored. Useful for incremental synchronization."
+        example: "{\"from\": 1790640000000, \"to\": 1790726399999}"
+      }
+  ];
+
+  // Call IDs.
+  repeated string id = 24 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Array of call IDs (UUID, OR logic). Exact match on `id`. Empty array = no filter."
+        example: "[\"0e6f8f3a-5b1c-4c1e-9a55-3f0f2b6c9d10\"]"
+      }
+  ];
+
+  // Transfer source calls.
+  repeated string transfer_from = 25 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Array of call IDs (UUID, OR logic). Returns calls that were created by a transfer FROM one of the given calls (`transfer_from`). Empty array = no filter."
+        example: "[\"0e6f8f3a-5b1c-4c1e-9a55-3f0f2b6c9d10\"]"
+      }
+  ];
+
+  // Transfer target calls.
+  repeated string transfer_to = 26 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Array of call IDs (UUID, OR logic). Returns calls that were transferred TO one of the given calls (`transfer_to`). Empty array = no filter."
+        example: "[\"7a1d2c44-9f30-4f0b-8c6e-1b2a3c4d5e6f\"]"
+      }
+  ];
+
+  // Dependency root.
+  string dependency_id = 27 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Root call ID (UUID). Returns the full dependency tree of the call: all descendants reachable recursively through `parent_id` (child legs) or `transfer_from` (transfers). The root call itself is excluded. Required when `timeline` is true. If omitted, no filter is applied."
+        format: "uuid"
+        example: "\"0e6f8f3a-5b1c-4c1e-9a55-3f0f2b6c9d10\""
+      }
+  ];
+
+  // Tags.
+  repeated string tags = 28 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Array of tags (OR logic). Matches calls having at least one of the given tags (array overlap). Empty array = no filter."
+        example: "[\"vip\", \"complaint\"]"
+      }
+  ];
+
+  // Channel variables.
+  map<string, string> variables = 29 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Custom call variables filter. Matches calls whose stored variables (JSONB payload) contain ALL given key/value pairs (containment, AND logic between pairs; exact, case-sensitive values). Empty map = no filter."
+        example: "{\"campaign\": \"autumn_sale\", \"lang\": \"uk\"}"
+      }
+  ];
+
+  // AMD results.
+  repeated string amd_result = 30 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Array of answering machine detection (AMD) results (OR logic). Matches either the classic AMD result or the AI AMD result. Passing an empty string element (\"\") additionally matches calls without a detection result. Empty array = no filter."
+        example: "[\"HUMAN\", \"MACHINE\"]"
+      }
+  ];
+
+  // Transcript full-text search.
+  string fts = 31 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Full-text search over call transcripts (PostgreSQL plainto_tsquery semantics: all words must be present, order-insensitive). Implicitly requires the call to have a transcript. Ignored when `has_transcript` is false. If omitted or empty, no filter is applied."
+        example: "\"refund order delivery\""
+      }
+  ];
+
+  // Directions (array).
+  repeated string directions = 32 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Array of call directions (`inbound`, `outbound`). Not applied by the GetHistoryByGroups query; use the singular `direction` field for direction filtering."
+        example: "[\"inbound\"]"
+      }
+  ];
+
+  // Has transcript.
+  google.protobuf.BoolValue has_transcript = 33 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Tri-state filter by transcript presence. true = only calls with a transcript (further narrowed by `fts` if set); false = only calls without a transcript; omitted/null = no filter (unless `fts` is set)."
+        example: "true"
+      }
+  ];
+
+  // Agent note.
+  string agent_description = 34 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Case-insensitive pattern search (ILIKE) in the agent's wrap-up description of the queue attempt OR in any call annotation note. If omitted or empty, no filter is applied."
+        example: "\"callback requested\""
+      }
+  ];
+
+  // Leg owners.
+  repeated int64 owner_id = 35 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Array of user IDs (OR logic). Matches calls where the given user is the direct owner of the leg (`user_id`) only; unlike `user_id`, participation in other legs is not considered. Empty array = no filter."
+        example: "[101]"
+      }
+  ];
+
+  // Grantees.
+  repeated int64 grantee_id = 36 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Array of grantee IDs (OR logic): the authorization subject (user/role/gateway identity) that the call was placed on behalf of. Exact match on `grantee_id`. Empty array = no filter."
+        example: "[55]"
+      }
+  ];
+
+  // AI AMD results.
+  repeated string amd_ai_result = 37 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Array of AI-based answering machine detection results (OR logic). Matched against `amd_ai_result` in lowercase. Empty array = no filter."
+        example: "[\"human\", \"voicemail\"]"
+      }
+  ];
+
+  // Talk time range.
+  FilterBetween talk = 38 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Range filter (inclusive) on talk time (`talk_sec`) in SECONDS, i.e. the time the parties were actually connected, excluding ringing and hold. Omitted bound = open-ended."
+        example: "{\"from\": 10, \"to\": 300}"
+      }
+  ];
+
+  // Evaluated calls.
+  google.protobuf.BoolValue rated = 39 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Tri-state filter by quality evaluation. false = only calls that have NOT been evaluated; true = only evaluated calls, optionally narrowed by `rated_user`, `rated_by`, `score_required` and `score_optional`. Setting any of those filters without `rated` also restricts results to evaluated calls. Omitted/null = no filter."
+        example: "true"
+      }
+  ];
+
+  // Evaluators.
+  repeated int64 rated_by = 40 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Array of user IDs of evaluators (supervisors/QA) who created the evaluation (OR logic). Restricts to evaluated calls. Empty array = no filter."
+        example: "[12]"
+      }
+  ];
+
+  // Required score range.
+  FilterBetween score_required = 41 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Range filter (inclusive) on the evaluation score of REQUIRED (mandatory) questions (`score_required`). Restricts to evaluated calls. Omitted bound = open-ended."
+        example: "{\"from\": 70, \"to\": 100}"
+      }
+  ];
+
+  // Optional score range.
+  FilterBetween score_optional = 42 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Range filter (inclusive) on the evaluation score of OPTIONAL questions (`score_optional`). Restricts to evaluated calls. Omitted bound = open-ended."
+        example: "{\"from\": 0, \"to\": 100}"
+      }
+  ];
+
+  // Evaluated users.
+  repeated int64 rated_user = 43 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Array of user IDs of the evaluated agents/operators (OR logic). Restricts to evaluated calls. Empty array = no filter."
+        example: "[101]"
+      }
+  ];
+
+  // Contacts.
+  repeated int64 contact_id = 44 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Array of CRM contact IDs (OR logic). Exact match on the call's linked contact (`contact_id`). Empty array = no filter."
+        example: "[88001]"
+      }
+  ];
+
+  // Routing schemas.
+  repeated int32 schema_id = 45 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Array of routing schema (call flow / IVR) IDs (OR logic). Matches calls that executed at least one of the given schemas (array overlap on `schema_ids`). Empty array = no filter."
+        example: "[4, 9]"
+      }
+  ];
+
+  // Transfers.
+  google.protobuf.BoolValue has_transfer = 46 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Tri-state filter by transfers. true = only calls involved in a blind or attended transfer; false = only calls with no transfer; omitted/null = no filter."
+        example: "true"
+      }
+  ];
+
+  // Timeline mode.
+  google.protobuf.BoolValue timeline = 47 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "If true, returns only the legs relevant for building a call timeline of the call tree given by `dependency_id`: transferred legs handled by a user, blind transfer legs, and legs whose parent differs from the root. REQUIRES `dependency_id`; without it the result is empty. Omitted/null = no filter."
+        example: "true"
+      }
+  ];
+
+  // Excluded queue types.
+  repeated engine.QueueType excluded_queue_types = 48 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Array of queue types to EXCLUDE from the result. Calls whose queue type is in the list are hidden; calls that did not pass through a queue are always kept. Empty array = nothing excluded."
+      }
+  ];
 }
 
 message AggregateRequest {
@@ -331,8 +692,21 @@ message ListAggregate {
   repeated AggregateResult items = 1;
 }
 
+// Paginated list of call history records.
 message ListHistoryCall {
-  bool next = 1;
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+      json_schema: {
+        title: "ListHistoryCall"
+        description: "Page of call history records."
+      }
+    };
+
+    // True if more records are available on the next page.
+  bool next = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "true"}
+  ];
+
+  // Call history records for the requested page.
   repeated HistoryCall items = 2;
 }
 
@@ -424,138 +798,494 @@ message TranscriptLookup {
   Lookup file = 4;
 }
 
+// A single completed call leg (CDR record) with its queue, agent, media,
+// evaluation and transfer context.
+//
+// Terminology: "Leg A" is the top-level (parent) call; "Leg B" is a child leg
+// created by bridging or transferring (`parent_id` is set).
+// All timestamps are Unix epoch MILLISECONDS (UTC); all `*_sec` fields are
+// durations in SECONDS. All fields are output-only.
 message HistoryCall {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+      json_schema: {
+        title: "HistoryCall"
+        description: "Completed call leg (CDR) enriched with queue, agent, recording, transcript, evaluation and transfer information. Timestamps are Unix epoch milliseconds (UTC); durations are seconds."
+      }
+      example: "{\"id\": \"0e6f8f3a-5b1c-4c1e-9a55-3f0f2b6c9d10\",  \"direction\": \"inbound\", \"destination\": \"0800123456\", \"created_at\": 1790676900000, \"answered_at\": 1790676903000, \"bridged_at\": 1790676905000, \"hangup_at\": 1790677020000, \"hangup_by\": \"A\", \"cause\": \"NORMAL_CLEARING\", \"duration\": 120, \"wait_sec\": 3, \"bill_sec\": 117, \"talk_sec\": 115}"
+    };
+
+  // Blind transfer record.
   message BlindTransfer {
-    string number = 1;
-    int64 time = 2;
+
+    // Destination number the call was blind-transferred to.
+    string number = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"1002\""}
+    ];
+
+    // Time of the transfer, Unix epoch milliseconds (UTC).
+    int64 time = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "1790676960000"}
+    ];
+
+    // User who initiated the blind transfer.
     Lookup user = 3;
   }
 
+
+  // Media quality statistics (RTP/RTCP) of the call session.
+  // Each metric has avg/min/max values and the offsets (from call start) at
+  // which the min/max occurred.
   message QualityMetrics {
-    // Унікальний ідентифікатор сесії
+    // Unique SIP session identifier the statistics belong to.
     string sip_id = 1;
 
-    // Mean Opinion Score (MOS) - оцінка якості передачі голосу
-    float mos_avg = 2;
-    float mos_min = 3;
-    float mos_max = 4;
-    int32 mos_min_at = 5;
-    int32 mos_max_at = 6;
+    // Mean Opinion Score (MOS): voice quality estimate, scale 1.0 (bad) to 5.0 (excellent).
+    float mos_avg = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "4.3"}
+    ];
 
-    // Jitter - показник коливання затримки пакетів
-    float jitter_avg = 7;
-    float jitter_min = 8;
-    float jitter_max = 9;
-    int32 jitter_min_at = 10;
-    int32 jitter_max_at = 11;
+    // Minimum MOS during the call.
+    float mos_min = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "3.8"}
+    ];
 
-    // Packet Loss - відсоток втрачених пакетів
-    float packetloss_avg = 12;
-    float packetloss_min = 13;
-    float packetloss_max = 14;
-    int32 packetloss_min_at = 15;
-    int32 packetloss_max_at = 16;
+    // Maximum MOS during the call.
+    float mos_max = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "4.4"}
+    ];
 
-    // Round Trip Time (RTT) - час проходження сигналу в обидва боки (мс)
-    float roundtrip_avg = 17;
-    float roundtrip_min = 18;
-    float roundtrip_max = 19;
-    int32 roundtrip_min_at = 20;
-    int32 roundtrip_max_at = 21;
+    // Offset (seconds from call start) of the minimum MOS.
+    int32 mos_min_at = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "42"}
+    ];
+
+    // Offset (seconds from call start) of the maximum MOS.
+    int32 mos_max_at = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "5"}
+    ];
+
+    // Jitter: packet delay variation, in milliseconds. Average value.
+    float jitter_avg = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "6.2"}
+    ];
+
+    // Minimum jitter (ms).
+    float jitter_min = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "1.1"}
+    ];
+
+    // Maximum jitter (ms).
+    float jitter_max = 9 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "23.5"}
+    ];
+
+    // Offset (seconds from call start) of the minimum jitter.
+    int32 jitter_min_at = 10 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "12"}
+    ];
+
+    // Offset (seconds from call start) of the maximum jitter.
+    int32 jitter_max_at = 11 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "77"}
+    ];
+
+    // Packet loss: percentage of lost RTP packets. Average value.
+    float packetloss_avg = 12 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "0.4"}
+    ];
+
+    // Minimum packet loss (%).
+    float packetloss_min = 13 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "0"}
+    ];
+
+    // Maximum packet loss (%).
+    float packetloss_max = 14 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "2.1"}
+    ];
+
+    // Offset (seconds from call start) of the minimum packet loss.
+    int32 packetloss_min_at = 15 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "3"}
+    ];
+
+    // Offset (seconds from call start) of the maximum packet loss.
+    int32 packetloss_max_at = 16 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "90"}
+    ];
+
+    // Round Trip Time (RTT): signal round-trip delay, in milliseconds. Average value.
+    float roundtrip_avg = 17 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "48.7"}
+    ];
+
+    // Minimum RTT (ms).
+    float roundtrip_min = 18 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "31.0"}
+    ];
+
+    // Maximum RTT (ms).
+    float roundtrip_max = 19 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "120.3"}
+    ];
+
+    // Offset (seconds from call start) of the minimum RTT.
+    int32 roundtrip_min_at = 20 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "8"}
+    ];
+
+    // Offset (seconds from call start) of the maximum RTT.
+    int32 roundtrip_max_at = 21 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "64"}
+    ];
   }
 
-  string id = 1;
-  string app_id = 2;
-  string type = 3;
-  string parent_id = 4;
+  // Unique call (leg) identifier.
+  string id = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {format: "uuid" example: "\"0e6f8f3a-5b1c-4c1e-9a55-3f0f2b6c9d10\""}
+  ];
+
+  // Identifier of the application/node that handled the call.
+  string app_id = 2 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"call-center-node-01\""}
+  ];
+
+  // Record type. Always `call` for this resource.
+  string type = 3 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"call\""}
+  ];
+
+  // ID of the parent leg (Leg A). Empty for a top-level call.
+  string parent_id = 4 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {format: "uuid" example: "\"7a1d2c44-9f30-4f0b-8c6e-1b2a3c4d5e6f\""}
+  ];
+
+  // // User (operator) on this leg; falls back to the queue agent's user if the leg has no direct user.
   Lookup user = 5;
-  string extension = 6;
+
+  // SIP extension of the user. For agent-driven queue types the agent's extension is used.
+  string extension = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"1001\""}];
+
+  // SIP gateway (trunk) used by the leg.
   Lookup gateway = 7;
-  string direction = 8;
-  string destination = 9;
+
+  // Call direction: `inbound` or `outbound`.
+  string direction = 8 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"inbound\""}
+  ];
+
+  // Dialed destination number (DID or dialed digits).
+  string destination = 9 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"0800123456\""}
+  ];
+
+  // Caller endpoint (type, number, id, name).
   Endpoint from = 10;
+
+  // Callee endpoint (type, number, id, name).
   Endpoint to = 11;
-  map<string, string> variables = 12;
 
-  int64 created_at = 13;
-  int64 answered_at = 14;
-  int64 bridged_at = 15;
-  int64 hangup_at = 16;
+  // Custom call variables (channel payload) set by the dialplan, flow, API or integrations.
+  map<string, string> variables = 12 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "{\"campaign\": \"autumn_sale\"}"}
+  ];
+
+  // Call creation time (Unix epoch ms, UTC).
+  int64 created_at = 13 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "1790676900000"}
+  ];
+
+  // Time the call was answered (Unix epoch ms, UTC). 0 if never answered.
+  int64 answered_at = 14 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "1790676903000"}
+  ];
+
+  // Time the leg was bridged to the other party (Unix epoch ms, UTC). 0 if never bridged.
+  int64 bridged_at = 15 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "1790676905000"}
+  ];
+
+  // Hangup time (Unix epoch ms, UTC).
+  int64 hangup_at = 16 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "1790677020000"}
+  ];
+
+  // Party that terminated the call: `A` = caller, `B` = callee, `F` = terminated by the platform (mapped to disposition `ended`).
   string hangup_by = 17;
-  string cause = 18;
 
-  int32 duration = 19;
-  int32 hold_sec = 20;
-  int32 wait_sec = 21;
-  int32 bill_sec = 22;
+  // Hangup cause (Q.850/FreeSWITCH style).
+  string cause = 18 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"NORMAL_CLEARING\""}
+  ];
 
-  int32 sip_code = 23;
+  // Total duration in seconds (hangup - creation), including ringing and wait.
+  int32 duration = 19 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "120"}
+  ];
+
+  // Total hold time in seconds.
+  int32 hold_sec = 20 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "4"}
+  ];
+
+  // Wait time in seconds: creation to answer (or to hangup if never answered).
+  int32 wait_sec = 21 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "3"}
+  ];
+
+  // Billable seconds: answer to hangup. 0 if never answered.
+  int32 bill_sec = 22 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "117"}
+  ];
+
+  // Final SIP response code of the leg.
+  int32 sip_code = 23 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "200"}
+  ];
+
+  // Recordings and other files attached to this call or to its parent call.
   repeated CallFile files = 24;
 
+  // Queue the call was processed in.
   Lookup queue = 25;
+
+  // Queue member associated with the call.
   Lookup member = 26;
+
+  // Team of the handling agent.
   Lookup team = 27;
+
+  // Agent who handled the queue attempt.
   Lookup agent = 28;
 
-  int64 joined_at = 29;
-  int64 leaving_at = 30;
-  int64 reporting_at = 31;
-  int64 queue_bridged_at = 32;
-  int32 queue_wait_sec = 33;
-  int32 queue_duration_sec = 34;
-  int32 reporting_sec = 35;
-  string result = 36;
-  repeated string tags = 37;
-  string display = 38;
-  int64 stored_at = 39;
-  string transfer_from = 40;
-  string transfer_to = 41;
-  bool has_children = 42;
-  string agent_description = 43;
+  // Time the call joined the queue (Unix epoch ms, UTC).
+  int64 joined_at = 29 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "1790676901000"}
+  ];
+
+  // Time the call left the queue (Unix epoch ms, UTC).
+  int64 leaving_at = 30 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "1790677020000"}
+  ];
+
+  // Time the agent finished post-call reporting/wrap-up (Unix epoch ms, UTC).
+  int64 reporting_at = 31 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "1790677050000"}
+  ];
+
+  // Time the call was bridged to the agent within the queue (Unix epoch ms, UTC).
+  int64 queue_bridged_at = 32 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "1790676905000"}
+  ];
+
+  // Time in queue before being bridged (or before leaving if never bridged), seconds.
+  int32 queue_wait_sec = 33 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "119"}
+  ];
+
+  // Total time spent in the queue (leaving - joined), seconds.
+  int32 queue_duration_sec = 34 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "30"}
+  ];
+
+  // Post-call reporting (wrap-up) time in seconds. 0 if no reporting occurred.
+  int32 reporting_sec = 35 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "30"}
+  ];
+
+  // Queue attempt result (disposition set by the system or the agent).
+  string result = 36 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"success\""}
+  ];
+
+  // Tags assigned to the call.
+  repeated string tags = 37 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "[\"vip\"]"}
+  ];
+
+  // Display label/number of the queue member for this attempt.
+  string display = 38 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"380501234567\""}
+  ];
+
+  // Time the record was persisted to history (Unix epoch ms, UTC).
+  int64 stored_at = 39 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "1790677030000"}
+  ];
+
+  // ID of the call this leg was transferred from. Empty if not a transfer.
+  string transfer_from = 40 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {format: "uuid" example: "\"7a1d2c44-9f30-4f0b-8c6e-1b2a3c4d5e6f\""}
+  ];
+
+  // ID of the call this leg was transferred to. For child legs without an explicit value, derived from the parent's bridged leg.
+  string transfer_to = 41 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {format: "uuid" example: "\"b3c4d5e6-1a2b-4c3d-8e9f-0a1b2c3d4e5f\""}
+  ];
+
+  // True if the call has child legs (Leg B) or blind-transfer legs.
+  bool has_children = 42 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "true"}
+  ];
+
+  // Agent's wrap-up note for the queue attempt (leading/trailing whitespace trimmed).
+  string agent_description = 43 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"Customer asked for a callback tomorrow\""}
+  ];
+
+  // Hold intervals of this call and its child legs, ordered by start time.
   repeated CallHold hold = 44;
+
+  // Operator annotations (notes on recording segments), newest first.
   repeated CallAnnotation annotations = 45;
+
+  // Answering machine detection result (classic AMD, falls back to AI AMD).
   string amd_result = 46;
-  string hangup_disposition = 47;
-  string blind_transfer = 48;
 
+    // Derived call outcome. One of: empty (child leg), `not_answered`, `cancelled`, `ended`, `agent_dropped`, `client_dropped`, `error`.
+  string hangup_disposition = 47 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"client_dropped\""}
+  ];
+
+  // Destination number of a blind transfer performed on this call. Empty if none.
+  string blind_transfer = 48 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"1002\""}
+  ];
+
+  // Background jobs (e.g. transcription, retention, upload) related to the call's files.
   repeated HistoryFileJob files_job = 49;
+
+  // Available transcripts of the call recording.
   repeated TranscriptLookup transcripts = 50;
-  int32 talk_sec = 51;
+
+  // Talk time in seconds: the time parties were connected, excluding ringing and hold.
+  int32 talk_sec = 51 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "115"}
+  ];
+
+  // Grantee (authorization subject) the call was placed on behalf of.
   Lookup grantee = 52;
-  string amd_ai_result = 53;
-  repeated string amd_ai_logs = 54;
 
-  int64 rate_id = 55;
+  // AI-based answering machine detection result.
+  string amd_ai_result = 53 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"human\""}
+  ];
+
+  // Diagnostic logs produced by the AI answering machine detection.
+  repeated string amd_ai_logs = 54 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "[\"greeting detected\"]"}
+  ];
+
+  // ID of the quality evaluation (audit rate) of this call. 0 if not evaluated.
+  int64 rate_id = 55 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "3021"}
+  ];
+
+  // User who was evaluated.
   Lookup rated_user = 56;
+
+  // User (supervisor/QA) who performed the evaluation.
   Lookup rated_by = 57;
-  float score_optional = 58;
-  float score_required = 59;
-  int64 attempt_id = 60;
-  bool allow_evaluation = 61;
-  google.protobuf.Value form_fields = 62;
-  string bridged_id = 63;
 
+  // Evaluation score of optional questions.
+  float score_optional = 58 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "85.5"}
+  ];
+
+  // Evaluation score of required (mandatory) questions.
+  float score_required = 59 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "92.0"}
+  ];
+
+  // ID of the queue attempt linked to this call.
+  int64 attempt_id = 60 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "550012"}
+  ];
+
+  // True if the call can currently be evaluated (answered queue call, or a bridged leg without transfers involving a user).
+  bool allow_evaluation = 61 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "true"}
+  ];
+
+  // Wrap-up form field values filled in by the agent (arbitrary JSON).
+  google.protobuf.Value form_fields = 62 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "{\"reason\": \"refund\", \"resolved\": true}"}
+  ];
+
+  // ID of the leg this call is bridged with.
+  string bridged_id = 63 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {format: "uuid" example: "\"c5d6e7f8-2b3c-4d4e-9f0a-1b2c3d4e5f60\""}
+  ];
+
+  // CRM contact linked to the call.
   Lookup contact = 64;
-  int64 member_id = 65;
+
+  // ID of the queue member associated with the call.
+  int64 member_id = 65 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "900123"}
+  ];
+
+  // Routing schemas (call flows/IVR) executed during the call.
   repeated Lookup schemas = 67;
+
+  // Phrase that triggered the hangup, if any.
   string hangup_phrase = 68;
+
+  // All blind transfers performed during the call, in chronological order.
   repeated BlindTransfer blind_transfers = 69;
-  string from_number = 70;
-  string to_number = 71;
 
-  string destination_name = 72;
+  // Caller number (A-number).
+  string from_number = 70 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"380501234567\""}
+  ];
 
+  // Callee number (B-number).
+  string to_number = 71 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"0800123456\""}
+  ];
+
+  // Human-readable name of the destination (e.g. DID or queue label).
+  string destination_name = 72 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"Support hotline\""}
+  ];
+
+  // Wrap-up form submitted by an agent for a queue attempt.
   message CallForm {
+
+      // Agent who submitted the form.
     Lookup agent = 1;
-    google.protobuf.Value form_fields = 2;
-    int64 reporting_at = 3;
+
+    // Form field values (arbitrary JSON).
+    google.protobuf.Value form_fields = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "{\"reason\": \"refund\"}"}
+    ];
+
+    // Time the form was submitted (Unix epoch ms, UTC).
+    int64 reporting_at = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "1790677050000"}
+    ];
   }
 
+  // Forms submitted across all queue attempts of the call (up to 20 entries).
   repeated CallForm forms = 73;
-  string conversation_id = 74;
-  string meeting_id = 75;
+
+  // ID of the chat conversation linked to the call (video meeting/chat).
+  string conversation_id = 74 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f60\""}
+  ];
+
+  // ID of the WebRTC meeting associated with the call.
+  string meeting_id = 75 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"meet-8f31c2\""}
+  ];
+
+  // Media quality (MOS, jitter, packet loss, RTT) statistics of the call.
   QualityMetrics quality_metrics = 76;
-  string user_agent = 77;
+
+  // User-Agent of the client/softphone that made or received the call.
+  string user_agent = 77 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"Webitel-Phone/1.4 (Chrome 129)\""}
+  ];
 }
 
 message EavesdropCallRequest {
