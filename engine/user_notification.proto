@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package engine;
+
+option go_package = "github.com/webitel/protos/engine";
+
+import "google/api/annotations.proto";
+import "const.proto";
+
+service UserNotificationService {
+  rpc SearchUserNotification(SearchUserNotificationRequest) returns (ListUserNotification) {
+    option (google.api.http) = {
+      get: "/user/notifications"
+    };
+  }
+
+  rpc CountUserNotification(CountUserNotificationRequest) returns (CountUserNotificationResponse) {
+    option (google.api.http) = {
+      get: "/user/notifications/count"
+    };
+  }
+
+  rpc MarkReadUserNotification(MarkReadUserNotificationRequest) returns (MarkReadUserNotificationResponse) {
+    option (google.api.http) = {
+      put: "/user/notifications/read"
+      body: "*"
+    };
+  }
+}
+
+message UserNotification {
+  int64 id = 1;
+  int64 created_at = 2;
+  string type = 3;
+  string message = 4;
+  int64 read_at = 5;
+}
+
+message SearchUserNotificationRequest {
+  int32 page = 1;
+  int32 size = 2;
+  string q = 3;
+  string sort = 4;
+  repeated string fields = 5;
+  FilterBetween created_at = 6;
+  optional bool read = 7;
+}
+
+message ListUserNotification {
+  bool next = 1;
+  repeated UserNotification items = 2;
+}
+
+message CountUserNotificationRequest {
+  string q = 1;
+  FilterBetween created_at = 2;
+  optional bool read = 3;
+}
+
+message CountUserNotificationResponse {
+  optional int64 count = 1;
+}
+
+message MarkReadUserNotificationRequest {
+  repeated int64 id = 1;
+  bool all = 2;
+}
+
+message MarkReadUserNotificationResponse {
+  optional int64 count = 1;
+}

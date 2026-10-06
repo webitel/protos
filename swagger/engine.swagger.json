@@ -131,6 +131,9 @@
       "name": "UserHelperService"
     },
     {
+      "name": "UserNotificationService"
+    },
+    {
       "name": "WebHookService"
     }
   ],
@@ -14928,7 +14931,8 @@
                 "block_all_member_numbers_from_list",
                 "login_options",
                 "default_members_filter",
-                "self_assigned_call_sound_notification"
+                "self_assigned_call_sound_notification",
+                "message_ttl"
               ]
             },
             "collectionFormat": "multi"
@@ -15603,6 +15607,168 @@
         ],
         "tags": [
           "UserHelperService"
+        ]
+      }
+    },
+    "/user/notifications": {
+      "get": {
+        "operationId": "SearchUserNotification",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.ListUserNotification"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "created_at.from",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "created_at.to",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "read",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "UserNotificationService"
+        ]
+      }
+    },
+    "/user/notifications/count": {
+      "get": {
+        "operationId": "CountUserNotification",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.CountUserNotificationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "created_at.from",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "created_at.to",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "read",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "UserNotificationService"
+        ]
+      }
+    },
+    "/user/notifications/read": {
+      "put": {
+        "operationId": "MarkReadUserNotification",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.MarkReadUserNotificationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engine.MarkReadUserNotificationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserNotificationService"
         ]
       }
     },
@@ -18508,6 +18674,15 @@
     },
     "engine.ConfirmPushResponse": {
       "type": "object"
+    },
+    "engine.CountUserNotificationResponse": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
     },
     "engine.CreateAgentPauseCauseRequest": {
       "type": "object",
@@ -21511,6 +21686,21 @@
         }
       }
     },
+    "engine.ListUserNotification": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "boolean"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/engine.UserNotification"
+          }
+        }
+      }
+    },
     "engine.ListUserStatus": {
       "type": "object",
       "properties": {
@@ -21570,6 +21760,30 @@
         },
         "name": {
           "type": "string"
+        }
+      }
+    },
+    "engine.MarkReadUserNotificationRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
+        "all": {
+          "type": "boolean"
+        }
+      }
+    },
+    "engine.MarkReadUserNotificationResponse": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -25089,7 +25303,8 @@
         "block_all_member_numbers_from_list",
         "login_options",
         "default_members_filter",
-        "self_assigned_call_sound_notification"
+        "self_assigned_call_sound_notification",
+        "message_ttl"
       ],
       "default": "empty_system_settings_name"
     },
@@ -25651,6 +25866,29 @@
         },
         "comment": {
           "type": "string"
+        }
+      }
+    },
+    "engine.UserNotification": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "type": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "read_at": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
