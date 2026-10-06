@@ -3516,6 +3516,13 @@
             "type": "boolean"
           },
           {
+            "name": "cursor.around",
+            "description": "Fetch a window centred on the cursor message in a single request,\nignoring `before`. The window holds `size` messages, newest first:\nthe cursor message with up to size - size/2 - 1 older ones, and up to\nsize/2 newer ones. When one side runs short the window is not refilled\nfrom the other. next_cursor / prev_cursor continue the history from the\nwindow's oldest / newest message.\n\nSupported by SearchThreadMessagesHistory only.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
             "name": "size",
             "description": "Maximum number of matches to return.",
             "in": "query",
@@ -4237,6 +4244,13 @@
             "type": "boolean"
           },
           {
+            "name": "cursor.around",
+            "description": "Fetch a window centred on the cursor message in a single request,\nignoring `before`. The window holds `size` messages, newest first:\nthe cursor message with up to size - size/2 - 1 older ones, and up to\nsize/2 newer ones. When one side runs short the window is not refilled\nfrom the other. next_cursor / prev_cursor continue the history from the\nwindow's oldest / newest message.\n\nSupported by SearchThreadMessagesHistory only.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
             "name": "size",
             "description": "Maximum number of messages to return.",
             "in": "query",
@@ -4318,6 +4332,12 @@
             "name": "member_id",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "reason",
+            "in": "query",
+            "required": false,
             "type": "string"
           }
         ],
@@ -4878,6 +4898,13 @@
           {
             "name": "cursor.before",
             "description": "Pagination direction flag.\n\nfalse -\u003e fetch messages older than the cursor (scrolling up the chat)\ntrue  -\u003e fetch messages newer than the cursor (moving toward the present)",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "cursor.around",
+            "description": "Fetch a window centred on the cursor message in a single request,\nignoring `before`. The window holds `size` messages, newest first:\nthe cursor message with up to size - size/2 - 1 older ones, and up to\nsize/2 newer ones. When one side runs short the window is not refilled\nfrom the other. next_cursor / prev_cursor continue the history from the\nwindow's oldest / newest message.\n\nSupported by SearchThreadMessagesHistory only.",
             "in": "query",
             "required": false,
             "type": "boolean"
@@ -5849,6 +5876,10 @@
         "before": {
           "type": "boolean",
           "description": "Pagination direction flag.\n\nfalse -\u003e fetch messages older than the cursor (scrolling up the chat)\ntrue  -\u003e fetch messages newer than the cursor (moving toward the present)"
+        },
+        "around": {
+          "type": "boolean",
+          "description": "Fetch a window centred on the cursor message in a single request,\nignoring `before`. The window holds `size` messages, newest first:\nthe cursor message with up to size - size/2 - 1 older ones, and up to\nsize/2 newer ones. When one side runs short the window is not refilled\nfrom the other. next_cursor / prev_cursor continue the history from the\nwindow's oldest / newest message.\n\nSupported by SearchThreadMessagesHistory only."
         }
       },
       "description": "HistoryMessageCursorRequest represents a cursor-based pagination request\nfor retrieving messages relative to a specific message ID.\n\nThis request is used in keyset pagination, where the `id` field acts as a\ncursor pointing to a reference message in the history. The server returns\nmessages either before or after this cursor depending on the `before` flag.\n\nPagination semantics:\n  - The `id` must be a valid UUID of an existing message.\n  - The result set is always ordered consistently (e.g., by creation time).\n  - The `before` flag controls the direction of traversal in the message history.\n\nDirection behavior — note the flag reads inverted, because it maps onto the\nkeyset direction over an id-descending order:\n  - before = false:\n      Fetch messages *older* than the given one, walking back into history.\n      This is the direction a chat uses when scrolling up.\n\n  - before = true:\n      Fetch messages *newer* than the given one, moving toward the present.\n      Returns nothing when the cursor is already the newest message.\n\nNotes:\n  - This approach avoids offset-based pagination issues such as skipping\n    or duplicating records when data changes.\n  - Typically used for chat/message history scrolling.\n  - The number of returned messages is controlled separately (e.g., via limit)."
