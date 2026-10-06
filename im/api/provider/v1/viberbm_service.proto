@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package webitel.im.api.provider.v1;
+
+import "google/api/annotations.proto";
+import "api/provider/v1/messages.proto";
+
+option go_package = "github.com/webitel/im-provider-service/gen/api/provider/v1;provider";
+
+// ViberBmService defines RPC methods for managing InfoBip Viber Business
+// Messages gateways. Distinct from the direct Viber Bot API.
+service ViberBmService {
+  rpc CreateViberBm(ProviderCreateViberBmGateRequest) returns (ProviderCreateViberBmGateResponse) {
+    option (google.api.http) = { post: "/im/gates/viber_bm", body: "*" };
+  }
+
+  rpc GetViberBm(ProviderGetViberBmGateRequest) returns (ProviderGetViberBmGateResponse) {
+    option (google.api.http) = { get: "/im/gates/viber_bm/{id}" };
+  }
+
+  rpc UpdateViberBm(ProviderUpdateViberBmGateRequest) returns (ProviderUpdateViberBmGateResponse) {
+    option (google.api.http) = { patch: "/im/gates/viber_bm/{id}", body: "*" };
+  }
+
+  rpc DeleteViberBm(ProviderDeleteViberBmGateRequest) returns (ProviderDeleteViberBmGateResponse) {
+    option (google.api.http) = { delete: "/im/gates/viber_bm/{id}" };
+  }
+
+  rpc ListViberBm(ProviderListViberBmGatesRequest) returns (ProviderListViberBmGatesResponse) {
+    option (google.api.http) = { get: "/im/gates/viber_bm" };
+  }
+
+  // SendViberBmTemplate sends an approved, business-initiated template message
+  // for cold-start outreach (no open 24h session).
+  rpc SendViberBmTemplate(SendViberBmTemplateRequest) returns (SendViberBmTemplateResponse) {
+    option (google.api.http) = { post: "/im/gates/viber_bm/{gate_id}/template", body: "*" };
+  }
+}
