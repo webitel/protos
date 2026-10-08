@@ -277,6 +277,23 @@ message HistoryMessage {
   // was never edited or deleted; otherwise GetMessageRevisions returns that
   // many entries.
   int32 revision_count = 26;
+
+  // Members the message could not be delivered to, with the provider's reason.
+  // Empty when it reached everyone; an entry is dropped once a later delivery succeeds.
+  repeated DeliveryFailure failures = 29;
+}
+
+// DeliveryFailure is one member a message could not be delivered to.
+message DeliveryFailure {
+  // Recipient contact id; resolved like sender_id.
+  string member_id = 1;
+  DeliveryError error = 2;
+}
+
+// DeliveryError is a provider's delivery failure, e.g. {code: "403", message: "bot was blocked by the user"}.
+message DeliveryError {
+  string code = 1;
+  string message = 2;
 }
 
 // What happened to a message at one point of its history.
