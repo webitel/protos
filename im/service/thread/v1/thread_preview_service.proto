@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package webitel.im.service.thread.v1;
+
+import "buf/validate/validate.proto";
+import "service/thread/v1/shared.proto";
+
+option go_package = "github.com/webitel/im-thread-service/gen/go/thread/v1;thread";
+
+// ThreadPreviewService grants a contact a time-limited, read-only look at a thread
+// (history, revisions, members, variables) without making them a member: no system
+// message, no member.joined, no delivery, no unread counters, no bot handover.
+// Trusted orchestrator calls only: the initiator's role in the thread is not checked,
+// it is stored for audit.
+service ThreadPreviewService {
+  // Grants (or, while active, extends) a preview. Fails if the contact is already an active member.
+  rpc GivePreview(GivePreviewRequest) returns (GivePreviewResponse);
+  // Revokes the contact's active preview (operator declined).
+  rpc RemoveFromPreview(RemoveFromPreviewRequest) returns (RemoveFromPreviewResponse);
+  // Atomically revokes the active preview and adds the contact as a full member with the
+  // given role, publishing the same events as AddMember. Fails if the preview is not active.
+  rpc UpgradePreviewToFullMember(UpgradePreviewToFullMemberRequest) returns (UpgradePreviewToFullMemberResponse);
+}
+
+message ThreadPreview {
+  string id = 1;
+  string thread_id = 2;
+  string contact_id = 3;
+  string initiator_contact_id = 4;
+  int32 domain_id = 5;
+  // Unix milliseconds.
+  int64 created_at = 6;
+  // Unix milliseconds; the preview stops granting access at this moment.
+  int64 expires_at = 7;
+}
+
+message GivePreviewRequest {
+  string thread_id = 1 [(buf.validate.field).string.uuid = true, (buf.validate.field).required = true];
+  string contact_id = 2 [(buf.validate.field).string.uuid = true, (buf.validate.field).required = true];
+  string initiator_contact_id = 3 [(buf.validate.field).string.uuid = true, (buf.validate.field).required = true];
+  int32 domain_id = 4 [(buf.validate.field).int32.gt = 0, (buf.validate.field).required = true];
+  // Preview lifetime from now, in milliseconds. Capped from above.
+  int64 duration_ms = 5 [(buf.validate.field).int64 = {gt: 0, lte: 3600000}];
+}
+
+message GivePreviewResponse {
+  ThreadPreview preview = 1;
+}
+
+message RemoveFromPreviewRequest {
+  string thread_id = 1 [(buf.validate.field).string.uuid = true, (buf.validate.field).required = true];
+  string contact_id = 2 [(buf.validate.field).string.uuid = true, (buf.validate.field).required = true];
+  // Who revoked it; optional, logged only.
+  optional string initiator_contact_id = 3 [(buf.validate.field).string.uuid = true];
+  int32 domain_id = 4 [(buf.validate.field).int32.gt = 0, (buf.validate.field).required = true];
+}
+
+message RemoveFromPreviewResponse {}
+
+message UpgradePreviewToFullMemberRequest {
+  string thread_id = 1 [(buf.validate.field).string.uuid = true, (buf.validate.field).required = true];
+  string contact_id = 2 [(buf.validate.field).string.uuid = true, (buf.validate.field).required = true];
+  string initiator_contact_id = 3 [(buf.validate.field).string.uuid = true, (buf.validate.field).required = true];
+  int32 domain_id = 4 [(buf.validate.field).int32.gt = 0, (buf.validate.field).required = true];
+  ThreadRole role = 5 [(buf.validate.field).enum.defined_only = true, (buf.validate.field).required = true];
+}
+
+message UpgradePreviewToFullMemberResponse {
+  ThreadMember member = 1;
+}

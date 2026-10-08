@@ -280,7 +280,9 @@ message GetThreadRequest {
   // List of fields to include in the response.
   repeated string fields = 3;
 
-  // Caller contact id; when set, the thread carries the caller's updates_cursor.
+  // Caller contact id; when set, the caller must be an active member of the thread
+  // or own an active preview of it (otherwise PermissionDenied), and the thread carries
+  // the caller's updates_cursor. Empty = trusted internal call.
   string caller_id = 4;
 }
 
@@ -575,10 +577,34 @@ message SearchVariablesRequest {
   int32 page = 2;
   repeated string fields = 3;
   repeated string thread_ids = 4;
+  // Caller contact id. When set, only variables of threads the caller may read
+  // (active member or active preview owner) are returned: thread_ids is narrowed
+  // to those, and empty thread_ids means "all threads readable by the caller".
+  // Empty = trusted internal call, no restriction.
+  string caller_id = 5 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+  // Domain to restrict results to; 0 = any.
+  int32 domain_id = 6 [
+    (buf.validate.field).int32.gt = 0,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
 }
 
 message LocateVariablesRequest {
   string thread_id = 1 [(buf.validate.field).string.uuid = true];
+  // Caller contact id. When set, the caller must be an active member or active
+  // preview owner, otherwise PermissionDenied. Empty = trusted internal call, no restriction.
+  string caller_id = 2 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+  // Domain to restrict results to; 0 = any.
+  int32 domain_id = 3 [
+    (buf.validate.field).int32.gt = 0,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
 }
 
 message FlushVariablesRequest {
