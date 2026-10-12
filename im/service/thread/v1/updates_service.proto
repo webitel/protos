@@ -76,21 +76,9 @@ message ThreadUpdates {
   // Every member referenced in this entry, once.
   repeated ThreadMember members = 12;
 
-  // Messages that failed to reach a member since the cursor.
-  repeated MessageFailure failures = 13;
-}
-
-// MessageFailure is a message that could not be delivered to a member.
-message MessageFailure {
-  string message_id = 1;
-  // Recipient contact id; resolved through members.
-  string member_id = 2;
-  MessageFailureError error = 3;
-}
-
-message MessageFailureError {
-  string code = 1;
-  string message = 2;
+  // Delivery failures ride on UpdatedMessage.failures.
+  reserved 13;
+  reserved "failures";
 }
 
 
@@ -115,6 +103,8 @@ message UpdatedMessage {
   System system = 16;
   repeated MessageReaction reactions = 17;
   bool internal = 18;
+  // Members the message could not be delivered to; failure member ids resolve through members.
+  repeated DeliveryFailure failures = 19;
 }
 
 message ThreadMemberChange {

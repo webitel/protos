@@ -373,6 +373,22 @@ message HistoryMessage {
 
   // Emoji reactions currently held on the message, aggregated per emoji.
   repeated MessageReaction reactions = 25;
+
+  // Members the message could not be delivered to, with the provider's reason.
+  // Empty when it reached everyone; an entry is dropped once a later delivery succeeds.
+  repeated DeliveryFailure failures = 27;
+}
+
+// DeliveryFailure is one member a message could not be delivered to.
+message DeliveryFailure {
+  ThreadMember member = 1;
+  DeliveryError error = 2;
+}
+
+// DeliveryError is a provider's delivery failure, e.g. {code: "403", message: "bot was blocked by the user"}.
+message DeliveryError {
+  string code = 1;
+  string message = 2;
 }
 
 // MessageReaction is one emoji aggregate on a history message.
