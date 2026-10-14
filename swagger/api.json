@@ -38628,6 +38628,52 @@
         }
       }
     },
+    "/storage/file_policies/allowed": {
+      "get": {
+        "tags": [
+          "FilePoliciesService"
+        ],
+        "summary": "Allowed upload MIME types per channel for the caller's domain, as the HTTP\nupload route applies them. Needs a session only: no files_policy scope.",
+        "operationId": "SearchAllowedUploadTypes",
+        "parameters": [
+          {
+            "type": "array",
+            "items": {
+              "enum": [
+                "UnknownChannel",
+                "ChatChannel",
+                "MailChannel",
+                "CallChannel",
+                "LogChannel",
+                "MediaChannel",
+                "KnowledgebaseChannel",
+                "CasesChannel",
+                "ScreenRecordingChannel"
+              ],
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Channels to return. Empty: every channel.\n\n - ScreenRecordingChannel: ScreenshotChannel = 8; // deprecated",
+            "name": "channel",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storage.ListAllowedUploadTypes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/storage/file_policies/{from_id}/to/{to_id}": {
       "patch": {
         "tags": [
@@ -65593,6 +65639,25 @@
         }
       }
     },
+    "storage.AllowedUploadTypes": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "$ref": "#/definitions/storage.UploadFileChannel"
+        },
+        "mime_types": {
+          "description": "Glob patterns (* and ?) of the enabled policies covering the channel, as\nstored, in match order, without duplicates. Not every pattern fits an HTML\naccept attribute, and one can match every type without being * or */*.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unrestricted": {
+          "description": "The type check passes any MIME type on this channel: no enabled policy\nwith MIME types covers it, or one of the patterns below is * or */*.\nIgnore mime_types when true. What follows a type match still applies: the\nsize limit and, on MediaChannel, the check of the content against the\ndeclared type.",
+          "type": "boolean"
+        }
+      }
+    },
     "storage.BackendProfile": {
       "type": "object",
       "properties": {
@@ -66001,6 +66066,11 @@
     "storage.CustomFileProperties": {
       "type": "object",
       "properties": {
+        "duration": {
+          "type": "string",
+          "format": "int64",
+          "title": "milliseconds, video/audio only"
+        },
         "end_time": {
           "type": "string",
           "format": "int64",
@@ -66426,9 +66496,15 @@
         "name": {
           "type": "string"
         },
+        "properties": {
+          "$ref": "#/definitions/storage.CustomFileProperties"
+        },
         "size": {
           "type": "string",
           "format": "int64"
+        },
+        "thumbnail": {
+          "$ref": "#/definitions/storage.Thumbnail"
         },
         "uuid": {
           "type": "string"
@@ -66512,6 +66588,18 @@
         },
         "source": {
           "$ref": "#/definitions/engine.Lookup"
+        }
+      }
+    },
+    "storage.ListAllowedUploadTypes": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/storage.AllowedUploadTypes"
+          }
         }
       }
     },
