@@ -67,6 +67,14 @@ service FilePoliciesService {
       body: "*"
     };
   }
+
+  // Allowed upload MIME types per channel for the caller's domain, as the HTTP
+  // upload route applies them. Needs a session only: no files_policy scope.
+  rpc SearchAllowedUploadTypes(SearchAllowedUploadTypesRequest) returns (ListAllowedUploadTypes) {
+    option (google.api.http) = {
+      get: "/storage/file_policies/allowed"
+    };
+  }
 }
 
 message FilePolicyApplyRequest {
@@ -170,4 +178,27 @@ message MovePositionFilePolicyRequest {
 
 message MovePositionFilePolicyResponse {
   bool success = 1;
+}
+
+message SearchAllowedUploadTypesRequest {
+  // Channels to return. Empty: every channel.
+  repeated UploadFileChannel channel = 1;
+}
+
+message ListAllowedUploadTypes {
+  repeated AllowedUploadTypes items = 1;
+}
+
+message AllowedUploadTypes {
+  UploadFileChannel channel = 1;
+  // The type check passes any MIME type on this channel: no enabled policy
+  // with MIME types covers it, or one of the patterns below is * or */*.
+  // Ignore mime_types when true. What follows a type match still applies: the
+  // size limit and, on MediaChannel, the check of the content against the
+  // declared type.
+  bool unrestricted = 2;
+  // Glob patterns (* and ?) of the enabled policies covering the channel, as
+  // stored, in match order, without duplicates. Not every pattern fits an HTML
+  // accept attribute, and one can match every type without being * or */*.
+  repeated string mime_types = 3;
 }
