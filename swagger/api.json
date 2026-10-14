@@ -3774,6 +3774,46 @@
         }
       }
     },
+    "/call_center/list/{list_id}/communication/bulk": {
+      "post": {
+        "tags": [
+          "ListService"
+        ],
+        "summary": "Bulk create ListCommunication",
+        "operationId": "CreateListCommunicationBulk",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "list_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engine.ListService.CreateListCommunicationBulkBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.ListCommunicationBulkResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/call_center/list/{list_id}/communication/{id}": {
       "get": {
         "tags": [
@@ -57912,6 +57952,21 @@
         }
       }
     },
+    "engine.CreateListCommunicationBulkItem": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "expire_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "number": {
+          "type": "string"
+        }
+      }
+    },
     "engine.CreateListRequest": {
       "type": "object",
       "properties": {
@@ -59827,6 +59882,40 @@
         }
       }
     },
+    "engine.ListCommunicationBulkError": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "$ref": "#/definitions/google.rpc.Status"
+        },
+        "index": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "item": {
+          "$ref": "#/definitions/engine.ListCommunication"
+        }
+      }
+    },
+    "engine.ListCommunicationBulkResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/engine.ListCommunication"
+          }
+        },
+        "failures": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/engine.ListCommunicationBulkError"
+          }
+        }
+      }
+    },
     "engine.ListCommunicationType": {
       "type": "object",
       "properties": {
@@ -60271,6 +60360,18 @@
         },
         "number": {
           "type": "string"
+        }
+      }
+    },
+    "engine.ListService.CreateListCommunicationBulkBody": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/engine.CreateListCommunicationBulkItem"
+          }
         }
       }
     },
