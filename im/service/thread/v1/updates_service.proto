@@ -46,6 +46,17 @@ message GetUpdatesResponse {
   repeated ThreadUpdates threads = 3;
 }
 
+// DeletedMessage is a message deleted since cursor.
+message DeletedMessage {
+  string id = 1;
+
+  // Unix time in milliseconds when the message was deleted.
+  int64 deleted_at = 2;
+
+  // Membership that deleted the message; carries contact_id for the caller to resolve.
+  ThreadMember deleted_by = 3;
+}
+
 message ThreadUpdates {
   string thread_id = 1;
 
@@ -67,6 +78,7 @@ message ThreadUpdates {
   // New or changed messages in their current state; upsert by id.
   repeated UpdatedMessage messages = 7;
 
+  // Ids of deleted_messages, kept for older clients; prefer deleted_messages.
   repeated string deleted_message_ids = 8;
 
   repeated ThreadMemberChange member_changes = 9;
@@ -79,6 +91,9 @@ message ThreadUpdates {
   // Delivery failures ride on UpdatedMessage.failures.
   reserved 13;
   reserved "failures";
+
+  // Messages deleted since cursor, with when and who deleted them.
+  repeated DeletedMessage deleted_messages = 14;
 }
 
 
