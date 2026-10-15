@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package webitel.im.api.gateway.v1;
+
+import "google/api/annotations.proto";
+import "buf/validate/validate.proto";
+import "api/gateway/v1/contact.proto";
+import "api/gateway/v1/peer.proto";
+import "api/gateway/v1/thread_member.proto";
+
+// ThreadPreviewService grants a contact a time-limited, read-only look at a thread
+// without making them a member. Trusted inter-service callers only.
+// The initiator is derived from the caller's identity and is never taken from the request.
+service ThreadPreviewService {
+  // GivePreview grants (or, while active, extends) a preview.
+  rpc GivePreview(GivePreviewRequest) returns (GivePreviewResponse) {
+    option (google.api.http) = {
+      post: "/v1/threads/{thread_id}/preview"
+      body: "*"
+    };
+  };
+  // RemoveFromPreview revokes the contact's active preview.
+  rpc RemoveFromPreview(RemoveFromPreviewRequest) returns (RemoveFromPreviewResponse) {
+    option (google.api.http) = {
+      post: "/v1/threads/{thread_id}/preview/remove"
+      body: "*"
+    };
+  };
+  // UpgradePreviewToFullMember atomically revokes the active preview and adds the contact as a full member.
+  rpc UpgradePreviewToFullMember(UpgradePreviewToFullMemberRequest) returns (UpgradePreviewToFullMemberResponse) {
+    option (google.api.http) = {
+      post: "/v1/threads/{thread_id}/preview/upgrade"
+      body: "*"
+    };
+  };
+}
+
+message ThreadPreview {
+  string id = 1;
+  string thread_id = 2;
+  Contact contact = 3;
+  Contact initiator = 4;
+  // Unix milliseconds.
+  int64 created_at = 5;
+  // Unix milliseconds; the preview stops granting access at this moment.
+  int64 expires_at = 6;
+}
+
+message GivePreviewRequest {
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+  // The contact receiving the preview.
+  PeerIdentity contact = 2 [(buf.validate.field).required = true];
+  // Preview lifetime from now, in milliseconds.
+  int64 duration_ms = 3 [(buf.validate.field).int64 = {gt: 0, lte: 3600000}];
+}
+
+message GivePreviewResponse {
+  ThreadPreview preview = 1;
+}
+
+message RemoveFromPreviewRequest {
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+  // The contact whose preview is revoked.
+  PeerIdentity contact = 2 [(buf.validate.field).required = true];
+}
+
+message RemoveFromPreviewResponse {}
+
+message UpgradePreviewToFullMemberRequest {
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+  // The contact to upgrade to a full member.
+  PeerIdentity contact = 2 [(buf.validate.field).required = true];
+  ThreadRole role = 3 [
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).required = true
+  ];
+}
+
+message UpgradePreviewToFullMemberResponse {
+  ThreadMember member = 1;
+}

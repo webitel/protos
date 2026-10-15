@@ -3572,6 +3572,46 @@
         ]
       }
     },
+    "/call_center/list/{list_id}/communication/bulk": {
+      "post": {
+        "summary": "Bulk create ListCommunication",
+        "operationId": "CreateListCommunicationBulk",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.ListCommunicationBulkResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "list_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engine.ListService.CreateListCommunicationBulkBody"
+            }
+          }
+        ],
+        "tags": [
+          "ListService"
+        ]
+      }
+    },
     "/call_center/list/{list_id}/communication/{id}": {
       "get": {
         "summary": "List item",
@@ -5444,6 +5484,45 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/engine.MemberService.AttemptsRenewalResultBody"
+            }
+          }
+        ],
+        "tags": [
+          "MemberService"
+        ]
+      }
+    },
+    "/call_center/queues/attempts/{attempt_id}/transfer": {
+      "patch": {
+        "operationId": "TransferAttempt",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.TransferAttemptResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "attempt_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engine.MemberService.TransferAttemptBody"
             }
           }
         ],
@@ -19053,6 +19132,21 @@
         }
       }
     },
+    "engine.CreateListCommunicationBulkItem": {
+      "type": "object",
+      "properties": {
+        "number": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "expire_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "engine.CreateListRequest": {
       "type": "object",
       "properties": {
@@ -20968,6 +21062,40 @@
         }
       }
     },
+    "engine.ListCommunicationBulkError": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "item": {
+          "$ref": "#/definitions/engine.ListCommunication"
+        },
+        "error": {
+          "$ref": "#/definitions/google.rpc.Status"
+        }
+      }
+    },
+    "engine.ListCommunicationBulkResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/engine.ListCommunication"
+          }
+        },
+        "failures": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/engine.ListCommunicationBulkError"
+          }
+        }
+      }
+    },
     "engine.ListCommunicationType": {
       "type": "object",
       "properties": {
@@ -21412,6 +21540,18 @@
         "expire_at": {
           "type": "string",
           "format": "int64"
+        }
+      }
+    },
+    "engine.ListService.CreateListCommunicationBulkBody": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/engine.CreateListCommunicationBulkItem"
+          }
         }
       }
     },
@@ -22341,6 +22481,20 @@
         },
         "q": {
           "type": "string"
+        }
+      }
+    },
+    "engine.MemberService.TransferAttemptBody": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "type": "string",
+          "format": "int64",
+          "description": "Exactly one of agent_id or queue_id must be set."
+        },
+        "queue_id": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -25495,6 +25649,9 @@
           "$ref": "#/definitions/engine.Lookup"
         }
       }
+    },
+    "engine.TransferAttemptResponse": {
+      "type": "object"
     },
     "engine.Trigger": {
       "type": "object",

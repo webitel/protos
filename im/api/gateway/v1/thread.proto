@@ -254,6 +254,10 @@ message ThreadSearchRequest {
   // Filter threads by participants identified by their (iss, sub) identity.
   // Resolved to contacts inside the thread service, so no contact UUID is required.
   repeated PeerIdentity participants = 10;
+
+  // Return only threads where the caller has at least one unread message.
+  // Ignored when false.
+  bool unread = 11;
 }
 
 // GetThreadRequest defines parameters for retrieving a single thread by ID.
@@ -417,6 +421,10 @@ message TransferRequest {
     (buf.validate.field).enum.defined_only = true,
     (buf.validate.field).required = true
   ];
+
+  // Member the thread is transferred from. Honored only for trusted service
+  // callers (schema/engine); user calls always transfer from the caller.
+  optional PeerIdentity initiator = 4;
 }
 
 message TransferResponse {

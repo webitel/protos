@@ -3774,6 +3774,46 @@
         }
       }
     },
+    "/call_center/list/{list_id}/communication/bulk": {
+      "post": {
+        "tags": [
+          "ListService"
+        ],
+        "summary": "Bulk create ListCommunication",
+        "operationId": "CreateListCommunicationBulk",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "list_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engine.ListService.CreateListCommunicationBulkBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.ListCommunicationBulkResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/call_center/list/{list_id}/communication/{id}": {
       "get": {
         "tags": [
@@ -5523,6 +5563,45 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/engine.AttemptRenewalResultResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/call_center/queues/attempts/{attempt_id}/transfer": {
+      "patch": {
+        "tags": [
+          "MemberService"
+        ],
+        "operationId": "TransferAttempt",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "attempt_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/engine.MemberService.TransferAttemptBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/engine.TransferAttemptResponse"
             }
           },
           "default": {
@@ -17775,6 +17854,16 @@
             "description": "Includes the history of ONLY those dialogs\nwhose member channel(s) contain\na specified set of variables.",
             "name": "group[string]",
             "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Sort the result: \"date\" | \"+date\" (OLDest..to..NEWest), \"-date\" (default, NEWest..to..OLDest)",
+            "name": "sort",
+            "in": "query"
           }
         ],
         "responses": {
@@ -17964,6 +18053,16 @@
             "type": "string",
             "description": "Includes the history of ONLY those dialogs\nwhose member channel(s) contain\na specified set of variables.",
             "name": "group[string][string]",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Sort the result: \"date\" | \"+date\" (OLDest..to..NEWest), \"-date\" (default, NEWest..to..OLDest)",
+            "name": "sort",
             "in": "query"
           }
         ],
@@ -38569,6 +38668,52 @@
         }
       }
     },
+    "/storage/file_policies/allowed": {
+      "get": {
+        "tags": [
+          "FilePoliciesService"
+        ],
+        "summary": "Allowed upload MIME types per channel for the caller's domain, as the HTTP\nupload route applies them. Needs a session only: no files_policy scope.",
+        "operationId": "SearchAllowedUploadTypes",
+        "parameters": [
+          {
+            "type": "array",
+            "items": {
+              "enum": [
+                "UnknownChannel",
+                "ChatChannel",
+                "MailChannel",
+                "CallChannel",
+                "LogChannel",
+                "MediaChannel",
+                "KnowledgebaseChannel",
+                "CasesChannel",
+                "ScreenRecordingChannel"
+              ],
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Channels to return. Empty: every channel.\n\n - ScreenRecordingChannel: ScreenshotChannel = 8; // deprecated",
+            "name": "channel",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storage.ListAllowedUploadTypes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/storage/file_policies/{from_id}/to/{to_id}": {
       "patch": {
         "tags": [
@@ -44945,6 +45090,12 @@
             "description": "Filter threads by participant contact IDs.",
             "name": "contact_ids",
             "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Return only threads where the caller has at least one unread message.\nIgnored when false.",
+            "name": "unread",
+            "in": "query"
           }
         ],
         "responses": {
@@ -45482,6 +45633,123 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/webitel.im.api.gateway.v1.UpdateThreadPermissionsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/threads/{thread_id}/preview": {
+      "post": {
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadPreviewService"
+        ],
+        "summary": "GivePreview grants (or, while active, extends) a preview.",
+        "operationId": "ThreadPreviewService_GivePreview",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "thread_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadPreviewService.GivePreviewBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.GivePreviewResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/threads/{thread_id}/preview/remove": {
+      "post": {
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadPreviewService"
+        ],
+        "summary": "RemoveFromPreview revokes the contact's active preview.",
+        "operationId": "ThreadPreviewService_RemoveFromPreview",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "thread_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadPreviewService.RemoveFromPreviewBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.RemoveFromPreviewResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/threads/{thread_id}/preview/upgrade": {
+      "post": {
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadPreviewService"
+        ],
+        "summary": "UpgradePreviewToFullMember atomically revokes the active preview and adds the contact as a full member.",
+        "operationId": "ThreadPreviewService_UpgradePreviewToFullMember",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "thread_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadPreviewService.UpgradePreviewToFullMemberBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.UpgradePreviewToFullMemberResponse"
             }
           },
           "default": {
@@ -57807,6 +58075,21 @@
         }
       }
     },
+    "engine.CreateListCommunicationBulkItem": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "expire_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "number": {
+          "type": "string"
+        }
+      }
+    },
     "engine.CreateListRequest": {
       "type": "object",
       "properties": {
@@ -59722,6 +60005,40 @@
         }
       }
     },
+    "engine.ListCommunicationBulkError": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "$ref": "#/definitions/google.rpc.Status"
+        },
+        "index": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "item": {
+          "$ref": "#/definitions/engine.ListCommunication"
+        }
+      }
+    },
+    "engine.ListCommunicationBulkResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/engine.ListCommunication"
+          }
+        },
+        "failures": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/engine.ListCommunicationBulkError"
+          }
+        }
+      }
+    },
     "engine.ListCommunicationType": {
       "type": "object",
       "properties": {
@@ -60166,6 +60483,18 @@
         },
         "number": {
           "type": "string"
+        }
+      }
+    },
+    "engine.ListService.CreateListCommunicationBulkBody": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/engine.CreateListCommunicationBulkItem"
+          }
         }
       }
     },
@@ -61095,6 +61424,20 @@
           "additionalProperties": {
             "type": "string"
           }
+        }
+      }
+    },
+    "engine.MemberService.TransferAttemptBody": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "description": "Exactly one of agent_id or queue_id must be set.",
+          "type": "string",
+          "format": "int64"
+        },
+        "queue_id": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -64247,6 +64590,9 @@
         }
       }
     },
+    "engine.TransferAttemptResponse": {
+      "type": "object"
+    },
     "engine.Trigger": {
       "type": "object",
       "properties": {
@@ -65517,6 +65863,25 @@
         }
       }
     },
+    "storage.AllowedUploadTypes": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "$ref": "#/definitions/storage.UploadFileChannel"
+        },
+        "mime_types": {
+          "description": "Glob patterns (* and ?) of the enabled policies covering the channel, as\nstored, in match order, without duplicates. Not every pattern fits an HTML\naccept attribute, and one can match every type without being * or */*.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unrestricted": {
+          "description": "The type check passes any MIME type on this channel: no enabled policy\nwith MIME types covers it, or one of the patterns below is * or */*.\nIgnore mime_types when true. What follows a type match still applies: the\nsize limit and, on MediaChannel, the check of the content against the\ndeclared type.",
+          "type": "boolean"
+        }
+      }
+    },
     "storage.BackendProfile": {
       "type": "object",
       "properties": {
@@ -65925,6 +66290,11 @@
     "storage.CustomFileProperties": {
       "type": "object",
       "properties": {
+        "duration": {
+          "type": "string",
+          "format": "int64",
+          "title": "milliseconds, video/audio only"
+        },
         "end_time": {
           "type": "string",
           "format": "int64",
@@ -66350,9 +66720,15 @@
         "name": {
           "type": "string"
         },
+        "properties": {
+          "$ref": "#/definitions/storage.CustomFileProperties"
+        },
         "size": {
           "type": "string",
           "format": "int64"
+        },
+        "thumbnail": {
+          "$ref": "#/definitions/storage.Thumbnail"
         },
         "uuid": {
           "type": "string"
@@ -66436,6 +66812,18 @@
         },
         "source": {
           "$ref": "#/definitions/engine.Lookup"
+        }
+      }
+    },
+    "storage.ListAllowedUploadTypes": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/storage.AllowedUploadTypes"
+          }
         }
       }
     },
@@ -72104,6 +72492,30 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.DeliveryError": {
+      "description": "DeliveryError is a provider's delivery failure, e.g. {code: \"403\", message: \"bot was blocked by the user\"}.",
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.DeliveryFailure": {
+      "description": "DeliveryFailure is one member a message could not be delivered to.",
+      "type": "object",
+      "properties": {
+        "error": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.DeliveryError"
+        },
+        "member": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadMember"
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.Device": {
       "type": "object",
       "title": "Device (Client) endpoint. [FROM]",
@@ -72413,6 +72825,14 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.GivePreviewResponse": {
+      "type": "object",
+      "properties": {
+        "preview": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadPreview"
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.HandBackToBotResponse": {
       "type": "object"
     },
@@ -72457,6 +72877,14 @@
           "description": "Message last update timestamp (Unix time, milliseconds).",
           "type": "string",
           "format": "int64"
+        },
+        "failures": {
+          "description": "Members the message could not be delivered to, with the provider's reason.\nEmpty when it reached everyone; an entry is dropped once a later delivery succeeds.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.DeliveryFailure"
+          }
         },
         "forward_origin": {
           "description": "Set when this message is a forward. Never populated for a deleted\nmessage: the tombstone must not leak the origin name.",
@@ -73039,32 +73467,6 @@
         }
       }
     },
-    "webitel.im.api.gateway.v1.MessageFailure": {
-      "description": "MessageFailure is a message that could not be delivered to a member.",
-      "type": "object",
-      "properties": {
-        "error": {
-          "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageFailureError"
-        },
-        "member": {
-          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadMember"
-        },
-        "message_id": {
-          "type": "string"
-        }
-      }
-    },
-    "webitel.im.api.gateway.v1.MessageFailureError": {
-      "type": "object",
-      "properties": {
-        "code": {
-          "type": "string"
-        },
-        "message": {
-          "type": "string"
-        }
-      }
-    },
     "webitel.im.api.gateway.v1.MessageLocation": {
       "type": "object",
       "properties": {
@@ -73222,6 +73624,9 @@
     "webitel.im.api.gateway.v1.RegisterDeviceResponse": {
       "type": "object",
       "title": "No Reply ; Error status if failed"
+    },
+    "webitel.im.api.gateway.v1.RemoveFromPreviewResponse": {
+      "type": "object"
     },
     "webitel.im.api.gateway.v1.RemoveMemberResponse": {
       "type": "object"
@@ -73839,6 +74244,10 @@
         "contact": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.PeerIdentity"
         },
+        "initiator": {
+          "description": "Member the thread is transferred from. Honored only for trusted service\ncallers (schema/engine); user calls always transfer from the caller.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.PeerIdentity"
+        },
         "role": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadRole"
         }
@@ -73942,6 +74351,68 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.ThreadPreview": {
+      "type": "object",
+      "properties": {
+        "contact": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Contact"
+        },
+        "created_at": {
+          "description": "Unix milliseconds.",
+          "type": "string",
+          "format": "int64"
+        },
+        "expires_at": {
+          "description": "Unix milliseconds; the preview stops granting access at this moment.",
+          "type": "string",
+          "format": "int64"
+        },
+        "id": {
+          "type": "string"
+        },
+        "initiator": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Contact"
+        },
+        "thread_id": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.ThreadPreviewService.GivePreviewBody": {
+      "type": "object",
+      "properties": {
+        "contact": {
+          "description": "The contact receiving the preview.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.PeerIdentity"
+        },
+        "duration_ms": {
+          "description": "Preview lifetime from now, in milliseconds.",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.ThreadPreviewService.RemoveFromPreviewBody": {
+      "type": "object",
+      "properties": {
+        "contact": {
+          "description": "The contact whose preview is revoked.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.PeerIdentity"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.ThreadPreviewService.UpgradePreviewToFullMemberBody": {
+      "type": "object",
+      "properties": {
+        "contact": {
+          "description": "The contact to upgrade to a full member.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.PeerIdentity"
+        },
+        "role": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadRole"
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.ThreadRole": {
       "type": "string",
       "default": "ROLE_UNSPECIFIED",
@@ -74002,14 +74473,6 @@
         "dialog": {
           "description": "The thread itself, set when it is new to the caller (created or joined since cursor).\nSame model as the thread list, except last_msg and updates_cursor are never set here.",
           "$ref": "#/definitions/webitel.im.api.gateway.v1.Thread"
-        },
-        "failures": {
-          "description": "Messages that failed to reach a member since the cursor.",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageFailure"
-          }
         },
         "left": {
           "description": "The caller is no longer a member: drop the thread.",
@@ -74159,6 +74622,14 @@
           "type": "string",
           "format": "int64"
         },
+        "failures": {
+          "description": "Members the message could not be delivered to, with the provider's reason.\nEmpty when it reached everyone.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.DeliveryFailure"
+          }
+        },
         "forward_origin": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardOrigin"
         },
@@ -74204,6 +74675,14 @@
         "type": {
           "type": "integer",
           "format": "int32"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.UpgradePreviewToFullMemberResponse": {
+      "type": "object",
+      "properties": {
+        "member": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadMember"
         }
       }
     },
@@ -80599,6 +81078,10 @@
       "name": "webitel.im.api.gateway.v1.ThreadManagement"
     },
     {
+      "description": "ThreadPreviewService grants a contact a time-limited, read-only look at a thread\nwithout making them a member. Trusted inter-service callers only.\nThe initiator is derived from the caller's identity and is never taken from the request.",
+      "name": "webitel.im.api.gateway.v1.ThreadPreviewService"
+    },
+    {
       "description": "ThreadTagManagement defines the gRPC service for managing tags on threads.",
       "name": "webitel.im.api.gateway.v1.ThreadTagManagement"
     },
@@ -80719,6 +81202,10 @@
     {
       "description": "MessageStatus is an internal service-to-service API for reporting\nper-recipient message delivery confirmations. Called by im-delivery\n(stream ACKs, pushes) and im-providers (provider webhooks receipts).\n\nAll RPCs accept batches and are idempotent: status transitions are\nmonotonic (SENT -\u003e DELIVERED -\u003e READ; FAILED only from SENT, and may be\nsuperseded by a later DELIVERED), so duplicate and out-of-order receipts\nare safely ignored.",
       "name": "webitel.im.service.thread.v1.MessageStatus"
+    },
+    {
+      "description": "ThreadPreviewService grants a contact a time-limited, read-only look at a thread\n(history, revisions, members, variables) without making them a member: no system\nmessage, no member.joined, no delivery, no unread counters, no bot handover.\nTrusted orchestrator calls only: the initiator's role in the thread is not checked,\nit is stored for audit.",
+      "name": "webitel.im.service.thread.v1.ThreadPreviewService"
     },
     {
       "name": "webitel.im.service.thread.v1.ThreadTagManagement"
