@@ -45090,6 +45090,12 @@
             "description": "Filter threads by participant contact IDs.",
             "name": "contact_ids",
             "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Return only threads where the caller has at least one unread message.\nIgnored when false.",
+            "name": "unread",
+            "in": "query"
           }
         ],
         "responses": {
@@ -45627,6 +45633,123 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/webitel.im.api.gateway.v1.UpdateThreadPermissionsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/threads/{thread_id}/preview": {
+      "post": {
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadPreviewService"
+        ],
+        "summary": "GivePreview grants (or, while active, extends) a preview.",
+        "operationId": "ThreadPreviewService_GivePreview",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "thread_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadPreviewService.GivePreviewBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.GivePreviewResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/threads/{thread_id}/preview/remove": {
+      "post": {
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadPreviewService"
+        ],
+        "summary": "RemoveFromPreview revokes the contact's active preview.",
+        "operationId": "ThreadPreviewService_RemoveFromPreview",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "thread_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadPreviewService.RemoveFromPreviewBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.RemoveFromPreviewResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/threads/{thread_id}/preview/upgrade": {
+      "post": {
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadPreviewService"
+        ],
+        "summary": "UpgradePreviewToFullMember atomically revokes the active preview and adds the contact as a full member.",
+        "operationId": "ThreadPreviewService_UpgradePreviewToFullMember",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "thread_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadPreviewService.UpgradePreviewToFullMemberBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.UpgradePreviewToFullMemberResponse"
             }
           },
           "default": {
@@ -72369,6 +72492,30 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.DeliveryError": {
+      "description": "DeliveryError is a provider's delivery failure, e.g. {code: \"403\", message: \"bot was blocked by the user\"}.",
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.DeliveryFailure": {
+      "description": "DeliveryFailure is one member a message could not be delivered to.",
+      "type": "object",
+      "properties": {
+        "error": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.DeliveryError"
+        },
+        "member": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadMember"
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.Device": {
       "type": "object",
       "title": "Device (Client) endpoint. [FROM]",
@@ -72678,6 +72825,14 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.GivePreviewResponse": {
+      "type": "object",
+      "properties": {
+        "preview": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadPreview"
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.HandBackToBotResponse": {
       "type": "object"
     },
@@ -72722,6 +72877,14 @@
           "description": "Message last update timestamp (Unix time, milliseconds).",
           "type": "string",
           "format": "int64"
+        },
+        "failures": {
+          "description": "Members the message could not be delivered to, with the provider's reason.\nEmpty when it reached everyone; an entry is dropped once a later delivery succeeds.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.DeliveryFailure"
+          }
         },
         "forward_origin": {
           "description": "Set when this message is a forward. Never populated for a deleted\nmessage: the tombstone must not leak the origin name.",
@@ -73304,32 +73467,6 @@
         }
       }
     },
-    "webitel.im.api.gateway.v1.MessageFailure": {
-      "description": "MessageFailure is a message that could not be delivered to a member.",
-      "type": "object",
-      "properties": {
-        "error": {
-          "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageFailureError"
-        },
-        "member": {
-          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadMember"
-        },
-        "message_id": {
-          "type": "string"
-        }
-      }
-    },
-    "webitel.im.api.gateway.v1.MessageFailureError": {
-      "type": "object",
-      "properties": {
-        "code": {
-          "type": "string"
-        },
-        "message": {
-          "type": "string"
-        }
-      }
-    },
     "webitel.im.api.gateway.v1.MessageLocation": {
       "type": "object",
       "properties": {
@@ -73487,6 +73624,9 @@
     "webitel.im.api.gateway.v1.RegisterDeviceResponse": {
       "type": "object",
       "title": "No Reply ; Error status if failed"
+    },
+    "webitel.im.api.gateway.v1.RemoveFromPreviewResponse": {
+      "type": "object"
     },
     "webitel.im.api.gateway.v1.RemoveMemberResponse": {
       "type": "object"
@@ -74104,6 +74244,10 @@
         "contact": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.PeerIdentity"
         },
+        "initiator": {
+          "description": "Member the thread is transferred from. Honored only for trusted service\ncallers (schema/engine); user calls always transfer from the caller.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.PeerIdentity"
+        },
         "role": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadRole"
         }
@@ -74207,6 +74351,68 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.ThreadPreview": {
+      "type": "object",
+      "properties": {
+        "contact": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Contact"
+        },
+        "created_at": {
+          "description": "Unix milliseconds.",
+          "type": "string",
+          "format": "int64"
+        },
+        "expires_at": {
+          "description": "Unix milliseconds; the preview stops granting access at this moment.",
+          "type": "string",
+          "format": "int64"
+        },
+        "id": {
+          "type": "string"
+        },
+        "initiator": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.Contact"
+        },
+        "thread_id": {
+          "type": "string"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.ThreadPreviewService.GivePreviewBody": {
+      "type": "object",
+      "properties": {
+        "contact": {
+          "description": "The contact receiving the preview.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.PeerIdentity"
+        },
+        "duration_ms": {
+          "description": "Preview lifetime from now, in milliseconds.",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.ThreadPreviewService.RemoveFromPreviewBody": {
+      "type": "object",
+      "properties": {
+        "contact": {
+          "description": "The contact whose preview is revoked.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.PeerIdentity"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.ThreadPreviewService.UpgradePreviewToFullMemberBody": {
+      "type": "object",
+      "properties": {
+        "contact": {
+          "description": "The contact to upgrade to a full member.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.PeerIdentity"
+        },
+        "role": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadRole"
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.ThreadRole": {
       "type": "string",
       "default": "ROLE_UNSPECIFIED",
@@ -74267,14 +74473,6 @@
         "dialog": {
           "description": "The thread itself, set when it is new to the caller (created or joined since cursor).\nSame model as the thread list, except last_msg and updates_cursor are never set here.",
           "$ref": "#/definitions/webitel.im.api.gateway.v1.Thread"
-        },
-        "failures": {
-          "description": "Messages that failed to reach a member since the cursor.",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/webitel.im.api.gateway.v1.MessageFailure"
-          }
         },
         "left": {
           "description": "The caller is no longer a member: drop the thread.",
@@ -74424,6 +74622,14 @@
           "type": "string",
           "format": "int64"
         },
+        "failures": {
+          "description": "Members the message could not be delivered to, with the provider's reason.\nEmpty when it reached everyone.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.DeliveryFailure"
+          }
+        },
         "forward_origin": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ForwardOrigin"
         },
@@ -74469,6 +74675,14 @@
         "type": {
           "type": "integer",
           "format": "int32"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.UpgradePreviewToFullMemberResponse": {
+      "type": "object",
+      "properties": {
+        "member": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadMember"
         }
       }
     },
@@ -80864,6 +81078,10 @@
       "name": "webitel.im.api.gateway.v1.ThreadManagement"
     },
     {
+      "description": "ThreadPreviewService grants a contact a time-limited, read-only look at a thread\nwithout making them a member. Trusted inter-service callers only.\nThe initiator is derived from the caller's identity and is never taken from the request.",
+      "name": "webitel.im.api.gateway.v1.ThreadPreviewService"
+    },
+    {
       "description": "ThreadTagManagement defines the gRPC service for managing tags on threads.",
       "name": "webitel.im.api.gateway.v1.ThreadTagManagement"
     },
@@ -80984,6 +81202,10 @@
     {
       "description": "MessageStatus is an internal service-to-service API for reporting\nper-recipient message delivery confirmations. Called by im-delivery\n(stream ACKs, pushes) and im-providers (provider webhooks receipts).\n\nAll RPCs accept batches and are idempotent: status transitions are\nmonotonic (SENT -\u003e DELIVERED -\u003e READ; FAILED only from SENT, and may be\nsuperseded by a later DELIVERED), so duplicate and out-of-order receipts\nare safely ignored.",
       "name": "webitel.im.service.thread.v1.MessageStatus"
+    },
+    {
+      "description": "ThreadPreviewService grants a contact a time-limited, read-only look at a thread\n(history, revisions, members, variables) without making them a member: no system\nmessage, no member.joined, no delivery, no unread counters, no bot handover.\nTrusted orchestrator calls only: the initiator's role in the thread is not checked,\nit is stored for audit.",
+      "name": "webitel.im.service.thread.v1.ThreadPreviewService"
     },
     {
       "name": "webitel.im.service.thread.v1.ThreadTagManagement"
