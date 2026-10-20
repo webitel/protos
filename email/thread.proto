@@ -1,0 +1,360 @@
+syntax = "proto3";
+
+package webitel.email;
+
+option go_package = "github.com/webitel/webitel-emails/api/email;email";
+
+import "general.proto";
+import "google/api/annotations.proto";
+import "proto/webitel/option.proto";
+
+// EmailThreads serves the operator decisions about an email conversation.
+service EmailThreads {
+  option (option.objclass) = "email_thread";
+
+  // BindEmailThreadContact links a conversation to a contact chosen by an
+  // operator. It outranks automatic contact resolution, including a later one.
+  // The contact itself is created in Contacts, under the operator's own session.
+  rpc BindEmailThreadContact(BindEmailThreadContactRequest) returns (BindEmailThreadContactResponse) {
+    option (google.api.http) = {
+      put: "/v1/email/threads/{thread_id}/contact"
+      body: "*"
+    };
+    option (option.access) = ACTION_UPDATE;
+  }
+
+  // UnbindEmailThreadContact removes the contact of a conversation and keeps it
+  // that way: automatic resolution never writes over an unlinked conversation.
+  rpc UnbindEmailThreadContact(UnbindEmailThreadContactRequest) returns (UnbindEmailThreadContactResponse) {
+    option (google.api.http) = {
+      delete: "/v1/email/threads/{thread_id}/contact"
+    };
+    option (option.access) = ACTION_UPDATE;
+  }
+
+  // ListEmailThreads returns the conversations the caller handles now or took
+  // into work earlier. Nothing else in the domain is listed.
+  rpc ListEmailThreads(ListEmailThreadsRequest) returns (EmailThreadList) {
+    option (google.api.http) = {
+      get: "/v1/email/threads"
+    };
+    option (option.access) = ACTION_READ;
+  }
+
+  // LocateEmailThread returns one conversation visible to the caller, without
+  // its messages. Any other conversation is reported as not found.
+  rpc LocateEmailThread(LocateEmailThreadRequest) returns (EmailThread) {
+    option (google.api.http) = {
+      get: "/v1/email/threads/{thread_id}"
+    };
+    option (option.access) = ACTION_READ;
+  }
+
+  // ListEmailThreadMessages returns the complete emails of a visible
+  // conversation; the HTML body is always sanitized.
+  rpc ListEmailThreadMessages(ListEmailThreadMessagesRequest) returns (EmailMessageList) {
+    option (google.api.http) = {
+      get: "/v1/email/threads/{thread_id}/messages"
+    };
+    option (option.access) = ACTION_READ;
+  }
+
+  // LocateEmailThreadMessage returns one complete email of a visible
+  // conversation.
+  rpc LocateEmailThreadMessage(LocateEmailThreadMessageRequest) returns (EmailMessage) {
+    option (google.api.http) = {
+      get: "/v1/email/threads/{thread_id}/messages/{message_id}"
+    };
+    option (option.access) = ACTION_READ;
+  }
+
+  // GetEmailAttachmentLink returns a short-lived download link to a stored
+  // attachment of a visible email.
+  rpc GetEmailAttachmentLink(GetEmailAttachmentLinkRequest) returns (GetEmailAttachmentLinkResponse) {
+    option (google.api.http) = {
+      get: "/v1/email/threads/{thread_id}/messages/{message_id}/attachments/{attachment_id}/link"
+    };
+    option (option.access) = ACTION_READ;
+  }
+}
+
+// BindEmailThreadContactRequest selects a conversation and the contact to link.
+message BindEmailThreadContactRequest {
+  int64 thread_id = 1;
+  // Identifier of an existing contact of the same domain.
+  int64 contact_id = 2;
+}
+
+// BindEmailThreadContactResponse confirms the binding.
+message BindEmailThreadContactResponse {
+}
+
+// UnbindEmailThreadContactRequest selects the conversation to unlink.
+message UnbindEmailThreadContactRequest {
+  int64 thread_id = 1;
+}
+
+// UnbindEmailThreadContactResponse confirms the removal.
+message UnbindEmailThreadContactResponse {
+}
+
+// EmailThreadStatus is the processing status of a conversation, projected from
+// the Email attempts of call_center.
+enum EmailThreadStatus {
+  EMAIL_THREAD_STATUS_UNSPECIFIED = 0;
+  EMAIL_THREAD_STATUS_NEW = 1;
+  EMAIL_THREAD_STATUS_DISTRIBUTED = 2;
+  EMAIL_THREAD_STATUS_IN_PROGRESS = 3;
+  EMAIL_THREAD_STATUS_POSTPONED = 4;
+  EMAIL_THREAD_STATUS_PROCESSED = 5;
+}
+
+// EmailThreadAccess tells why the caller sees a conversation.
+enum EmailThreadAccess {
+  EMAIL_THREAD_ACCESS_UNSPECIFIED = 0;
+  // The caller is the agent currently responsible for the conversation.
+  EMAIL_THREAD_ACCESS_CURRENT = 1;
+  // The caller took the conversation into work earlier; read only.
+  EMAIL_THREAD_ACCESS_HISTORY = 2;
+}
+
+// EmailThreadAssignment selects conversations by the caller's relation to them.
+enum EmailThreadAssignment {
+  // Same as EMAIL_THREAD_ASSIGNMENT_ALL.
+  EMAIL_THREAD_ASSIGNMENT_UNSPECIFIED = 0;
+  EMAIL_THREAD_ASSIGNMENT_CURRENT = 1;
+  EMAIL_THREAD_ASSIGNMENT_HISTORY = 2;
+  // Current and history conversations of the caller, not all of the domain.
+  EMAIL_THREAD_ASSIGNMENT_ALL = 3;
+}
+
+// EmailContactResolutionState tells why a conversation has or has no contact.
+enum EmailContactResolutionState {
+  EMAIL_CONTACT_RESOLUTION_STATE_UNSPECIFIED = 0;
+  EMAIL_CONTACT_RESOLUTION_STATE_PENDING = 1;
+  EMAIL_CONTACT_RESOLUTION_STATE_RESOLVED = 2;
+  EMAIL_CONTACT_RESOLUTION_STATE_NOT_FOUND = 3;
+  EMAIL_CONTACT_RESOLUTION_STATE_AMBIGUOUS = 4;
+  EMAIL_CONTACT_RESOLUTION_STATE_UNAVAILABLE = 5;
+  EMAIL_CONTACT_RESOLUTION_STATE_UNLINKED = 6;
+}
+
+enum EmailMessageDirection {
+  EMAIL_MESSAGE_DIRECTION_UNSPECIFIED = 0;
+  EMAIL_MESSAGE_DIRECTION_INBOUND = 1;
+  EMAIL_MESSAGE_DIRECTION_OUTBOUND = 2;
+}
+
+enum EmailMessageKind {
+  EMAIL_MESSAGE_KIND_UNSPECIFIED = 0;
+  EMAIL_MESSAGE_KIND_REGULAR = 1;
+  EMAIL_MESSAGE_KIND_AUTO_REPLY = 2;
+  EMAIL_MESSAGE_KIND_BOUNCE = 3;
+}
+
+// EmailMessageOrder is the chronological direction of a message page.
+enum EmailMessageOrder {
+  // Same as EMAIL_MESSAGE_ORDER_ASC.
+  EMAIL_MESSAGE_ORDER_UNSPECIFIED = 0;
+  EMAIL_MESSAGE_ORDER_ASC = 1;
+  EMAIL_MESSAGE_ORDER_DESC = 2;
+}
+
+// EmailInlineContentStatus tells whether the inline images of an HTML body
+// could be linked.
+enum EmailInlineContentStatus {
+  EMAIL_INLINE_CONTENT_STATUS_UNSPECIFIED = 0;
+  // The body references no stored inline image.
+  EMAIL_INLINE_CONTENT_STATUS_NONE = 1;
+  EMAIL_INLINE_CONTENT_STATUS_OK = 2;
+  // Storage could not issue a link; such images are removed from the body.
+  EMAIL_INLINE_CONTENT_STATUS_UNAVAILABLE = 3;
+}
+
+enum EmailAttachmentDisposition {
+  EMAIL_ATTACHMENT_DISPOSITION_UNSPECIFIED = 0;
+  EMAIL_ATTACHMENT_DISPOSITION_ATTACHMENT = 1;
+  EMAIL_ATTACHMENT_DISPOSITION_INLINE = 2;
+}
+
+enum EmailAttachmentState {
+  EMAIL_ATTACHMENT_STATE_UNSPECIFIED = 0;
+  EMAIL_ATTACHMENT_STATE_STORED = 1;
+  // The file was deliberately not stored; see the skipped reason.
+  EMAIL_ATTACHMENT_STATE_SKIPPED = 2;
+}
+
+enum EmailAttachmentSkippedReason {
+  EMAIL_ATTACHMENT_SKIPPED_REASON_UNSPECIFIED = 0;
+  EMAIL_ATTACHMENT_SKIPPED_REASON_COUNT_LIMIT_EXCEEDED = 1;
+  EMAIL_ATTACHMENT_SKIPPED_REASON_SIZE_LIMIT_EXCEEDED = 2;
+  EMAIL_ATTACHMENT_SKIPPED_REASON_TOTAL_SIZE_LIMIT_EXCEEDED = 3;
+  EMAIL_ATTACHMENT_SKIPPED_REASON_READ_ERROR = 4;
+}
+
+// EmailAddress is one participant address of an email.
+message EmailAddress {
+  string address = 1;
+  string name = 2;
+}
+
+// EmailThreadPreview summarizes the newest complete email of a conversation.
+message EmailThreadPreview {
+  int64 message_id = 1;
+  EmailMessageDirection direction = 2;
+  EmailAddress from = 3;
+  // Up to 200 characters of the plain text body; may be empty.
+  string text = 4;
+  int64 received_at = 5;
+}
+
+// EmailThread is a conversation visible to the caller. Times are Unix
+// milliseconds; zero ids and times mean the value is absent.
+message EmailThread {
+  int64 id = 1;
+  general.Lookup profile = 2;
+  string subject = 3;
+  EmailThreadStatus status = 4;
+  int64 status_changed_at = 5;
+  int64 created_at = 6;
+  int64 updated_at = 7;
+  int64 last_message_at = 8;
+  int64 completed_at = 9;
+
+  int64 contact_id = 10;
+  EmailContactResolutionState contact_resolution_state = 11;
+
+  int64 queue_id = 12;
+  int64 postponed_until = 13;
+  general.Lookup current_user = 14;
+  general.Lookup last_handled_user = 15;
+
+  EmailThreadAccess access = 16;
+  // Set only for EMAIL_THREAD_ACCESS_CURRENT. The version is meaningful only
+  // with a non-zero attempt id, since an attempt starts at version zero.
+  int64 current_attempt_id = 17;
+  int64 current_attempt_version = 18;
+
+  EmailThreadPreview preview = 19;
+}
+
+// ListEmailThreadsRequest selects a page of the caller's conversations.
+message ListEmailThreadsRequest {
+  // Page number from 1; 0 is the first page.
+  int32 page = 1;
+  // Threads per page, 1 to 100; 0 is 20.
+  int32 size = 2;
+  // Comma-separated fields with an optional "+" or "-" prefix: last_message_at,
+  // created_at, updated_at, status_changed_at. Defaults to "-last_message_at".
+  string sort = 3;
+  // Unspecified is ALL.
+  EmailThreadAssignment assignment = 4;
+  repeated EmailThreadStatus status = 5;
+  repeated int64 profile_id = 6;
+  // 0 is any contact.
+  int64 contact_id = 7;
+}
+
+// EmailThreadList is a page of conversations.
+message EmailThreadList {
+  repeated EmailThread items = 1;
+  bool next = 2;
+}
+
+// LocateEmailThreadRequest selects a conversation.
+message LocateEmailThreadRequest {
+  int64 thread_id = 1;
+}
+
+// EmailBounce describes a delivery failure report.
+message EmailBounce {
+  string original_message_id = 1;
+  string recipient = 2;
+  string status = 3;
+  string diagnostic_code = 4;
+}
+
+// EmailAttachment describes a file of an email; the file itself is reached
+// through GetEmailAttachmentLink.
+message EmailAttachment {
+  int64 id = 1;
+  string file_name = 2;
+  string mime_type = 3;
+  int64 size = 4;
+  EmailAttachmentDisposition disposition = 5;
+  // Set only for inline parts.
+  string content_id = 6;
+  EmailAttachmentState state = 7;
+  EmailAttachmentSkippedReason skipped_reason = 8;
+}
+
+// EmailMessage is one complete email. Times are Unix milliseconds.
+message EmailMessage {
+  int64 id = 1;
+  int64 thread_id = 2;
+  int64 profile_id = 3;
+  EmailMessageDirection direction = 4;
+  EmailMessageKind kind = 5;
+
+  // RFC 5322 Message-ID and In-Reply-To.
+  string internet_message_id = 6;
+  string in_reply_to = 7;
+  string subject = 8;
+
+  // Blind copy recipients are never returned.
+  repeated EmailAddress from = 9;
+  repeated EmailAddress sender = 10;
+  repeated EmailAddress reply_to = 11;
+  repeated EmailAddress to = 12;
+  repeated EmailAddress cc = 13;
+
+  int64 sent_at = 14;
+  int64 received_at = 15;
+
+  // Plain text; never to be rendered as HTML.
+  string body_text = 16;
+  // Sanitized HTML; the stored original is never returned.
+  string body_html = 17;
+  bool remote_content_blocked = 18;
+  EmailInlineContentStatus inline_content_status = 19;
+
+  EmailBounce bounce = 20;
+  repeated EmailAttachment attachments = 21;
+}
+
+// ListEmailThreadMessagesRequest selects a page of the emails of a conversation.
+message ListEmailThreadMessagesRequest {
+  int64 thread_id = 1;
+  int32 size = 2;
+  // Opaque cursor from a previous page with the same order; empty for the first.
+  string cursor = 3;
+  EmailMessageOrder order = 4;
+}
+
+// EmailMessageList is a page of emails. Pages never repeat an email; one completed
+// later with an earlier time shows up when read again from the start.
+message EmailMessageList {
+  repeated EmailMessage items = 1;
+  bool next = 2;
+  string next_cursor = 3;
+}
+
+// LocateEmailThreadMessageRequest selects one email of a conversation.
+message LocateEmailThreadMessageRequest {
+  int64 thread_id = 1;
+  int64 message_id = 2;
+}
+
+// GetEmailAttachmentLinkRequest selects one stored attachment of an email.
+message GetEmailAttachmentLinkRequest {
+  int64 thread_id = 1;
+  int64 message_id = 2;
+  int64 attachment_id = 3;
+}
+
+// GetEmailAttachmentLinkResponse is a short-lived download link.
+message GetEmailAttachmentLinkResponse {
+  string url = 1;
+  // Unix milliseconds; the link may stop working at this time or earlier.
+  int64 expires_at = 2;
+}
