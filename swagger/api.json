@@ -20425,6 +20425,7 @@
             "in": "query"
           },
           {
+            "minItems": 1,
             "uniqueItems": true,
             "type": "array",
             "items": {
@@ -20938,6 +20939,7 @@
             "in": "query"
           },
           {
+            "minItems": 1,
             "uniqueItems": true,
             "type": "array",
             "items": {
@@ -21270,6 +21272,44 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "IMClients"
+        ],
+        "summary": "Link an IM-stack contact (im-contact-service UUID) with the Contact.\nIf the IM contact is already linked to another Contact\nwithin the domain, the link is reassigned to this Contact.",
+        "operationId": "LinkIMContact",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Link contact ID (or etag).",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/IMClientsLinkIMContactBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/contactsIMClient"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        }
       }
     },
     "/contacts/{contact_id}/imclients/{id}": {
@@ -21521,6 +21561,7 @@
             "in": "query"
           },
           {
+            "minItems": 1,
             "uniqueItems": true,
             "type": "array",
             "items": {
@@ -21788,6 +21829,7 @@
             "in": "query"
           },
           {
+            "minItems": 1,
             "uniqueItems": true,
             "type": "array",
             "items": {
@@ -22219,6 +22261,7 @@
             "in": "query"
           },
           {
+            "minItems": 1,
             "uniqueItems": true,
             "type": "array",
             "items": {
@@ -22739,6 +22782,7 @@
             "in": "query"
           },
           {
+            "minItems": 1,
             "uniqueItems": true,
             "type": "array",
             "items": {
@@ -23238,6 +23282,7 @@
             "in": "query"
           },
           {
+            "minItems": 1,
             "uniqueItems": true,
             "type": "array",
             "items": {
@@ -23906,6 +23951,7 @@
             "in": "query"
           },
           {
+            "minItems": 1,
             "uniqueItems": true,
             "type": "array",
             "items": {
@@ -24378,6 +24424,7 @@
             "in": "query"
           },
           {
+            "minItems": 1,
             "uniqueItems": true,
             "type": "array",
             "items": {
@@ -42675,6 +42722,16 @@
             "type": "boolean",
             "name": "only_bots",
             "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Filter by contact IDs.",
+            "name": "ids",
+            "in": "query"
           }
         ],
         "responses": {
@@ -45349,6 +45406,45 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/webitel.im.api.gateway.v1.TakeOverFromBotResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/threads/{thread_id}/crm_contact": {
+      "put": {
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadManagement"
+        ],
+        "summary": "Sets (or clears) the CRM contact selected by the operator for the thread.\nLinking the IM contact to the CRM contact itself is done via the CRM API.",
+        "operationId": "ThreadManagement_SetCrmContact",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "thread_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadManagement.SetCrmContactBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SetCrmContactResponse"
             }
           },
           "default": {
@@ -48716,6 +48812,27 @@
     "FormatUnderline": {
       "type": "object"
     },
+    "IMClientsLinkIMContactBody": {
+      "type": "object",
+      "properties": {
+        "gateway_id": {
+          "description": "App (gateway) the IM contact is connected through. Optional.",
+          "type": "string"
+        },
+        "im_contact_id": {
+          "description": "IM-stack contact ID (UUID) from the im-contact-service. Required.",
+          "type": "string"
+        },
+        "protocol": {
+          "description": "Protocol (provider type) of the IM conversation, e.g. \"telegram\". Required.",
+          "type": "string"
+        },
+        "via": {
+          "description": "[Via] App(-specific) peer(-id) to connect[from] the IM contact. Optional.",
+          "type": "string"
+        }
+      }
+    },
     "ImportCSVRequestAction": {
       "type": "string",
       "default": "continue",
@@ -50904,7 +51021,7 @@
           "title": "[optional] positive value signify 'active'"
         },
         "presence": {
-          "description": "// FIXME: well-known types ?\r\n repeated Dialog  call = 9;\r\n repeated Sipreg  sip = 9;\r\n repeated Websock wss = 9;",
+          "description": "// FIXME: well-known types ?\n repeated Dialog  call = 9;\n repeated Sipreg  sip = 9;\n repeated Websock wss = 9;",
           "type": "array",
           "title": "detailed: -registered -tracking tuples",
           "items": {
@@ -53035,6 +53152,10 @@
           "description": "The unique ID of the association. Never changes.",
           "type": "string"
         },
+        "im_contact_id": {
+          "description": "IM-stack contact ID (UUID) from the im-contact-service.\nMutually exclusive with .user: a link has either a legacy\nchat client (.user) or an IM-stack contact, never both.",
+          "type": "string"
+        },
         "protocol": {
           "description": "Protocol used to connect the IM client.",
           "type": "string"
@@ -53409,6 +53530,10 @@
         },
         "gateway_id": {
           "description": "App (Text-Gateway) used to connect the IM client.",
+          "type": "string"
+        },
+        "im_contact_id": {
+          "description": "IM-stack contact ID (UUID) from the im-contact-service.\nExactly one of .external_user or .im_contact_id must be set.",
           "type": "string"
         },
         "protocol": {
@@ -65839,7 +65964,7 @@
       "additionalProperties": {}
     },
     "protobufNullValue": {
-      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value.",
+      "description": "Represents a JSON `null`.\n\n`NullValue` is a sentinel, using an enum with only one value to represent\nthe null value for the `Value` type union.\n\nA field of type `NullValue` with any value other than `0` is considered\ninvalid. Most ProtoJSON serializers will emit a Value with a `null_value` set\nas a JSON `null` regardless of the integer value, and so will round trip to\na `0` value.\n\n - NULL_VALUE: Null value.",
       "type": "string",
       "default": "NULL_VALUE",
       "enum": [
@@ -72350,6 +72475,10 @@
           "type": "string",
           "format": "int64"
         },
+        "id": {
+          "description": "Unique contact identifier.",
+          "type": "string"
+        },
         "is_bot": {
           "description": "Represents if usere is real person or automatic script.",
           "type": "boolean"
@@ -72491,6 +72620,24 @@
             "type": "object",
             "$ref": "#/definitions/webitel.im.api.gateway.v1.SkippedMessage"
           }
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.DeletedMessage": {
+      "description": "DeletedMessage is a message deleted since cursor.",
+      "type": "object",
+      "properties": {
+        "deleted_at": {
+          "description": "Unix time in milliseconds when the message was deleted.",
+          "type": "string",
+          "format": "int64"
+        },
+        "deleted_by": {
+          "description": "Member who deleted the message, in the same shape as a message's sender.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadMember"
+        },
+        "id": {
+          "type": "string"
         }
       }
     },
@@ -74053,6 +74200,14 @@
     "webitel.im.api.gateway.v1.SendTypingResponse": {
       "type": "object"
     },
+    "webitel.im.api.gateway.v1.SetCrmContactResponse": {
+      "type": "object",
+      "properties": {
+        "crm_contact_id": {
+          "type": "string"
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.SetReactionResponse": {
       "type": "object",
       "properties": {
@@ -74124,6 +74279,10 @@
           "description": "Thread creation timestamp (Unix time, milliseconds).",
           "type": "string",
           "format": "int64"
+        },
+        "crm_contact_id": {
+          "description": "Webitel CRM contact selected by an operator for this thread.\nEmpty if no CRM contact has been selected.",
+          "type": "string"
         },
         "description": {
           "description": "Optional thread description.",
@@ -74222,6 +74381,15 @@
     },
     "webitel.im.api.gateway.v1.ThreadManagement.HandBackToBotBody": {
       "type": "object"
+    },
+    "webitel.im.api.gateway.v1.ThreadManagement.SetCrmContactBody": {
+      "type": "object",
+      "properties": {
+        "crm_contact_id": {
+          "description": "Webitel CRM contact id. Empty string clears the selection.",
+          "type": "string"
+        }
+      }
     },
     "webitel.im.api.gateway.v1.ThreadManagement.SetVariablesBody": {
       "description": "SetVariablesRequest defines parameters\nfor setting or updating thread variables.",
@@ -74467,13 +74635,22 @@
       "type": "object",
       "properties": {
         "deleted_message_ids": {
+          "description": "Ids of deleted_messages, kept for older clients; prefer deleted_messages.",
           "type": "array",
           "items": {
             "type": "string"
           }
         },
+        "deleted_messages": {
+          "description": "Messages deleted since cursor, with when and who deleted them; drop them by id.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.DeletedMessage"
+          }
+        },
         "dialog": {
-          "description": "The thread itself, set when it is new to the caller (created or joined since cursor).\nSame model as the thread list, except last_msg and updates_cursor are never set here.",
+          "description": "The thread itself, set when it is new to the caller (created or joined since cursor)\nor when its attributes changed since cursor (e.g. crm_contact_id); replace the cached thread.\nSame model as the thread list, except last_msg and updates_cursor are never set here.",
           "$ref": "#/definitions/webitel.im.api.gateway.v1.Thread"
         },
         "left": {
