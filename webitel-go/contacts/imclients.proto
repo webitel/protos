@@ -70,6 +70,12 @@ message IMClient {
   string via = 14;
   // External user id.
   string external_id = 15;
+
+  // IM-stack contact ID (UUID) from the im-contact-service.
+  // Mutually exclusive with .user: a link has either a legacy
+  // chat client (.user) or an IM-stack contact, never both.
+  string im_contact_id = 16;
+
 }
 
 // Input of the contact IM client.
@@ -90,6 +96,10 @@ message InputIMClient {
   
   // [Via] App(-specific) peer(-id) to connect[from] the IM client.
   string via = 13;
+
+  // IM-stack contact ID (UUID) from the im-contact-service.
+  // Exactly one of .external_user or .im_contact_id must be set.
+  string im_contact_id = 14;
 }
 
 
@@ -115,6 +125,16 @@ service IMClients {
 //    };
 //  }
 
+
+  // Link an IM-stack contact (im-contact-service UUID) with the Contact.
+  // If the IM contact is already linked to another Contact
+  // within the domain, the link is reassigned to this Contact.
+  rpc LinkIMContact(LinkIMContactRequest) returns (IMClient) {
+    option (google.api.http) = {
+      post: "/contacts/{contact_id}/imclients"
+      body: "*"
+    };
+  }
 
   rpc DeleteIMClient(DeleteIMClientRequest) returns (EmptyResponse) {
     option (google.api.http) = {
@@ -169,6 +189,19 @@ message ListIMClientsRequest {
   // Link(s) with unique ID only.
   repeated string id = 7;
 
+}
+
+message LinkIMContactRequest {
+  // Link contact ID (or etag).
+  string contact_id = 1;
+  // IM-stack contact ID (UUID) from the im-contact-service. Required.
+  string im_contact_id = 2;
+  // Protocol (provider type) of the IM conversation, e.g. "telegram". Required.
+  string protocol = 3;
+  // App (gateway) the IM contact is connected through. Optional.
+  string gateway_id = 4;
+  // [Via] App(-specific) peer(-id) to connect[from] the IM contact. Optional.
+  string via = 5;
 }
 
 message DeleteIMClientRequest {

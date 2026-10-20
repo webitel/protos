@@ -56,6 +56,9 @@ service ThreadManagement {
   // Takes the conversation from the thread's bot back to the operator.
   rpc TakeOverFromBot(TakeOverFromBotRequest) returns (TakeOverFromBotResponse);
 
+  // Sets (or clears) the CRM contact an operator selected for the thread.
+  rpc SetCrmContact(SetCrmContactRequest) returns (SetCrmContactResponse);
+
   rpc SetVariables(SetVariablesRequest) returns (ThreadVariables);
 
   rpc SearchVariables(SearchVariablesRequest) returns (SearchVariablesResponse);
@@ -169,6 +172,10 @@ message Thread {
 
   // The caller's GetUpdates cursor as of this read (set by Get; Search carries it on the response).
   string updates_cursor = 20;
+
+  // Webitel CRM contact selected by an operator for this thread.
+  // Empty if no CRM contact has been selected.
+  string crm_contact_id = 21;
 }
 
 //#endregion
@@ -546,6 +553,28 @@ message TakeOverFromBotRequest {
 }
 
 message TakeOverFromBotResponse {}
+
+message SetCrmContactRequest {
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  // Operator's contact.
+  string initiator_contact_id = 2 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  int32 domain_id = 3 [(buf.validate.field).int32.gt = 0];
+
+  // Webitel CRM contact id. Empty string clears the selection.
+  string crm_contact_id = 4 [(buf.validate.field).string.pattern = "^[0-9]*$"];
+}
+
+message SetCrmContactResponse {
+  string crm_contact_id = 1;
+}
 
 // #region Thread Variables
 
