@@ -6,6 +6,7 @@ import "api/gateway/v1/contact.proto";
 import "api/gateway/v1/message_history.proto";
 import "api/gateway/v1/peer.proto";
 import "api/gateway/v1/thread_member.proto";
+import "api/gateway/v1/thread_tag.proto";
 import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/struct.proto";
@@ -209,6 +210,9 @@ message Thread {
   // Webitel CRM contact selected by an operator for this thread.
   // Empty if no CRM contact has been selected.
   string crm_contact_id = 18;
+
+  // The caller's own tags on this thread. Empty if the caller hasn't tagged it.
+  repeated ChatTag tags = 19;
 }
 
 //#endregion
@@ -271,6 +275,14 @@ message ThreadSearchRequest {
   // Return only threads where the caller has at least one unread message.
   // Ignored when false.
   bool unread = 11;
+
+  // Return only threads the caller has tagged with every one of these tags (AND semantics).
+  // Ignored when empty.
+  repeated string tags = 12;
+
+  // Exclude threads the caller has tagged with any of these tags.
+  // Ignored when empty.
+  repeated string exclude_tags = 13;
 }
 
 // GetThreadRequest defines parameters for retrieving a single thread by ID.
