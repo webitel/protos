@@ -45154,6 +45154,26 @@
             "description": "Return only threads where the caller has at least one unread message.\nIgnored when false.",
             "name": "unread",
             "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Return only threads the caller has tagged with every one of these tags (AND semantics).\nIgnored when empty.",
+            "name": "tags",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Exclude threads the caller has tagged with any of these tags.\nIgnored when empty.",
+            "name": "exclude_tags",
+            "in": "query"
           }
         ],
         "responses": {
@@ -45897,6 +45917,66 @@
         }
       }
     },
+    "/v1/threads/{thread_id}/snooze": {
+      "post": {
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadTagManagement"
+        ],
+        "summary": "Snooze moves the thread to the caller's Snoozed tab. The chat returns to Active on its own\nwhen anyone but the caller writes to it. Succeeds when the thread is already snoozed.",
+        "operationId": "ThreadTagManagement_Snooze",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "thread_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ChatTag"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadTagManagement"
+        ],
+        "summary": "Unsnooze returns the thread to the caller's Active tab. Succeeds when it is not snoozed.",
+        "operationId": "ThreadTagManagement_Unsnooze",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "thread_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.RemoveThreadTagResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/v1/threads/{thread_id}/tags": {
       "post": {
         "tags": [
@@ -45925,6 +46005,43 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/webitel.im.api.gateway.v1.ChatTag"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/threads/{thread_id}/tags/{tag}": {
+      "delete": {
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadTagManagement"
+        ],
+        "summary": "RemoveTagByName removes the caller's tag from a thread by its name. Succeeds when the tag is absent.",
+        "operationId": "ThreadTagManagement_RemoveTagByName",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "thread_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "tag",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.RemoveThreadTagResponse"
             }
           },
           "default": {
@@ -74320,6 +74437,14 @@
           "description": "Thread subject or title.",
           "type": "string"
         },
+        "tags": {
+          "description": "The caller's own tags on this thread. Empty if the caller hasn't tagged it.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.ChatTag"
+          }
+        },
         "type": {
           "description": "Type of the thread.",
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadKind"
@@ -74631,6 +74756,18 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.ThreadTags": {
+      "description": "ThreadTags is the caller's own tags on a thread.",
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.ThreadUpdates": {
       "type": "object",
       "properties": {
@@ -74679,6 +74816,10 @@
             "type": "object",
             "$ref": "#/definitions/webitel.im.api.gateway.v1.MemberReadState"
           }
+        },
+        "tags": {
+          "description": "The caller's current tags on the thread, set only when they changed since cursor; replace the\ncached ones. Absent means unchanged, empty items means every tag was removed.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadTags"
         },
         "thread_id": {
           "type": "string"
@@ -81253,16 +81394,16 @@
       "name": "webitel.im.api.gateway.v1.Account"
     },
     {
+      "description": "ThreadTagManagement defines the gRPC service for managing tags on threads.",
+      "name": "webitel.im.api.gateway.v1.ThreadTagManagement"
+    },
+    {
       "description": "ThreadManagement service provides access to group threads manipulating\nand read-only access for direct threads.",
       "name": "webitel.im.api.gateway.v1.ThreadManagement"
     },
     {
       "description": "ThreadPreviewService grants a contact a time-limited, read-only look at a thread\nwithout making them a member. Trusted inter-service callers only.\nThe initiator is derived from the caller's identity and is never taken from the request.",
       "name": "webitel.im.api.gateway.v1.ThreadPreviewService"
-    },
-    {
-      "description": "ThreadTagManagement defines the gRPC service for managing tags on threads.",
-      "name": "webitel.im.api.gateway.v1.ThreadTagManagement"
     },
     {
       "description": "Updates serves catch-up across all of the caller's threads.",
