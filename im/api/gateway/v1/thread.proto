@@ -30,6 +30,12 @@ service ThreadManagement {
     option (google.api.http) = {get: "/v1/threads/unread"};
   }
 
+  // Returns the caller's chat counters for the chat panel tabs: every active
+  // chat, the active chats outside Snoozed, and the snoozed chats.
+  rpc GetCounters(GetCountersRequest) returns (GetCountersResponse) {
+    option (google.api.http) = {get: "/v1/threads/counters"};
+  }
+
   rpc Create(ThreadManagementCreateRequest) returns (ThreadManagementCreateResponse) {
     option (google.api.http) = {
       post: "/v1/threads"
@@ -321,6 +327,38 @@ message GetUnreadSummaryResponse {
 
   // Total number of unread messages across all chats.
   int64 unread_messages = 2;
+}
+
+// GetCountersRequest narrows the counted chats; the participant is taken
+// from the authenticated caller by the gateway.
+message GetCountersRequest {
+  // Count only threads of these kinds. Empty counts every kind.
+  // UNKNOWN (0) is not allowed.
+  repeated ThreadKind types = 1 [
+    (buf.validate.field).repeated.items.enum.defined_only = true,
+    (buf.validate.field).repeated.items.enum.not_in = 0
+  ];
+}
+
+// ThreadCounters is the size of one chat folder.
+message ThreadCounters {
+  // Number of chats in the folder.
+  int32 total = 1;
+
+  // Number of chats in the folder with at least one unread message.
+  int32 unread_chats = 2;
+}
+
+// GetCountersResponse carries the caller's counters per chat folder.
+message GetCountersResponse {
+  // Every chat the caller is an active member of: active plus snoozed.
+  ThreadCounters all = 1;
+
+  // Chats the caller has not snoozed.
+  ThreadCounters active = 2;
+
+  // Chats the caller has snoozed.
+  ThreadCounters snoozed = 3;
 }
 
 message SearchLeftRequest {

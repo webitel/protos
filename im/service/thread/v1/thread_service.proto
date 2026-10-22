@@ -27,6 +27,10 @@ service ThreadManagement {
   // chats. Counts are individual to the participant's own read state.
   rpc GetUnreadSummary(GetUnreadSummaryRequest) returns (GetUnreadSummaryResponse);
 
+  // Returns a participant's chat counters: every active chat, the active chats
+  // outside Snoozed, and the snoozed chats, each with its unread chat count.
+  rpc GetCounters(GetCountersRequest) returns (GetCountersResponse);
+
   // Creates a new group thread.
   // The creator becomes the owner of the thread.
   // Returns a single thread by its identifier.
@@ -333,6 +337,45 @@ message GetUnreadSummaryResponse {
 
   // Total number of unread messages across all chats.
   int64 unread_messages = 2;
+}
+
+// GetCountersRequest asks for the chat counters of a single participant.
+message GetCountersRequest {
+  // Contact id of the participant whose counters are requested.
+  string self_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  // Domain identifier the participant belongs to.
+  int32 domain_id = 2 [(buf.validate.field).int32.gt = 0];
+
+  // Count only threads of these kinds. Empty counts every kind.
+  repeated ThreadKind kinds = 3 [(buf.validate.field).repeated.items.enum = {
+    defined_only: true
+    not_in: 0
+  }];
+}
+
+// ThreadCounters is the size of one chat folder.
+message ThreadCounters {
+  // Number of chats in the folder.
+  int32 total = 1;
+
+  // Number of chats in the folder with at least one unread message.
+  int32 unread_chats = 2;
+}
+
+// GetCountersResponse carries the participant's counters per chat folder.
+message GetCountersResponse {
+  // Every chat the participant is an active member of: active plus snoozed.
+  ThreadCounters all = 1;
+
+  // Chats the participant has not snoozed.
+  ThreadCounters active = 2;
+
+  // Chats the participant has snoozed.
+  ThreadCounters snoozed = 3;
 }
 
 message SearchLeftRequest {

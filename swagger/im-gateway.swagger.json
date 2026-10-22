@@ -3981,6 +3981,48 @@
         ]
       }
     },
+    "/v1/threads/counters": {
+      "get": {
+        "summary": "Returns the caller's chat counters for the chat panel tabs: every active\nchat, the active chats outside Snoozed, and the snoozed chats.",
+        "operationId": "ThreadManagement_GetCounters",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.GetCountersResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "types",
+            "description": "Count only threads of these kinds. Empty counts every kind.\nUNKNOWN (0) is not allowed.\n\n - UNKNOWN: Unknown or unspecified thread type.\nMust not be used in valid requests.\n - DIRECT: One-to-one private thread between two users.\n - GROUP: Group thread with multiple members.\n - CHANNEL: Channel-style thread (broadcast or topic based communication).",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "UNKNOWN",
+                "DIRECT",
+                "GROUP",
+                "CHANNEL"
+              ]
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadManagement"
+        ]
+      }
+    },
     "/v1/threads/left": {
       "get": {
         "summary": "Search threads that the caller has left from",
@@ -6031,6 +6073,24 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.GetCountersResponse": {
+      "type": "object",
+      "properties": {
+        "all": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadCounters",
+          "description": "Every chat the caller is an active member of: active plus snoozed."
+        },
+        "active": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadCounters",
+          "description": "Chats the caller has not snoozed."
+        },
+        "snoozed": {
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadCounters",
+          "description": "Chats the caller has snoozed."
+        }
+      },
+      "description": "GetCountersResponse carries the caller's counters per chat folder."
+    },
     "webitel.im.api.gateway.v1.GetMessageRevisionsResponse": {
       "type": "object",
       "properties": {
@@ -7475,6 +7535,22 @@
         }
       },
       "description": "Thread represents a thread (aka chat or conversation) entity."
+    },
+    "webitel.im.api.gateway.v1.ThreadCounters": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of chats in the folder."
+        },
+        "unread_chats": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of chats in the folder with at least one unread message."
+        }
+      },
+      "description": "ThreadCounters is the size of one chat folder."
     },
     "webitel.im.api.gateway.v1.ThreadKind": {
       "type": "string",
