@@ -554,8 +554,10 @@ message UpdateAgentRequest {
   uint32 task_count = 14;
   bool screen_control = 15;
   uint32 extra_chat_count = 16;
-  // Maximum of concurrently assigned Email attempts; 0 disables Email.
-  uint32 email_count = 17;
+  // Base Email slots; omitted keeps the current value, explicit 0 disables base slots.
+  optional uint32 email_count = 17;
+  // Extra Email slots; omitted keeps the current value.
+  optional uint32 extra_email_count = 19;
 }
 
 message PatchAgentRequest {
@@ -576,6 +578,8 @@ message PatchAgentRequest {
   bool screen_control = 14;
   uint32 extra_chat_count = 15;
   uint32 email_count = 16;
+  // Extra Email slots; updated only when included in fields.
+  uint32 extra_email_count = 18;
 }
 
 message ReadAgentRequest {
@@ -631,7 +635,10 @@ message CreateAgentRequest {
   uint32 task_count = 13;
   bool screen_control = 14;
   uint32 extra_chat_count = 15;
-  uint32 email_count = 16;
+  // Base Email slots; omitted defaults to 1, explicit 0 disables base slots.
+  optional uint32 email_count = 16;
+  // Extra Email slots; default 0.
+  uint32 extra_email_count = 18;
 }
 
 message SkillAgent {
@@ -690,7 +697,10 @@ message Agent {
   UserPresence user_presence_status = 23;
   optional uint32 extra_chat_count = 24;
   string status_type = 25;
+  // Configured base Email slots.
   uint32 email_count = 26;
+  // Configured Extra Email slots.
+  uint32 extra_email_count = 28;
 }
 
 message ListAgent {
