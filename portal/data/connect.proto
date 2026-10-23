@@ -1,0 +1,52 @@
+syntax = "proto3";
+package webitel.portal;
+option go_package = "webitel.go/api/portal;portal";
+
+import "google/rpc/status.proto";
+import "google/protobuf/any.proto";
+
+// Update notification message.
+// MAY be `Response` to the `Request`
+// -OR- well-known Update *like message
+message Update {
+  // Date when this update was sent.
+  int64 date = 1;
+  // Update notification arguments data
+  google.protobuf.Any data = 3;
+}
+
+// RPC Request envelope
+message Request {
+  // Client generated request id ; mostly: integer sequence
+  string id = 1;
+  // /path/to/pkg/Service.Method
+  string path = 2;
+  // Metadata. Headers
+  map<string, string> meta = 4;
+  // Method *related request @type arguments
+  google.protobuf.Any data = 3;
+}
+
+// RPC Response to the Request
+message Response {
+  // Client request id
+  string id = 1;
+  // Metadata. Headers
+  map<string, string> meta = 4;
+  // Result payload data
+  google.protobuf.Any data = 3;
+  // RPC failure status
+  google.rpc.Status err = 2;
+  
+}
+
+message Echo {
+  bytes data = 1;
+}
+
+// UpdateDisconnect notifies the client about
+// an imminent disconnect due to specified reason.
+message UpdateDisconnect {
+  // The disconnect reason
+  google.rpc.Status cause = 1;
+}
