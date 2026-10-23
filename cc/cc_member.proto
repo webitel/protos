@@ -351,14 +351,33 @@ message ChatJoinToQueueRequest {
 }
 
 message EmailJoinToQueueRequest {
-    string email_id  = 1;
+    // Legacy cc_email id; ignored by Emails 2.0.
+    string email_id = 1 [deprecated = true];
     int32 queue_id = 2;
+    // email-service Thread joined to the queue.
+    int64 thread_id = 3;
+    // Idempotency key: the email.message.inbound event that started the Flow.
+    string email_event_id = 4;
 
-    int64 domain_id = 100; // todo
+    int64 domain_id = 100;
 }
 
 message EmailJoinToQueueResponse {
-    string status = 1;
+    enum Result {
+        RESULT_UNSPECIFIED = 0;
+        // A new attempt was created for the Thread.
+        RESULT_CREATED = 1;
+        // The Thread already had an active attempt; it was returned unchanged.
+        RESULT_ALREADY_ACTIVE = 2;
+        // The event was already joined; the stored result is returned.
+        RESULT_REPLAYED = 3;
+    }
+
+    string status = 1 [deprecated = true];
+    int64 attempt_id = 2;
+    // Queue of the attempt, which may differ from the requested one.
+    int32 queue_id = 3;
+    Result result = 4;
 }
 
 message DirectAgentToMemberRequest {
