@@ -27484,12 +27484,13 @@
                 "PROVIDER_TYPE_FACEBOOK",
                 "PROVIDER_TYPE_INSTAGRAM",
                 "PROVIDER_TYPE_WHATSAPP",
-                "PROVIDER_TYPE_CUSTOM"
+                "PROVIDER_TYPE_CUSTOM",
+                "PROVIDER_TYPE_VIBER_BM"
               ],
               "type": "string"
             },
             "collectionFormat": "multi",
-            "description": "Filter by channel type (Telegram, Facebook, etc.)",
+            "description": "Filter by channel type (Telegram, Facebook, etc.)\n\n - PROVIDER_TYPE_VIBER_BM: Viber Business Messages (Infobip).",
             "name": "types",
             "in": "query"
           },
@@ -27510,6 +27511,13 @@
             "type": "string",
             "description": "Search query for name or metadata",
             "name": "q",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Domain to list gates of. Required for service (mTLS) callers, which carry\nno user identity; ignored for user callers, whose own domain is used.",
+            "name": "domain_id",
             "in": "query"
           }
         ],
@@ -72562,6 +72570,10 @@
           "description": "Display name of the contact.",
           "type": "string"
         },
+        "phone": {
+          "description": "Phone number in E.164 format (e.g. +380671234567). Empty if unknown.",
+          "type": "string"
+        },
         "sub": {
           "description": "Associated internal system subject/identifier.",
           "type": "string"
@@ -74357,6 +74369,10 @@
       "description": "Thread represents a thread (aka chat or conversation) entity.",
       "type": "object",
       "properties": {
+        "channel": {
+          "description": "Channel the external participant reaches the thread through: a provider\ngate (WhatsApp, Facebook, Viber BM, custom) or a portal / widget\napplication. Unset when it cannot be resolved (e.g. an internal thread).",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadChannel"
+        },
         "created_at": {
           "description": "Thread creation timestamp (Unix time, milliseconds).",
           "type": "string",
@@ -74433,6 +74449,42 @@
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadVariables"
         }
       }
+    },
+    "webitel.im.api.gateway.v1.ThreadChannel": {
+      "description": "ThreadChannel describes the channel a thread came in through.",
+      "type": "object",
+      "properties": {
+        "address": {
+          "description": "Public address of the channel: the WhatsApp business phone number, the\nFacebook page name, the Viber BM sender name. Empty for portal / widget.",
+          "type": "string"
+        },
+        "id": {
+          "description": "Source identifier: the gate id for provider channels, the application\n(client) id for portal / widget channels.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Display name: the gate name or the application name.",
+          "type": "string"
+        },
+        "type": {
+          "description": "Channel kind; drives the logo shown to the operator.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadChannelType"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.ThreadChannelType": {
+      "description": "ThreadChannelType is the fixed set of channel kinds a thread can come through.",
+      "type": "string",
+      "default": "THREAD_CHANNEL_TYPE_UNSPECIFIED",
+      "enum": [
+        "THREAD_CHANNEL_TYPE_UNSPECIFIED",
+        "THREAD_CHANNEL_TYPE_WHATSAPP",
+        "THREAD_CHANNEL_TYPE_FACEBOOK",
+        "THREAD_CHANNEL_TYPE_VIBER_BM",
+        "THREAD_CHANNEL_TYPE_PORTAL",
+        "THREAD_CHANNEL_TYPE_WIDGET",
+        "THREAD_CHANNEL_TYPE_CUSTOM"
+      ]
     },
     "webitel.im.api.gateway.v1.ThreadCounters": {
       "description": "ThreadCounters is the size of one chat folder.",
@@ -75986,7 +76038,7 @@
       }
     },
     "webitel.im.api.provider.v1.ProviderType": {
-      "description": "/ ProviderType defines the specific provider or protocol used for messaging.",
+      "description": "/ ProviderType defines the specific provider or protocol used for messaging.\n\n - PROVIDER_TYPE_VIBER_BM: Viber Business Messages (Infobip).",
       "type": "string",
       "default": "PROVIDER_TYPE_UNSPECIFIED",
       "enum": [
@@ -75997,7 +76049,9 @@
         "PROVIDER_TYPE_META_APP",
         "PROVIDER_TYPE_FACEBOOK",
         "PROVIDER_TYPE_INSTAGRAM",
-        "PROVIDER_TYPE_WHATSAPP"
+        "PROVIDER_TYPE_WHATSAPP",
+        "PROVIDER_TYPE_CUSTOM",
+        "PROVIDER_TYPE_VIBER_BM"
       ]
     },
     "webitel.im.api.provider.v1.ProviderUpdateFacebookGateResponse": {
@@ -77779,6 +77833,10 @@
     "webitel.im.provider.v1.ProviderSummary": {
       "type": "object",
       "properties": {
+        "address": {
+          "description": "Public address of the channel the gate serves: the WhatsApp business\nphone number, the Facebook page name (page id when the name is unknown),\nthe Viber BM sender name. Empty when the provider has none.",
+          "type": "string"
+        },
         "capabilities": {
           "description": "Delivery-status receipts the channel is able to produce; unset when no\nprovider adapter is registered for the channel type.",
           "$ref": "#/definitions/webitel.im.provider.v1.ProviderStatusCapabilities"
@@ -77842,7 +77900,7 @@
       }
     },
     "webitel.im.provider.v1.ProviderType": {
-      "description": "/ ProviderType defines the specific provider or protocol used for messaging.",
+      "description": "/ ProviderType defines the specific provider or protocol used for messaging.\n\n - PROVIDER_TYPE_VIBER_BM: Viber Business Messages (Infobip).",
       "type": "string",
       "default": "PROVIDER_TYPE_UNSPECIFIED",
       "enum": [
@@ -77854,7 +77912,8 @@
         "PROVIDER_TYPE_FACEBOOK",
         "PROVIDER_TYPE_INSTAGRAM",
         "PROVIDER_TYPE_WHATSAPP",
-        "PROVIDER_TYPE_CUSTOM"
+        "PROVIDER_TYPE_CUSTOM",
+        "PROVIDER_TYPE_VIBER_BM"
       ]
     },
     "webitel.im.provider.v1.ProviderUpdateCustomGateResponse": {
