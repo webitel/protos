@@ -150,6 +150,16 @@ message ThreadManagementCreateResponse {
   Thread thread = 1;
 }
 
+// ThreadSource is the gate (im-providers) a thread arrived through.
+message ThreadSource {
+  // Gate id.
+  string id = 1;
+  // Gate display name.
+  string name = 2;
+  // Provider type, e.g. facebook | whatsapp | telegram_bot.
+  string type = 3;
+}
+
 // Thread represents a thread (aka chat or conversation) entity.
 message Thread {
   // Unique thread identifier.
@@ -196,6 +206,12 @@ message Thread {
 
   // The caller's GetUpdates cursor as of this read (set by Get; Search carries it on the response).
   string updates_cursor = 17;
+
+  // Source gate of the thread (the external member's via). Unset when unknown.
+  ThreadSource source = 20;
+
+  // Queue through which the calling participant received the thread. Set by Search; unset when unknown.
+  ThreadQueue queue = 21;
 }
 
 //#endregion

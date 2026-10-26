@@ -110,6 +110,16 @@ enum ThreadKind {
   CHANNEL = 3;
 }
 
+// ThreadSource is the gate a thread arrived through.
+message ThreadSource {
+  // Gate id = thread_dialog.via of the external member.
+  string id = 1;
+  // Gate display name.
+  string name = 2;
+  // Provider type, e.g. facebook | whatsapp | telegram_bot.
+  string type = 3;
+}
+
 // Thread represents a thread (aka chat or conversation) entity.
 message Thread {
   // Unique thread identifier.
@@ -169,6 +179,12 @@ message Thread {
 
   // The caller's GetUpdates cursor as of this read (set by Get; Search carries it on the response).
   string updates_cursor = 20;
+
+  // Source gate of the thread (external member's via). Unset when unknown.
+  ThreadSource source = 22;
+
+  // Queue through which the requesting participant (self_id) received the thread. Search only.
+  ThreadQueue queue = 23;
 }
 
 //#endregion
@@ -436,6 +452,9 @@ message AddMemberRequest {
   // membership/permission checks are skipped, yet initiator_contact_id is still
   // recorded as the message sender. Decouples "who acted" from "enforce permissions".
   optional bool system_call = 7;
+
+  // Optional call_center queue through which the new member receives the thread.
+  ThreadQueue queue = 8;
 }
 
 message AddMemberResponse {
@@ -486,6 +505,9 @@ message TransferRequest {
   // When transferring to a bot, controls whether it automatically leaves after its schema completes.
   // Defaults to true if not set.
   optional bool auto_leave = 6;
+
+  // Optional call_center queue through which the target receives the thread. Empty -> no queue.
+  ThreadQueue queue = 7;
 }
 
 message TransferResponse {
