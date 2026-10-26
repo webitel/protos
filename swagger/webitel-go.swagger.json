@@ -14764,6 +14764,17 @@
                 "deleted_by": {
                   "$ref": "#/definitions/apiObjectId",
                   "title": "[optional] disabled by"
+                },
+                "expires_at": {
+                  "type": "string",
+                  "format": "int64"
+                },
+                "notify_users": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/apiObjectId"
+                  }
                 }
               },
               "description": "processing\n------------\ntoken.user.id // [required] authorization\ntoken.usage   // [optional] short description"
@@ -14771,10 +14782,17 @@
           },
           {
             "name": "enable",
-            "description": "ObjectId user = 1; // [required]\n string usage = 2;  // [optional] usage description\n bool enable = 3;",
             "in": "query",
             "required": false,
             "type": "boolean"
+          },
+          {
+            "name": "expiry_days",
+            "description": "[optional] create-only; server derives token.expires_at",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -14865,6 +14883,17 @@
                 "deleted_by": {
                   "$ref": "#/definitions/apiObjectId",
                   "title": "[optional] disabled by"
+                },
+                "expires_at": {
+                  "type": "string",
+                  "format": "int64"
+                },
+                "notify_users": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/apiObjectId"
+                  }
                 }
               },
               "title": "[required] identification + modifications(about)"
@@ -14974,6 +15003,17 @@
                 "deleted_by": {
                   "$ref": "#/definitions/apiObjectId",
                   "title": "[optional] disabled by"
+                },
+                "expires_at": {
+                  "type": "string",
+                  "format": "int64"
+                },
+                "notify_users": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/apiObjectId"
+                  }
                 }
               },
               "title": "[required] identification + modifications(about)"
@@ -18813,6 +18853,29 @@
         }
       }
     },
+    "apiTokenExpiryWarning": {
+      "type": "object",
+      "properties": {
+        "days_remaining": {
+          "type": "string",
+          "format": "int64",
+          "title": "Days until token expires"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "Unix timestamp when token expires"
+        },
+        "token_id": {
+          "type": "string",
+          "title": "Personal access token id"
+        },
+        "usage": {
+          "type": "string",
+          "title": "Token short description (name)"
+        }
+      }
+    },
     "apiUpdateAccessResponseV1": {
       "type": "object",
       "properties": {
@@ -19090,6 +19153,17 @@
         "deleted_by": {
           "$ref": "#/definitions/apiObjectId",
           "title": "[optional] disabled by"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "notify_users": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/apiObjectId"
+          }
         }
       },
       "description": "UserId lookup value."
@@ -19190,7 +19264,9 @@
         "user_warning_id_unspecified",
         "password_expires_soon",
         "license_expires_soon",
-        "license_expired"
+        "license_expired",
+        "token_expires_soon",
+        "token_expired"
       ],
       "default": "user_warning_id_unspecified"
     },
@@ -19299,6 +19375,9 @@
         },
         "license_expiry": {
           "$ref": "#/definitions/apiLicenseExpiryWarning"
+        },
+        "token_expiry": {
+          "$ref": "#/definitions/apiTokenExpiryWarning"
         }
       }
     },
