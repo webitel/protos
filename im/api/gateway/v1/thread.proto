@@ -230,11 +230,44 @@ message Thread {
   // The caller's own tags on this thread. Empty if the caller hasn't tagged it.
   repeated ChatTag tags = 19;
 
+  // Channel the external participant reaches the thread through: a provider
+  // gate (WhatsApp, Facebook, Viber BM, custom) or a portal / widget
+  // application. Unset when it cannot be resolved (e.g. an internal thread).
+  ThreadChannel channel = 20;
+
   // Source gate of the thread (the external member's via). Unset when unknown.
-  ThreadSource source = 20;
+  ThreadSource source = 21;
 
   // Queue through which the calling participant received the thread. Set by Search; unset when unknown.
-  ThreadQueue queue = 21;
+  ThreadQueue queue = 22;
+}
+
+// ThreadChannel describes the channel a thread came in through.
+message ThreadChannel {
+  // Channel kind; drives the logo shown to the operator.
+  ThreadChannelType type = 1;
+
+  // Display name: the gate name or the application name.
+  string name = 2;
+
+  // Public address of the channel: the WhatsApp business phone number, the
+  // Facebook page name, the Viber BM sender name. Empty for portal / widget.
+  string address = 3;
+
+  // Source identifier: the gate id for provider channels, the application
+  // (client) id for portal / widget channels.
+  string id = 4;
+}
+
+// ThreadChannelType is the fixed set of channel kinds a thread can come through.
+enum ThreadChannelType {
+  THREAD_CHANNEL_TYPE_UNSPECIFIED = 0;
+  THREAD_CHANNEL_TYPE_WHATSAPP = 1;
+  THREAD_CHANNEL_TYPE_FACEBOOK = 2;
+  THREAD_CHANNEL_TYPE_VIBER_BM = 3;
+  THREAD_CHANNEL_TYPE_PORTAL = 4;
+  THREAD_CHANNEL_TYPE_WIDGET = 5;
+  THREAD_CHANNEL_TYPE_CUSTOM = 6;
 }
 
 //#endregion
