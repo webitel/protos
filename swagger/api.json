@@ -41858,9 +41858,20 @@
                   "title": "[optional] disabled by",
                   "$ref": "#/definitions/apiObjectId"
                 },
+                "expires_at": {
+                  "type": "string",
+                  "format": "int64"
+                },
                 "id": {
                   "type": "string",
                   "title": "tokenKey::token_key"
+                },
+                "notify_users": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/apiObjectId"
+                  }
                 },
                 "token": {
                   "type": "string",
@@ -41893,8 +41904,14 @@
           },
           {
             "type": "boolean",
-            "description": "ObjectId user = 1; // [required]\n string usage = 2;  // [optional] usage description\n bool enable = 3;",
             "name": "enable",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "[optional] create-only; server derives token.expires_at",
+            "name": "expiry_days",
             "in": "query"
           }
         ],
@@ -41961,6 +41978,17 @@
                 "deleted_by": {
                   "title": "[optional] disabled by",
                   "$ref": "#/definitions/apiObjectId"
+                },
+                "expires_at": {
+                  "type": "string",
+                  "format": "int64"
+                },
+                "notify_users": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/apiObjectId"
+                  }
                 },
                 "token": {
                   "type": "string",
@@ -42068,6 +42096,17 @@
                 "deleted_by": {
                   "title": "[optional] disabled by",
                   "$ref": "#/definitions/apiObjectId"
+                },
+                "expires_at": {
+                  "type": "string",
+                  "format": "int64"
+                },
+                "notify_users": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/apiObjectId"
+                  }
                 },
                 "token": {
                   "type": "string",
@@ -51720,6 +51759,29 @@
         }
       }
     },
+    "apiTokenExpiryWarning": {
+      "type": "object",
+      "properties": {
+        "days_remaining": {
+          "type": "string",
+          "format": "int64",
+          "title": "Days until token expires"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "Unix timestamp when token expires"
+        },
+        "token_id": {
+          "type": "string",
+          "title": "Personal access token id"
+        },
+        "usage": {
+          "type": "string",
+          "title": "Token short description (name)"
+        }
+      }
+    },
     "apiUpdateAccessResponseV1": {
       "type": "object",
       "properties": {
@@ -51975,9 +52037,20 @@
           "title": "[optional] disabled by",
           "$ref": "#/definitions/apiObjectId"
         },
+        "expires_at": {
+          "type": "string",
+          "format": "int64"
+        },
         "id": {
           "type": "string",
           "title": "tokenKey::token_key"
+        },
+        "notify_users": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/apiObjectId"
+          }
         },
         "token": {
           "type": "string",
@@ -52098,7 +52171,9 @@
         "user_warning_id_unspecified",
         "password_expires_soon",
         "license_expires_soon",
-        "license_expired"
+        "license_expired",
+        "token_expires_soon",
+        "token_expired"
       ]
     },
     "apiUserinfo": {
@@ -52206,6 +52281,9 @@
         },
         "password_expiry": {
           "$ref": "#/definitions/apiPasswordExpiryWarning"
+        },
+        "token_expiry": {
+          "$ref": "#/definitions/apiTokenExpiryWarning"
         }
       }
     },
