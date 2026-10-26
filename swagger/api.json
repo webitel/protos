@@ -12074,6 +12074,11 @@
             "collectionFormat": "multi",
             "name": "excluded_queue_types",
             "in": "query"
+          },
+          {
+            "type": "boolean",
+            "name": "hide_number",
+            "in": "query"
           }
         ],
         "responses": {
@@ -20425,6 +20430,7 @@
             "in": "query"
           },
           {
+            "minItems": 1,
             "uniqueItems": true,
             "type": "array",
             "items": {
@@ -20938,6 +20944,7 @@
             "in": "query"
           },
           {
+            "minItems": 1,
             "uniqueItems": true,
             "type": "array",
             "items": {
@@ -21270,6 +21277,44 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "IMClients"
+        ],
+        "summary": "Link an IM-stack contact (im-contact-service UUID) with the Contact.\nIf the IM contact is already linked to another Contact\nwithin the domain, the link is reassigned to this Contact.",
+        "operationId": "LinkIMContact",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Link contact ID (or etag).",
+            "name": "contact_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/IMClientsLinkIMContactBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/contactsIMClient"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        }
       }
     },
     "/contacts/{contact_id}/imclients/{id}": {
@@ -21521,6 +21566,7 @@
             "in": "query"
           },
           {
+            "minItems": 1,
             "uniqueItems": true,
             "type": "array",
             "items": {
@@ -21788,6 +21834,7 @@
             "in": "query"
           },
           {
+            "minItems": 1,
             "uniqueItems": true,
             "type": "array",
             "items": {
@@ -22219,6 +22266,7 @@
             "in": "query"
           },
           {
+            "minItems": 1,
             "uniqueItems": true,
             "type": "array",
             "items": {
@@ -22739,6 +22787,7 @@
             "in": "query"
           },
           {
+            "minItems": 1,
             "uniqueItems": true,
             "type": "array",
             "items": {
@@ -23238,6 +23287,7 @@
             "in": "query"
           },
           {
+            "minItems": 1,
             "uniqueItems": true,
             "type": "array",
             "items": {
@@ -23906,6 +23956,7 @@
             "in": "query"
           },
           {
+            "minItems": 1,
             "uniqueItems": true,
             "type": "array",
             "items": {
@@ -24378,6 +24429,7 @@
             "in": "query"
           },
           {
+            "minItems": 1,
             "uniqueItems": true,
             "type": "array",
             "items": {
@@ -35124,68 +35176,6 @@
         }
       }
     },
-    "/routing/schema/{schema_id}/versions": {
-      "get": {
-        "tags": [
-          "SchemaVersionService"
-        ],
-        "operationId": "SearchSchemaVersion",
-        "parameters": [
-          {
-            "type": "string",
-            "format": "int64",
-            "name": "schema_id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "integer",
-            "format": "int32",
-            "name": "page",
-            "in": "query"
-          },
-          {
-            "type": "integer",
-            "format": "int32",
-            "name": "size",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "name": "q",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "name": "sort",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
-            "name": "fields",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/engine.SearchSchemaVersionResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/google.rpc.Status"
-            }
-          }
-        }
-      }
-    },
     "/routing/variables": {
       "get": {
         "tags": [
@@ -35482,7 +35472,6 @@
                 "enable_omnichannel",
                 "member_chunk_size",
                 "amd_cancel_not_human",
-                "scheme_version_limit",
                 "enable_2fa",
                 "export_settings",
                 "search_number_length",
@@ -35517,7 +35506,8 @@
                 "block_all_member_numbers_from_list",
                 "login_options",
                 "default_members_filter",
-                "self_assigned_call_sound_notification"
+                "self_assigned_call_sound_notification",
+                "record_all_calls"
               ],
               "type": "string"
             },
@@ -42674,6 +42664,16 @@
             "type": "boolean",
             "name": "only_bots",
             "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Filter by contact IDs.",
+            "name": "ids",
+            "in": "query"
           }
         ],
         "responses": {
@@ -45096,6 +45096,26 @@
             "description": "Return only threads where the caller has at least one unread message.\nIgnored when false.",
             "name": "unread",
             "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Return only threads the caller has tagged with every one of these tags (AND semantics).\nIgnored when empty.",
+            "name": "tags",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Exclude threads the caller has tagged with any of these tags.\nIgnored when empty.",
+            "name": "exclude_tags",
+            "in": "query"
           }
         ],
         "responses": {
@@ -45134,6 +45154,47 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadManagementCreateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/threads/counters": {
+      "get": {
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadManagement"
+        ],
+        "summary": "Returns the caller's chat counters for the chat panel tabs: every active\nchat, the active chats outside Snoozed, and the snoozed chats.",
+        "operationId": "ThreadManagement_GetCounters",
+        "parameters": [
+          {
+            "type": "array",
+            "items": {
+              "enum": [
+                "UNKNOWN",
+                "DIRECT",
+                "GROUP",
+                "CHANNEL"
+              ],
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Count only threads of these kinds. Empty counts every kind.\nUNKNOWN (0) is not allowed.\n\n - UNKNOWN: Unknown or unspecified thread type.\nMust not be used in valid requests.\n - DIRECT: One-to-one private thread between two users.\n - GROUP: Group thread with multiple members.\n - CHANNEL: Channel-style thread (broadcast or topic based communication).",
+            "name": "types",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.GetCountersResponse"
             }
           },
           "default": {
@@ -45348,6 +45409,45 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/webitel.im.api.gateway.v1.TakeOverFromBotResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/threads/{thread_id}/crm_contact": {
+      "put": {
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadManagement"
+        ],
+        "summary": "Sets (or clears) the CRM contact selected by the operator for the thread.\nLinking the IM contact to the CRM contact itself is done via the CRM API.",
+        "operationId": "ThreadManagement_SetCrmContact",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "thread_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadManagement.SetCrmContactBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.SetCrmContactResponse"
             }
           },
           "default": {
@@ -45800,6 +45900,66 @@
         }
       }
     },
+    "/v1/threads/{thread_id}/snooze": {
+      "post": {
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadTagManagement"
+        ],
+        "summary": "Snooze moves the thread to the caller's Snoozed tab. The chat returns to Active on its own\nwhen anyone but the caller writes to it. Succeeds when the thread is already snoozed.",
+        "operationId": "ThreadTagManagement_Snooze",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "thread_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.ChatTag"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadTagManagement"
+        ],
+        "summary": "Unsnooze returns the thread to the caller's Active tab. Succeeds when it is not snoozed.",
+        "operationId": "ThreadTagManagement_Unsnooze",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "thread_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.RemoveThreadTagResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/v1/threads/{thread_id}/tags": {
       "post": {
         "tags": [
@@ -45828,6 +45988,43 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/webitel.im.api.gateway.v1.ChatTag"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
+    "/v1/threads/{thread_id}/tags/{tag}": {
+      "delete": {
+        "tags": [
+          "webitel.im.api.gateway.v1.ThreadTagManagement"
+        ],
+        "summary": "RemoveTagByName removes the caller's tag from a thread by its name. Succeeds when the tag is absent.",
+        "operationId": "ThreadTagManagement_RemoveTagByName",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "thread_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "tag",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webitel.im.api.gateway.v1.RemoveThreadTagResponse"
             }
           },
           "default": {
@@ -48715,6 +48912,27 @@
     "FormatUnderline": {
       "type": "object"
     },
+    "IMClientsLinkIMContactBody": {
+      "type": "object",
+      "properties": {
+        "gateway_id": {
+          "description": "App (gateway) the IM contact is connected through. Optional.",
+          "type": "string"
+        },
+        "im_contact_id": {
+          "description": "IM-stack contact ID (UUID) from the im-contact-service. Required.",
+          "type": "string"
+        },
+        "protocol": {
+          "description": "Protocol (provider type) of the IM conversation, e.g. \"telegram\". Required.",
+          "type": "string"
+        },
+        "via": {
+          "description": "[Via] App(-specific) peer(-id) to connect[from] the IM contact. Optional.",
+          "type": "string"
+        }
+      }
+    },
     "ImportCSVRequestAction": {
       "type": "string",
       "default": "continue",
@@ -50903,7 +51121,7 @@
           "title": "[optional] positive value signify 'active'"
         },
         "presence": {
-          "description": "// FIXME: well-known types ?\r\n repeated Dialog  call = 9;\r\n repeated Sipreg  sip = 9;\r\n repeated Websock wss = 9;",
+          "description": "// FIXME: well-known types ?\n repeated Dialog  call = 9;\n repeated Sipreg  sip = 9;\n repeated Websock wss = 9;",
           "type": "array",
           "title": "detailed: -registered -tracking tuples",
           "items": {
@@ -53034,6 +53252,10 @@
           "description": "The unique ID of the association. Never changes.",
           "type": "string"
         },
+        "im_contact_id": {
+          "description": "IM-stack contact ID (UUID) from the im-contact-service.\nMutually exclusive with .user: a link has either a legacy\nchat client (.user) or an IM-stack contact, never both.",
+          "type": "string"
+        },
         "protocol": {
           "description": "Protocol used to connect the IM client.",
           "type": "string"
@@ -53408,6 +53630,10 @@
         },
         "gateway_id": {
           "description": "App (Text-Gateway) used to connect the IM client.",
+          "type": "string"
+        },
+        "im_contact_id": {
+          "description": "IM-stack contact ID (UUID) from the im-contact-service.\nExactly one of .external_user or .im_contact_id must be set.",
           "type": "string"
         },
         "protocol": {
@@ -63705,35 +63931,6 @@
         "value": {}
       }
     },
-    "engine.SchemaVersion": {
-      "type": "object",
-      "properties": {
-        "created_at": {
-          "type": "string",
-          "format": "int64"
-        },
-        "created_by": {
-          "$ref": "#/definitions/engine.Lookup"
-        },
-        "id": {
-          "type": "string",
-          "format": "int64"
-        },
-        "note": {
-          "type": "string"
-        },
-        "payload": {},
-        "schema": {},
-        "schema_id": {
-          "type": "string",
-          "format": "int64"
-        },
-        "version": {
-          "type": "string",
-          "format": "uint64"
-        }
-      }
-    },
     "engine.SearchHistoryCallRequest": {
       "type": "object",
       "properties": {
@@ -63833,6 +64030,9 @@
           "type": "boolean"
         },
         "has_transfer": {
+          "type": "boolean"
+        },
+        "hide_number": {
           "type": "boolean"
         },
         "id": {
@@ -63981,21 +64181,6 @@
         },
         "next": {
           "description": "Indicates whether another page of results exists.",
-          "type": "boolean"
-        }
-      }
-    },
-    "engine.SearchSchemaVersionResponse": {
-      "type": "object",
-      "properties": {
-        "items": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/engine.SchemaVersion"
-          }
-        },
-        "next": {
           "type": "boolean"
         }
       }
@@ -64236,7 +64421,6 @@
         "enable_omnichannel",
         "member_chunk_size",
         "amd_cancel_not_human",
-        "scheme_version_limit",
         "enable_2fa",
         "export_settings",
         "search_number_length",
@@ -64271,7 +64455,8 @@
         "block_all_member_numbers_from_list",
         "login_options",
         "default_members_filter",
-        "self_assigned_call_sound_notification"
+        "self_assigned_call_sound_notification",
+        "record_all_calls"
       ]
     },
     "engine.SystemSettingService.PatchSystemSettingBody": {
@@ -65029,16 +65214,18 @@
       }
     },
     "google.protobuf.Any": {
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }",
       "type": "object",
       "properties": {
         "@type": {
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics.",
           "type": "string"
         }
       },
       "additionalProperties": {}
     },
     "google.protobuf.NullValue": {
-      "description": "Represents a JSON `null`.\n\n`NullValue` is a sentinel, using an enum with only one value to represent\nthe null value for the `Value` type union.\n\nA field of type `NullValue` with any value other than `0` is considered\ninvalid. Most ProtoJSON serializers will emit a Value with a `null_value` set\nas a JSON `null` regardless of the integer value, and so will round trip to\na `0` value.\n\n - NULL_VALUE: Null value.",
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value.",
       "type": "string",
       "default": "NULL_VALUE",
       "enum": [
@@ -65046,13 +65233,16 @@
       ]
     },
     "google.rpc.Status": {
+      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https://github.com/grpc). Each `Status` message contains\nthree pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the\n[API Design Guide](https://cloud.google.com/apis/design/errors).",
       "type": "object",
       "properties": {
         "code": {
+          "description": "The status code, which should be an enum value of\n[google.rpc.Code][google.rpc.Code].",
           "type": "integer",
           "format": "int32"
         },
         "details": {
+          "description": "A list of messages that carry the error details.  There is a common set of\nmessage types for APIs to use.",
           "type": "array",
           "items": {
             "type": "object",
@@ -65060,6 +65250,7 @@
           }
         },
         "message": {
+          "description": "A developer-facing error message, which should be in English. Any\nuser-facing error message should be localized and sent in the\n[google.rpc.Status.details][google.rpc.Status.details] field, or localized\nby the client.",
           "type": "string"
         }
       }
@@ -65837,7 +66028,7 @@
       "additionalProperties": {}
     },
     "protobufNullValue": {
-      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value.",
+      "description": "Represents a JSON `null`.\n\n`NullValue` is a sentinel, using an enum with only one value to represent\nthe null value for the `Value` type union.\n\nA field of type `NullValue` with any value other than `0` is considered\ninvalid. Most ProtoJSON serializers will emit a Value with a `null_value` set\nas a JSON `null` regardless of the integer value, and so will round trip to\na `0` value.\n\n - NULL_VALUE: Null value.",
       "type": "string",
       "default": "NULL_VALUE",
       "enum": [
@@ -72348,6 +72539,10 @@
           "type": "string",
           "format": "int64"
         },
+        "id": {
+          "description": "Unique contact identifier.",
+          "type": "string"
+        },
         "is_bot": {
           "description": "Represents if usere is real person or automatic script.",
           "type": "boolean"
@@ -72489,6 +72684,24 @@
             "type": "object",
             "$ref": "#/definitions/webitel.im.api.gateway.v1.SkippedMessage"
           }
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.DeletedMessage": {
+      "description": "DeletedMessage is a message deleted since cursor.",
+      "type": "object",
+      "properties": {
+        "deleted_at": {
+          "description": "Unix time in milliseconds when the message was deleted.",
+          "type": "string",
+          "format": "int64"
+        },
+        "deleted_by": {
+          "description": "Member who deleted the message, in the same shape as a message's sender.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadMember"
+        },
+        "id": {
+          "type": "string"
         }
       }
     },
@@ -72755,6 +72968,24 @@
       "properties": {
         "settings": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ContactSettings"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.GetCountersResponse": {
+      "description": "GetCountersResponse carries the caller's counters per chat folder.",
+      "type": "object",
+      "properties": {
+        "active": {
+          "description": "Chats the caller has not snoozed.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadCounters"
+        },
+        "all": {
+          "description": "Every chat the caller is an active member of: active plus snoozed.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadCounters"
+        },
+        "snoozed": {
+          "description": "Chats the caller has snoozed.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadCounters"
         }
       }
     },
@@ -74051,6 +74282,14 @@
     "webitel.im.api.gateway.v1.SendTypingResponse": {
       "type": "object"
     },
+    "webitel.im.api.gateway.v1.SetCrmContactResponse": {
+      "type": "object",
+      "properties": {
+        "crm_contact_id": {
+          "type": "string"
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.SetReactionResponse": {
       "type": "object",
       "properties": {
@@ -74123,6 +74362,10 @@
           "type": "string",
           "format": "int64"
         },
+        "crm_contact_id": {
+          "description": "Webitel CRM contact selected by an operator for this thread.\nEmpty if no CRM contact has been selected.",
+          "type": "string"
+        },
         "description": {
           "description": "Optional thread description.",
           "type": "string"
@@ -74159,6 +74402,14 @@
           "description": "Thread subject or title.",
           "type": "string"
         },
+        "tags": {
+          "description": "The caller's own tags on this thread. Empty if the caller hasn't tagged it.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.ChatTag"
+          }
+        },
         "type": {
           "description": "Type of the thread.",
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadKind"
@@ -74180,6 +74431,22 @@
         "variables": {
           "description": "Optional variables associated with the thread.",
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadVariables"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.ThreadCounters": {
+      "description": "ThreadCounters is the size of one chat folder.",
+      "type": "object",
+      "properties": {
+        "total": {
+          "description": "Number of chats in the folder.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "unread_chats": {
+          "description": "Number of chats in the folder with at least one unread message.",
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -74220,6 +74487,15 @@
     },
     "webitel.im.api.gateway.v1.ThreadManagement.HandBackToBotBody": {
       "type": "object"
+    },
+    "webitel.im.api.gateway.v1.ThreadManagement.SetCrmContactBody": {
+      "type": "object",
+      "properties": {
+        "crm_contact_id": {
+          "description": "Webitel CRM contact id. Empty string clears the selection.",
+          "type": "string"
+        }
+      }
     },
     "webitel.im.api.gateway.v1.ThreadManagement.SetVariablesBody": {
       "description": "SetVariablesRequest defines parameters\nfor setting or updating thread variables.",
@@ -74461,17 +74737,38 @@
         }
       }
     },
+    "webitel.im.api.gateway.v1.ThreadTags": {
+      "description": "ThreadTags is the caller's own tags on a thread.",
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "webitel.im.api.gateway.v1.ThreadUpdates": {
       "type": "object",
       "properties": {
         "deleted_message_ids": {
+          "description": "Ids of deleted_messages, kept for older clients; prefer deleted_messages.",
           "type": "array",
           "items": {
             "type": "string"
           }
         },
+        "deleted_messages": {
+          "description": "Messages deleted since cursor, with when and who deleted them; drop them by id.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webitel.im.api.gateway.v1.DeletedMessage"
+          }
+        },
         "dialog": {
-          "description": "The thread itself, set when it is new to the caller (created or joined since cursor).\nSame model as the thread list, except last_msg and updates_cursor are never set here.",
+          "description": "The thread itself, set when it is new to the caller (created or joined since cursor)\nor when its attributes changed since cursor (e.g. crm_contact_id); replace the cached thread.\nSame model as the thread list, except last_msg and updates_cursor are never set here.",
           "$ref": "#/definitions/webitel.im.api.gateway.v1.Thread"
         },
         "left": {
@@ -74500,6 +74797,10 @@
             "type": "object",
             "$ref": "#/definitions/webitel.im.api.gateway.v1.MemberReadState"
           }
+        },
+        "tags": {
+          "description": "The caller's current tags on the thread, set only when they changed since cursor; replace the\ncached ones. Absent means unchanged, empty items means every tag was removed.",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadTags"
         },
         "thread_id": {
           "type": "string"
@@ -80948,9 +81249,6 @@
       "name": "SchemaVariablesService"
     },
     {
-      "name": "SchemaVersionService"
-    },
-    {
       "name": "SystemSettingService"
     },
     {
@@ -81074,16 +81372,16 @@
       "name": "webitel.im.api.gateway.v1.Account"
     },
     {
+      "description": "ThreadTagManagement defines the gRPC service for managing tags on threads.",
+      "name": "webitel.im.api.gateway.v1.ThreadTagManagement"
+    },
+    {
       "description": "ThreadManagement service provides access to group threads manipulating\nand read-only access for direct threads.",
       "name": "webitel.im.api.gateway.v1.ThreadManagement"
     },
     {
       "description": "ThreadPreviewService grants a contact a time-limited, read-only look at a thread\nwithout making them a member. Trusted inter-service callers only.\nThe initiator is derived from the caller's identity and is never taken from the request.",
       "name": "webitel.im.api.gateway.v1.ThreadPreviewService"
-    },
-    {
-      "description": "ThreadTagManagement defines the gRPC service for managing tags on threads.",
-      "name": "webitel.im.api.gateway.v1.ThreadTagManagement"
     },
     {
       "description": "Updates serves catch-up across all of the caller's threads.",

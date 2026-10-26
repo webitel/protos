@@ -6,6 +6,7 @@ import "api/gateway/v1/contact.proto";
 import "api/gateway/v1/message_history.proto";
 import "api/gateway/v1/peer.proto";
 import "api/gateway/v1/thread_member.proto";
+import "api/gateway/v1/thread_tag.proto";
 import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/struct.proto";
@@ -27,6 +28,12 @@ service ThreadManagement {
   // chats with unread messages and the total number of unread messages.
   rpc GetUnreadSummary(GetUnreadSummaryRequest) returns (GetUnreadSummaryResponse) {
     option (google.api.http) = {get: "/v1/threads/unread"};
+  }
+
+  // Returns the caller's chat counters for the chat panel tabs: every active
+  // chat, the active chats outside Snoozed, and the snoozed chats.
+  rpc GetCounters(GetCountersRequest) returns (GetCountersResponse) {
+    option (google.api.http) = {get: "/v1/threads/counters"};
   }
 
   rpc Create(ThreadManagementCreateRequest) returns (ThreadManagementCreateResponse) {
@@ -73,6 +80,15 @@ service ThreadManagement {
   rpc TakeOverFromBot(TakeOverFromBotRequest) returns (TakeOverFromBotResponse) {
     option (google.api.http) = {
       post: "/v1/threads/{thread_id}/bot/takeover"
+      body: "*"
+    };
+  }
+
+  // Sets (or clears) the CRM contact selected by the operator for the thread.
+  // Linking the IM contact to the CRM contact itself is done via the CRM API.
+  rpc SetCrmContact(SetCrmContactRequest) returns (SetCrmContactResponse) {
+    option (google.api.http) = {
+      put: "/v1/threads/{thread_id}/crm_contact"
       body: "*"
     };
   }
@@ -207,6 +223,13 @@ message Thread {
   // The caller's GetUpdates cursor as of this read (set by Get; Search carries it on the response).
   string updates_cursor = 17;
 
+  // Webitel CRM contact selected by an operator for this thread.
+  // Empty if no CRM contact has been selected.
+  string crm_contact_id = 18;
+
+  // The caller's own tags on this thread. Empty if the caller hasn't tagged it.
+  repeated ChatTag tags = 19;
+
   // Source gate of the thread (the external member's via). Unset when unknown.
   ThreadSource source = 20;
 
@@ -274,6 +297,14 @@ message ThreadSearchRequest {
   // Return only threads where the caller has at least one unread message.
   // Ignored when false.
   bool unread = 11;
+
+  // Return only threads the caller has tagged with every one of these tags (AND semantics).
+  // Ignored when empty.
+  repeated string tags = 12;
+
+  // Exclude threads the caller has tagged with any of these tags.
+  // Ignored when empty.
+  repeated string exclude_tags = 13;
 }
 
 // GetThreadRequest defines parameters for retrieving a single thread by ID.
@@ -312,6 +343,38 @@ message GetUnreadSummaryResponse {
 
   // Total number of unread messages across all chats.
   int64 unread_messages = 2;
+}
+
+// GetCountersRequest narrows the counted chats; the participant is taken
+// from the authenticated caller by the gateway.
+message GetCountersRequest {
+  // Count only threads of these kinds. Empty counts every kind.
+  // UNKNOWN (0) is not allowed.
+  repeated ThreadKind types = 1 [
+    (buf.validate.field).repeated.items.enum.defined_only = true,
+    (buf.validate.field).repeated.items.enum.not_in = 0
+  ];
+}
+
+// ThreadCounters is the size of one chat folder.
+message ThreadCounters {
+  // Number of chats in the folder.
+  int32 total = 1;
+
+  // Number of chats in the folder with at least one unread message.
+  int32 unread_chats = 2;
+}
+
+// GetCountersResponse carries the caller's counters per chat folder.
+message GetCountersResponse {
+  // Every chat the caller is an active member of: active plus snoozed.
+  ThreadCounters all = 1;
+
+  // Chats the caller has not snoozed.
+  ThreadCounters active = 2;
+
+  // Chats the caller has snoozed.
+  ThreadCounters snoozed = 3;
 }
 
 message SearchLeftRequest {
@@ -424,6 +487,20 @@ message TakeOverFromBotRequest {
 }
 
 message TakeOverFromBotResponse {}
+
+message SetCrmContactRequest {
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  // Webitel CRM contact id. Empty string clears the selection.
+  string crm_contact_id = 2 [(buf.validate.field).string.pattern = "^[0-9]*$"];
+}
+
+message SetCrmContactResponse {
+  string crm_contact_id = 1;
+}
 
 message TransferRequest {
   string thread_id = 1 [
