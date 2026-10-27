@@ -223,7 +223,13 @@ message Thread {
   // Channel the external participant reaches the thread through: a provider
   // gate (WhatsApp, Facebook, Viber BM, custom) or a portal / widget
   // application. Unset when it cannot be resolved (e.g. an internal thread).
+  // Search sorts by channel.name with the sort-only key "channel_name"
+  // (+channel_name / -channel_name); threads without a gate name sort last.
   ThreadChannel channel = 20;
+
+  // Queue through which the calling participant received the thread. Set by Search; unset when unknown.
+  // Search sorts by queue.name with the sort-only key "queue_name".
+  ThreadQueue queue = 21;
 }
 
 // ThreadChannel describes the channel a thread came in through.
@@ -252,6 +258,10 @@ enum ThreadChannelType {
   THREAD_CHANNEL_TYPE_PORTAL = 4;
   THREAD_CHANNEL_TYPE_WIDGET = 5;
   THREAD_CHANNEL_TYPE_CUSTOM = 6;
+  THREAD_CHANNEL_TYPE_TELEGRAM_BOT = 7;
+  THREAD_CHANNEL_TYPE_TELEGRAM_APP = 8;
+  THREAD_CHANNEL_TYPE_VIBER = 9;
+  THREAD_CHANNEL_TYPE_INSTAGRAM = 10;
 }
 
 //#endregion
