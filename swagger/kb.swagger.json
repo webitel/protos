@@ -1382,6 +1382,19 @@
               "type": "string"
             },
             "collectionFormat": "multi"
+          },
+          {
+            "name": "state",
+            "description": "Optional state filter.\n\n - SPACE_STATE_ACTIVE: Articles of the space are retrievable.\n - SPACE_STATE_INACTIVE: Articles are kept but excluded from search and suggestions.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "SPACE_STATE_UNSPECIFIED",
+              "SPACE_STATE_ACTIVE",
+              "SPACE_STATE_INACTIVE"
+            ],
+            "default": "SPACE_STATE_UNSPECIFIED"
           }
         ],
         "tags": [
@@ -2409,6 +2422,10 @@
             "format": "int64"
           },
           "description": "Team ids the space is bound to as default operator visibility;\nthe set replaces the current binding, empty removes it."
+        },
+        "state": {
+          "$ref": "#/definitions/webitel.kb.SpaceState",
+          "description": "Lifecycle state; unspecified keeps the current one, active on create."
         }
       },
       "description": "InputSpace carries the writable fields of a space."
@@ -2606,6 +2623,10 @@
           },
           "description": "Teams the space is bound to as default operator visibility;\nempty when no binding is configured."
         },
+        "state": {
+          "$ref": "#/definitions/webitel.kb.SpaceState",
+          "description": "Lifecycle state."
+        },
         "created_at": {
           "type": "string",
           "format": "int64",
@@ -2644,6 +2665,16 @@
         }
       },
       "description": "SpaceList is a page of spaces."
+    },
+    "webitel.kb.SpaceState": {
+      "type": "string",
+      "enum": [
+        "SPACE_STATE_UNSPECIFIED",
+        "SPACE_STATE_ACTIVE",
+        "SPACE_STATE_INACTIVE"
+      ],
+      "default": "SPACE_STATE_UNSPECIFIED",
+      "description": "Space lifecycle state.\n\n - SPACE_STATE_ACTIVE: Articles of the space are retrievable.\n - SPACE_STATE_INACTIVE: Articles are kept but excluded from search and suggestions."
     },
     "webitel.kb.SuggestRequest": {
       "type": "object",

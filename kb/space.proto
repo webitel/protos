@@ -60,6 +60,15 @@ service Spaces {
   }
 }
 
+// Space lifecycle state.
+enum SpaceState {
+  SPACE_STATE_UNSPECIFIED = 0;
+  // Articles of the space are retrievable.
+  SPACE_STATE_ACTIVE = 1;
+  // Articles are kept but excluded from search and suggestions.
+  SPACE_STATE_INACTIVE = 2;
+}
+
 // Space is a knowledge-base space read model.
 message Space {
   // Unique identifier of the space.
@@ -89,6 +98,8 @@ message Space {
   // Teams the space is bound to as default operator visibility;
   // empty when no binding is configured.
   repeated general.Lookup teams = 13;
+  // Lifecycle state.
+  SpaceState state = 14;
   // CreatedAt timestamp (epoch ms).
   int64 created_at = 20;
   // UpdatedAt timestamp (epoch ms).
@@ -120,6 +131,8 @@ message InputSpace {
   // Team ids the space is bound to as default operator visibility;
   // the set replaces the current binding, empty removes it.
   repeated int64 team_ids = 10;
+  // Lifecycle state; unspecified keeps the current one, active on create.
+  SpaceState state = 11;
 }
 
 // ListSpacesRequest parameters.
@@ -134,6 +147,8 @@ message ListSpacesRequest {
   string sort = 4;
   // Set of fields to return.
   repeated string fields = 5;
+  // Optional state filter.
+  SpaceState state = 6;
 }
 
 // SpaceList is a page of spaces.
