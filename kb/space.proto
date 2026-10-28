@@ -4,6 +4,7 @@ package webitel.kb;
 
 option go_package = "github.com/webitel/webitel-kb/api/kb;kb";
 
+import "buf/validate/validate.proto";
 import "general.proto";
 import "google/api/annotations.proto";
 import "proto/webitel/option.proto";
@@ -113,8 +114,8 @@ message Space {
 
 // InputSpace carries the writable fields of a space.
 message InputSpace {
-  // Human-readable name.
-  string name = 1;
+  // Human-readable name, at most 255 characters.
+  string name = 1 [(buf.validate.field).string.max_len = 255];
   // Free-text description.
   string description = 9;
   // Space language; immutable after creation.
