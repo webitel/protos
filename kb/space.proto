@@ -60,6 +60,15 @@ service Spaces {
   }
 }
 
+// Space lifecycle state.
+enum SpaceState {
+  SPACE_STATE_UNSPECIFIED = 0;
+  // Articles of the space are retrievable.
+  SPACE_STATE_ACTIVE = 1;
+  // Articles are kept but excluded from search and suggestions.
+  SPACE_STATE_INACTIVE = 2;
+}
+
 // Space is a knowledge-base space read model.
 message Space {
   // Unique identifier of the space.
@@ -78,7 +87,8 @@ message Space {
   int64 target_embedding_model_id = 6;
   // Reranker model id (type=reranker).
   int64 reranker_model_id = 7;
-  // Whether articles in this space are embedded for vector search.
+  // Whether vector search is on. Without a model the space is searched by
+  // text alone.
   bool vector_search_enabled = 8;
   // Whether reranking is applied (default off, on for suggest).
   bool rerank_enabled = 9;
@@ -89,6 +99,8 @@ message Space {
   // Teams the space is bound to as default operator visibility;
   // empty when no binding is configured.
   repeated general.Lookup teams = 13;
+  // Lifecycle state.
+  SpaceState state = 14;
   // CreatedAt timestamp (epoch ms).
   int64 created_at = 20;
   // UpdatedAt timestamp (epoch ms).
@@ -111,17 +123,18 @@ message InputSpace {
   int64 embedding_model_id = 3;
   // Reranker model id.
   int64 reranker_model_id = 4;
-  // Whether articles are embedded for vector search.
-  bool vector_search_enabled = 5;
+  // Whether vector search is on; on when omitted at creation. Without a
+  // model the space is searched by text alone.
+  optional bool vector_search_enabled = 5;
   // Whether reranking is applied.
   bool rerank_enabled = 6;
   // Chunking strategy identifier.
   string chunking_strategy = 7;
-  // Article used as the space home page.
-  int64 home_article_id = 8;
   // Team ids the space is bound to as default operator visibility;
   // the set replaces the current binding, empty removes it.
   repeated int64 team_ids = 10;
+  // Lifecycle state; unspecified keeps the current one, active on create.
+  SpaceState state = 11;
 }
 
 // ListSpacesRequest parameters.
@@ -136,6 +149,8 @@ message ListSpacesRequest {
   string sort = 4;
   // Set of fields to return.
   repeated string fields = 5;
+  // Optional state filter.
+  SpaceState state = 6;
 }
 
 // SpaceList is a page of spaces.
