@@ -357,7 +357,17 @@ message EmailJoinToQueueRequest {
     // email-service Thread joined to the queue.
     int64 thread_id = 3;
     // Idempotency key: the email.message.inbound event that started the Flow.
+    // Valid replays return the stored result without changing routing parameters.
     string email_event_id = 4;
+    // Priority in [0, 2147483647]; default 0. Invalid values return InvalidArgument
+    // with ID store.sql_member.email_join.invalid_priority.
+    int32 priority = 5;
+    // Explicit Sticky candidate; 0 means no candidate.
+    int32 sticky_agent_id = 6;
+    // Allows Extra capacity independently of priority; default false.
+    bool extra_email_count = 7;
+    // Initial inbound From address, trimmed and lowercased; empty if unavailable.
+    string from_address = 8;
 
     int64 domain_id = 100;
 }
