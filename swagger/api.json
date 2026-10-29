@@ -44933,7 +44933,7 @@
               "type": "string"
             },
             "collectionFormat": "multi",
-            "description": "List of fields that should be returned in the response.\nIf empty, a default set of fields is returned.\nUsed for response optimization.",
+            "description": "List of fields that should be returned in the response.\nIf empty, a default set of fields is returned.\nUsed for response optimization.\nThe default set includes \"channel\" and \"queue\".",
             "name": "fields",
             "in": "query"
           },
@@ -44955,7 +44955,7 @@
           },
           {
             "type": "string",
-            "description": "Sorting field.\nOptional \"+\" or \"-\" prefix indicates ascending or descending order.\nExample: \"-created_at\", \"subject\"",
+            "description": "Sorting field.\nOptional \"+\" or \"-\" prefix indicates ascending or descending order.\nExample: \"-created_at\", \"subject\"\nSort-only keys: \"channel_name\", \"queue_name\" (threads without a value sort last).",
             "name": "sort",
             "in": "query"
           },
@@ -73925,7 +73925,7 @@
       "type": "object",
       "properties": {
         "channel": {
-          "description": "Channel the external participant reaches the thread through: a provider\ngate (WhatsApp, Facebook, Viber BM, custom) or a portal / widget\napplication. Unset when it cannot be resolved (e.g. an internal thread).",
+          "description": "Channel the external participant reaches the thread through: a provider\ngate (WhatsApp, Facebook, Viber BM, custom) or a portal / widget\napplication. Unset when it cannot be resolved (e.g. an internal thread).\nSearch sorts by channel.name with the sort-only key \"channel_name\"\n(+channel_name / -channel_name); threads without a gate name sort last.",
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadChannel"
         },
         "created_at": {
@@ -73956,6 +73956,10 @@
             "type": "object",
             "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadMember"
           }
+        },
+        "queue": {
+          "description": "Queue through which the calling participant received the thread. Set by Search; unset when unknown.\nSearch sorts by queue.name with the sort-only key \"queue_name\".",
+          "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadQueue"
         },
         "read_states": {
           "description": "Per-member read horizons (snapshot, matches GetUpdates model).\nClient derives inbox/outbox watermarks: own_last_read = inbox; MIN over others = outbox.",
@@ -74038,7 +74042,11 @@
         "THREAD_CHANNEL_TYPE_VIBER_BM",
         "THREAD_CHANNEL_TYPE_PORTAL",
         "THREAD_CHANNEL_TYPE_WIDGET",
-        "THREAD_CHANNEL_TYPE_CUSTOM"
+        "THREAD_CHANNEL_TYPE_CUSTOM",
+        "THREAD_CHANNEL_TYPE_TELEGRAM_BOT",
+        "THREAD_CHANNEL_TYPE_TELEGRAM_APP",
+        "THREAD_CHANNEL_TYPE_VIBER",
+        "THREAD_CHANNEL_TYPE_INSTAGRAM"
       ]
     },
     "webitel.im.api.gateway.v1.ThreadCounters": {
@@ -74293,6 +74301,21 @@
         },
         "role": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadRole"
+        }
+      }
+    },
+    "webitel.im.api.gateway.v1.ThreadQueue": {
+      "description": "ThreadQueue is a call_center queue through which an agent received a thread.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Queue id.",
+          "type": "string",
+          "format": "int64"
+        },
+        "name": {
+          "description": "Queue display name.",
+          "type": "string"
         }
       }
     },
