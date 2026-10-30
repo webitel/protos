@@ -556,7 +556,8 @@ message UpdateAgentRequest {
   uint32 extra_chat_count = 16;
   // Base Email slots; omitted keeps the current value, explicit 0 disables base slots.
   optional uint32 email_count = 17;
-  // Maximum of postponed Email attempts; 0 disables postponing. Absent keeps the current value.
+  // Maximum of postponed Email attempts; 0 disables postponing. Absent keeps the current value;
+  // PatchAgentRequest clears the limit.
   optional uint32 email_postponed_count = 18;
   // Extra Email slots; omitted keeps the current value.
   optional uint32 extra_email_count = 19;
@@ -580,7 +581,9 @@ message PatchAgentRequest {
   bool screen_control = 14;
   uint32 extra_chat_count = 15;
   uint32 email_count = 16;
-  uint32 email_postponed_count = 17;
+  // Maximum of postponed Email attempts; 0 disables postponing. Absent with the field in fields
+  // removes the limit.
+  optional uint32 email_postponed_count = 17;
   // Extra Email slots; updated only when included in fields.
   uint32 extra_email_count = 18;
 }
@@ -640,7 +643,8 @@ message CreateAgentRequest {
   uint32 extra_chat_count = 15;
   // Base Email slots; omitted defaults to 1, explicit 0 disables base slots.
   optional uint32 email_count = 16;
-  uint32 email_postponed_count = 17;
+  // Maximum of postponed Email attempts; omitted means no limit, explicit 0 disables postponing.
+  optional uint32 email_postponed_count = 17;
   // Extra Email slots; default 0.
   uint32 extra_email_count = 18;
 }
@@ -703,7 +707,8 @@ message Agent {
   string status_type = 25;
   // Configured base Email slots.
   uint32 email_count = 26;
-  uint32 email_postponed_count = 27;
+  // Maximum of postponed Email attempts; absent means no limit, 0 disables postponing.
+  optional uint32 email_postponed_count = 27;
   // Configured Extra Email slots.
   uint32 extra_email_count = 28;
 }
