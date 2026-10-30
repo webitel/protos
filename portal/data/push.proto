@@ -1,0 +1,165 @@
+syntax = "proto3";
+package webitel.portal;
+option go_package = "webitel.go/api/portal;portal";
+
+// PUSH Subscription
+// https://core.telegram.org/api/push-updates#subscribing-to-notifications
+message DevicePush {
+  // PUSH Token kind
+  oneof token {
+
+    // // Register client's device (X-Portal-Device)
+    // // for custom (external) PUSH notification proxy service
+    // bool proxy = 3;
+    
+    // [F]irebase [C]loud [M]essaging Service (firebase token for google firebase)
+    string FCM = 1;
+    
+    // [A]pple [P]ush [N]otification Service (device token for apple push)
+    string APN = 2;
+    
+    // // 3 - MPNS (channel URI for microsoft push)
+    // string MPNS = 3;
+    
+    // // 4 - Simple push (endpoint for firefox's deprecated simple push API): note that this push type can also be used by an open source push notification spec like UnifiedPush ».
+    // // Simple push works by sending a simple PUT request with a version=number payload to the specified HTTPS endpoint every time a relevant message is received: upon receiving such a notification, clients should connect to the MTProto API and fetch updates.
+    // // (Note that the number won't necessarily be incremental in Telegram's implementation, just treat each distinct request as a signal that a new message is waiting to be fetched via MTProto).
+    // string PUSH = 4;
+    // // 5 - Ubuntu phone (token for ubuntu push)
+    // // 6 - Blackberry (token for blackberry push)
+    // // 7 - MTProto separate session
+    // // 8 - WNS (windows push)
+    // string WNS = 8;
+    // // 9 - APNS VoIP (token for apple push VoIP)
+    // // 10 - Web push (web push, see below)
+    // // 11 - MPNS VoIP (token for microsoft push VoIP)
+    // // 12 - Tizen (token for tizen push)
+    
+    // For 10 web push, the token must be a JSON-encoded object with the following keys:
+    // endpoint: Absolute URL exposed by the push service where the application server can send push messages
+    // keys: P-256 elliptic curve Diffie-Hellman parameters in the following object
+    // p256dh: Base64url-encoded P-256 elliptic curve Diffie-Hellman public key
+    // auth: Base64url-encoded authentication secret
+    WebPush web = 10;
+  }
+  // For FCM and APNS VoIP, optional encryption key used to encrypt push notifications
+  string secret = 20;
+}
+
+// // device token for apple push
+// message APNsVoIP {
+//   string token = 1;
+//   string secret = 2;
+// }
+
+// // device token for apple push
+// message FCMVoIP {
+//   string token = 1;
+//   string secret = 2;
+// }
+
+// WebPUSH subscription
+message WebPush {
+  // endpoint: Absolute URL exposed by the push service where the application server can send push messages
+  string endpoint = 1;
+  
+  // keys: P-256 elliptic curve Diffie-Hellman parameters in the following object
+  // p256dh: Base64url-encoded P-256 elliptic curve Diffie-Hellman public key
+  // auth: Base64url-encoded authentication secret
+  message Key {
+    // auth: Base64url-encoded authentication secret
+    bytes auth = 1;
+    // p256dh: Base64url-encoded P-256 elliptic curve Diffie-Hellman public key
+    bytes p256dh = 2;
+  }
+
+  // P-256 elliptic curve Diffie-Hellman parameters
+  Key key = 2;
+}
+
+// ------------------- Service Client Options --------------------- //
+
+// PUSH proxy (custom) service configuration
+message PushProxy {
+  // Custom PUSH proxy URL.
+  string uri = 1;
+  // DESIGN. Subscription(s).
+  // Set of update types to emit:
+  // - "message"       ; UpdateNewMessage
+  // - "chat_member"   ; UpdateChatMember
+  // - "left_member"   ; UpdateLeftMessage
+  // - "chat_complete" ; UpdateChatComplete
+  repeated string sub = 2;
+}
+
+// [F]irebase [C]loud [M]essaging service client configuration
+message FCMsClient {
+
+  // // Client 
+  // oneof client {
+
+    // Proxy URL to [POST] a notification message [TO] specified target.
+    // https://fcm.googleapis.com/v1/{parent=projects/*}/messages:send
+    string proxy = 1;
+
+    // Authenticate FCMs API calls with the given service account JSON credentials.
+    // https://firebase.google.com/docs/cloud-messaging/auth-server#authorize-http-v1-send-requests
+    bytes creds = 2;
+
+  // }
+}
+
+// [A]pple [P]ush [N]otification service client configuration
+message APNsClient {
+
+  // Client proxy URL.
+  // - https://api.push.apple.com               ; Apple Push Services ; Default
+  // - https://api.sandbox.push.apple.com       ; Apple Sandbox Push Services
+  // - http://host[:port][/path/to/handle/apns] ; Custom service
+  string proxy = 1;
+
+  // OPTIONAL. Client transport protocol.
+  // - h2 ; Default
+  // - http/1.1
+  string proto = 2;
+
+  // The topic for the notification.
+  // In general, the topic is your app’s bundle ID/app ID.
+  // It can have a suffix based on the type of push notification.
+  // If you’re using a certificate that supports PushKit VoIP or watchOS complication notifications,
+  // you must include this header with the bundle ID of your app and if applicable, the proper suffix.
+  // If you’re using token-based authentication with APNs, you must include this header with the correct bundle ID and suffix combination.
+  //
+  // To learn more about app ID, see Register an App ID.
+  // https://developer.apple.com/help/account/manage-identifiers/register-an-app-id
+  string topic = 3;
+
+  // Token/key configuration
+  message Token {
+    // A 10-character string with the Key ID.
+    // You must include this string in your JSON tokens.
+    // https://developer.apple.com/documentation/usernotifications/establishing-a-token-based-connection-to-apns
+    string key_id = 1;
+    // An authentication token signing key, specified as a text file (with a .p8 file extension)
+    // Raw (inline) file content. base64/PEM source data
+    bytes auth_key = 2;
+    // A 10-character string with the Team ID you use for developing your company’s apps.
+    // The issuer key. Obtain this value from your developer account.
+    // https://developer.apple.com/help/account/manage-your-team/locate-your-team-id/
+    string team_id = 3;
+  }
+
+  // Token-based client authentication.
+  Token token = 4;
+
+  // TLS Client Certificate
+  message TLSClient {
+    // CERTIFICATE ; base64/PEM source data
+    bytes cert = 1;
+    // PRIVATE KEY ; base64/PEM source data
+    bytes pkey = 2;
+  }
+
+  // Certificate-based client authentication.
+  TLSClient tls = 5;
+}
