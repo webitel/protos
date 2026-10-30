@@ -33,6 +33,14 @@ service MemberService {
 
     rpc InterceptAttempt(InterceptAttemptRequest) returns (InterceptAttemptResponse) {}
     rpc ResumeAttempt(ResumeAttemptRequest) returns (ResumeAttemptResponse) {}
+
+    // Email attempt lifecycle; the request form tells the caller: an operator or a Flow.
+    rpc EmailAttemptTake(EmailAttemptTakeRequest) returns (EmailAttemptResponse) {}
+    rpc EmailAttemptPostpone(EmailAttemptPostponeRequest) returns (EmailAttemptResponse) {}
+    rpc EmailAttemptReturn(EmailAttemptReturnRequest) returns (EmailAttemptResponse) {}
+    rpc EmailAttemptComplete(EmailAttemptCompleteRequest) returns (EmailAttemptResponse) {}
+    // Wakes the active attempt of the Thread once per inbound Email event, with or without a Flow.
+    rpc EmailWakeUp(EmailWakeUpRequest) returns (EmailWakeUpResponse) {}
 }
 
 message IMJoinToQueueRequest {
@@ -85,10 +93,20 @@ message IMJoinToQueueResponse {
 message ResumeAttemptRequest {
     int64 domain_id = 1;
     int64 attempt_id = 2;
+
+    // An Email attempt is resumed either by its agent (attempt_id, thread_id, agent_id,
+    // expected_version, command_id) or by a Flow (thread_id and email_event_id only).
+    int64 thread_id = 3;
+    int32 agent_id = 4;
+    optional int64 expected_version = 5;
+    string command_id = 6;
+    string email_event_id = 7;
 }
 
 message ResumeAttemptResponse {
     bool ok = 1;
+    // Set for an Email attempt.
+    EmailAttemptResponse email = 2;
 }
 
 message InterceptAttemptRequest {
@@ -282,10 +300,17 @@ message AttemptRenewalResultRequest {
     int64 domain_id = 1;
     int64 attempt_id = 2;
     uint32 renewal = 3;
+
+    // Required for an Email attempt, which is renewed only by its agent at the expected version.
+    int64 thread_id = 4;
+    int32 agent_id = 5;
+    optional int64 expected_version = 6;
+    string command_id = 7;
 }
 
 message AttemptRenewalResultResponse {
-
+    // Set for an Email attempt.
+    EmailAttemptResponse email = 1;
 }
 
 message QueueEvent {
@@ -464,4 +489,100 @@ message AttemptResultRequest {
 
 message AttemptResultResponse {
     string status = 1;
+}
+
+// Operator form of an Email attempt command, sent by engine for the agent of the attempt.
+message EmailAttemptOperator {
+    int64 attempt_id = 1;
+    int32 agent_id = 2;
+    // attempt_version the agent saw; a newer attempt rejects the command.
+    optional int64 expected_version = 3;
+    // Idempotency key of the command; a retry repeats it with the same arguments.
+    string command_id = 4;
+}
+
+// Flow form: the attempt is the active one of the Thread, woken by this inbound Email event.
+message EmailAttemptFlow {
+    string email_event_id = 1;
+}
+
+message EmailAttemptTakeRequest {
+    int64 domain_id = 1;
+    int64 thread_id = 2;
+    EmailAttemptOperator operator = 3;
+}
+
+message EmailAttemptPostponeRequest {
+    int64 domain_id = 1;
+    int64 thread_id = 2;
+
+    oneof caller {
+        EmailAttemptOperator operator = 3;
+        EmailAttemptFlow flow = 4;
+    }
+
+    oneof deadline {
+        // Unix milliseconds.
+        int64 postponed_until = 5;
+        int32 postpone_for_sec = 6;
+    }
+}
+
+message EmailAttemptReturnRequest {
+    int64 domain_id = 1;
+    int64 thread_id = 2;
+    EmailAttemptOperator operator = 3;
+}
+
+message EmailAttemptCompleteRequest {
+    int64 domain_id = 1;
+    int64 thread_id = 2;
+    EmailAttemptOperator operator = 3;
+}
+
+// State of the attempt after the command, or after its first execution for a replay.
+message EmailAttemptResponse {
+    int64 attempt_id = 1;
+    int64 thread_id = 2;
+    // waiting, offering, active, postponed, processing or leaving.
+    string state = 3;
+    int64 attempt_version = 4;
+    // Order of the change among the changes of the Thread.
+    int64 projection_version = 5;
+    // Set when the attempt left: processed or processing_timeout.
+    string result = 6;
+    int32 queue_id = 7;
+    int32 agent_id = 8;
+    // Unix milliseconds; set while postponed.
+    int64 postponed_until = 9;
+    bool replayed = 10;
+}
+
+message EmailWakeUpRequest {
+    int64 domain_id = 1;
+    int64 thread_id = 2;
+    // The email.message.inbound event; its result is kept and returned again on a replay.
+    string email_event_id = 3;
+}
+
+message EmailWakeUpResponse {
+    enum Result {
+        RESULT_UNSPECIFIED = 0;
+        // A postponed attempt went back to work with its agent.
+        RESULT_WOKEN = 1;
+        // A postponed attempt went to the queue: its agent had no slot or was not online.
+        RESULT_QUEUED = 2;
+        // An attempt in post-processing went back to work.
+        RESULT_REOPENED = 3;
+        // The active attempt needed no change.
+        RESULT_NOOP = 4;
+        // The Thread has no active attempt.
+        RESULT_NOT_ACTIVE = 5;
+    }
+
+    Result result = 1;
+    int64 attempt_id = 2;
+    string state = 3;
+    int64 attempt_version = 4;
+    bool replayed = 5;
 }
