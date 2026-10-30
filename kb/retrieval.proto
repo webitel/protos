@@ -4,6 +4,7 @@ package webitel.kb;
 
 option go_package = "github.com/webitel/webitel-kb/api/kb;kb";
 
+import "buf/validate/validate.proto";
 import "common.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
@@ -80,7 +81,7 @@ message SearchRequest {
   // Optional tag filter.
   repeated string tags = 3;
   // How to combine the tag filter; unspecified means any.
-  TagMatch tag_match = 4;
+  TagMatch tag_match = 4 [(buf.validate.field).enum.defined_only = true];
   // Page size.
   int32 size = 5;
   // Page number (1-based).
@@ -97,8 +98,8 @@ message SearchResponse {
 
 // ResolveRequest selects articles by id within the given spaces.
 message ResolveRequest {
-  // Article ids to resolve.
-  repeated int64 ids = 1;
+  // Article ids to resolve, at most 5000.
+  repeated int64 ids = 1 [(buf.validate.field).repeated.max_items = 5000];
   // Spaces the ids are expected in (RBAC scope).
   repeated int64 space_ids = 2;
 }
@@ -111,6 +112,12 @@ message ResolveResponse {
 
 // SemanticSearchRequest parameters for hybrid retrieval.
 message SemanticSearchRequest {
+  option (buf.validate.message).cel = {
+    id: "kb.retrieval.space_required"
+    message: "at least one space is required"
+    expression: "this.query.trim() == '' || size(this.space_ids) > 0"
+  };
+
   // Natural-language query (e.g. STT transcript).
   string query = 1;
   // Spaces to search within (bot service scope).
@@ -122,7 +129,7 @@ message SemanticSearchRequest {
   // Optional tag filter.
   repeated string tags = 5;
   // How to combine the tag filter; unspecified means any.
-  TagMatch tag_match = 6;
+  TagMatch tag_match = 6 [(buf.validate.field).enum.defined_only = true];
 }
 
 // SemanticSearchResponse returns ranked chunks and optional citations.
@@ -135,6 +142,12 @@ message SemanticSearchResponse {
 
 // SuggestRequest parameters for operator assist.
 message SuggestRequest {
+  option (buf.validate.message).cel = {
+    id: "kb.retrieval.space_required"
+    message: "a team or at least one space is required"
+    expression: "this.customer_message.trim() == '' || size(this.space_ids) > 0 || this.team_id > 0"
+  };
+
   // Latest customer message used as the query.
   string customer_message = 1;
   // Spaces to search within.
@@ -156,7 +169,7 @@ message SuggestResponse {
 // MenuRequest parameters for bot menus.
 message MenuRequest {
   // Space to read from.
-  int64 space_id = 1;
+  int64 space_id = 1 [(buf.validate.field).int64.gt = 0];
   // Parent article id; 0 for top level.
   int64 parent_id = 2;
   // Maximum hierarchy depth to return.

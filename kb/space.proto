@@ -4,6 +4,7 @@ package webitel.kb;
 
 option go_package = "github.com/webitel/webitel-kb/api/kb;kb";
 
+import "buf/validate/validate.proto";
 import "general.proto";
 import "google/api/annotations.proto";
 import "proto/webitel/option.proto";
@@ -113,16 +114,16 @@ message Space {
 
 // InputSpace carries the writable fields of a space.
 message InputSpace {
-  // Human-readable name.
-  string name = 1;
+  // Human-readable name, at most 255 characters.
+  string name = 1 [(buf.validate.field).string.max_len = 255];
   // Free-text description.
   string description = 9;
   // Space language; immutable after creation.
   string language = 2;
   // Active embedding model id.
-  int64 embedding_model_id = 3;
+  int64 embedding_model_id = 3 [(buf.validate.field).int64.gte = 0];
   // Reranker model id.
-  int64 reranker_model_id = 4;
+  int64 reranker_model_id = 4 [(buf.validate.field).int64.gte = 0];
   // Whether vector search is on; on when omitted at creation. Without a
   // model the space is searched by text alone.
   optional bool vector_search_enabled = 5;
@@ -132,9 +133,9 @@ message InputSpace {
   string chunking_strategy = 7;
   // Team ids the space is bound to as default operator visibility;
   // the set replaces the current binding, empty removes it.
-  repeated int64 team_ids = 10;
+  repeated int64 team_ids = 10 [(buf.validate.field).repeated.items.int64.gt = 0];
   // Lifecycle state; unspecified keeps the current one, active on create.
-  SpaceState state = 11;
+  SpaceState state = 11 [(buf.validate.field).enum.defined_only = true];
 }
 
 // ListSpacesRequest parameters.
@@ -150,7 +151,7 @@ message ListSpacesRequest {
   // Set of fields to return.
   repeated string fields = 5;
   // Optional state filter.
-  SpaceState state = 6;
+  SpaceState state = 6 [(buf.validate.field).enum.defined_only = true];
 }
 
 // SpaceList is a page of spaces.
@@ -164,21 +165,28 @@ message SpaceList {
 // LocateSpaceRequest selects a space by id.
 message LocateSpaceRequest {
   // Space id.
-  int64 id = 1;
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
 }
 
 // CreateSpaceRequest wraps the space to create.
 message CreateSpaceRequest {
-  // Space fields.
-  InputSpace input = 1;
+  // Space fields; language is required.
+  InputSpace input = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel = {
+      id: "kb.space.language_required"
+      message: "language is required"
+      expression: "this.language != ''"
+    }
+  ];
 }
 
 // UpdateSpaceRequest wraps the space id and updated fields.
 message UpdateSpaceRequest {
   // Space id.
-  int64 id = 1;
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
   // Updated space fields.
-  InputSpace input = 2;
+  InputSpace input = 2 [(buf.validate.field).required = true];
   // Input fields to apply, filled by the gateway from a PATCH body.
   repeated string x_json_mask = 3;
 }
@@ -186,5 +194,5 @@ message UpdateSpaceRequest {
 // DeleteSpaceRequest selects a space to delete.
 message DeleteSpaceRequest {
   // Space id.
-  int64 id = 1;
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
 }

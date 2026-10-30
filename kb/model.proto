@@ -4,6 +4,7 @@ package webitel.kb;
 
 option go_package = "github.com/webitel/webitel-kb/api/kb;kb";
 
+import "buf/validate/validate.proto";
 import "general.proto";
 import "google/api/annotations.proto";
 import "proto/webitel/option.proto";
@@ -100,7 +101,12 @@ message EmbeddingModel {
 // InputEmbeddingModel carries the writable fields of a model.
 message InputEmbeddingModel {
   // Model type: "embedding" or "reranker".
-  string type = 1;
+  string type = 1 [
+    (buf.validate.field).string = {
+      in: ["embedding", "reranker"]
+    },
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
   // Human-readable name.
   string name = 2;
   // Provider key.
@@ -144,21 +150,28 @@ message EmbeddingModelList {
 // LocateModelRequest selects a model by id.
 message LocateModelRequest {
   // Model id.
-  int64 id = 1;
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
 }
 
 // CreateModelRequest wraps the model to create.
 message CreateModelRequest {
-  // Model fields.
-  InputEmbeddingModel input = 1;
+  // Model fields; the type is required.
+  InputEmbeddingModel input = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel = {
+      id: "kb.model.type_required"
+      message: "type is required"
+      expression: "this.type != ''"
+    }
+  ];
 }
 
 // UpdateModelRequest wraps the model id and updated fields.
 message UpdateModelRequest {
   // Model id.
-  int64 id = 1;
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
   // Updated model fields.
-  InputEmbeddingModel input = 2;
+  InputEmbeddingModel input = 2 [(buf.validate.field).required = true];
   // Input fields to apply, filled by the gateway from a PATCH body.
   repeated string x_json_mask = 3;
 }
@@ -166,11 +179,11 @@ message UpdateModelRequest {
 // DeleteModelRequest selects a model to delete.
 message DeleteModelRequest {
   // Model id.
-  int64 id = 1;
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
 }
 
 // ValidateModelRequest selects a model to validate.
 message ValidateModelRequest {
   // Model id.
-  int64 id = 1;
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
 }
