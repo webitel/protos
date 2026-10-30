@@ -238,12 +238,14 @@ message DeleteArticleRequest {
   string etag = 1;
 }
 
-// MoveArticleRequest reparents an article.
+// MoveArticleRequest reparents an article, possibly into another space.
 message MoveArticleRequest {
   // Concurrency token of the article to move.
   string etag = 1;
   // New parent id; 0 to move to top level.
   int64 new_parent_id = 2 [(buf.validate.field).int64.gte = 0];
+  // Target space id of the same language; 0 keeps the current space.
+  int64 new_space_id = 3 [(buf.validate.field).int64.gte = 0];
 }
 
 // ReindexArticleRequest selects the article to index again.
