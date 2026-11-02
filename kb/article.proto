@@ -242,9 +242,11 @@ message DeleteArticleRequest {
 message MoveArticleRequest {
   // Concurrency token of the article to move.
   string etag = 1;
-  // New parent id; 0 to move to top level.
+  // New parent id; 0 to move to top level. The article moves into the space
+  // of the parent.
   int64 new_parent_id = 2 [(buf.validate.field).int64.gte = 0];
-  // Target space id of the same language; 0 keeps the current space.
+  // Target space id of the same language for a move to top level; 0 keeps
+  // the current space. With a new parent it may only repeat its space.
   int64 new_space_id = 3 [(buf.validate.field).int64.gte = 0];
 }
 

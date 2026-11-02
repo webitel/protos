@@ -1397,11 +1397,15 @@
             "default": "SPACE_STATE_UNSPECIFIED"
           },
           {
-            "name": "language",
-            "description": "Optional language filter; matches the base language of the tag.",
+            "name": "languages",
+            "description": "Optional language filter, at most 50 tags; matches the base language of\nany of them.",
             "in": "query",
             "required": false,
-            "type": "string"
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -2076,12 +2080,12 @@
         "new_parent_id": {
           "type": "string",
           "format": "int64",
-          "description": "New parent id; 0 to move to top level."
+          "description": "New parent id; 0 to move to top level. The article moves into the space\nof the parent."
         },
         "new_space_id": {
           "type": "string",
           "format": "int64",
-          "description": "Target space id of the same language; 0 keeps the current space."
+          "description": "Target space id of the same language for a move to top level; 0 keeps\nthe current space. With a new parent it may only repeat its space."
         }
       },
       "description": "MoveArticleRequest reparents an article, possibly into another space."
