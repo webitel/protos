@@ -43760,6 +43760,16 @@
             "description": "Optional state filter.\n\n - SPACE_STATE_ACTIVE: Articles of the space are retrievable.\n - SPACE_STATE_INACTIVE: Articles are kept but excluded from search and suggestions.",
             "name": "state",
             "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Optional language filter, at most 50 tags; matches the base language of\nany of them.",
+            "name": "languages",
+            "in": "query"
           }
         ],
         "responses": {
@@ -78082,11 +78092,16 @@
       }
     },
     "webitel.kb.Articles.MoveArticleBody": {
-      "description": "MoveArticleRequest reparents an article.",
+      "description": "MoveArticleRequest reparents an article, possibly into another space.",
       "type": "object",
       "properties": {
         "new_parent_id": {
-          "description": "New parent id; 0 to move to top level.",
+          "description": "New parent id; 0 to move to top level. The article moves into the space\nof the parent.",
+          "type": "string",
+          "format": "int64"
+        },
+        "new_space_id": {
+          "description": "Target space id of the same language for a move to top level; 0 keeps\nthe current space. With a new parent it may only repeat its space.",
           "type": "string",
           "format": "int64"
         }
