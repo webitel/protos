@@ -9,10 +9,23 @@ message Identity {
   string issuer = 1;
   // name is the real name, used everywhere inside Webitel (history, reports).
   string name = 2;
-  optional string via = 3;
+  // Deprecated: use via_ref.id. Kept for clients that still send only the gate id.
+  optional string via = 3 [deprecated = true];
   // chat_name is the name external clients see instead of the real one. Empty means
   // "no separate public name" — channels then fall back to their own default.
   string chat_name = 4;
+  // Gate the identity came through, with its display data. Optional.
+  Via via_ref = 5;
+}
+
+// Via is the gate (im-providers) a message came through.
+message Via {
+  // Gate id.
+  string id = 1;
+  // Gate display name.
+  string name = 2;
+  // Provider type, e.g. facebook | whatsapp | telegram_bot.
+  string type = 3;
 }
 
 // Represents a peer in the messaging system.

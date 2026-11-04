@@ -4,6 +4,7 @@ package webitel.kb;
 
 option go_package = "github.com/webitel/webitel-kb/api/kb;kb";
 
+import "buf/validate/validate.proto";
 import "general.proto";
 import "google/api/annotations.proto";
 import "proto/webitel/option.proto";
@@ -87,13 +88,13 @@ message AttachFileRequest {
   // Concurrency token / locator of the owning article.
   string article_etag = 1;
   // Storage file id, as the upload returned it.
-  int64 file_id = 2;
+  int64 file_id = 2 [(buf.validate.field).int64.gt = 0];
 }
 
 // DeleteFileRequest selects a file to remove from an article.
 message DeleteFileRequest {
   // File id.
-  int64 id = 1;
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
   // Concurrency token / locator of the owning article.
   string article_etag = 2;
 }

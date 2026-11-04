@@ -97,7 +97,8 @@ message ReadWorkingScheduleRequest {
           'created_at',
           'created_by',
           'updated_at',
-          'updated_by'
+          'updated_by',
+          'etag'
         ]
       }
     }
@@ -149,7 +150,8 @@ message SearchWorkingScheduleRequest {
           'created_at',
           'created_by',
           'updated_at',
-          'updated_by'
+          'updated_by',
+          'etag'
         ]
       }
     }
@@ -217,9 +219,9 @@ message WorkingScheduleForecast {
 
 enum WorkingScheduleState {
   WORKING_SCHEDULE_STATE_UNSPECIFIED = 0;
-  WORKING_SCHEDULE_STATE_ACTIVE = 1;
+  WORKING_SCHEDULE_STATE_DRAFT = 1;
   WORKING_SCHEDULE_STATE_PENDING = 2;
-  WORKING_SCHEDULE_STATE_DRAFT = 3;
+  WORKING_SCHEDULE_STATE_ACTIVE = 3;
   WORKING_SCHEDULE_STATE_ARCHIVED = 4;
 }
 
@@ -253,4 +255,8 @@ message WorkingSchedule {
 
   repeated LookupEntity agents = 17;
   int64 total_agents = 18;
+
+  // Version of the row, returned by every read. UpdateWorkingSchedule requires
+  // it and refuses with Aborted when the schedule has changed since.
+  string etag = 19;
 }

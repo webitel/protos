@@ -189,7 +189,7 @@
         "parameters": [
           {
             "name": "input",
-            "description": "Article fields.",
+            "description": "Article fields; the space is required.",
             "in": "body",
             "required": true,
             "schema": {
@@ -1111,7 +1111,7 @@
         "parameters": [
           {
             "name": "input",
-            "description": "Model fields.",
+            "description": "Model fields; the type is required.",
             "in": "body",
             "required": true,
             "schema": {
@@ -1382,6 +1382,30 @@
               "type": "string"
             },
             "collectionFormat": "multi"
+          },
+          {
+            "name": "state",
+            "description": "Optional state filter.\n\n - SPACE_STATE_ACTIVE: Articles of the space are retrievable.\n - SPACE_STATE_INACTIVE: Articles are kept but excluded from search and suggestions.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "SPACE_STATE_UNSPECIFIED",
+              "SPACE_STATE_ACTIVE",
+              "SPACE_STATE_INACTIVE"
+            ],
+            "default": "SPACE_STATE_UNSPECIFIED"
+          },
+          {
+            "name": "languages",
+            "description": "Optional language filter, at most 50 tags; matches the base language of\nany of them.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -1408,7 +1432,7 @@
         "parameters": [
           {
             "name": "input",
-            "description": "Space fields.",
+            "description": "Space fields; language is required.",
             "in": "body",
             "required": true,
             "schema": {
@@ -1846,6 +1870,10 @@
           "$ref": "#/definitions/webitel.kb.ArticleVersion",
           "description": "Published version, only when requested in fields."
         },
+        "home": {
+          "type": "boolean",
+          "description": "Whether the article is the home page of its space."
+        },
         "created_at": {
           "type": "string",
           "format": "int64",
@@ -2052,10 +2080,15 @@
         "new_parent_id": {
           "type": "string",
           "format": "int64",
-          "description": "New parent id; 0 to move to top level."
+          "description": "New parent id; 0 to move to top level. The article moves into the space\nof the parent."
+        },
+        "new_space_id": {
+          "type": "string",
+          "format": "int64",
+          "description": "Target space id of the same language for a move to top level; 0 keeps\nthe current space. With a new parent it may only repeat its space."
         }
       },
-      "description": "MoveArticleRequest reparents an article."
+      "description": "MoveArticleRequest reparents an article, possibly into another space."
     },
     "webitel.kb.Attachments.AttachFileBody": {
       "type": "object",
@@ -2298,7 +2331,7 @@
         },
         "subject": {
           "type": "string",
-          "description": "Article subject."
+          "description": "Article subject, at most 255 characters."
         },
         "tags": {
           "type": "array",
@@ -2314,6 +2347,10 @@
         "body_rich_text": {
           "type": "object",
           "description": "Editor document; serialized server-side to markdown/plaintext/tsvector."
+        },
+        "home": {
+          "type": "boolean",
+          "description": "Creates the article as the home page of its space; create only."
         }
       },
       "description": "InputArticle carries the writable fields of an article and its body."
@@ -2362,7 +2399,7 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "Human-readable name."
+          "description": "Human-readable name, at most 255 characters."
         },
         "description": {
           "type": "string",
@@ -2384,7 +2421,7 @@
         },
         "vector_search_enabled": {
           "type": "boolean",
-          "description": "Whether articles are embedded for vector search."
+          "description": "Whether vector search is on; on when omitted at creation. Without a\nmodel the space is searched by text alone."
         },
         "rerank_enabled": {
           "type": "boolean",
@@ -2394,11 +2431,6 @@
           "type": "string",
           "description": "Chunking strategy identifier."
         },
-        "home_article_id": {
-          "type": "string",
-          "format": "int64",
-          "description": "Article used as the space home page."
-        },
         "team_ids": {
           "type": "array",
           "items": {
@@ -2406,6 +2438,10 @@
             "format": "int64"
           },
           "description": "Team ids the space is bound to as default operator visibility;\nthe set replaces the current binding, empty removes it."
+        },
+        "state": {
+          "$ref": "#/definitions/webitel.kb.SpaceState",
+          "description": "Lifecycle state; unspecified keeps the current one, active on create."
         }
       },
       "description": "InputSpace carries the writable fields of a space."
@@ -2433,7 +2469,7 @@
             "type": "string",
             "format": "int64"
           },
-          "description": "Article ids to resolve."
+          "description": "Article ids to resolve, at most 5000."
         },
         "space_ids": {
           "type": "array",
@@ -2580,7 +2616,7 @@
         },
         "vector_search_enabled": {
           "type": "boolean",
-          "description": "Whether articles in this space are embedded for vector search."
+          "description": "Whether vector search is on. Without a model the space is searched by\ntext alone."
         },
         "rerank_enabled": {
           "type": "boolean",
@@ -2602,6 +2638,10 @@
             "$ref": "#/definitions/general.Lookup"
           },
           "description": "Teams the space is bound to as default operator visibility;\nempty when no binding is configured."
+        },
+        "state": {
+          "$ref": "#/definitions/webitel.kb.SpaceState",
+          "description": "Lifecycle state."
         },
         "created_at": {
           "type": "string",
@@ -2641,6 +2681,16 @@
         }
       },
       "description": "SpaceList is a page of spaces."
+    },
+    "webitel.kb.SpaceState": {
+      "type": "string",
+      "enum": [
+        "SPACE_STATE_UNSPECIFIED",
+        "SPACE_STATE_ACTIVE",
+        "SPACE_STATE_INACTIVE"
+      ],
+      "default": "SPACE_STATE_UNSPECIFIED",
+      "description": "Space lifecycle state.\n\n - SPACE_STATE_ACTIVE: Articles of the space are retrievable.\n - SPACE_STATE_INACTIVE: Articles are kept but excluded from search and suggestions."
     },
     "webitel.kb.SuggestRequest": {
       "type": "object",
@@ -2742,6 +2792,10 @@
             "$ref": "#/definitions/webitel.kb.TreeNode"
           },
           "description": "Child nodes."
+        },
+        "state": {
+          "$ref": "#/definitions/webitel.kb.ArticleState",
+          "description": "Lifecycle state."
         }
       },
       "description": "TreeNode is a single node of an article hierarchy tree."
@@ -2751,7 +2805,7 @@
       "properties": {
         "notes": {
           "type": "string",
-          "description": "Optional notes for the new version."
+          "description": "Optional notes for the new version, at most 50 characters."
         }
       },
       "description": "RestoreVersionRequest selects a version to restore."
