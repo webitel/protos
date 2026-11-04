@@ -101,6 +101,8 @@ message ResumeAttemptRequest {
     optional int64 expected_version = 5;
     string command_id = 6;
     string email_event_id = 7;
+    // Operator Email form: the session user of engine; not set by a Flow.
+    int64 user_id = 8;
 }
 
 message ResumeAttemptResponse {
@@ -185,10 +187,19 @@ message TransferRequest {
     int32 queue_id = 4;
 
     map<string,string> form_fields = 5;
+
+    // Email form: thread_id and operator, exactly one of agent_id and queue_id, no form_fields;
+    // attempt_id is 0 or operator.attempt_id.
+    int64 thread_id = 6;
+    EmailAttemptOperator operator = 7;
+    // Optional, up to 500 characters.
+    string comment = 8;
 }
 
 message TransferResponse {
-
+    // Email form: the transferred attempt and the attempt created for the Thread.
+    EmailAttemptResponse email = 1;
+    EmailAttemptResponse transferred_to = 2;
 }
 
 message CancelAgentDistributeRequest {
@@ -306,6 +317,8 @@ message AttemptRenewalResultRequest {
     int32 agent_id = 5;
     optional int64 expected_version = 6;
     string command_id = 7;
+    // The session user of engine.
+    int64 user_id = 8;
 }
 
 message AttemptRenewalResultResponse {
@@ -499,6 +512,8 @@ message EmailAttemptOperator {
     optional int64 expected_version = 3;
     // Idempotency key of the command; a retry repeats it with the same arguments.
     string command_id = 4;
+    // The session user of engine; must be the user of agent_id.
+    int64 user_id = 5;
 }
 
 // Flow form: the attempt is the active one of the Thread, woken by this inbound Email event.
@@ -532,6 +547,8 @@ message EmailAttemptReturnRequest {
     int64 domain_id = 1;
     int64 thread_id = 2;
     EmailAttemptOperator operator = 3;
+    // Required, 1 to 500 characters.
+    string reason = 4;
 }
 
 message EmailAttemptCompleteRequest {
@@ -549,7 +566,7 @@ message EmailAttemptResponse {
     int64 attempt_version = 4;
     // Order of the change among the changes of the Thread.
     int64 projection_version = 5;
-    // Set when the attempt left: processed or processing_timeout.
+    // Set when the attempt left: processed, processing_timeout or transfer.
     string result = 6;
     int32 queue_id = 7;
     int32 agent_id = 8;
