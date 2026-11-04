@@ -41,7 +41,7 @@ service Articles {
       post: "/v1/kb/articles",
       body: "input"
     };
-    option (option.access) = ACTION_UPDATE;
+    option (option.access) = ACTION_CREATE;
   }
 
   // UpdateArticle updates an article, creating a new version (optimistic lock via etag).
@@ -62,7 +62,7 @@ service Articles {
     option (google.api.http) = {
       delete: "/v1/kb/articles/{etag}"
     };
-    option (option.access) = ACTION_UPDATE;
+    option (option.access) = ACTION_DELETE;
   }
 
   // MoveArticle reparents an article, validating cycles and max depth.
@@ -191,6 +191,8 @@ message ListArticlesRequest {
   repeated string fields = 9;
   // How the tag filter combines the tags.
   TagMatch tag_match = 10 [(buf.validate.field).enum.defined_only = true];
+  // Operator team; its binding limits the spaces listed.
+  int64 team_id = 11 [(buf.validate.field).int64.gte = 0];
 }
 
 // ArticleList is a page of articles.
@@ -272,6 +274,8 @@ message ListAncestorsRequest {
 message GetTreeRequest {
   // Space id.
   int64 space_id = 1 [(buf.validate.field).int64.gt = 0];
+  // Operator team; a space outside its binding returns no nodes.
+  int64 team_id = 2 [(buf.validate.field).int64.gte = 0];
 }
 
 // GetTreeResponse returns the root nodes of the space tree.
