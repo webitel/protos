@@ -526,12 +526,15 @@ message HistoryCall {
   string amd_ai_result = 53;
   repeated string amd_ai_logs = 54;
 
+  // Latest score: on a root leg (no parent) it is the latest score of the whole
+  // call including transferred legs; on a child leg it is the score of that leg only.
   int64 rate_id = 55;
   Lookup rated_user = 56;
   Lookup rated_by = 57;
   float score_optional = 58;
   float score_required = 59;
   int64 attempt_id = 60;
+  // True when this leg is in the list of agents that can be scored for the call.
   bool allow_evaluation = 61;
   google.protobuf.Value form_fields = 62;
   string bridged_id = 63;
@@ -559,25 +562,34 @@ message HistoryCall {
   string user_agent = 77;
   bool hide_number = 78;
 
-  message CallRate {
-    int64 id = 1;
-    string call_id = 2;
-    Lookup rated_user = 3;
-    Lookup rated_by = 4;
-    float score_required = 5;
-    float score_optional = 6;
-    int64 created_at = 7;
-  }
+  // All scores, oldest first: of the whole call on a root leg,
+  // of this leg only on a child leg.
+  repeated HistoryCallRate rates = 79;
+  // Agents that can be scored for the call, in bridge order.
+  // Filled only on a root leg (no parent); empty on child legs.
+  repeated HistoryCallEvaluationAgent evaluation_agents = 80;
+}
 
-  message EvaluationAgent {
-    string call_id = 1;
-    Lookup user = 2;
-    int64 bridged_at = 3;
-    int64 rate_id = 4;
-  }
+// HistoryCallRate is one score of a call.
+message HistoryCallRate {
+  int64 id = 1;
+  // Leg that was scored.
+  string call_id = 2;
+  Lookup rated_user = 3;
+  Lookup rated_by = 4;
+  float score_required = 5;
+  float score_optional = 6;
+  int64 created_at = 7;
+}
 
-  repeated CallRate rates = 79;
-  repeated EvaluationAgent evaluation_agents = 80;
+// HistoryCallEvaluationAgent is an agent that can be scored for a call.
+message HistoryCallEvaluationAgent {
+  // Leg to pass as the call id when scoring this agent.
+  string call_id = 1;
+  Lookup user = 2;
+  int64 bridged_at = 3;
+  // Latest score of this agent in the call; 0 when not scored yet.
+  int64 rate_id = 4;
 }
 
 message EavesdropCallRequest {
