@@ -116,14 +116,18 @@ message DeleteAgentAbsenceResponse {
 message CreateAgentsAbsencesRequest {
   message absentType {
     AbsenceType type_id = 1 [(buf.validate.field).enum = {defined_only: true, in: [1, 2, 3]}];
-    int64 date_from = 2 [(buf.validate.field).int64.gt = 0];
-    int64 date_to = 3 [(buf.validate.field).int64.gt = 0];
+
+    // "YYYY-MM-DD", inclusive.
+    string date_from = 4 [(buf.validate.field).string.pattern = "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"];
+    string date_to = 5 [(buf.validate.field).string.pattern = "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"];
 
     option (buf.validate.message).cel = {
       id: "absent_at.filter",
       message: "date_to should be greater than date_from",
       expression: "this.date_to >= this.date_from"
     };
+
+    reserved 2, 3;
   }
 
   repeated absentType items = 1 [(buf.validate.field).repeated.min_items = 1];
@@ -169,5 +173,9 @@ message Absence {
   LookupEntity updated_by = 6;
 
   AbsenceType type_id = 7 [(buf.validate.field).enum = {defined_only: true, in: [1, 2, 3]}];
-  int64 absent_at = 8 [(buf.validate.field).int64.gt = 0];
+
+  // "YYYY-MM-DD".
+  string absent_at = 9 [(buf.validate.field).string.pattern = "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"];
+
+  reserved 8;
 }

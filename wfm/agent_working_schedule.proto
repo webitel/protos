@@ -27,13 +27,20 @@ service AgentWorkingScheduleService {
   }
 }
 
+// The Add shifts modal: a weekly template the server expands into shifts over a range
+// of dates (WFM-103). Hours are wall-clock minutes from midnight in the time zone of
+// the schedule's calendar, so a shift keeps its hours across a daylight saving change.
 message CreateAgentsWorkingScheduleShiftsRequest {
   int64 working_schedule_id = 1;
-  FilterBetween date = 2 [(buf.validate.field).required = true];
+
+  // Date from and Date to of the modal.
+  DateRange date = 5 [(buf.validate.field).required = true];
+
   repeated LookupEntity agents = 3 [(buf.validate.field).repeated.min_items = 1];
 
-  // Map key is a day of week: 0 - Sunday, ..., 6 - Saturday.
-  map<int64, AgentScheduleShift> items = 4 [
+  // Map key is a day of week: 0 - Sunday, ..., 6 - Saturday. A day missing from the
+  // map, one switched off in the modal, gets no shifts.
+  map<int64, ShiftTemplateDay> days = 6 [
     (buf.validate.field).required = true,
     (buf.validate.field).map = {
       min_pairs: 1
@@ -49,21 +56,88 @@ message CreateAgentsWorkingScheduleShiftsRequest {
       }
     }
   ];
+
+  // Pauses of every day. Each belongs to the range that contains it; a pause outside
+  // every range of a day refuses the request.
+  repeated ShiftTemplatePause pauses = 7;
+
+  // Skills switched on for the time of every shift the request creates. Different
+  // skills for different ranges take separate requests.
+  repeated AgentScheduleShiftSkill skills = 8;
+
+  reserved 2, 4;
+}
+
+// ShiftTemplateDay holds the shifts of one day of week, several when the agent works
+// on different skills at different hours.
+message ShiftTemplateDay {
+  repeated ShiftTemplateRange ranges = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+// ShiftTemplateRange is one shift of a day, in minutes from midnight. An end before the
+// start crosses midnight: 1320 to 360 is 22:00 to 06:00, a shift of the day it starts on.
+message ShiftTemplateRange {
+  option (buf.validate.message).cel = {
+    id: "time",
+    message: "a shift cannot start and end at the same time",
+    expression: "this.start != this.end"
+  };
+
+  int32 start = 1 [(buf.validate.field).int32 = {
+    gte: 0
+    lt: 1440
+  }];
+
+  int32 end = 2 [(buf.validate.field).int32 = {
+    gte: 0
+    lte: 1440
+  }];
+}
+
+// ShiftTemplatePause is a pause of every day at a wall-clock time. In a range that
+// crosses midnight, a pause after 00:00 belongs to the shift of the previous day.
+message ShiftTemplatePause {
+  // Minutes from midnight.
+  int32 start = 1 [(buf.validate.field).int32 = {
+    gte: 0
+    lt: 1440
+  }];
+
+  // Minutes.
+  int32 duration = 2 [(buf.validate.field).int32.gt = 0];
+
+  optional LookupEntity cause = 3;
 }
 
 message CreateAgentsWorkingScheduleShiftsResponse {
   repeated AgentWorkingSchedule items = 1;
+
+  // Days the request left without shifts, and why: an absence, or a date another
+  // active schedule locks (WFM-103).
+  repeated SkippedDay skipped = 2;
+}
+
+message SkippedDay {
+  LookupEntity agent = 1;
+
+  // "YYYY-MM-DD".
+  string date = 2;
+
+  // An error id, <layer>.<entity>.<what>.
+  string reason = 3;
 }
 
 message SearchAgentsWorkingScheduleRequest {
   int64 working_schedule_id = 1;
-  FilterBetween date = 2;
+  DateRange date = 7 [(buf.validate.field).required = true];
 
   repeated int64 supervisor_id = 3;
   repeated int64 team_id = 4;
   repeated int64 skill_id = 5;
 
   optional string q = 6;
+
+  reserved 2;
 }
 
 message SearchAgentsWorkingScheduleResponse {
@@ -73,15 +147,18 @@ message SearchAgentsWorkingScheduleResponse {
 }
 
 message Holiday {
-  int64 date = 1;
+  // "YYYY-MM-DD".
+  string date = 3;
   string name = 2;
+
+  reserved 1;
 }
 
 message AgentScheduleShiftPause {
   option (buf.validate.message).cel = {
     id: "time",
     message: "end time cannot be earlier than start time",
-    expression: "this.start < this.end"
+    expression: "this.start_at < this.end_at"
   };
 
   int64 id = 1;
@@ -91,36 +168,29 @@ message AgentScheduleShiftPause {
   int64 updated_at = 5;
   LookupEntity updated_by = 6;
 
-  int64 start = 7 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).int64 = {
-      gte: 0
-      lte: 1440
-    }
-  ];
-
-  int64 end = 8 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).int64 = {
-      gte: 0
-      lte: 1440
-    }
-  ];
+  // Epoch milliseconds, inside the shift.
+  int64 start_at = 10 [(buf.validate.field).int64.gt = 0];
+  int64 end_at = 11 [(buf.validate.field).int64.gt = 0];
 
   optional LookupEntity cause = 9;
+
+  reserved 7, 8;
 }
 
+// AgentScheduleShiftSkill switches a skill the agent already has on or off for the time
+// of the shift, with the agent's own capacity (WFM-114).
 message AgentScheduleShiftSkill {
   LookupEntity skill = 1 [(buf.validate.field).required = true];
-  int64 capacity = 2 [(buf.validate.field).required = true];
   bool enabled = 3;
+
+  reserved 2;
 }
 
 message AgentScheduleShift {
   option (buf.validate.message).cel = {
     id: "time",
-    message: "end time cannot be earlier than start time",
-    expression: "this.start < this.end"
+    message: "a shift ends after it starts and lasts at most 24 hours",
+    expression: "this.start_at < this.end_at && this.end_at - this.start_at <= 86400000"
   };
 
   int64 id = 1;
@@ -130,33 +200,45 @@ message AgentScheduleShift {
   int64 updated_at = 5;
   LookupEntity updated_by = 6;
 
-  int64 start = 7 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).int64 = {
-      gte: 0
-      lte: 1440
-    }
-  ];
-
-  int64 end = 8 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).int64 = {
-      gte: 0
-      lte: 1440
-    }
-  ];
+  // Epoch milliseconds. The shift ends right before end_at, so the next one can start at end_at.
+  int64 start_at = 11 [(buf.validate.field).int64.gt = 0];
+  int64 end_at = 12 [(buf.validate.field).int64.gt = 0];
 
   repeated AgentScheduleShiftPause pauses = 9;
   repeated AgentScheduleShiftSkill skills = 10;
+
+  // Set by the server. The working date, "YYYY-MM-DD": the day the shift starts on in the
+  // time zone of the schedule's calendar, so a night shift belongs to the day it starts.
+  string working_date = 13;
+
+  // Version of the shift, returned by every read. Editing a shift requires it (WFM-99).
+  string etag = 14;
+
+  // Set by the server.
+  ShiftSource source = 15;
+
+  // Set by the server for a planner's shift: the planning run that wrote it.
+  int64 planner_run_id = 16;
+
+  reserved 7, 8;
+}
+
+enum ShiftSource {
+  SHIFT_SOURCE_UNSPECIFIED = 0;
+  SHIFT_SOURCE_MANUAL = 1;
+  SHIFT_SOURCE_PLANNER = 2;
 }
 
 message AgentSchedule {
-  int64 date = 1;
+  // The working date, "YYYY-MM-DD".
+  string date = 5;
   bool locked = 2;
-  oneof type {
-    AbsenceType absence = 3;
-    AgentScheduleShift shift = 4;
-  }
+
+  // A day has an absence or shifts, not both.
+  AbsenceType absence = 3;
+  repeated AgentScheduleShift shifts = 6;
+
+  reserved 1, 4;
 }
 
 message AgentWorkingSchedule {
