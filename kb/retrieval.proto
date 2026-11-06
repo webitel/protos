@@ -11,7 +11,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "proto/webitel/option.proto";
 
 // Retrieval serves read-only search and lookup over the knowledge base for
-// operators (search/resolve/suggest) and bots (semantic_search/menu).
+// agents (search/resolve/suggest) and bots (semantic_search/menu).
 // All endpoints return an empty list with HTTP 200 on no match, never an error.
 service Retrieval {
   option (option.objclass) = "kb_articles";
@@ -43,7 +43,7 @@ service Retrieval {
     option (option.access) = ACTION_READ;
   }
 
-  // Suggest runs hybrid retrieval with cross-encoder rerank for operator assist.
+  // Suggest runs hybrid retrieval with cross-encoder rerank for agent assist.
   rpc Suggest(SuggestRequest) returns (SuggestResponse) {
     option (google.api.http) = {
       post: "/v1/kb/articles/suggest",
@@ -86,7 +86,7 @@ message SearchRequest {
   int32 size = 5;
   // Page number (1-based).
   int32 page = 6;
-  // Operator team; its binding limits the spaces searched.
+  // Agent team; its binding limits the spaces searched.
   int64 team_id = 7 [(buf.validate.field).int64.gte = 0];
 }
 
@@ -142,7 +142,7 @@ message SemanticSearchResponse {
   repeated Citation citations = 2;
 }
 
-// SuggestRequest parameters for operator assist.
+// SuggestRequest parameters for agent assist.
 message SuggestRequest {
   option (buf.validate.message).cel = {
     id: "kb.retrieval.space_required"
@@ -154,7 +154,7 @@ message SuggestRequest {
   string customer_message = 1;
   // Spaces to search within.
   repeated int64 space_ids = 2;
-  // Operator team id (team binding scope).
+  // Agent team id (team binding scope).
   int64 team_id = 3;
   // When true return chunks instead of article summaries.
   bool return_chunks = 4;
