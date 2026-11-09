@@ -76,6 +76,15 @@ service EmailThreads {
     };
     option (option.access) = ACTION_READ;
   }
+
+  // ListEmailThreadActions returns the recorded transitions of a visible
+  // conversation, oldest first.
+  rpc ListEmailThreadActions(ListEmailThreadActionsRequest) returns (EmailThreadActionList) {
+    option (google.api.http) = {
+      get: "/v1/email/threads/{thread_id}/actions"
+    };
+    option (option.access) = ACTION_READ;
+  }
 }
 
 // BindEmailThreadContactRequest selects a conversation and the contact to link.
@@ -357,4 +366,45 @@ message GetEmailAttachmentLinkResponse {
   string url = 1;
   // Unix milliseconds; the link may stop working at this time or earlier.
   int64 expires_at = 2;
+}
+
+// ListEmailThreadActionsRequest selects a page of the actions of a conversation.
+message ListEmailThreadActionsRequest {
+  int64 thread_id = 1;
+  // Actions per page, 1 to 100; 0 is 20.
+  int32 size = 2;
+  // Opaque cursor from a previous page; empty for the first.
+  string cursor = 3;
+}
+
+// EmailThreadAction is one transition of the conversation in call_center.
+message EmailThreadAction {
+  // Order of the action among the actions of the conversation.
+  int64 projection_version = 1;
+  // Unix milliseconds.
+  int64 occurred_at = 2;
+  string transition = 3;
+  // Empty for a reopening without an attempt.
+  string attempt_state = 4;
+  // Set when the attempt left: processed, processing_timeout or transfer.
+  string result = 5;
+  // engine, flow or system.
+  string source = 6;
+  // The operator who sent the command; empty for flow and system.
+  general.Lookup actor = 7;
+  // The user of the agent of the attempt after the action.
+  general.Lookup agent = 8;
+  int64 queue_id = 9;
+  // Set only for a transfer, one of the two.
+  int64 transfer_to_queue_id = 10;
+  general.Lookup transfer_to_user = 11;
+  // Plain text: the reason of a return or the comment of a transfer.
+  string comment = 12;
+}
+
+// EmailThreadActionList is a page of actions.
+message EmailThreadActionList {
+  repeated EmailThreadAction items = 1;
+  bool next = 2;
+  string next_cursor = 3;
 }
