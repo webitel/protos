@@ -36,7 +36,7 @@ service Spaces {
       post: "/v1/kb/spaces",
       body: "input"
     };
-    option (option.access) = ACTION_UPDATE;
+    option (option.access) = ACTION_CREATE;
   }
 
   // UpdateSpace updates a space (language cannot be changed).
@@ -57,7 +57,7 @@ service Spaces {
     option (google.api.http) = {
       delete: "/v1/kb/spaces/{id}"
     };
-    option (option.access) = ACTION_UPDATE;
+    option (option.access) = ACTION_DELETE;
   }
 }
 
@@ -97,7 +97,7 @@ message Space {
   string chunking_strategy = 10;
   // Article used as the space home page; 0 if unset.
   int64 home_article_id = 11;
-  // Teams the space is bound to as default operator visibility;
+  // Teams the space is bound to as default agent visibility;
   // empty when no binding is configured.
   repeated general.Lookup teams = 13;
   // Lifecycle state.
@@ -131,7 +131,7 @@ message InputSpace {
   bool rerank_enabled = 6;
   // Chunking strategy identifier.
   string chunking_strategy = 7;
-  // Team ids the space is bound to as default operator visibility;
+  // Team ids the space is bound to as default agent visibility;
   // the set replaces the current binding, empty removes it.
   repeated int64 team_ids = 10 [(buf.validate.field).repeated.items.int64.gt = 0];
   // Lifecycle state; unspecified keeps the current one, active on create.
@@ -155,6 +155,8 @@ message ListSpacesRequest {
   // Optional language filter, at most 50 tags; matches the base language of
   // any of them.
   repeated string languages = 7 [(buf.validate.field).repeated.max_items = 50];
+  // Agent team; its binding limits the spaces listed.
+  int64 team_id = 8 [(buf.validate.field).int64.gte = 0];
 }
 
 // SpaceList is a page of spaces.
