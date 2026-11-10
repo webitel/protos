@@ -20,6 +20,25 @@ service ThreadTagManagement {
       delete: "/v1/tags/{id}"
     };
   };
+  // RemoveTagByName removes the caller's tag from a thread by its name. Succeeds when the tag is absent.
+  rpc RemoveTagByName(RemoveThreadTagByNameRequest) returns (RemoveThreadTagResponse) {
+    option (google.api.http) = {
+      delete: "/v1/threads/{thread_id}/tags/{tag}"
+    };
+  };
+  // Snooze moves the thread to the caller's Snoozed tab. The chat returns to Active on its own
+  // when anyone but the caller writes to it. Succeeds when the thread is already snoozed.
+  rpc Snooze(SnoozeThreadRequest) returns (ChatTag) {
+    option (google.api.http) = {
+      post: "/v1/threads/{thread_id}/snooze"
+    };
+  };
+  // Unsnooze returns the thread to the caller's Active tab. Succeeds when it is not snoozed.
+  rpc Unsnooze(UnsnoozeThreadRequest) returns (RemoveThreadTagResponse) {
+    option (google.api.http) = {
+      delete: "/v1/threads/{thread_id}/snooze"
+    };
+  };
   // Search searches for tags.
   rpc Search(SearchThreadTagsRequest) returns (SearchThreadTagsResponse) {
     option (google.api.http) = {
@@ -56,7 +75,35 @@ message RemoveThreadTagRequest {
   ];
 }
 
+message RemoveThreadTagByNameRequest {
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+  string tag = 2 [
+    (buf.validate.field).string = {
+      min_len: 1,
+      max_len: 64,
+      pattern: "^[\\p{L}\\p{N}_-]+$"
+    }
+  ];
+}
+
 message RemoveThreadTagResponse {}
+
+message SnoozeThreadRequest {
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+}
+
+message UnsnoozeThreadRequest {
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+}
 
 message SearchThreadTagsRequest {
   int32 page = 1 [

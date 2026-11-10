@@ -354,6 +354,23 @@ message ProviderListGatesRequest {
   repeated webitel.im.provider.v1.ProviderType types = 3; // Filter by channel type (Telegram, Facebook, etc.)
   webitel.im.provider.v1.ProviderStatus status = 4; // Filter by active/inactive status
   string q = 5; // Search query for name or metadata
+  // Domain to list gates of. Required for service (mTLS) callers, which carry
+  // no user identity; ignored for user callers, whose own domain is used.
+  int64 domain_id = 6;
+}
+
+/// GetGateRequest identifies a single gate.
+message GetGateRequest {
+  // Gate id.
+  string id = 1;
+  // Domain the gate must belong to. Required for service (mTLS) callers;
+  // ignored for user callers, whose own domain is used.
+  int64 domain_id = 2;
+}
+
+/// GetGateResponse carries the requested gate.
+message GetGateResponse {
+  webitel.im.provider.v1.ProviderSummary item = 1;
 }
 
 /// ProviderListGatesResponse returns a paginated list of provider summaries.

@@ -9,6 +9,9 @@ option go_package = "github.com/webitel/im-thread-service/gen/go/thread/v1;threa
 service ThreadTagManagement {
   rpc AddTag(AddThreadTagRequest) returns (ChatTag);
   rpc RemoveTag(RemoveThreadTagRequest) returns (RemoveThreadTagResponse);
+  rpc RemoveTagByName(RemoveThreadTagByNameRequest) returns (RemoveThreadTagResponse);
+  rpc Snooze(SnoozeThreadRequest) returns (ChatTag);
+  rpc Unsnooze(UnsnoozeThreadRequest) returns (RemoveThreadTagResponse);
   rpc Search(SearchThreadTagsRequest) returns (SearchThreadTagsResponse);
 }
 
@@ -49,7 +52,47 @@ message RemoveThreadTagRequest {
   ];
 }
 
+message RemoveThreadTagByNameRequest {
+  string contact_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+  string thread_id = 2 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+  string tag = 3 [
+    (buf.validate.field).string = {
+      min_len: 1,
+      max_len: 64,
+      pattern: "^[\\p{L}\\p{N}_-]+$"
+    }
+  ];
+}
+
 message RemoveThreadTagResponse {}
+
+message SnoozeThreadRequest {
+  string contact_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+  string thread_id = 2 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+}
+
+message UnsnoozeThreadRequest {
+  string contact_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+  string thread_id = 2 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+}
 
 message SearchThreadTagsRequest {
   string contact_id = 1 [

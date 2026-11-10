@@ -27,6 +27,10 @@ service ThreadManagement {
   // chats. Counts are individual to the participant's own read state.
   rpc GetUnreadSummary(GetUnreadSummaryRequest) returns (GetUnreadSummaryResponse);
 
+  // Returns a participant's chat counters: every active chat, the active chats
+  // outside Snoozed, and the snoozed chats, each with its unread chat count.
+  rpc GetCounters(GetCountersRequest) returns (GetCountersResponse);
+
   // Creates a new group thread.
   // The creator becomes the owner of the thread.
   // Returns a single thread by its identifier.
@@ -113,6 +117,16 @@ enum ThreadKind {
   CHANNEL = 3;
 }
 
+// ThreadSource is the gate a thread arrived through.
+message ThreadSource {
+  // Gate id = thread_dialog.via of the external member.
+  string id = 1;
+  // Gate display name.
+  string name = 2;
+  // Provider type, e.g. facebook | whatsapp | telegram_bot.
+  string type = 3;
+}
+
 // Thread represents a thread (aka chat or conversation) entity.
 message Thread {
   // Unique thread identifier.
@@ -176,6 +190,12 @@ message Thread {
   // Webitel CRM contact selected by an operator for this thread.
   // Empty if no CRM contact has been selected.
   string crm_contact_id = 21;
+
+  // Source gate of the thread (external member's via). Unset when unknown.
+  ThreadSource source = 22;
+
+  // Queue through which the requesting participant (self_id) received the thread. Search only.
+  ThreadQueue queue = 23;
 }
 
 //#endregion
@@ -261,6 +281,15 @@ message ThreadSearchRequest {
   // Restrict results to threads where the caller (self_id) has at least one unread message.
   // Ignored when false.
   bool unread = 14;
+
+  // Exclude threads the caller (self_id) has tagged with any of these tags.
+  // Ignored when empty.
+  repeated string exclude_tags = 15;
+
+  // Set by im-gateway-service for callers granted the Webitel "im_read_all"
+  // permission: results are not limited to threads the caller (self_id) is a
+  // member of, domain_ids is required.
+  optional bool system_call = 16;
 }
 
 // ContactIdentity addresses a contact by its external identity (issuer + subject)
@@ -329,6 +358,45 @@ message GetUnreadSummaryResponse {
 
   // Total number of unread messages across all chats.
   int64 unread_messages = 2;
+}
+
+// GetCountersRequest asks for the chat counters of a single participant.
+message GetCountersRequest {
+  // Contact id of the participant whose counters are requested.
+  string self_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  // Domain identifier the participant belongs to.
+  int32 domain_id = 2 [(buf.validate.field).int32.gt = 0];
+
+  // Count only threads of these kinds. Empty counts every kind.
+  repeated ThreadKind kinds = 3 [(buf.validate.field).repeated.items.enum = {
+    defined_only: true
+    not_in: 0
+  }];
+}
+
+// ThreadCounters is the size of one chat folder.
+message ThreadCounters {
+  // Number of chats in the folder.
+  int32 total = 1;
+
+  // Number of chats in the folder with at least one unread message.
+  int32 unread_chats = 2;
+}
+
+// GetCountersResponse carries the participant's counters per chat folder.
+message GetCountersResponse {
+  // Every chat the participant is an active member of: active plus snoozed.
+  ThreadCounters all = 1;
+
+  // Chats the participant has not snoozed.
+  ThreadCounters active = 2;
+
+  // Chats the participant has snoozed.
+  ThreadCounters snoozed = 3;
 }
 
 message SearchLeftRequest {
@@ -443,6 +511,9 @@ message AddMemberRequest {
   // membership/permission checks are skipped, yet initiator_contact_id is still
   // recorded as the message sender. Decouples "who acted" from "enforce permissions".
   optional bool system_call = 7;
+
+  // Optional call_center queue through which the new member receives the thread.
+  ThreadQueue queue = 8;
 }
 
 message AddMemberResponse {
@@ -493,6 +564,9 @@ message TransferRequest {
   // When transferring to a bot, controls whether it automatically leaves after its schema completes.
   // Defaults to true if not set.
   optional bool auto_leave = 6;
+
+  // Optional call_center queue through which the target receives the thread. Empty -> no queue.
+  ThreadQueue queue = 7;
 }
 
 message TransferResponse {

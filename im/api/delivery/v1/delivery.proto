@@ -85,6 +85,9 @@ message ServerEvent {
 
     // Some events for this connection were dropped: catch up via GetUpdates.
     ResyncEvent resync_event = 16;
+
+    // The recipient's own tags on a thread changed.
+    ThreadTagsChangedEvent thread_tags_changed_event = 17;
   }
 }
 
@@ -231,6 +234,19 @@ message MemberChangedEvent {
 
   // The recipient's GetUpdates cursor after this change; save the latest one received.
   string updates_cursor = 5;
+}
+
+// ThreadTagsChangedEvent tells the tag owner's sessions that their tags on a thread
+// changed; sent to the owner only.
+message ThreadTagsChangedEvent {
+  // Thread whose tags changed.
+  string thread_id = 1;
+
+  // The owner's current tags on the thread; replace the cached ones.
+  repeated string tags = 2;
+
+  // The recipient's GetUpdates cursor after this change; save the latest one received.
+  string updates_cursor = 3;
 }
 
 //------------------------------------------------------------------------------
