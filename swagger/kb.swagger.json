@@ -88,12 +88,16 @@
             "type": "string"
           },
           {
-            "name": "space_id",
-            "description": "Space to list within.",
+            "name": "space_ids",
+            "description": "Optional space filter, any of at most 100 spaces.",
             "in": "query",
             "required": false,
-            "type": "string",
-            "format": "int64"
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
           },
           {
             "name": "tags",
@@ -107,18 +111,21 @@
             "collectionFormat": "multi"
           },
           {
-            "name": "state",
-            "description": "Optional state filter.",
+            "name": "states",
+            "description": "Optional state filter, any of the states.",
             "in": "query",
             "required": false,
-            "type": "string",
-            "enum": [
-              "ARTICLE_STATE_UNSPECIFIED",
-              "DRAFT",
-              "ACTIVE",
-              "INACTIVE"
-            ],
-            "default": "ARTICLE_STATE_UNSPECIFIED"
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "ARTICLE_STATE_UNSPECIFIED",
+                "DRAFT",
+                "ACTIVE",
+                "INACTIVE"
+              ]
+            },
+            "collectionFormat": "multi"
           },
           {
             "name": "type",
@@ -163,6 +170,17 @@
               "TAG_MATCH_ANY"
             ],
             "default": "TAG_MATCH_UNSPECIFIED"
+          },
+          {
+            "name": "languages",
+            "description": "Optional space language filter, at most 50 tags; matches the base\nlanguage of any of them.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -1649,6 +1667,14 @@
           {
             "name": "depth_limit",
             "description": "Maximum hierarchy depth to return.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "description": "Maximum number of items, at most 100; 0 returns up to 100.",
             "in": "query",
             "required": false,
             "type": "integer",

@@ -179,12 +179,18 @@ message ListArticlesRequest {
   int32 page = 2;
   // Optional subject search.
   string q = 3;
-  // Space to list within.
-  int64 space_id = 4;
+  // Optional space filter, any of at most 100 spaces.
+  repeated int64 space_ids = 4 [
+    (buf.validate.field).repeated.max_items = 100,
+    (buf.validate.field).repeated.items.int64.gt = 0
+  ];
   // Optional tag filter.
   repeated string tags = 5;
-  // Optional state filter.
-  ArticleState state = 6 [(buf.validate.field).enum.defined_only = true];
+  // Optional state filter, any of the states.
+  repeated ArticleState states = 6 [
+    (buf.validate.field).repeated.max_items = 3,
+    (buf.validate.field).repeated.items.enum = {defined_only: true, not_in: [0]}
+  ];
   // Optional type filter.
   ArticleType type = 7 [(buf.validate.field).enum.defined_only = true];
   // Sorting criteria (e.g. field:asc).
@@ -193,6 +199,9 @@ message ListArticlesRequest {
   repeated string fields = 9;
   // How the tag filter combines the tags.
   TagMatch tag_match = 10 [(buf.validate.field).enum.defined_only = true];
+  // Optional space language filter, at most 50 tags; matches the base
+  // language of any of them.
+  repeated string languages = 12 [(buf.validate.field).repeated.max_items = 50];
 }
 
 // ArticleList is a page of articles.
