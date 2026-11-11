@@ -62,7 +62,7 @@ service PdfService {
 
   // Streams an agent's completed PDF exports packed into a ZIP archive.
   // The archive is assembled on the fly without creating a temporary file.
-  rpc DownloadAgentPdfArchive(DownloadAgentPdfArchiveRequest) returns (stream DownloadAgentPdfArchiveResponse) {
+  rpc DownloadPdfArchive(DownloadPdfArchiveRequest) returns (stream DownloadPdfArchiveResponse) {
     option (google.api.http) = {get: "/agents/{agent_id}/exports/archive/pdfs"};
   }
 
@@ -229,7 +229,7 @@ message DownloadScreenshotArchiveResponse {
 }
 
 // Request for streaming completed PDF exports of one agent as a ZIP archive.
-message DownloadAgentPdfArchiveRequest {
+message DownloadPdfArchiveRequest {
   int64 agent_id = 1; // Unique identifier of the agent.
   repeated int64 file_ids = 2; // Optional storage file IDs of selected PDFs.
   int64 from = 3; // Start of the uploaded_at range (Unix millis).
@@ -238,6 +238,6 @@ message DownloadAgentPdfArchiveRequest {
 
 // One frame of a streamed PDF ZIP archive.
 // The archive name is sent through the "filename" gRPC response header.
-message DownloadAgentPdfArchiveResponse {
+message DownloadPdfArchiveResponse {
   bytes data = 1;
 }
