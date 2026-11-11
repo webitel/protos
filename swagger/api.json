@@ -992,6 +992,16 @@
             "collectionFormat": "multi",
             "name": "not_user_id",
             "in": "query"
+          },
+          {
+            "type": "boolean",
+            "name": "user_deactivated",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "name": "any",
+            "in": "query"
           }
         ],
         "responses": {
@@ -1333,6 +1343,16 @@
             },
             "collectionFormat": "multi",
             "name": "auditor_id",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "name": "user_deactivated",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "name": "any",
             "in": "query"
           }
         ],
@@ -35194,6 +35214,8 @@
                 "default_members_filter",
                 "self_assigned_call_sound_notification",
                 "record_all_calls",
+                "auto_deactivation_period",
+                "auto_deletion_period",
                 "max_login_attempts",
                 "block_login_time"
               ],
@@ -42561,6 +42583,13 @@
             "description": "How the tag filter combines the tags.\n\n - TAG_MATCH_UNSPECIFIED: Default mode: match articles having ANY listed tag (OR).\n - TAG_MATCH_ALL: Match articles having ALL listed tags (AND).\n - TAG_MATCH_ANY: Match articles having ANY listed tag (OR).",
             "name": "tag_match",
             "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Agent team; its binding limits the spaces listed.",
+            "name": "team_id",
+            "in": "query"
           }
         ],
         "responses": {
@@ -42705,6 +42734,13 @@
             "description": "Page number (1-based).",
             "name": "page",
             "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Agent team; its binding limits the spaces searched.",
+            "name": "team_id",
+            "in": "query"
           }
         ],
         "responses": {
@@ -42762,11 +42798,11 @@
         "tags": [
           "Retrieval"
         ],
-        "summary": "Suggest runs hybrid retrieval with cross-encoder rerank for operator assist.",
+        "summary": "Suggest runs hybrid retrieval with cross-encoder rerank for agent assist.",
         "operationId": "Suggest",
         "parameters": [
           {
-            "description": "SuggestRequest parameters for operator assist.",
+            "description": "SuggestRequest parameters for agent assist.",
             "name": "body",
             "in": "body",
             "required": true,
@@ -43770,6 +43806,13 @@
             "description": "Optional language filter, at most 50 tags; matches the base language of\nany of them.",
             "name": "languages",
             "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Agent team; its binding limits the spaces listed.",
+            "name": "team_id",
+            "in": "query"
           }
         ],
         "responses": {
@@ -44092,6 +44135,13 @@
             "name": "space_id",
             "in": "path",
             "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Agent team; a space outside its binding returns no nodes.",
+            "name": "team_id",
+            "in": "query"
           }
         ],
         "responses": {
@@ -49659,6 +49709,11 @@
           "title": "[optional] contact connected to this user",
           "$ref": "#/definitions/apiObjectId"
         },
+        "deleted_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "unix; non-zero deactivates the user, zero activates (fields: [\"deleted_at\"])"
+        },
         "device": {
           "title": "[optional] default device assigned",
           "$ref": "#/definitions/apiObjectId"
@@ -54994,6 +55049,9 @@
         "user": {
           "$ref": "#/definitions/engine.Lookup"
         },
+        "user_deactivated": {
+          "type": "boolean"
+        },
         "user_presence_status": {
           "$ref": "#/definitions/engine.Agent.UserPresence"
         }
@@ -55861,6 +55919,9 @@
         "user": {
           "$ref": "#/definitions/engine.Lookup"
         },
+        "user_deactivated": {
+          "type": "boolean"
+        },
         "utilization": {
           "type": "number",
           "format": "float"
@@ -55953,6 +56014,9 @@
         },
         "user": {
           "$ref": "#/definitions/engine.Lookup"
+        },
+        "user_deactivated": {
+          "type": "boolean"
         }
       }
     },
@@ -56830,6 +56894,9 @@
         },
         "rated_user": {
           "$ref": "#/definitions/engine.Lookup"
+        },
+        "rated_user_deactivated": {
+          "type": "boolean"
         },
         "score_optional": {
           "type": "number",
@@ -64043,6 +64110,8 @@
         "default_members_filter",
         "self_assigned_call_sound_notification",
         "record_all_calls",
+        "auto_deactivation_period",
+        "auto_deletion_period",
         "max_login_attempts",
         "block_login_time"
       ]
@@ -78454,7 +78523,7 @@
           "$ref": "#/definitions/webitel.kb.SpaceState"
         },
         "team_ids": {
-          "description": "Team ids the space is bound to as default operator visibility;\nthe set replaces the current binding, empty removes it.",
+          "description": "Team ids the space is bound to as default agent visibility;\nthe set replaces the current binding, empty removes it.",
           "type": "array",
           "items": {
             "type": "string",
@@ -78663,7 +78732,7 @@
           "format": "int64"
         },
         "teams": {
-          "description": "Teams the space is bound to as default operator visibility;\nempty when no binding is configured.",
+          "description": "Teams the space is bound to as default agent visibility;\nempty when no binding is configured.",
           "type": "array",
           "items": {
             "type": "object",
@@ -78714,7 +78783,7 @@
       ]
     },
     "webitel.kb.SuggestRequest": {
-      "description": "SuggestRequest parameters for operator assist.",
+      "description": "SuggestRequest parameters for agent assist.",
       "type": "object",
       "properties": {
         "customer_message": {
@@ -78734,7 +78803,7 @@
           }
         },
         "team_id": {
-          "description": "Operator team id (team binding scope).",
+          "description": "Agent team id (team binding scope).",
           "type": "string",
           "format": "int64"
         }
@@ -81209,7 +81278,7 @@
       "name": "webitel.im.service.thread.v1.Updates"
     },
     {
-      "description": "Retrieval serves read-only search and lookup over the knowledge base for\noperators (search/resolve/suggest) and bots (semantic_search/menu).\nAll endpoints return an empty list with HTTP 200 on no match, never an error.",
+      "description": "Retrieval serves read-only search and lookup over the knowledge base for\nagents (search/resolve/suggest) and bots (semantic_search/menu).\nAll endpoints return an empty list with HTTP 200 on no match, never an error.",
       "name": "Retrieval"
     },
     {
