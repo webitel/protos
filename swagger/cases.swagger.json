@@ -1031,12 +1031,17 @@
             "schema": {
               "type": "object",
               "example": {
-                "text": "My new comment"
+                "text": "My new comment",
+                "type": "CASE_COMMENT_TYPE_EXTERNAL"
               },
               "properties": {
                 "text": {
                   "type": "string",
                   "description": "Content of the comment."
+                },
+                "type": {
+                  "$ref": "#/definitions/webitel.cases.CaseCommentType",
+                  "description": "Visibility type of the comment. Create: CASE_COMMENT_TYPE_INTERNAL when unspecified."
                 },
                 "userID": {
                   "$ref": "#/definitions/general.Lookup",
@@ -1103,12 +1108,17 @@
             "schema": {
               "type": "object",
               "example": {
-                "text": "My new comment"
+                "text": "My new comment",
+                "type": "CASE_COMMENT_TYPE_EXTERNAL"
               },
               "properties": {
                 "text": {
                   "type": "string",
                   "description": "Content of the comment."
+                },
+                "type": {
+                  "$ref": "#/definitions/webitel.cases.CaseCommentType",
+                  "description": "Visibility type of the comment. Create: CASE_COMMENT_TYPE_INTERNAL when unspecified."
                 },
                 "userID": {
                   "$ref": "#/definitions/general.Lookup",
@@ -2959,6 +2969,22 @@
             "type": "array",
             "items": {
               "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "type",
+            "description": "Filter by comment visibility type.\n\n - CASE_COMMENT_TYPE_UNSPECIFIED: Treated as CASE_COMMENT_TYPE_INTERNAL on create.\n - CASE_COMMENT_TYPE_INTERNAL: Controlled by the internal_comments permission.\n - CASE_COMMENT_TYPE_EXTERNAL: Controlled by the case_comments permission.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "CASE_COMMENT_TYPE_UNSPECIFIED",
+                "CASE_COMMENT_TYPE_INTERNAL",
+                "CASE_COMMENT_TYPE_EXTERNAL"
+              ]
             },
             "collectionFormat": "multi"
           }
@@ -6389,6 +6415,10 @@
             "format": "int64"
           },
           "title": "System field"
+        },
+        "type": {
+          "$ref": "#/definitions/webitel.cases.CaseCommentType",
+          "description": "Visibility type of the comment."
         }
       },
       "description": "Represents a comment associated with a case."
@@ -6415,6 +6445,16 @@
         }
       },
       "description": "Contains a paginated list of comments."
+    },
+    "webitel.cases.CaseCommentType": {
+      "type": "string",
+      "enum": [
+        "CASE_COMMENT_TYPE_UNSPECIFIED",
+        "CASE_COMMENT_TYPE_INTERNAL",
+        "CASE_COMMENT_TYPE_EXTERNAL"
+      ],
+      "default": "CASE_COMMENT_TYPE_UNSPECIFIED",
+      "description": "Visibility type of a case comment.\n\n - CASE_COMMENT_TYPE_UNSPECIFIED: Treated as CASE_COMMENT_TYPE_INTERNAL on create.\n - CASE_COMMENT_TYPE_INTERNAL: Controlled by the internal_comments permission.\n - CASE_COMMENT_TYPE_EXTERNAL: Controlled by the case_comments permission."
     },
     "webitel.cases.CaseCommunication": {
       "type": "object",
@@ -7252,7 +7292,8 @@
     "webitel.cases.InputCaseComment": {
       "type": "object",
       "example": {
-        "text": "My new comment"
+        "text": "My new comment",
+        "type": "CASE_COMMENT_TYPE_EXTERNAL"
       },
       "properties": {
         "etag": {
@@ -7262,6 +7303,10 @@
         "text": {
           "type": "string",
           "description": "Content of the comment."
+        },
+        "type": {
+          "$ref": "#/definitions/webitel.cases.CaseCommentType",
+          "description": "Visibility type of the comment. Create: CASE_COMMENT_TYPE_INTERNAL when unspecified."
         },
         "userID": {
           "$ref": "#/definitions/general.Lookup",
