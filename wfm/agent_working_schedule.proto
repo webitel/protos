@@ -144,6 +144,29 @@ message SearchAgentsWorkingScheduleResponse {
   repeated Holiday holidays = 1;
   repeated AgentWorkingSchedule items = 2;
   int64 total = 3;
+
+  // The calendar of the schedule, to tell working days from days off and to show
+  // times in its zone.
+  ScheduleCalendar calendar = 4;
+}
+
+message ScheduleCalendar {
+  // IANA name, such as "Europe/Kyiv".
+  string time_zone = 1;
+
+  // Map key is a day of week as in the Add shifts template: 0 - Sunday, ..., 6 - Saturday.
+  // Every day is present; a day without ranges is a day off.
+  map<int64, CalendarDay> week = 2;
+}
+
+message CalendarDay {
+  // Working hours, wall-clock minutes from midnight in the calendar's zone.
+  repeated CalendarRange ranges = 1;
+}
+
+message CalendarRange {
+  int32 start = 1;
+  int32 end = 2;
 }
 
 message Holiday {
