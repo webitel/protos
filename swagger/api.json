@@ -80084,6 +80084,32 @@
         }
       }
     },
+    "wfmCalendarDay": {
+      "type": "object",
+      "properties": {
+        "ranges": {
+          "description": "Working hours, wall-clock minutes from midnight in the calendar's zone.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmCalendarRange"
+          }
+        }
+      }
+    },
+    "wfmCalendarRange": {
+      "type": "object",
+      "properties": {
+        "end": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "start": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
     "wfmCreateAgentAbsenceResponse": {
       "type": "object",
       "properties": {
@@ -80512,6 +80538,22 @@
         }
       }
     },
+    "wfmScheduleCalendar": {
+      "type": "object",
+      "properties": {
+        "time_zone": {
+          "description": "IANA name, such as \"Europe/Kyiv\".",
+          "type": "string"
+        },
+        "week": {
+          "description": "Map key is a day of week as in the Add shifts template: 0 - Sunday, ..., 6 - Saturday.\nEvery day is present; a day without ranges is a day off.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/wfmCalendarDay"
+          }
+        }
+      }
+    },
     "wfmSearchAgentAbsenceResponse": {
       "type": "object",
       "properties": {
@@ -80542,6 +80584,10 @@
     "wfmSearchAgentsWorkingScheduleResponse": {
       "type": "object",
       "properties": {
+        "calendar": {
+          "description": "The calendar of the schedule, to tell working days from days off and to show\ntimes in its zone.",
+          "$ref": "#/definitions/wfmScheduleCalendar"
+        },
         "holidays": {
           "type": "array",
           "items": {
