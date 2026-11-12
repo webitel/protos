@@ -1,0 +1,50 @@
+syntax = "proto3";
+package webitel.portal;
+option go_package = "webitel.go/api/portal;portal";
+
+// import "google/protobuf/duration.proto";
+import "google/protobuf/wrappers.proto";
+
+// message LimitRate {
+//   uint32 max = 1; // number
+//   string per = 2; // unit e.g.: ms, s, m, h, d
+//   // uint64 per = 2;
+//   // google.protobuf.Duration per = 2;
+// }
+
+// enum LimitAlgo {
+//   token_bucket = 0;
+//   leaky_bucket = 1;
+//   fixed_window = 2;
+//   sliding_window = 3;
+// }
+
+message LimitZone {
+  // string name = 0;
+  string key = 1;
+  string algo = 2; // known: fixed_window, token_bucket
+  string rate = 3; // format: "10r/s"
+  // LimitRate rate = 2;
+  // LimitAlgo algo = 3;
+}
+
+message LimitReq {
+  // string zone = 0;
+  // uint32 burst = 1;
+  // uint32 delay = 2;
+  google.protobuf.UInt32Value burst = 1;
+  google.protobuf.UInt32Value delay = 2;
+}
+
+message LimitPath {
+  // Zone rate limit request options
+  map<string, LimitReq> zone = 1;
+}
+
+message RateLimit {
+  // Zone(s) map key rate limit and strategy
+  map<string, LimitZone> zone = 1;
+  // Path associates the rate limit zone request with API endpoint
+  map<string, LimitPath> path = 2;
+  // map<string,<map,LimitReq>> path = 2;
+}
