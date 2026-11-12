@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package webitel.email;
+
+option go_package = "github.com/webitel/webitel-emails/api/email;email";
+
+import "google/api/annotations.proto";
+import "proto/webitel/option.proto";
+
+// EmailThreads serves the operator decisions about an email conversation.
+service EmailThreads {
+  option (option.objclass) = "email_thread";
+
+  // BindEmailThreadContact links a conversation to a contact chosen by an
+  // operator. It outranks automatic contact resolution, including a later one.
+  // The contact itself is created in Contacts, under the operator's own session.
+  rpc BindEmailThreadContact(BindEmailThreadContactRequest) returns (BindEmailThreadContactResponse) {
+    option (google.api.http) = {
+      put: "/v1/email/threads/{thread_id}/contact"
+      body: "*"
+    };
+    option (option.access) = ACTION_UPDATE;
+  }
+
+  // UnbindEmailThreadContact removes the contact of a conversation and keeps it
+  // that way: automatic resolution never writes over an unlinked conversation.
+  rpc UnbindEmailThreadContact(UnbindEmailThreadContactRequest) returns (UnbindEmailThreadContactResponse) {
+    option (google.api.http) = {
+      delete: "/v1/email/threads/{thread_id}/contact"
+    };
+    option (option.access) = ACTION_UPDATE;
+  }
+}
+
+// BindEmailThreadContactRequest selects a conversation and the contact to link.
+message BindEmailThreadContactRequest {
+  int64 thread_id = 1;
+  // Identifier of an existing contact of the same domain.
+  int64 contact_id = 2;
+}
+
+// BindEmailThreadContactResponse confirms the binding.
+message BindEmailThreadContactResponse {
+}
+
+// UnbindEmailThreadContactRequest selects the conversation to unlink.
+message UnbindEmailThreadContactRequest {
+  int64 thread_id = 1;
+}
+
+// UnbindEmailThreadContactResponse confirms the removal.
+message UnbindEmailThreadContactResponse {
+}
