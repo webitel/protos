@@ -46637,13 +46637,11 @@
           },
           {
             "type": "string",
-            "format": "int64",
             "name": "date.from",
             "in": "query"
           },
           {
             "type": "string",
-            "format": "int64",
             "name": "date.to",
             "in": "query"
           },
@@ -46710,6 +46708,7 @@
             "in": "body",
             "required": true,
             "schema": {
+              "description": "The Add shifts modal: a weekly template the server expands into shifts over a range\nof dates (WFM-103). Hours are wall-clock minutes from midnight in the time zone of\nthe schedule's calendar, so a shift keeps its hours across a daylight saving change.",
               "type": "object",
               "properties": {
                 "agents": {
@@ -46720,13 +46719,30 @@
                   }
                 },
                 "date": {
-                  "$ref": "#/definitions/wfmFilterBetween"
+                  "description": "Date from and Date to of the modal.",
+                  "$ref": "#/definitions/wfmDateRange"
                 },
-                "items": {
-                  "description": "Map key is a day of week: 0 - Sunday, ..., 6 - Saturday.",
+                "days": {
+                  "description": "Map key is a day of week: 0 - Sunday, ..., 6 - Saturday. A day missing from the\nmap, one switched off in the modal, gets no shifts.",
                   "type": "object",
                   "additionalProperties": {
-                    "$ref": "#/definitions/wfmAgentScheduleShift"
+                    "$ref": "#/definitions/wfmShiftTemplateDay"
+                  }
+                },
+                "pauses": {
+                  "description": "Pauses of every day. Each belongs to the range that contains it; a pause outside\nevery range of a day refuses the request.",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/wfmShiftTemplatePause"
+                  }
+                },
+                "skills": {
+                  "description": "Skills switched on for the time of every shift the request creates. Different\nskills for different ranges take separate requests.",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/wfmAgentScheduleShiftSkill"
                   }
                 }
               }
@@ -46938,8 +46954,8 @@
                   "type": "object",
                   "properties": {
                     "absent_at": {
-                      "type": "string",
-                      "format": "int64"
+                      "description": "\"YYYY-MM-DD\".",
+                      "type": "string"
                     },
                     "created_at": {
                       "type": "string",
@@ -48203,12 +48219,15 @@
                       "format": "int64"
                     },
                     "end_date_at": {
-                      "type": "string",
-                      "format": "int64"
+                      "type": "string"
                     },
                     "end_time_at": {
                       "type": "string",
                       "format": "int64"
+                    },
+                    "etag": {
+                      "description": "Version of the row, returned by every read. UpdateWorkingSchedule requires\nit and refuses with Aborted when the schedule has changed since.",
+                      "type": "string"
                     },
                     "extra_skills": {
                       "type": "array",
@@ -48221,8 +48240,8 @@
                       "type": "string"
                     },
                     "start_date_at": {
-                      "type": "string",
-                      "format": "int64"
+                      "description": "The first and the last day of the schedule, \"YYYY-MM-DD\".",
+                      "type": "string"
                     },
                     "start_time_at": {
                       "type": "string",
@@ -48514,12 +48533,11 @@
       "type": "object",
       "properties": {
         "date_from": {
-          "type": "string",
-          "format": "int64"
+          "description": "\"YYYY-MM-DD\", inclusive.",
+          "type": "string"
         },
         "date_to": {
-          "type": "string",
-          "format": "int64"
+          "type": "string"
         },
         "type_id": {
           "$ref": "#/definitions/wfmAbsenceType"
@@ -79844,8 +79862,8 @@
       "type": "object",
       "properties": {
         "absent_at": {
-          "type": "string",
-          "format": "int64"
+          "description": "\"YYYY-MM-DD\".",
+          "type": "string"
         },
         "created_at": {
           "type": "string",
@@ -79903,17 +79921,22 @@
       "type": "object",
       "properties": {
         "absence": {
+          "description": "A day has an absence or shifts, not both.",
           "$ref": "#/definitions/wfmAbsenceType"
         },
         "date": {
-          "type": "string",
-          "format": "int64"
+          "description": "The working date, \"YYYY-MM-DD\".",
+          "type": "string"
         },
         "locked": {
           "type": "boolean"
         },
-        "shift": {
-          "$ref": "#/definitions/wfmAgentScheduleShift"
+        "shifts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmAgentScheduleShift"
+          }
         }
       }
     },
@@ -79931,9 +79954,13 @@
           "type": "string",
           "format": "int64"
         },
-        "end": {
+        "end_at": {
           "type": "string",
           "format": "int64"
+        },
+        "etag": {
+          "description": "Version of the shift, returned by every read. Editing a shift requires it (WFM-99).",
+          "type": "string"
         },
         "id": {
           "type": "string",
@@ -79946,6 +79973,11 @@
             "$ref": "#/definitions/wfmAgentScheduleShiftPause"
           }
         },
+        "planner_run_id": {
+          "description": "Set by the server for a planner's shift: the planning run that wrote it.",
+          "type": "string",
+          "format": "int64"
+        },
         "skills": {
           "type": "array",
           "items": {
@@ -79953,7 +79985,12 @@
             "$ref": "#/definitions/wfmAgentScheduleShiftSkill"
           }
         },
-        "start": {
+        "source": {
+          "description": "Set by the server.",
+          "$ref": "#/definitions/wfmShiftSource"
+        },
+        "start_at": {
+          "description": "Epoch milliseconds. The shift ends right before end_at, so the next one can start at end_at.",
           "type": "string",
           "format": "int64"
         },
@@ -79963,6 +80000,10 @@
         },
         "updated_by": {
           "$ref": "#/definitions/wfmLookupEntity"
+        },
+        "working_date": {
+          "description": "Set by the server. The working date, \"YYYY-MM-DD\": the day the shift starts on in the\ntime zone of the schedule's calendar, so a night shift belongs to the day it starts.",
+          "type": "string"
         }
       }
     },
@@ -79983,7 +80024,7 @@
           "type": "string",
           "format": "int64"
         },
-        "end": {
+        "end_at": {
           "type": "string",
           "format": "int64"
         },
@@ -79991,7 +80032,8 @@
           "type": "string",
           "format": "int64"
         },
-        "start": {
+        "start_at": {
+          "description": "Epoch milliseconds, inside the shift.",
           "type": "string",
           "format": "int64"
         },
@@ -80005,12 +80047,9 @@
       }
     },
     "wfmAgentScheduleShiftSkill": {
+      "description": "AgentScheduleShiftSkill switches a skill the agent already has on or off for the time\nof the shift, with the agent's own capacity (WFM-114).",
       "type": "object",
       "properties": {
-        "capacity": {
-          "type": "string",
-          "format": "int64"
-        },
         "enabled": {
           "type": "boolean"
         },
@@ -80093,6 +80132,14 @@
             "type": "object",
             "$ref": "#/definitions/wfmAgentWorkingSchedule"
           }
+        },
+        "skipped": {
+          "description": "Days the request left without shifts, and why: an absence, or a date another\nactive schedule locks (WFM-103).",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmSkippedDay"
+          }
         }
       }
     },
@@ -80173,6 +80220,18 @@
       "properties": {
         "item": {
           "$ref": "#/definitions/wfmWorkingSchedule"
+        }
+      }
+    },
+    "wfmDateRange": {
+      "description": "DateRange is an inclusive range of calendar dates, \"YYYY-MM-DD\". A calendar date\nis a day, not an instant: it does not depend on the client's time zone.",
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
         }
       }
     },
@@ -80314,8 +80373,8 @@
       "type": "object",
       "properties": {
         "date": {
-          "type": "string",
-          "format": "int64"
+          "description": "\"YYYY-MM-DD\".",
+          "type": "string"
         },
         "name": {
           "type": "string"
@@ -80578,6 +80637,15 @@
         }
       }
     },
+    "wfmShiftSource": {
+      "type": "string",
+      "default": "SHIFT_SOURCE_UNSPECIFIED",
+      "enum": [
+        "SHIFT_SOURCE_UNSPECIFIED",
+        "SHIFT_SOURCE_MANUAL",
+        "SHIFT_SOURCE_PLANNER"
+      ]
+    },
     "wfmShiftTemplate": {
       "type": "object",
       "properties": {
@@ -80618,6 +80686,52 @@
         }
       }
     },
+    "wfmShiftTemplateDay": {
+      "description": "ShiftTemplateDay holds the shifts of one day of week, several when the agent works\non different skills at different hours.",
+      "type": "object",
+      "properties": {
+        "ranges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmShiftTemplateRange"
+          }
+        }
+      }
+    },
+    "wfmShiftTemplatePause": {
+      "description": "ShiftTemplatePause is a pause of every day at a wall-clock time. In a range that\ncrosses midnight, a pause after 00:00 belongs to the shift of the previous day.",
+      "type": "object",
+      "properties": {
+        "cause": {
+          "$ref": "#/definitions/wfmLookupEntity"
+        },
+        "duration": {
+          "description": "Minutes.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "start": {
+          "description": "Minutes from midnight.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "wfmShiftTemplateRange": {
+      "description": "ShiftTemplateRange is one shift of a day, in minutes from midnight. An end before the\nstart crosses midnight: 1320 to 360 is 22:00 to 06:00, a shift of the day it starts on.",
+      "type": "object",
+      "properties": {
+        "end": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "start": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
     "wfmShiftTemplateTime": {
       "type": "object",
       "properties": {
@@ -80628,6 +80742,22 @@
         "start": {
           "type": "integer",
           "format": "int32"
+        }
+      }
+    },
+    "wfmSkippedDay": {
+      "type": "object",
+      "properties": {
+        "agent": {
+          "$ref": "#/definitions/wfmLookupEntity"
+        },
+        "date": {
+          "description": "\"YYYY-MM-DD\".",
+          "type": "string"
+        },
+        "reason": {
+          "description": "An error id, \u003clayer\u003e.\u003centity\u003e.\u003cwhat\u003e.",
+          "type": "string"
         }
       }
     },
@@ -80799,12 +80929,15 @@
           "format": "int64"
         },
         "end_date_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "string"
         },
         "end_time_at": {
           "type": "string",
           "format": "int64"
+        },
+        "etag": {
+          "description": "Version of the row, returned by every read. UpdateWorkingSchedule requires\nit and refuses with Aborted when the schedule has changed since.",
+          "type": "string"
         },
         "extra_skills": {
           "type": "array",
@@ -80821,8 +80954,8 @@
           "type": "string"
         },
         "start_date_at": {
-          "type": "string",
-          "format": "int64"
+          "description": "The first and the last day of the schedule, \"YYYY-MM-DD\".",
+          "type": "string"
         },
         "start_time_at": {
           "type": "string",
@@ -80877,9 +81010,9 @@
       "default": "WORKING_SCHEDULE_STATE_UNSPECIFIED",
       "enum": [
         "WORKING_SCHEDULE_STATE_UNSPECIFIED",
-        "WORKING_SCHEDULE_STATE_ACTIVE",
-        "WORKING_SCHEDULE_STATE_PENDING",
         "WORKING_SCHEDULE_STATE_DRAFT",
+        "WORKING_SCHEDULE_STATE_PENDING",
+        "WORKING_SCHEDULE_STATE_ACTIVE",
         "WORKING_SCHEDULE_STATE_ARCHIVED"
       ]
     }
