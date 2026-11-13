@@ -2201,7 +2201,16 @@
         "score": {
           "type": "number",
           "format": "double",
-          "description": "Relevance score assigned by retrieval (higher is better)."
+          "description": "Relevance in [0, 1]: the reranker score when the response is reranked,\notherwise the vector similarity to the query; 0 in a space without\nvector search."
+        },
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "description": "Chunk id; every article version has chunks of its own."
+        },
+        "subject": {
+          "type": "string",
+          "description": "Subject of the article."
         }
       },
       "description": "Chunk is a contiguous slice of an article version, the unit returned by\nsemantic search and consumed by downstream RAG."
@@ -2628,6 +2637,15 @@
         "tag_match": {
           "$ref": "#/definitions/webitel.kb.TagMatch",
           "description": "How to combine the tag filter; unspecified means any."
+        },
+        "rerank": {
+          "type": "boolean",
+          "description": "Whether to rerank the chunks with the reranker of the spaces; applies\nonly to spaces with reranking enabled."
+        },
+        "min_score": {
+          "type": "number",
+          "format": "double",
+          "description": "Minimum chunk score in [0, 1]; chunks without a relevance measure (a\nspace without vector search, not reranked) are kept."
         }
       },
       "description": "SemanticSearchRequest parameters for hybrid retrieval."
@@ -2650,6 +2668,10 @@
             "$ref": "#/definitions/webitel.kb.Citation"
           },
           "description": "Structured citations (empty unless requested)."
+        },
+        "reranked": {
+          "type": "boolean",
+          "description": "Whether the reranker ordered and scored the chunks."
         }
       },
       "description": "SemanticSearchResponse returns ranked chunks and optional citations."
@@ -2822,6 +2844,10 @@
             "$ref": "#/definitions/webitel.kb.Chunk"
           },
           "description": "Suggested chunks for draft generation."
+        },
+        "reranked": {
+          "type": "boolean",
+          "description": "Whether the reranker ordered and scored the suggestions."
         }
       },
       "description": "SuggestResponse returns reranked suggestions."
