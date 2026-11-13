@@ -134,6 +134,15 @@ message SemanticSearchRequest {
   repeated string tags = 5;
   // How to combine the tag filter; unspecified means any.
   TagMatch tag_match = 6 [(buf.validate.field).enum.defined_only = true];
+  // Whether to rerank the chunks with the reranker of the spaces; applies
+  // only to spaces with reranking enabled.
+  bool rerank = 7;
+  // Minimum chunk score in [0, 1]; chunks without a relevance measure (a
+  // space without vector search, not reranked) are kept.
+  double min_score = 8 [(buf.validate.field).double = {
+    gte: 0
+    lte: 1
+  }];
 }
 
 // SemanticSearchResponse returns ranked chunks and optional citations.
@@ -142,6 +151,8 @@ message SemanticSearchResponse {
   repeated Chunk chunks = 1;
   // Structured citations (empty unless requested).
   repeated Citation citations = 2;
+  // Whether the reranker ordered and scored the chunks.
+  bool reranked = 3;
 }
 
 // SuggestRequest parameters for agent assist.
@@ -168,6 +179,8 @@ message SuggestResponse {
   repeated ArticleSummary articles = 1;
   // Suggested chunks for draft generation.
   repeated Chunk chunks = 2;
+  // Whether the reranker ordered and scored the suggestions.
+  bool reranked = 3;
 }
 
 // MenuRequest parameters for bot menus.
