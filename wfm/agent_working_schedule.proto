@@ -8,11 +8,20 @@ import "proto/webitel/option.proto";
 import "lookup.proto";
 import "filter.proto";
 import "agent_absence.proto";
+import "violation.proto";
 
 option go_package = "github.com/webitel/protos/wfm;wfm";
 
 service AgentWorkingScheduleService {
   option (option.objclass) = "working_schedules";
+
+  // Модалка Add shifts, див. запит. Дні з відсутністю і дні під замочком іншого активного
+  // графіка пропускаються і приходять у "skipped"; решта записується.
+  //
+  // Відмова всього запиту: storage.shift.refused зі списком порушень — зміна перетинається з
+  // іншою зміною оператора, або оператор чи дата не з цього графіка;
+  // storage.working_schedule.archived — архівний графік; service.request.too_large — більше за
+  // ліміт (розрахований на команду з 200 операторів на місяць).
   rpc CreateAgentsWorkingScheduleShifts(CreateAgentsWorkingScheduleShiftsRequest) returns (CreateAgentsWorkingScheduleShiftsResponse) {
     option (option.access) = ACTION_CREATE;
     option (google.api.http) = {
@@ -21,25 +30,51 @@ service AgentWorkingScheduleService {
     };
   }
 
+  // Календар графіка: сторінка його операторів з комірками, свята й робочий тиждень календаря
+  // графіка.
   rpc SearchAgentsWorkingSchedule(SearchAgentsWorkingScheduleRequest) returns (SearchAgentsWorkingScheduleResponse) {
     option (option.access) = ACTION_READ;
     option (google.api.http) = {get: "/wfm/agents/working_schedules/{working_schedule_id}"};
   }
+
+  // Модалка Edit shift: одна зміна з часом, паузами й навичками. Зміну шлете цілком: паузи й
+  // навички із запиту замінюють наявні. Видалити паузу з представлення День — той самий виклик,
+  // але без цієї паузи. Потрібен etag з читання; у відповіді зміна з новим etag. Дозволено в
+  // графіку draft, pending і active.
+  //
+  // Відмови: storage.shift.version_conflict (409) — зміну змінили після читання;
+  // storage.shift.refused зі списком порушень — ті самі правила, що в Add shifts, плюс
+  // відсутність чи замочок на дату; storage.working_schedule.archived; dbsql.query.no_rows
+  // (404) — зміни вже немає.
+  rpc UpdateAgentWorkingScheduleShift(UpdateAgentWorkingScheduleShiftRequest) returns (UpdateAgentWorkingScheduleShiftResponse) {
+    option (option.access) = ACTION_UPDATE;
+    option (google.api.http) = {
+      put: "/wfm/agents/working_schedules/{working_schedule_id}/shifts/{shift.id}"
+      body: "*"
+    };
+  }
+
+  // Видаляє зміну разом з паузами й навичками. Відмови ті самі, що в
+  // UpdateAgentWorkingScheduleShift, крім правил зміни.
+  rpc DeleteAgentWorkingScheduleShift(DeleteAgentWorkingScheduleShiftRequest) returns (DeleteAgentWorkingScheduleShiftResponse) {
+    option (option.access) = ACTION_UPDATE;
+    option (google.api.http) = {delete: "/wfm/agents/working_schedules/{working_schedule_id}/shifts/{id}"};
+  }
 }
 
-// The Add shifts modal: a weekly template the server expands into shifts over a range
-// of dates (WFM-103). Hours are wall-clock minutes from midnight in the time zone of
-// the schedule's calendar, so a shift keeps its hours across a daylight saving change.
+// Модалка Add shifts: тижневий шаблон, який сервер розгортає в зміни на діапазон дат. Години —
+// хвилини від півночі за годинником у зоні календаря графіка, тож зміна зберігає свої години
+// і під час переходу на літній час.
 message CreateAgentsWorkingScheduleShiftsRequest {
   int64 working_schedule_id = 1;
 
-  // Date from and Date to of the modal.
+  // Date from і Date to з модалки.
   DateRange date = 2 [(buf.validate.field).required = true];
 
   repeated LookupEntity agents = 3 [(buf.validate.field).repeated.min_items = 1];
 
-  // Map key is a day of week: 0 - Sunday, ..., 6 - Saturday. A day missing from the
-  // map, one switched off in the modal, gets no shifts.
+  // Ключ — день тижня: 0 — неділя, …, 6 — субота. День, якого немає в мапі (вимкнений у
+  // модалці), змін не отримує.
   map<int64, ShiftTemplateDay> days = 6 [
     (buf.validate.field).required = true,
     (buf.validate.field).map = {
@@ -57,25 +92,25 @@ message CreateAgentsWorkingScheduleShiftsRequest {
     }
   ];
 
-  // Pauses of every day. Each belongs to the range that contains it; a pause outside
-  // every range of a day refuses the request.
+  // Паузи кожного дня. Пауза належить діапазону, який її містить; пауза поза всіма
+  // діапазонами дня — відмова запиту.
   repeated ShiftTemplatePause pauses = 7;
 
-  // Skills switched on for the time of every shift the request creates. Different
-  // skills for different ranges take separate requests.
+  // Навички, що вмикаються на час кожної зміни запиту. Різні навички на різні діапазони —
+  // окремими запитами.
   repeated AgentScheduleShiftSkill skills = 8;
 
   reserved 4, 5;
 }
 
-// ShiftTemplateDay holds the shifts of one day of week, several when the agent works
-// on different skills at different hours.
+// ShiftTemplateDay — зміни одного дня тижня; кілька, якщо оператор у різні години працює на
+// різних навичках.
 message ShiftTemplateDay {
   repeated ShiftTemplateRange ranges = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
-// ShiftTemplateRange is one shift of a day, in minutes from midnight. An end before the
-// start crosses midnight: 1320 to 360 is 22:00 to 06:00, a shift of the day it starts on.
+// ShiftTemplateRange — одна зміна дня, у хвилинах від півночі. Кінець раніше за початок —
+// перехід через північ: 1320–360 — це 22:00–06:00, зміна дня, в який вона починається.
 message ShiftTemplateRange {
   option (buf.validate.message).cel = {
     id: "time",
@@ -94,16 +129,16 @@ message ShiftTemplateRange {
   }];
 }
 
-// ShiftTemplatePause is a pause of every day at a wall-clock time. In a range that
-// crosses midnight, a pause after 00:00 belongs to the shift of the previous day.
+// ShiftTemplatePause — пауза кожного дня в певний час за годинником. У діапазоні через
+// північ пауза після 00:00 належить зміні попереднього дня.
 message ShiftTemplatePause {
-  // Minutes from midnight.
+  // Хвилини від півночі.
   int32 start = 1 [(buf.validate.field).int32 = {
     gte: 0
     lt: 1440
   }];
 
-  // Minutes.
+  // Хвилини.
   int32 duration = 2 [(buf.validate.field).int32.gt = 0];
 
   optional LookupEntity cause = 3;
@@ -112,21 +147,33 @@ message ShiftTemplatePause {
 message CreateAgentsWorkingScheduleShiftsResponse {
   repeated AgentWorkingSchedule items = 1;
 
-  // Days the request left without shifts, and why: an absence, or a date another
-  // active schedule locks (WFM-103).
-  repeated SkippedDay skipped = 2;
+  // Дні, які запит залишив без змін, і чому: storage.shift.absence або
+  // storage.shift.locked_date з графіком, що займає дату.
+  repeated Violation skipped = 2;
 }
 
-message SkippedDay {
-  LookupEntity agent = 1;
+message UpdateAgentWorkingScheduleShiftRequest {
+  int64 working_schedule_id = 1 [(buf.validate.field).int64.gt = 0];
 
-  // A date as in DateRange: 00:00 UTC of the day, epoch milliseconds.
-  int64 date = 4;
+  // Зміна з id і etag з читання. Записуються start_at, end_at, pauses і skills; решту
+  // ставить сервер.
+  AgentScheduleShift shift = 2 [(buf.validate.field).required = true];
+}
 
-  // An error id, <layer>.<entity>.<what>.
-  string reason = 3;
+message UpdateAgentWorkingScheduleShiftResponse {
+  AgentScheduleShift shift = 1;
+}
 
-  reserved 2;
+message DeleteAgentWorkingScheduleShiftRequest {
+  int64 working_schedule_id = 1 [(buf.validate.field).int64.gt = 0];
+  int64 id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // etag з читання.
+  string etag = 3 [(buf.validate.field).string.min_len = 1];
+}
+
+message DeleteAgentWorkingScheduleShiftResponse {
+  int64 id = 1;
 }
 
 message SearchAgentsWorkingScheduleRequest {
@@ -139,7 +186,7 @@ message SearchAgentsWorkingScheduleRequest {
 
   optional string q = 6;
 
-  // A page of agents, ordered by name and then by id; the filters apply first.
+  // Сторінка операторів, сортування за іменем, далі за id; спершу застосовуються фільтри.
   optional int32 page = 8 [(buf.validate.field).int32.gt = 0];
   optional int32 size = 9 [(buf.validate.field).int32.gt = 0];
 
@@ -150,26 +197,25 @@ message SearchAgentsWorkingScheduleResponse {
   repeated Holiday holidays = 1;
   repeated AgentWorkingSchedule items = 2;
 
-  // Agents that match the filters, on all pages; 0 on a page past the last one.
+  // Скільки операторів підходить під фільтри, на всіх сторінках; 0 на сторінці після останньої.
   int64 total = 3;
   bool next = 5;
 
-  // The calendar of the schedule, to tell working days from days off and to show
-  // times in its zone.
+  // Календар графіка: щоб відрізнити робочі дні від вихідних і показувати час у його зоні.
   ScheduleCalendar calendar = 4;
 }
 
 message ScheduleCalendar {
-  // IANA name, such as "Europe/Kyiv".
+  // Назва зони IANA, наприклад "Europe/Kyiv".
   string time_zone = 1;
 
-  // Map key is a day of week as in the Add shifts template: 0 - Sunday, ..., 6 - Saturday.
-  // Every day is present; a day without ranges is a day off.
+  // Ключ — день тижня, як у шаблоні Add shifts: 0 — неділя, …, 6 — субота. Є всі дні; день
+  // без ranges — вихідний.
   map<int64, CalendarDay> week = 2;
 }
 
 message CalendarDay {
-  // Working hours, wall-clock minutes from midnight in the calendar's zone.
+  // Робочі години, хвилини від півночі в зоні календаря.
   repeated CalendarRange ranges = 1;
 }
 
@@ -179,7 +225,7 @@ message CalendarRange {
 }
 
 message Holiday {
-  // A date as in DateRange: 00:00 UTC of the day, epoch milliseconds.
+  // Дата, як у DateRange: 00:00 UTC дня, мілісекунди epoch.
   int64 date = 1;
   string name = 2;
 
@@ -200,7 +246,7 @@ message AgentScheduleShiftPause {
   int64 updated_at = 5;
   LookupEntity updated_by = 6;
 
-  // Epoch milliseconds, inside the shift.
+  // Мілісекунди epoch, у межах зміни.
   int64 start_at = 10 [(buf.validate.field).int64.gt = 0];
   int64 end_at = 11 [(buf.validate.field).int64.gt = 0];
 
@@ -209,8 +255,8 @@ message AgentScheduleShiftPause {
   reserved 7, 8;
 }
 
-// AgentScheduleShiftSkill switches a skill the agent already has on or off for the time
-// of the shift, with the agent's own capacity (WFM-114).
+// AgentScheduleShiftSkill вмикає чи вимикає на час зміни навичку, яка в оператора вже є, з
+// його власним capacity.
 message AgentScheduleShiftSkill {
   LookupEntity skill = 1 [(buf.validate.field).required = true];
   bool enabled = 3;
@@ -232,25 +278,25 @@ message AgentScheduleShift {
   int64 updated_at = 5;
   LookupEntity updated_by = 6;
 
-  // Epoch milliseconds. The shift ends right before end_at, so the next one can start at end_at.
+  // Мілісекунди epoch. Зміна закінчується перед end_at, тож наступна може починатися в end_at.
   int64 start_at = 11 [(buf.validate.field).int64.gt = 0];
   int64 end_at = 12 [(buf.validate.field).int64.gt = 0];
 
   repeated AgentScheduleShiftPause pauses = 9;
   repeated AgentScheduleShiftSkill skills = 10;
 
-  // Set by the server. The working date, a date as in DateRange: the day the shift starts
-  // on in the time zone of the schedule's calendar, so a night shift belongs to the day it
-  // starts. 00:00 UTC of that day, epoch milliseconds.
+  // Ставить сервер. Робоча дата, як у DateRange: день, у який зміна почалась за зоною
+  // календаря графіка, тож нічна зміна належить дню початку. 00:00 UTC цього дня, мілісекунди
+  // epoch.
   int64 working_date = 17;
 
-  // Version of the shift, returned by every read. Editing a shift requires it (WFM-99).
+  // Версія зміни, приходить у кожному читанні. Потрібна для правки й видалення зміни.
   string etag = 14;
 
-  // Set by the server.
+  // Ставить сервер.
   ShiftSource source = 15;
 
-  // Set by the server for a planner's shift: the planning run that wrote it.
+  // Ставить сервер для зміни планувальника: запуск планування, що її записав.
   int64 planner_run_id = 16;
 
   reserved 7, 8, 13;
@@ -263,12 +309,18 @@ enum ShiftSource {
 }
 
 message AgentSchedule {
-  // The working date, a date as in DateRange: 00:00 UTC of the day, epoch milliseconds.
+  // Робоча дата, як у DateRange: 00:00 UTC дня, мілісекунди epoch.
   int64 date = 1;
+
+  // У оператора на цю дату зміни в іншому активному графіку: ставити зміну тут не можна.
   bool locked = 2;
 
-  // A day has an absence or shifts, not both.
+  // У дні або відсутність, або зміни, не разом.
   AbsenceType absence = 3;
+
+  // Id відсутності, щоб видалити її з календаря.
+  int64 absence_id = 7;
+
   repeated AgentScheduleShift shifts = 6;
 
   reserved 4, 5;

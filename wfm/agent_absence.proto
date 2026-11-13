@@ -6,13 +6,20 @@ import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "proto/webitel/option.proto";
 import "lookup.proto";
+import "filter.proto";
+import "violation.proto";
 
 option go_package = "github.com/webitel/protos/wfm;wfm";
 
 service AgentAbsenceService {
   option (option.objclass) = "agent_absences";
 
-  // Creates one-day-absence for one agent.
+  // Ставить оператору відсутність на день. Відсутність одна на день, нова заміняє стару
+  // будь-якого типу, тож додати й змінити тип — той самий виклик. Минулі дні дозволені.
+  //
+  // Відмови: storage.absence.refused з порушенням, де названо графік, — якщо на цей день в
+  // оператора є зміна в графіку draft, pending чи active; service.agent.access (403) — немає
+  // доступу до оператора.
   rpc CreateAgentAbsence(CreateAgentAbsenceRequest) returns (CreateAgentAbsenceResponse) {
     option (option.access) = ACTION_CREATE;
     option (google.api.http) = {
@@ -21,19 +28,19 @@ service AgentAbsenceService {
     };
   }
 
-  // Reads one absence per agent by its id.
+  // Читає одну відсутність оператора за id.
   rpc ReadAgentAbsence(ReadAgentAbsenceRequest) returns (ReadAgentAbsenceResponse) {
     option (option.access) = ACTION_READ;
     option (google.api.http) = {get: "/wfm/agents/{agent_id}/absences/{id}"};
   }
 
-  // Searches agent absences by filters.
+  // Відсутності одного оператора.
   rpc SearchAgentAbsence(SearchAgentAbsenceRequest) returns (SearchAgentAbsenceResponse) {
     option (option.access) = ACTION_READ;
     option (google.api.http) = {get: "/wfm/agents/{agent_id}/absences"};
   }
 
-  // Updates agent concrete absence by its id.
+  // Оновлює відсутність за id. Фронту не потрібен: той самий результат дає CreateAgentAbsence.
   rpc UpdateAgentAbsence(UpdateAgentAbsenceRequest) returns (UpdateAgentAbsenceResponse) {
     option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
@@ -42,13 +49,18 @@ service AgentAbsenceService {
     };
   }
 
-  // Deletes agent concrete absence by its id.
+  // Видаляє відсутність за id; dbsql.query.no_rows (404), якщо її немає.
   rpc DeleteAgentAbsence(DeleteAgentAbsenceRequest) returns (DeleteAgentAbsenceResponse) {
     option (option.access) = ACTION_DELETE;
     option (google.api.http) = {delete: "/wfm/agents/{agent_id}/absences/{id}"};
   }
 
-  // Creates absences for multiple specified agents.
+  // Модалка Add absence: відсутності кількох типів на діапазони дат кільком операторам. Дні,
+  // де в оператора є зміна в графіку draft, pending чи active, пропускаються і приходять у
+  // "skipped"; решта записується, кожен день заміняє те, що там було.
+  //
+  // Відмови: service.request.too_large — більше за ліміт (розрахований на команду з 200
+  // операторів на місяць); service.agent.access (403) — немає доступу до оператора.
   rpc CreateAgentsAbsences(CreateAgentsAbsencesRequest) returns (CreateAgentsAbsencesResponse) {
     option (option.access) = ACTION_CREATE;
     option (google.api.http) = {
@@ -57,7 +69,8 @@ service AgentAbsenceService {
     };
   }
 
-  // Searches absences by filters.
+  // Сторінка Agents: усі оператори, до яких у користувача є доступ, з відсутностями чи без,
+  // і їхні відсутності за видимий тиждень чи місяць. Сортування за іменем, далі за id.
   rpc SearchAgentsAbsences(SearchAgentsAbsencesRequest) returns (SearchAgentsAbsencesResponse) {
     option (option.access) = ACTION_READ;
     option (google.api.http) = {get: "/wfm/agents/absences"};
@@ -117,7 +130,7 @@ message CreateAgentsAbsencesRequest {
   message absentType {
     AbsenceType type_id = 1 [(buf.validate.field).enum = {defined_only: true, in: [1, 2, 3]}];
 
-    // Dates as in DateRange: 00:00 UTC of the day, epoch milliseconds; date_to is included.
+    // Дати, як у DateRange: 00:00 UTC дня, мілісекунди epoch; date_to включно.
     int64 date_from = 2 [
       (buf.validate.field).int64.gt = 0,
       (buf.validate.field).cel = {
@@ -151,20 +164,39 @@ message CreateAgentsAbsencesRequest {
 
 message CreateAgentsAbsencesResponse {
   repeated AgentAbsences items = 1;
+
+  // Пропущені дні: причина storage.absence.shift і графік, де стоїть зміна.
+  repeated Violation skipped = 2;
 }
 
 message SearchAgentsAbsencesRequest {
-  optional string q = 1; // Searches by agent name.
-  optional int32 page = 2;
-  optional int32 size = 3;
+  // Видимий період, тиждень чи місяць. Обмежує відсутності, а не операторів.
+  DateRange date = 7 [(buf.validate.field).required = true];
+
+  repeated int64 team_id = 8;
+  repeated int64 supervisor_id = 9;
+  repeated int64 skill_id = 10;
+
+  // Пошук за іменем оператора.
+  optional string q = 1 [(buf.validate.field).string.max_len = 250];
+
+  optional int32 page = 2 [(buf.validate.field).int32.gt = 0];
+  optional int32 size = 3 [(buf.validate.field).int32.gt = 0];
+
+  // +name чи -name; без нього +name.
   optional string sort = 4;
   repeated string fields = 5;
-  repeated string filters = 6;
+
+  reserved 6;
 }
 
 message SearchAgentsAbsencesResponse {
+  // Оператор без відсутностей за період приходить без "absences".
   repeated AgentAbsences items = 1;
   bool next = 2;
+
+  // Скільки операторів підходить під фільтри, на всіх сторінках.
+  int64 total = 3;
 }
 
 message AgentAbsences {
@@ -189,7 +221,7 @@ message Absence {
 
   AbsenceType type_id = 7 [(buf.validate.field).enum = {defined_only: true, in: [1, 2, 3]}];
 
-  // A date as in DateRange: 00:00 UTC of the day, epoch milliseconds.
+  // Дата, як у DateRange: 00:00 UTC дня, мілісекунди epoch.
   int64 absent_at = 8 [
     (buf.validate.field).int64.gt = 0,
     (buf.validate.field).cel = {

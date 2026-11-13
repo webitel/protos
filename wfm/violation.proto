@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package wfm;
+
+import "lookup.proto";
+
+option go_package = "github.com/webitel/protos/wfm;wfm";
+
+// Violation — одне порушене правило: який оператор, на яку дату, чому і який інший графік
+// цьому заважає. Приходить у списку "violations" у тілі помилки-відмови і в "skipped" запису,
+// який пропускає частину днів замість відмови.
+//
+// Причини фронт розрізняє за id і перекладає:
+//   storage.shift.agent_not_in_schedule — оператора немає в графіку
+//   storage.shift.agent_deactivated — користувача оператора деактивовано
+//   storage.shift.outside_schedule — дата поза періодом графіка
+//   storage.shift.absence — на дату в оператора відсутність
+//   storage.shift.locked_date — на дату в оператора зміни в іншому активному графіку (замочок у календарі)
+//   storage.shift.overlap — зміна перетинається з іншою зміною оператора, зокрема з нічною
+//   storage.absence.shift — на дату в оператора зміна в графіку draft, pending чи active
+//   storage.working_schedule.team_active — у команди вже є активний графік на ці дати; без agent і date
+//
+// Помилки WFM: тіло {"id", "code", "status", "detail"}. Фронт розрізняє помилки за id, а не за
+// HTTP-статусом: 400 — це і валідація, і бізнес-відмова, 409 — і конфлікт версії, і дубль.
+// Текст для користувача — переклад за id, detail лише запасний. Відмова зі списком додає
+// "violations": [Violation].
+//
+// Спільне для всіх методів WFM: interceptor.validate (400) — некоректний запит;
+// interceptor.auth.license та interceptor.auth.permission (403) — немає ліцензії WFM чи права на
+// клас; service.agent.access (403) — немає доступу до оператора, ніколи не 404;
+// dbsql.query.no_rows (404) — запису вже немає; storage.working_schedule.archived (400) — будь-який
+// запис в архівний графік, він лише для читання. Після 409 (конфлікт версії) фронт перечитує
+// запис і показує, що дані оновились.
+message Violation {
+  // Немає, коли правило стосується графіка цілком.
+  LookupEntity agent = 1;
+
+  // Дата, як у DateRange: 00:00 UTC дня, мілісекунди epoch. Немає, коли правило стосується
+  // графіка цілком.
+  int64 date = 4;
+
+  // Id причини, <шар>.<сутність>.<що>.
+  string reason = 3;
+
+  // Інший графік, через який порушення, якщо він є.
+  LookupEntity schedule = 5;
+
+  reserved 2;
+}
