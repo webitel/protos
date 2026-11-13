@@ -215,6 +215,11 @@ message MessageDeletedEvent {
 
   // The recipient's GetUpdates cursor after this change; save the latest one received.
   string updates_cursor = 6;
+
+  // Set when the message was replaced by its retry (a failed send re-sent with
+  // retry_of): the id of the new message. Clients drop the bubble without a
+  // "deleted" tombstone; the new message arrives as its own event.
+  string replaced_by = 7;
 }
 
 // MemberChangedEvent tells every participant a member joined or left;
@@ -312,7 +317,10 @@ message MessageStatusEvent {
   optional int64 unread_count = 14;
 }
 
-// MessageStatusError is a provider's delivery failure, e.g. {code: "131047", message: "re-engagement window expired"}.
+// MessageStatusError is a delivery failure. code is normalized: file_too_large,
+// file_unavailable, unsupported_media, recipient_unavailable, channel_unavailable
+// or send_failed; treat any other value as send_failed. message is the
+// provider's detail for logs, not for display.
 message MessageStatusError {
   string code = 1;
   string message = 2;

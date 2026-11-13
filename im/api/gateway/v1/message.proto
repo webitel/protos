@@ -282,6 +282,11 @@ message SendTextRequest {
   optional ForwardOriginInput forward_origin = 23;
 
   map<string, string> variables = 24;
+
+  // Id of a message of the caller that failed to reach a recipient, when this
+  // send is its retry. The failed message is removed from the history in the
+  // same transaction and announced deleted with replaced_by = the new id.
+  optional string retry_of = 25 [(buf.validate.field).string.uuid = true];
 }
 
 // Represents a response to send a text message.
@@ -322,6 +327,11 @@ message SendDocumentRequest {
   // it; ignored on every later message. Providers fill it from the channel's
   // first-message payload so a flow schema can route on the caller's own data.
   map<string, string> variables = 24;
+
+  // Id of a message of the caller that failed to reach a recipient, when this
+  // send is its retry. The failed message is removed from the history in the
+  // same transaction and announced deleted with replaced_by = the new id.
+  optional string retry_of = 25 [(buf.validate.field).string.uuid = true];
 }
 
 // Represents a response to send message with document.
@@ -390,6 +400,11 @@ message SendLocationRequest {
 
   // ID of the message this is a reply to, as reported by the external channel.
   string reply_to_external_id = 12;
+
+  // Id of a message of the caller that failed to reach a recipient, when this
+  // send is its retry. The failed message is removed from the history in the
+  // same transaction and announced deleted with replaced_by = the new id.
+  optional string retry_of = 13 [(buf.validate.field).string.uuid = true];
 }
 
 // SendContactRequest sends contact information.
@@ -427,6 +442,11 @@ message SendContactRequest {
 
   // ID of the message this is a reply to, as reported by the external channel.
   string reply_to_external_id = 11;
+
+  // Id of a message of the caller that failed to reach a recipient, when this
+  // send is its retry. The failed message is removed from the history in the
+  // same transaction and announced deleted with replaced_by = the new id.
+  optional string retry_of = 12 [(buf.validate.field).string.uuid = true];
 }
 
 // SendInteractiveMessageRequest sends a structured interactive message.
