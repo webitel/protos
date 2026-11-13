@@ -17,10 +17,10 @@ message FilterBetween {
   int64 to = 2;
 }
 
-// DateRange is an inclusive range of calendar dates. A date anywhere in WFM is a day, not
-// an instant: 00:00 UTC of that day in epoch milliseconds, the same for every client
-// whatever its time zone. Any other value is refused, so a local midnight shows up as
-// an error instead of a day shifted by the client's offset.
+// DateRange — діапазон календарних дат, обидва кінці включно. Дата скрізь у WFM — це день, а не
+// момент часу: 00:00 UTC цього дня в мілісекундах epoch (Date.UTC(рік, місяць, день)), однакова
+// для кожного клієнта в будь-якій зоні. Інше значення відхиляється, тож локальна північ дає
+// помилку валідації, а не день, зсунутий на зміщення клієнта.
 message DateRange {
   option (buf.validate.message).cel = {
     id: "between",
@@ -37,7 +37,7 @@ message DateRange {
     }
   ];
 
-  // The last day, included.
+  // Останній день, включно.
   int64 to = 2 [
     (buf.validate.field).int64.gt = 0,
     (buf.validate.field).cel = {

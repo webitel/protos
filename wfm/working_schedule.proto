@@ -12,6 +12,10 @@ option go_package = "github.com/webitel/protos/wfm;wfm";
 
 service WorkingScheduleService {
   option (option.objclass) = "working_schedules";
+
+  // Новий графік завжди чернетка, хоч би який state прийшов у запиті. У нього потрапляють усі
+  // оператори команди, до яких у користувача є доступ; тих, кого додали в команду пізніше,
+  // додають вручну.
   rpc CreateWorkingSchedule(CreateWorkingScheduleRequest) returns (CreateWorkingScheduleResponse) {
     option (option.access) = ACTION_CREATE;
     option (google.api.http) = {
@@ -25,16 +29,36 @@ service WorkingScheduleService {
     option (google.api.http) = {get: "/wfm/lookups/working_schedules/{id}"};
   }
 
+  // Блок Forecast, прогноз: скільки операторів потрібно на кожну годину видимого періоду, з
+  // процедури прогнозу команди. Процедура виконується на кожен виклик і не зберігається, тож
+  // читайте при відкритті сторінки, зміні періоду чи оновленні, а не після правок. Якщо в
+  // команди немає довідника прогнозу, годин немає — фронт показує 0.
   rpc ReadWorkingScheduleForecast(ReadWorkingScheduleForecastRequest) returns (ReadWorkingScheduleForecastResponse) {
     option (option.access) = ACTION_READ;
     option (google.api.http) = {get: "/wfm/lookups/working_schedules/{id}/forecast"};
   }
 
+  // Блок Forecast, розплановано: скільки операторів на зміні й не в паузі — по 15 хвилин для
+  // представлення День і по днях для Тижня й Місяця. Читає лише графік, тож перечитуйте після
+  // кожної правки.
+  rpc ReadWorkingSchedulePlanned(ReadWorkingSchedulePlannedRequest) returns (ReadWorkingSchedulePlannedResponse) {
+    option (option.access) = ACTION_READ;
+    option (google.api.http) = {get: "/wfm/lookups/working_schedules/{id}/planned"};
+  }
+
+  // Реєстр графіків, у кожному кількість операторів.
   rpc SearchWorkingSchedule(SearchWorkingScheduleRequest) returns (SearchWorkingScheduleResponse) {
     option (option.access) = ACTION_READ;
     option (google.api.http) = {get: "/wfm/lookups/working_schedules"};
   }
 
+  // Правка шапки, лише в чернетці, з etag з читання; у відповіді новий etag. Зміна команди,
+  // календаря, дат чи шкали видаляє всі зміни графіка, тож фронт спершу попереджає; назва,
+  // навички Special time і перемикач блокування зміни не чіпають. При зміні команди оператори
+  // старої команди прибираються; додані вручну з інших команд лишаються.
+  //
+  // Відмови: service.working_schedule.state — графік не чернетка;
+  // storage.working_schedule.version_conflict (409) — шапку змінили після читання.
   rpc UpdateWorkingSchedule(UpdateWorkingScheduleRequest) returns (UpdateWorkingScheduleResponse) {
     option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
@@ -43,6 +67,8 @@ service WorkingScheduleService {
     };
   }
 
+  // Додає операторів з будь-якої команди, кожного один раз: той, хто вже в графіку,
+  // пропускається. У відповіді додані з іменами.
   rpc UpdateWorkingScheduleAddAgents(UpdateWorkingScheduleAddAgentsRequest) returns (UpdateWorkingScheduleAddAgentsResponse) {
     option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
@@ -51,11 +77,36 @@ service WorkingScheduleService {
     };
   }
 
+  // Прибирає оператора разом з його змінами в цьому графіку; відсутності лишаються.
   rpc UpdateWorkingScheduleRemoveAgent(UpdateWorkingScheduleRemoveAgentRequest) returns (UpdateWorkingScheduleRemoveAgentResponse) {
     option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {delete: "/wfm/lookups/working_schedules/{id}/agents/{agent_id}"};
   }
 
+  // Переводить графік в інший статус, у будь-якому порядку, крім виходу з архівного. З etag з
+  // читання; у відповіді графік з новим etag.
+  //
+  // У pending чи active: якщо є нерозплановані дні (оператор графіка і дата в періоді, де ні
+  // зміни, ні відсутності), спершу потрібна відповідь користувача. Без fill_days_off виклик
+  // відмовляє з service.working_schedule.unplanned_days, фронт питає «позначити їх
+  // вихідними?» і повторює виклик з відповіддю. Вихідні пишуться в тій самій транзакції і
+  // одразу видні в Agents.
+  //
+  // В active ще до цього питання може прийти storage.working_schedule.activation_refused зі
+  // списком порушень: storage.working_schedule.team_active — у команди інший активний графік
+  // на дати, що перетинаються; storage.shift.locked_date чи storage.shift.overlap — оператор
+  // працює в іншому активному графіку в ту саму дату чи в той самий час.
+  // storage.working_schedule.version_conflict (409) — шапку змінили після читання.
+  rpc UpdateWorkingScheduleState(UpdateWorkingScheduleStateRequest) returns (UpdateWorkingScheduleStateResponse) {
+    option (option.access) = ACTION_UPDATE;
+    option (google.api.http) = {
+      patch: "/wfm/lookups/working_schedules/{id}/state"
+      body: "*"
+    };
+  }
+
+  // Видаляє графік разом зі змінами, паузами й навичками; відсутності лишаються. Відмова
+  // service.working_schedule.active — графік активний, спершу змініть статус.
   rpc DeleteWorkingSchedule(DeleteWorkingScheduleRequest) returns (DeleteWorkingScheduleResponse) {
     option (option.access) = ACTION_DELETE;
     option (google.api.http) = {delete: "/wfm/lookups/working_schedules/{id}"};
@@ -110,12 +161,58 @@ message ReadWorkingScheduleResponse {
 }
 
 message ReadWorkingScheduleForecastRequest {
-  int64 id = 1;
-  FilterBetween date = 2;
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
+
+  // Видимий період.
+  DateRange date = 3 [(buf.validate.field).required = true];
+
+  reserved 2;
 }
 
 message ReadWorkingScheduleForecastResponse {
-   map<int64, WorkingScheduleForecast> items = 1;
+  repeated ForecastHour items = 2;
+
+  reserved 1;
+}
+
+message ForecastHour {
+  // День цієї години за зоною календаря графіка, дата як у DateRange: 00:00 UTC дня,
+  // мілісекунди epoch. Тиждень і Місяць показують найбільшу годину дня.
+  int64 date = 1;
+
+  // Початок години, мілісекунди epoch.
+  int64 start_at = 2;
+
+  // Скільки операторів потрібно.
+  int32 agents = 3;
+}
+
+message ReadWorkingSchedulePlannedRequest {
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
+
+  // Видимий період.
+  DateRange date = 2 [(buf.validate.field).required = true];
+}
+
+message ReadWorkingSchedulePlannedResponse {
+  // 15-хвилинні слоти, де хоча б один оператор на зміні й не в паузі; слоту немає в списку —
+  // значить 0. Оператор вважається відсутнім, лише якщо пауза покриває слот повністю.
+  repeated PlannedSlot slots = 1;
+
+  // Дні, де хоча б в одного оператора є зміна, за робочою датою.
+  repeated PlannedDay days = 2;
+}
+
+message PlannedSlot {
+  // Початок слота, мілісекунди epoch.
+  int64 start_at = 1;
+  int32 agents = 2;
+}
+
+message PlannedDay {
+  // Дата, як у DateRange: 00:00 UTC дня, мілісекунди epoch.
+  int64 date = 1;
+  int32 agents = 2;
 }
 
 message SearchWorkingScheduleRequest {
@@ -127,6 +224,7 @@ message SearchWorkingScheduleRequest {
   optional int32 page = 2 [(buf.validate.field).int32.gt = 0];
   optional int32 size = 3 [(buf.validate.field).int32.gt = 0];
 
+  // +name, -name, +state чи -state. Статуси йдуть у порядку Active, Pending, Draft, Archived.
   optional string sort = 4;
 
   repeated string fields = 5 [(buf.validate.field).repeated = {
@@ -197,6 +295,30 @@ message UpdateWorkingScheduleRemoveAgentResponse {
   int64 id = 1;
 }
 
+message UpdateWorkingScheduleStateRequest {
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
+
+  WorkingScheduleState state = 2 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+
+  // etag з читання.
+  string etag = 3 [(buf.validate.field).string.min_len = 1];
+
+  // Відповідь користувача про нерозплановані дні, після відмови
+  // service.working_schedule.unplanned_days: true — заповнити вихідними, зокрема свята й
+  // неробочі дні календаря; false — лишити порожніми. Не передано — відмова, якщо такі дні є.
+  optional bool fill_days_off = 4;
+}
+
+message UpdateWorkingScheduleStateResponse {
+  WorkingSchedule item = 1;
+
+  // Скільки днів заповнено вихідними.
+  int32 filled_days = 2;
+}
+
 message DeleteWorkingScheduleRequest {
   int64 id = 1 [
     (buf.validate.field).required = true,
@@ -206,15 +328,6 @@ message DeleteWorkingScheduleRequest {
 
 message DeleteWorkingScheduleResponse {
   int64 id = 1;
-}
-
-message WorkingScheduleForecast {
-  message Forecast {
-    int64 hour = 1;
-    int64 agents = 2;
-  }
-
-  repeated Forecast forecast = 1;
 }
 
 enum WorkingScheduleState {
@@ -239,13 +352,15 @@ message WorkingSchedule {
     (buf.validate.field).string.max_len = 250
   ];
 
+  // Ставить сервер: новий графік — чернетка, змінює лише UpdateWorkingScheduleState. Позначка
+  // «оператор підтвердив графік» у MVP береться звідси: в активному графіку підтвердили всі, в
+  // інших — ніхто.
   WorkingScheduleState state = 8;
 
   LookupEntity team = 9;
   LookupEntity calendar = 10;
 
-  // The first and the last day of the schedule, dates as in DateRange: 00:00 UTC of the
-  // day, epoch milliseconds.
+  // Перший і останній день графіка, дати як у DateRange: 00:00 UTC дня, мілісекунди epoch.
   int64 start_date_at = 11 [
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
     (buf.validate.field).int64.gt = 0,
@@ -266,17 +381,23 @@ message WorkingSchedule {
     }
   ];
 
+  // Шкала таблиці, хвилини від півночі в зоні календаря графіка. Обидва не задані — 24 години;
+  // кінець раніше за початок — шкала через північ. Задає лише, що показує таблиця, і зміни не
+  // обмежує.
   int64 start_time_at = 13;
   int64 end_time_at = 14;
 
+  // Навички Special time. Форма може змінитися на групу навичок (WFM-114).
   repeated LookupEntity extra_skills = 15;
+
+  // За замовчуванням вимкнено. Змінюється лише в чернетці.
   bool block_outside_activity = 16;
 
   repeated LookupEntity agents = 17;
   int64 total_agents = 18;
 
-  // Version of the row, returned by every read. UpdateWorkingSchedule requires
-  // it and refuses with Aborted when the schedule has changed since.
+  // Версія графіка, приходить у кожному читанні. Потрібна для UpdateWorkingSchedule і
+  // UpdateWorkingScheduleState; якщо графік змінили — 409 storage.working_schedule.version_conflict.
   string etag = 19;
 
   reserved 20, 21;

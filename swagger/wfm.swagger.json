@@ -39,7 +39,7 @@
   "paths": {
     "/wfm/agents/absences": {
       "get": {
-        "summary": "Searches absences by filters.",
+        "summary": "Сторінка Agents: усі оператори, до яких у користувача є доступ, з відсутностями чи без,\nі їхні відсутності за видимий тиждень чи місяць. Сортування за іменем, далі за id.",
         "operationId": "AgentAbsenceService_SearchAgentsAbsences",
         "responses": {
           "200": {
@@ -51,8 +51,56 @@
         },
         "parameters": [
           {
+            "name": "date.from",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "date.to",
+            "description": "Останній день, включно.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "team_id",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "supervisor_id",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "skill_id",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
             "name": "q",
-            "description": "Searches by agent name.",
+            "description": "Пошук за іменем оператора.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -73,22 +121,13 @@
           },
           {
             "name": "sort",
+            "description": "+name чи -name; без нього +name.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "fields",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          },
-          {
-            "name": "filters",
             "in": "query",
             "required": false,
             "type": "array",
@@ -103,7 +142,8 @@
         ]
       },
       "post": {
-        "summary": "Creates absences for multiple specified agents.",
+        "summary": "Модалка Add absence: відсутності кількох типів на діапазони дат кільком операторам. Дні,\nде в оператора є зміна в графіку draft, pending чи active, пропускаються і приходять у\n\"skipped\"; решта записується, кожен день заміняє те, що там було.",
+        "description": "Відмови: service.request.too_large — більше за ліміт (розрахований на команду з 200\nоператорів на місяць); service.agent.access (403) — немає доступу до оператора.",
         "operationId": "AgentAbsenceService_CreateAgentsAbsences",
         "responses": {
           "200": {
@@ -130,6 +170,7 @@
     },
     "/wfm/agents/working_schedules/{working_schedule_id}": {
       "get": {
+        "summary": "Календар графіка: сторінка його операторів з комірками, свята й робочий тиждень календаря\nграфіка.",
         "operationId": "AgentWorkingScheduleService_SearchAgentsWorkingSchedule",
         "responses": {
           "200": {
@@ -156,7 +197,7 @@
           },
           {
             "name": "date.to",
-            "description": "The last day, included.",
+            "description": "Останній день, включно.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -203,7 +244,7 @@
           },
           {
             "name": "page",
-            "description": "A page of agents, ordered by name and then by id; the filters apply first.",
+            "description": "Сторінка операторів, сортування за іменем, далі за id; спершу застосовуються фільтри.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -222,6 +263,8 @@
         ]
       },
       "post": {
+        "summary": "Модалка Add shifts, див. запит. Дні з відсутністю і дні під замочком іншого активного\nграфіка пропускаються і приходять у \"skipped\"; решта записується.",
+        "description": "Відмова всього запиту: storage.shift.refused зі списком порушень — зміна перетинається з\nіншою зміною оператора, або оператор чи дата не з цього графіка;\nstorage.working_schedule.archived — архівний графік; service.request.too_large — більше за\nліміт (розрахований на команду з 200 операторів на місяць).",
         "operationId": "AgentWorkingScheduleService_CreateAgentsWorkingScheduleShifts",
         "responses": {
           "200": {
@@ -248,7 +291,7 @@
               "properties": {
                 "date": {
                   "$ref": "#/definitions/wfmDateRange",
-                  "description": "Date from and Date to of the modal."
+                  "description": "Date from і Date to з модалки."
                 },
                 "agents": {
                   "type": "array",
@@ -262,7 +305,7 @@
                   "additionalProperties": {
                     "$ref": "#/definitions/wfmShiftTemplateDay"
                   },
-                  "description": "Map key is a day of week: 0 - Sunday, ..., 6 - Saturday. A day missing from the\nmap, one switched off in the modal, gets no shifts."
+                  "description": "Ключ — день тижня: 0 — неділя, …, 6 — субота. День, якого немає в мапі (вимкнений у\nмодалці), змін не отримує."
                 },
                 "pauses": {
                   "type": "array",
@@ -270,7 +313,7 @@
                     "type": "object",
                     "$ref": "#/definitions/wfmShiftTemplatePause"
                   },
-                  "description": "Pauses of every day. Each belongs to the range that contains it; a pause outside\nevery range of a day refuses the request."
+                  "description": "Паузи кожного дня. Пауза належить діапазону, який її містить; пауза поза всіма\nдіапазонами дня — відмова запиту."
                 },
                 "skills": {
                   "type": "array",
@@ -278,10 +321,160 @@
                     "type": "object",
                     "$ref": "#/definitions/wfmAgentScheduleShiftSkill"
                   },
-                  "description": "Skills switched on for the time of every shift the request creates. Different\nskills for different ranges take separate requests."
+                  "description": "Навички, що вмикаються на час кожної зміни запиту. Різні навички на різні діапазони —\nокремими запитами."
                 }
               },
-              "description": "The Add shifts modal: a weekly template the server expands into shifts over a range\nof dates (WFM-103). Hours are wall-clock minutes from midnight in the time zone of\nthe schedule's calendar, so a shift keeps its hours across a daylight saving change."
+              "description": "Модалка Add shifts: тижневий шаблон, який сервер розгортає в зміни на діапазон дат. Години —\nхвилини від півночі за годинником у зоні календаря графіка, тож зміна зберігає свої години\nі під час переходу на літній час."
+            }
+          }
+        ],
+        "tags": [
+          "AgentWorkingScheduleService"
+        ]
+      }
+    },
+    "/wfm/agents/working_schedules/{working_schedule_id}/shifts/{id}": {
+      "delete": {
+        "summary": "Видаляє зміну разом з паузами й навичками. Відмови ті самі, що в\nUpdateAgentWorkingScheduleShift, крім правил зміни.",
+        "operationId": "AgentWorkingScheduleService_DeleteAgentWorkingScheduleShift",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/wfmDeleteAgentWorkingScheduleShiftResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "working_schedule_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "etag",
+            "description": "etag з читання.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AgentWorkingScheduleService"
+        ]
+      }
+    },
+    "/wfm/agents/working_schedules/{working_schedule_id}/shifts/{shift.id}": {
+      "put": {
+        "summary": "Модалка Edit shift: одна зміна з часом, паузами й навичками. Зміну шлете цілком: паузи й\nнавички із запиту замінюють наявні. Видалити паузу з представлення День — той самий виклик,\nале без цієї паузи. Потрібен etag з читання; у відповіді зміна з новим etag. Дозволено в\nграфіку draft, pending і active.",
+        "description": "Відмови: storage.shift.version_conflict (409) — зміну змінили після читання;\nstorage.shift.refused зі списком порушень — ті самі правила, що в Add shifts, плюс\nвідсутність чи замочок на дату; storage.working_schedule.archived; dbsql.query.no_rows\n(404) — зміни вже немає.",
+        "operationId": "AgentWorkingScheduleService_UpdateAgentWorkingScheduleShift",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/wfmUpdateAgentWorkingScheduleShiftResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "working_schedule_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "shift.id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "shift": {
+                  "type": "object",
+                  "properties": {
+                    "domain_id": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "created_by": {
+                      "$ref": "#/definitions/wfmLookupEntity"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "updated_by": {
+                      "$ref": "#/definitions/wfmLookupEntity"
+                    },
+                    "start_at": {
+                      "type": "string",
+                      "format": "int64",
+                      "description": "Мілісекунди epoch. Зміна закінчується перед end_at, тож наступна може починатися в end_at."
+                    },
+                    "end_at": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "pauses": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "$ref": "#/definitions/wfmAgentScheduleShiftPause"
+                      }
+                    },
+                    "skills": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "$ref": "#/definitions/wfmAgentScheduleShiftSkill"
+                      }
+                    },
+                    "working_date": {
+                      "type": "string",
+                      "format": "int64",
+                      "description": "Ставить сервер. Робоча дата, як у DateRange: день, у який зміна почалась за зоною\nкалендаря графіка, тож нічна зміна належить дню початку. 00:00 UTC цього дня, мілісекунди\nepoch."
+                    },
+                    "etag": {
+                      "type": "string",
+                      "description": "Версія зміни, приходить у кожному читанні. Потрібна для правки й видалення зміни."
+                    },
+                    "source": {
+                      "$ref": "#/definitions/wfmShiftSource",
+                      "description": "Ставить сервер."
+                    },
+                    "planner_run_id": {
+                      "type": "string",
+                      "format": "int64",
+                      "description": "Ставить сервер для зміни планувальника: запуск планування, що її записав."
+                    }
+                  },
+                  "description": "Зміна з id і etag з читання. Записуються start_at, end_at, pauses і skills; решту\nставить сервер.",
+                  "title": "Зміна з id і etag з читання. Записуються start_at, end_at, pauses і skills; решту\nставить сервер."
+                }
+              }
             }
           }
         ],
@@ -292,7 +485,7 @@
     },
     "/wfm/agents/{agent_id}/absences": {
       "get": {
-        "summary": "Searches agent absences by filters.",
+        "summary": "Відсутності одного оператора.",
         "operationId": "AgentAbsenceService_SearchAgentAbsence",
         "responses": {
           "200": {
@@ -356,7 +549,8 @@
         ]
       },
       "post": {
-        "summary": "Creates one-day-absence for one agent.",
+        "summary": "Ставить оператору відсутність на день. Відсутність одна на день, нова заміняє стару\nбудь-якого типу, тож додати й змінити тип — той самий виклик. Минулі дні дозволені.",
+        "description": "Відмови: storage.absence.refused з порушенням, де названо графік, — якщо на цей день в\nоператора є зміна в графіку draft, pending чи active; service.agent.access (403) — немає\nдоступу до оператора.",
         "operationId": "AgentAbsenceService_CreateAgentAbsence",
         "responses": {
           "200": {
@@ -395,7 +589,7 @@
     },
     "/wfm/agents/{agent_id}/absences/{id}": {
       "get": {
-        "summary": "Reads one absence per agent by its id.",
+        "summary": "Читає одну відсутність оператора за id.",
         "operationId": "AgentAbsenceService_ReadAgentAbsence",
         "responses": {
           "200": {
@@ -426,7 +620,7 @@
         ]
       },
       "delete": {
-        "summary": "Deletes agent concrete absence by its id.",
+        "summary": "Видаляє відсутність за id; dbsql.query.no_rows (404), якщо її немає.",
         "operationId": "AgentAbsenceService_DeleteAgentAbsence",
         "responses": {
           "200": {
@@ -459,7 +653,7 @@
     },
     "/wfm/agents/{agent_id}/absences/{item.id}": {
       "put": {
-        "summary": "Updates agent concrete absence by its id.",
+        "summary": "Оновлює відсутність за id. Фронту не потрібен: той самий результат дає CreateAgentAbsence.",
         "operationId": "AgentAbsenceService_UpdateAgentAbsence",
         "responses": {
           "200": {
@@ -518,7 +712,7 @@
                     "absent_at": {
                       "type": "string",
                       "format": "int64",
-                      "description": "A date as in DateRange: 00:00 UTC of the day, epoch milliseconds."
+                      "description": "Дата, як у DateRange: 00:00 UTC дня, мілісекунди epoch."
                     }
                   }
                 }
@@ -1495,6 +1689,7 @@
     },
     "/wfm/lookups/working_schedules": {
       "get": {
+        "summary": "Реєстр графіків, у кожному кількість операторів.",
         "operationId": "WorkingScheduleService_SearchWorkingSchedule",
         "responses": {
           "200": {
@@ -1527,6 +1722,7 @@
           },
           {
             "name": "sort",
+            "description": "+name, -name, +state чи -state. Статуси йдуть у порядку Active, Pending, Draft, Archived.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -1547,6 +1743,7 @@
         ]
       },
       "post": {
+        "summary": "Новий графік завжди чернетка, хоч би який state прийшов у запиті. У нього потрапляють усі\nоператори команди, до яких у користувача є доступ; тих, кого додали в команду пізніше,\nдодають вручну.",
         "operationId": "WorkingScheduleService_CreateWorkingSchedule",
         "responses": {
           "200": {
@@ -1606,6 +1803,7 @@
         ]
       },
       "delete": {
+        "summary": "Видаляє графік разом зі змінами, паузами й навичками; відсутності лишаються. Відмова\nservice.working_schedule.active — графік активний, спершу змініть статус.",
         "operationId": "WorkingScheduleService_DeleteWorkingSchedule",
         "responses": {
           "200": {
@@ -1631,6 +1829,7 @@
     },
     "/wfm/lookups/working_schedules/{id}/agents": {
       "post": {
+        "summary": "Додає операторів з будь-якої команди, кожного один раз: той, хто вже в графіку,\nпропускається. У відповіді додані з іменами.",
         "operationId": "WorkingScheduleService_UpdateWorkingScheduleAddAgents",
         "responses": {
           "200": {
@@ -1673,6 +1872,7 @@
     },
     "/wfm/lookups/working_schedules/{id}/agents/{agent_id}": {
       "delete": {
+        "summary": "Прибирає оператора разом з його змінами в цьому графіку; відсутності лишаються.",
         "operationId": "WorkingScheduleService_UpdateWorkingScheduleRemoveAgent",
         "responses": {
           "200": {
@@ -1705,6 +1905,7 @@
     },
     "/wfm/lookups/working_schedules/{id}/forecast": {
       "get": {
+        "summary": "Блок Forecast, прогноз: скільки операторів потрібно на кожну годину видимого періоду, з\nпроцедури прогнозу команди. Процедура виконується на кожен виклик і не зберігається, тож\nчитайте при відкритті сторінки, зміні періоду чи оновленні, а не після правок. Якщо в\nкоманди немає довідника прогнозу, годин немає — фронт показує 0.",
         "operationId": "WorkingScheduleService_ReadWorkingScheduleForecast",
         "responses": {
           "200": {
@@ -1731,6 +1932,7 @@
           },
           {
             "name": "date.to",
+            "description": "Останній день, включно.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -1742,8 +1944,99 @@
         ]
       }
     },
+    "/wfm/lookups/working_schedules/{id}/planned": {
+      "get": {
+        "summary": "Блок Forecast, розплановано: скільки операторів на зміні й не в паузі — по 15 хвилин для\nпредставлення День і по днях для Тижня й Місяця. Читає лише графік, тож перечитуйте після\nкожної правки.",
+        "operationId": "WorkingScheduleService_ReadWorkingSchedulePlanned",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/wfmReadWorkingSchedulePlannedResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "date.from",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "date.to",
+            "description": "Останній день, включно.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "WorkingScheduleService"
+        ]
+      }
+    },
+    "/wfm/lookups/working_schedules/{id}/state": {
+      "patch": {
+        "summary": "Переводить графік в інший статус, у будь-якому порядку, крім виходу з архівного. З etag з\nчитання; у відповіді графік з новим etag.",
+        "description": "У pending чи active: якщо є нерозплановані дні (оператор графіка і дата в періоді, де ні\nзміни, ні відсутності), спершу потрібна відповідь користувача. Без fill_days_off виклик\nвідмовляє з service.working_schedule.unplanned_days, фронт питає «позначити їх\nвихідними?» і повторює виклик з відповіддю. Вихідні пишуться в тій самій транзакції і\nодразу видні в Agents.\n\nВ active ще до цього питання може прийти storage.working_schedule.activation_refused зі\nсписком порушень: storage.working_schedule.team_active — у команди інший активний графік\nна дати, що перетинаються; storage.shift.locked_date чи storage.shift.overlap — оператор\nпрацює в іншому активному графіку в ту саму дату чи в той самий час.\nstorage.working_schedule.version_conflict (409) — шапку змінили після читання.",
+        "operationId": "WorkingScheduleService_UpdateWorkingScheduleState",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/wfmUpdateWorkingScheduleStateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "state": {
+                  "$ref": "#/definitions/wfmWorkingScheduleState"
+                },
+                "etag": {
+                  "type": "string",
+                  "description": "etag з читання."
+                },
+                "fill_days_off": {
+                  "type": "boolean",
+                  "description": "Відповідь користувача про нерозплановані дні, після відмови\nservice.working_schedule.unplanned_days: true — заповнити вихідними, зокрема свята й\nнеробочі дні календаря; false — лишити порожніми. Не передано — відмова, якщо такі дні є."
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "WorkingScheduleService"
+        ]
+      }
+    },
     "/wfm/lookups/working_schedules/{item.id}": {
       "put": {
+        "summary": "Правка шапки, лише в чернетці, з etag з читання; у відповіді новий etag. Зміна команди,\nкалендаря, дат чи шкали видаляє всі зміни графіка, тож фронт спершу попереджає; назва,\nнавички Special time і перемикач блокування зміни не чіпають. При зміні команди оператори\nстарої команди прибираються; додані вручну з інших команд лишаються.",
+        "description": "Відмови: service.working_schedule.state — графік не чернетка;\nstorage.working_schedule.version_conflict (409) — шапку змінили після читання.",
         "operationId": "WorkingScheduleService_UpdateWorkingSchedule",
         "responses": {
           "200": {
@@ -1793,7 +2086,8 @@
                       "type": "string"
                     },
                     "state": {
-                      "$ref": "#/definitions/wfmWorkingScheduleState"
+                      "$ref": "#/definitions/wfmWorkingScheduleState",
+                      "description": "Ставить сервер: новий графік — чернетка, змінює лише UpdateWorkingScheduleState. Позначка\n«оператор підтвердив графік» у MVP береться звідси: в активному графіку підтвердили всі, в\nінших — ніхто."
                     },
                     "team": {
                       "$ref": "#/definitions/wfmLookupEntity"
@@ -1804,7 +2098,7 @@
                     "start_date_at": {
                       "type": "string",
                       "format": "int64",
-                      "description": "The first and the last day of the schedule, dates as in DateRange: 00:00 UTC of the\nday, epoch milliseconds."
+                      "description": "Перший і останній день графіка, дати як у DateRange: 00:00 UTC дня, мілісекунди epoch."
                     },
                     "end_date_at": {
                       "type": "string",
@@ -1812,7 +2106,8 @@
                     },
                     "start_time_at": {
                       "type": "string",
-                      "format": "int64"
+                      "format": "int64",
+                      "description": "Шкала таблиці, хвилини від півночі в зоні календаря графіка. Обидва не задані — 24 години;\nкінець раніше за початок — шкала через північ. Задає лише, що показує таблиця, і зміни не\nобмежує."
                     },
                     "end_time_at": {
                       "type": "string",
@@ -1823,10 +2118,12 @@
                       "items": {
                         "type": "object",
                         "$ref": "#/definitions/wfmLookupEntity"
-                      }
+                      },
+                      "description": "Навички Special time. Форма може змінитися на групу навичок (WFM-114)."
                     },
                     "block_outside_activity": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "description": "За замовчуванням вимкнено. Змінюється лише в чернетці."
                     },
                     "agents": {
                       "type": "array",
@@ -1841,7 +2138,7 @@
                     },
                     "etag": {
                       "type": "string",
-                      "description": "Version of the row, returned by every read. UpdateWorkingSchedule requires\nit and refuses with Aborted when the schedule has changed since."
+                      "description": "Версія графіка, приходить у кожному читанні. Потрібна для UpdateWorkingSchedule і\nUpdateWorkingScheduleState; якщо графік змінили — 409 storage.working_schedule.version_conflict."
                     }
                   }
                 }
@@ -1865,9 +2162,22 @@
         "date_from": {
           "type": "string",
           "format": "int64",
-          "description": "Dates as in DateRange: 00:00 UTC of the day, epoch milliseconds; date_to is included."
+          "description": "Дати, як у DateRange: 00:00 UTC дня, мілісекунди epoch; date_to включно."
         },
         "date_to": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "ExecuteForecastCalculationResponseForecast": {
+      "type": "object",
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "format": "int64"
+        },
+        "agents": {
           "type": "string",
           "format": "int64"
         }
@@ -1904,7 +2214,7 @@
         "absent_at": {
           "type": "string",
           "format": "int64",
-          "description": "A date as in DateRange: 00:00 UTC of the day, epoch milliseconds."
+          "description": "Дата, як у DateRange: 00:00 UTC дня, мілісекунди epoch."
         }
       }
     },
@@ -1939,14 +2249,20 @@
         "date": {
           "type": "string",
           "format": "int64",
-          "description": "The working date, a date as in DateRange: 00:00 UTC of the day, epoch milliseconds."
+          "description": "Робоча дата, як у DateRange: 00:00 UTC дня, мілісекунди epoch."
         },
         "locked": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "У оператора на цю дату зміни в іншому активному графіку: ставити зміну тут не можна."
         },
         "absence": {
           "$ref": "#/definitions/wfmAbsenceType",
-          "description": "A day has an absence or shifts, not both."
+          "description": "У дні або відсутність, або зміни, не разом."
+        },
+        "absence_id": {
+          "type": "string",
+          "format": "int64",
+          "description": "Id відсутності, щоб видалити її з календаря."
         },
         "shifts": {
           "type": "array",
@@ -1985,7 +2301,7 @@
         "start_at": {
           "type": "string",
           "format": "int64",
-          "description": "Epoch milliseconds. The shift ends right before end_at, so the next one can start at end_at."
+          "description": "Мілісекунди epoch. Зміна закінчується перед end_at, тож наступна може починатися в end_at."
         },
         "end_at": {
           "type": "string",
@@ -2008,20 +2324,20 @@
         "working_date": {
           "type": "string",
           "format": "int64",
-          "description": "Set by the server. The working date, a date as in DateRange: the day the shift starts\non in the time zone of the schedule's calendar, so a night shift belongs to the day it\nstarts. 00:00 UTC of that day, epoch milliseconds."
+          "description": "Ставить сервер. Робоча дата, як у DateRange: день, у який зміна почалась за зоною\nкалендаря графіка, тож нічна зміна належить дню початку. 00:00 UTC цього дня, мілісекунди\nepoch."
         },
         "etag": {
           "type": "string",
-          "description": "Version of the shift, returned by every read. Editing a shift requires it (WFM-99)."
+          "description": "Версія зміни, приходить у кожному читанні. Потрібна для правки й видалення зміни."
         },
         "source": {
           "$ref": "#/definitions/wfmShiftSource",
-          "description": "Set by the server."
+          "description": "Ставить сервер."
         },
         "planner_run_id": {
           "type": "string",
           "format": "int64",
-          "description": "Set by the server for a planner's shift: the planning run that wrote it."
+          "description": "Ставить сервер для зміни планувальника: запуск планування, що її записав."
         }
       }
     },
@@ -2053,7 +2369,7 @@
         "start_at": {
           "type": "string",
           "format": "int64",
-          "description": "Epoch milliseconds, inside the shift."
+          "description": "Мілісекунди epoch, у межах зміни."
         },
         "end_at": {
           "type": "string",
@@ -2074,7 +2390,7 @@
           "type": "boolean"
         }
       },
-      "description": "AgentScheduleShiftSkill switches a skill the agent already has on or off for the time\nof the shift, with the agent's own capacity (WFM-114)."
+      "description": "AgentScheduleShiftSkill вмикає чи вимикає на час зміни навичку, яка в оператора вже є, з\nйого власним capacity."
     },
     "wfmAgentWorkingConditions": {
       "type": "object",
@@ -2111,7 +2427,7 @@
             "type": "object",
             "$ref": "#/definitions/wfmCalendarRange"
           },
-          "description": "Working hours, wall-clock minutes from midnight in the calendar's zone."
+          "description": "Робочі години, хвилини від півночі в зоні календаря."
         }
       }
     },
@@ -2164,6 +2480,14 @@
             "type": "object",
             "$ref": "#/definitions/wfmAgentAbsences"
           }
+        },
+        "skipped": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmViolation"
+          },
+          "description": "Пропущені дні: причина storage.absence.shift і графік, де стоїть зміна."
         }
       }
     },
@@ -2181,9 +2505,9 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/wfmSkippedDay"
+            "$ref": "#/definitions/wfmViolation"
           },
-          "description": "Days the request left without shifts, and why: an absence, or a date another\nactive schedule locks (WFM-103)."
+          "description": "Дні, які запит залишив без змін, і чому: storage.shift.absence або\nstorage.shift.locked_date з графіком, що займає дату."
         }
       }
     },
@@ -2277,12 +2601,21 @@
         "to": {
           "type": "string",
           "format": "int64",
-          "description": "The last day, included."
+          "description": "Останній день, включно."
         }
       },
-      "description": "DateRange is an inclusive range of calendar dates. A date anywhere in WFM is a day, not\nan instant: 00:00 UTC of that day in epoch milliseconds, the same for every client\nwhatever its time zone. Any other value is refused, so a local midnight shows up as\nan error instead of a day shifted by the client's offset."
+      "description": "DateRange — діапазон календарних дат, обидва кінці включно. Дата скрізь у WFM — це день, а не\nмомент часу: 00:00 UTC цього дня в мілісекундах epoch (Date.UTC(рік, місяць, день)), однакова\nдля кожного клієнта в будь-якій зоні. Інше значення відхиляється, тож локальна північ дає\nпомилку валідації, а не день, зсунутий на зміщення клієнта."
     },
     "wfmDeleteAgentAbsenceResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "wfmDeleteAgentWorkingScheduleShiftResponse": {
       "type": "object",
       "properties": {
         "id": {
@@ -2343,21 +2676,8 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/wfmExecuteForecastCalculationResponseForecast"
+            "$ref": "#/definitions/ExecuteForecastCalculationResponseForecast"
           }
-        }
-      }
-    },
-    "wfmExecuteForecastCalculationResponseForecast": {
-      "type": "object",
-      "properties": {
-        "timestamp": {
-          "type": "string",
-          "format": "int64"
-        },
-        "agents": {
-          "type": "string",
-          "format": "int64"
         }
       }
     },
@@ -2416,13 +2736,33 @@
         }
       }
     },
+    "wfmForecastHour": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "int64",
+          "description": "День цієї години за зоною календаря графіка, дата як у DateRange: 00:00 UTC дня,\nмілісекунди epoch. Тиждень і Місяць показують найбільшу годину дня."
+        },
+        "start_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Початок години, мілісекунди epoch."
+        },
+        "agents": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Скільки операторів потрібно."
+        }
+      }
+    },
     "wfmHoliday": {
       "type": "object",
       "properties": {
         "date": {
           "type": "string",
           "format": "int64",
-          "description": "A date as in DateRange: 00:00 UTC of the day, epoch milliseconds."
+          "description": "Дата, як у DateRange: 00:00 UTC дня, мілісекунди epoch."
         },
         "name": {
           "type": "string"
@@ -2493,6 +2833,34 @@
         }
       }
     },
+    "wfmPlannedDay": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "int64",
+          "description": "Дата, як у DateRange: 00:00 UTC дня, мілісекунди epoch."
+        },
+        "agents": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "wfmPlannedSlot": {
+      "type": "object",
+      "properties": {
+        "start_at": {
+          "type": "string",
+          "format": "int64",
+          "description": "Початок слота, мілісекунди epoch."
+        },
+        "agents": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
     "wfmReadAgentAbsenceResponse": {
       "type": "object",
       "properties": {
@@ -2545,10 +2913,32 @@
       "type": "object",
       "properties": {
         "items": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/wfmWorkingScheduleForecast"
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmForecastHour"
           }
+        }
+      }
+    },
+    "wfmReadWorkingSchedulePlannedResponse": {
+      "type": "object",
+      "properties": {
+        "slots": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmPlannedSlot"
+          },
+          "description": "15-хвилинні слоти, де хоча б один оператор на зміні й не в паузі; слоту немає в списку —\nзначить 0. Оператор вважається відсутнім, лише якщо пауза покриває слот повністю."
+        },
+        "days": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmPlannedDay"
+          },
+          "description": "Дні, де хоча б в одного оператора є зміна, за робочою датою."
         }
       }
     },
@@ -2565,14 +2955,14 @@
       "properties": {
         "time_zone": {
           "type": "string",
-          "description": "IANA name, such as \"Europe/Kyiv\"."
+          "description": "Назва зони IANA, наприклад \"Europe/Kyiv\"."
         },
         "week": {
           "type": "object",
           "additionalProperties": {
             "$ref": "#/definitions/wfmCalendarDay"
           },
-          "description": "Map key is a day of week as in the Add shifts template: 0 - Sunday, ..., 6 - Saturday.\nEvery day is present; a day without ranges is a day off."
+          "description": "Ключ — день тижня, як у шаблоні Add shifts: 0 — неділя, …, 6 — субота. Є всі дні; день\nбез ranges — вихідний."
         }
       }
     },
@@ -2596,10 +2986,16 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/wfmAgentAbsences"
-          }
+          },
+          "description": "Оператор без відсутностей за період приходить без \"absences\"."
         },
         "next": {
           "type": "boolean"
+        },
+        "total": {
+          "type": "string",
+          "format": "int64",
+          "description": "Скільки операторів підходить під фільтри, на всіх сторінках."
         }
       }
     },
@@ -2623,14 +3019,14 @@
         "total": {
           "type": "string",
           "format": "int64",
-          "description": "Agents that match the filters, on all pages; 0 on a page past the last one."
+          "description": "Скільки операторів підходить під фільтри, на всіх сторінках; 0 на сторінці після останньої."
         },
         "next": {
           "type": "boolean"
         },
         "calendar": {
           "$ref": "#/definitions/wfmScheduleCalendar",
-          "description": "The calendar of the schedule, to tell working days from days off and to show\ntimes in its zone."
+          "description": "Календар графіка: щоб відрізнити робочі дні від вихідних і показувати час у його зоні."
         }
       }
     },
@@ -2769,7 +3165,7 @@
           }
         }
       },
-      "description": "ShiftTemplateDay holds the shifts of one day of week, several when the agent works\non different skills at different hours."
+      "description": "ShiftTemplateDay — зміни одного дня тижня; кілька, якщо оператор у різні години працює на\nрізних навичках."
     },
     "wfmShiftTemplatePause": {
       "type": "object",
@@ -2777,18 +3173,18 @@
         "start": {
           "type": "integer",
           "format": "int32",
-          "description": "Minutes from midnight."
+          "description": "Хвилини від півночі."
         },
         "duration": {
           "type": "integer",
           "format": "int32",
-          "description": "Minutes."
+          "description": "Хвилини."
         },
         "cause": {
           "$ref": "#/definitions/wfmLookupEntity"
         }
       },
-      "description": "ShiftTemplatePause is a pause of every day at a wall-clock time. In a range that\ncrosses midnight, a pause after 00:00 belongs to the shift of the previous day."
+      "description": "ShiftTemplatePause — пауза кожного дня в певний час за годинником. У діапазоні через\nпівніч пауза після 00:00 належить зміні попереднього дня."
     },
     "wfmShiftTemplateRange": {
       "type": "object",
@@ -2802,7 +3198,7 @@
           "format": "int32"
         }
       },
-      "description": "ShiftTemplateRange is one shift of a day, in minutes from midnight. An end before the\nstart crosses midnight: 1320 to 360 is 22:00 to 06:00, a shift of the day it starts on."
+      "description": "ShiftTemplateRange — одна зміна дня, у хвилинах від півночі. Кінець раніше за початок —\nперехід через північ: 1320–360 — це 22:00–06:00, зміна дня, в який вона починається."
     },
     "wfmShiftTemplateTime": {
       "type": "object",
@@ -2814,23 +3210,6 @@
         "end": {
           "type": "integer",
           "format": "int32"
-        }
-      }
-    },
-    "wfmSkippedDay": {
-      "type": "object",
-      "properties": {
-        "agent": {
-          "$ref": "#/definitions/wfmLookupEntity"
-        },
-        "date": {
-          "type": "string",
-          "format": "int64",
-          "description": "A date as in DateRange: 00:00 UTC of the day, epoch milliseconds."
-        },
-        "reason": {
-          "type": "string",
-          "description": "An error id, \u003clayer\u003e.\u003centity\u003e.\u003cwhat\u003e."
         }
       }
     },
@@ -2847,6 +3226,14 @@
       "properties": {
         "item": {
           "$ref": "#/definitions/wfmAgentWorkingConditions"
+        }
+      }
+    },
+    "wfmUpdateAgentWorkingScheduleShiftResponse": {
+      "type": "object",
+      "properties": {
+        "shift": {
+          "$ref": "#/definitions/wfmAgentScheduleShift"
         }
       }
     },
@@ -2910,6 +3297,42 @@
           "$ref": "#/definitions/wfmWorkingSchedule"
         }
       }
+    },
+    "wfmUpdateWorkingScheduleStateResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/wfmWorkingSchedule"
+        },
+        "filled_days": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Скільки днів заповнено вихідними."
+        }
+      }
+    },
+    "wfmViolation": {
+      "type": "object",
+      "properties": {
+        "agent": {
+          "$ref": "#/definitions/wfmLookupEntity",
+          "description": "Немає, коли правило стосується графіка цілком."
+        },
+        "date": {
+          "type": "string",
+          "format": "int64",
+          "description": "Дата, як у DateRange: 00:00 UTC дня, мілісекунди epoch. Немає, коли правило стосується\nграфіка цілком."
+        },
+        "reason": {
+          "type": "string",
+          "description": "Id причини, \u003cшар\u003e.\u003cсутність\u003e.\u003cщо\u003e."
+        },
+        "schedule": {
+          "$ref": "#/definitions/wfmLookupEntity",
+          "description": "Інший графік, через який порушення, якщо він є."
+        }
+      },
+      "description": "Violation — одне порушене правило: який оператор, на яку дату, чому і який інший графік\nцьому заважає. Приходить у списку \"violations\" у тілі помилки-відмови і в \"skipped\" запису,\nякий пропускає частину днів замість відмови.\n\nПричини фронт розрізняє за id і перекладає:\n  storage.shift.agent_not_in_schedule — оператора немає в графіку\n  storage.shift.agent_deactivated — користувача оператора деактивовано\n  storage.shift.outside_schedule — дата поза періодом графіка\n  storage.shift.absence — на дату в оператора відсутність\n  storage.shift.locked_date — на дату в оператора зміни в іншому активному графіку (замочок у календарі)\n  storage.shift.overlap — зміна перетинається з іншою зміною оператора, зокрема з нічною\n  storage.absence.shift — на дату в оператора зміна в графіку draft, pending чи active\n  storage.working_schedule.team_active — у команди вже є активний графік на ці дати; без agent і date\n\nПомилки WFM: тіло {\"id\", \"code\", \"status\", \"detail\"}. Фронт розрізняє помилки за id, а не за\nHTTP-статусом: 400 — це і валідація, і бізнес-відмова, 409 — і конфлікт версії, і дубль.\nТекст для користувача — переклад за id, detail лише запасний. Відмова зі списком додає\n\"violations\": [Violation].\n\nСпільне для всіх методів WFM: interceptor.validate (400) — некоректний запит;\ninterceptor.auth.license та interceptor.auth.permission (403) — немає ліцензії WFM чи права на\nклас; service.agent.access (403) — немає доступу до оператора, ніколи не 404;\ndbsql.query.no_rows (404) — запису вже немає; storage.working_schedule.archived (400) — будь-який\nзапис в архівний графік, він лише для читання. Після 409 (конфлікт версії) фронт перечитує\nзапис і показує, що дані оновились."
     },
     "wfmWorkingCondition": {
       "type": "object",
@@ -3003,7 +3426,8 @@
           "type": "string"
         },
         "state": {
-          "$ref": "#/definitions/wfmWorkingScheduleState"
+          "$ref": "#/definitions/wfmWorkingScheduleState",
+          "description": "Ставить сервер: новий графік — чернетка, змінює лише UpdateWorkingScheduleState. Позначка\n«оператор підтвердив графік» у MVP береться звідси: в активному графіку підтвердили всі, в\nінших — ніхто."
         },
         "team": {
           "$ref": "#/definitions/wfmLookupEntity"
@@ -3014,7 +3438,7 @@
         "start_date_at": {
           "type": "string",
           "format": "int64",
-          "description": "The first and the last day of the schedule, dates as in DateRange: 00:00 UTC of the\nday, epoch milliseconds."
+          "description": "Перший і останній день графіка, дати як у DateRange: 00:00 UTC дня, мілісекунди epoch."
         },
         "end_date_at": {
           "type": "string",
@@ -3022,7 +3446,8 @@
         },
         "start_time_at": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Шкала таблиці, хвилини від півночі в зоні календаря графіка. Обидва не задані — 24 години;\nкінець раніше за початок — шкала через північ. Задає лише, що показує таблиця, і зміни не\nобмежує."
         },
         "end_time_at": {
           "type": "string",
@@ -3033,10 +3458,12 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/wfmLookupEntity"
-          }
+          },
+          "description": "Навички Special time. Форма може змінитися на групу навичок (WFM-114)."
         },
         "block_outside_activity": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "За замовчуванням вимкнено. Змінюється лише в чернетці."
         },
         "agents": {
           "type": "array",
@@ -3051,32 +3478,7 @@
         },
         "etag": {
           "type": "string",
-          "description": "Version of the row, returned by every read. UpdateWorkingSchedule requires\nit and refuses with Aborted when the schedule has changed since."
-        }
-      }
-    },
-    "wfmWorkingScheduleForecast": {
-      "type": "object",
-      "properties": {
-        "forecast": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/wfmWorkingScheduleForecastForecast"
-          }
-        }
-      }
-    },
-    "wfmWorkingScheduleForecastForecast": {
-      "type": "object",
-      "properties": {
-        "hour": {
-          "type": "string",
-          "format": "int64"
-        },
-        "agents": {
-          "type": "string",
-          "format": "int64"
+          "description": "Версія графіка, приходить у кожному читанні. Потрібна для UpdateWorkingSchedule і\nUpdateWorkingScheduleState; якщо графік змінили — 409 storage.working_schedule.version_conflict."
         }
       }
     },
