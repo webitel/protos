@@ -294,7 +294,17 @@ message DeliveryFailure {
   DeliveryError error = 2;
 }
 
-// DeliveryError is a provider's delivery failure, e.g. {code: "403", message: "bot was blocked by the user"}.
+// DeliveryError is a delivery failure reported for one recipient.
+//
+// code is a stable, channel-independent value for the client to branch on:
+//   file_too_large        - an attachment exceeds the channel's size limit
+//   file_unavailable      - the channel could not fetch or read an attachment
+//   unsupported_media     - the channel does not accept this content/file type
+//   recipient_unavailable - the recipient blocked the bot, left, or is unreachable
+//   channel_unavailable   - the channel or im-providers could not be reached
+//   send_failed           - any other rejection
+// message is the provider's raw, human-readable detail (not for display logic),
+// e.g. {code: "recipient_unavailable", message: "bot was blocked by the user"}.
 message DeliveryError {
   string code = 1;
   string message = 2;

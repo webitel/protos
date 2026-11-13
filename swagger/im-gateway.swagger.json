@@ -5816,6 +5816,10 @@
         "deleted_by": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadMember",
           "description": "Member who deleted the message, in the same shape as a message's sender."
+        },
+        "replaced_by": {
+          "type": "string",
+          "description": "Id of the message that replaced this one when it was a failed send the\nsender retried. Set: drop the bubble without a \"deleted\" placeholder."
         }
       },
       "description": "DeletedMessage is a message deleted since cursor."
@@ -5830,7 +5834,7 @@
           "type": "string"
         }
       },
-      "description": "DeliveryError is a provider's delivery failure, e.g. {code: \"403\", message: \"bot was blocked by the user\"}."
+      "description": "DeliveryError is a delivery failure reported for one recipient.\n\ncode is a stable, channel-independent value for the client to branch on:\n  file_too_large        - an attachment exceeds the channel's size limit\n  file_unavailable      - the channel could not fetch or read an attachment\n  unsupported_media     - the channel does not accept this content/file type\n  recipient_unavailable - the recipient blocked the bot, left, or is unreachable\n  channel_unavailable   - the channel or im-providers could not be reached\n  send_failed           - any other rejection\nmessage is the provider's raw, human-readable detail (not for display logic),\ne.g. {code: \"recipient_unavailable\", message: \"bot was blocked by the user\"}."
     },
     "webitel.im.api.gateway.v1.DeliveryFailure": {
       "type": "object",
@@ -7161,6 +7165,10 @@
         "reply_to_external_id": {
           "type": "string",
           "description": "ID of the message this is a reply to, as reported by the external channel."
+        },
+        "retry_of": {
+          "type": "string",
+          "description": "Id of a message of the caller that failed to reach a recipient, when this\nsend is its retry. The failed message is removed from the history in the\nsame transaction and announced deleted with replaced_by = the new id."
         }
       },
       "description": "SendContactRequest sends contact information."
@@ -7207,6 +7215,10 @@
             "type": "string"
           },
           "description": "Variables seeded onto the thread when this message is the one that creates\nit; ignored on every later message. Providers fill it from the channel's\nfirst-message payload so a flow schema can route on the caller's own data."
+        },
+        "retry_of": {
+          "type": "string",
+          "description": "Id of a message of the caller that failed to reach a recipient, when this\nsend is its retry. The failed message is removed from the history in the\nsame transaction and announced deleted with replaced_by = the new id."
         }
       },
       "description": "Represents a request to send a message with document."
@@ -7324,6 +7336,10 @@
         "reply_to_external_id": {
           "type": "string",
           "description": "ID of the message this is a reply to, as reported by the external channel."
+        },
+        "retry_of": {
+          "type": "string",
+          "description": "Id of a message of the caller that failed to reach a recipient, when this\nsend is its retry. The failed message is removed from the history in the\nsame transaction and announced deleted with replaced_by = the new id."
         }
       },
       "description": "SendLocationRequest sends a geographic location message."
@@ -7378,6 +7394,10 @@
           "additionalProperties": {
             "type": "string"
           }
+        },
+        "retry_of": {
+          "type": "string",
+          "description": "Id of a message of the caller that failed to reach a recipient, when this\nsend is its retry. The failed message is removed from the history in the\nsame transaction and announced deleted with replaced_by = the new id."
         }
       },
       "description": "Represents a request to send a text message."
