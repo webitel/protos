@@ -8,11 +8,21 @@ import "proto/webitel/option.proto";
 import "lookup.proto";
 import "filter.proto";
 import "agent_absence.proto";
+import "violation.proto";
 
 option go_package = "github.com/webitel/protos/wfm;wfm";
 
 service AgentWorkingScheduleService {
   option (option.objclass) = "working_schedules";
+
+  // Expands a weekly template into shifts for several agents over a range of dates. Days with
+  // an absence and days another active schedule locks are skipped and returned in skipped; the
+  // rest is written.
+  //
+  // Refusals of the whole request: storage.shift.refused with violations - a shift overlaps
+  // another shift of the agent, or the agent or the date is not of this schedule;
+  // storage.working_schedule.archived; service.request.too_large - more than the limit, sized for
+  // a team of 200 agents over a month.
   rpc CreateAgentsWorkingScheduleShifts(CreateAgentsWorkingScheduleShiftsRequest) returns (CreateAgentsWorkingScheduleShiftsResponse) {
     option (option.access) = ACTION_CREATE;
     option (google.api.http) = {
@@ -21,25 +31,51 @@ service AgentWorkingScheduleService {
     };
   }
 
+  // A page of the schedule's agents with their days, and the holidays and working week of the
+  // schedule's calendar.
   rpc SearchAgentsWorkingSchedule(SearchAgentsWorkingScheduleRequest) returns (SearchAgentsWorkingScheduleResponse) {
     option (option.access) = ACTION_READ;
     option (google.api.http) = {get: "/wfm/agents/working_schedules/{working_schedule_id}"};
   }
+
+  // Replaces one shift whole: its time, and the pauses and skills of the request replace the
+  // existing ones, so a pause is deleted by sending the shift without it. Needs the etag from a
+  // read; the response carries the shift with the new etag. Allowed in a draft, pending or
+  // active schedule.
+  //
+  // Refusals: storage.shift.version_conflict (409) - the shift changed since the read;
+  // storage.shift.refused with violations - the rules of CreateAgentsWorkingScheduleShifts, plus
+  // an absence or a locked date; storage.working_schedule.archived; dbsql.query.no_rows (404) -
+  // the shift is gone.
+  rpc UpdateAgentWorkingScheduleShift(UpdateAgentWorkingScheduleShiftRequest) returns (UpdateAgentWorkingScheduleShiftResponse) {
+    option (option.access) = ACTION_UPDATE;
+    option (google.api.http) = {
+      put: "/wfm/agents/working_schedules/{working_schedule_id}/shifts/{shift.id}"
+      body: "*"
+    };
+  }
+
+  // Deletes a shift with its pauses and skills. Refusals as in UpdateAgentWorkingScheduleShift,
+  // except the shift rules.
+  rpc DeleteAgentWorkingScheduleShift(DeleteAgentWorkingScheduleShiftRequest) returns (DeleteAgentWorkingScheduleShiftResponse) {
+    option (option.access) = ACTION_UPDATE;
+    option (google.api.http) = {delete: "/wfm/agents/working_schedules/{working_schedule_id}/shifts/{id}"};
+  }
 }
 
-// The Add shifts modal: a weekly template the server expands into shifts over a range
-// of dates (WFM-103). Hours are wall-clock minutes from midnight in the time zone of
-// the schedule's calendar, so a shift keeps its hours across a daylight saving change.
+// A weekly template the server expands into shifts over a range of dates. Hours are
+// wall-clock minutes from midnight in the time zone of the schedule's calendar, so a shift
+// keeps its hours across a daylight saving change.
 message CreateAgentsWorkingScheduleShiftsRequest {
   int64 working_schedule_id = 1;
 
-  // Date from and Date to of the modal.
+  // Both ends included.
   DateRange date = 2 [(buf.validate.field).required = true];
 
   repeated LookupEntity agents = 3 [(buf.validate.field).repeated.min_items = 1];
 
-  // Map key is a day of week: 0 - Sunday, ..., 6 - Saturday. A day missing from the
-  // map, one switched off in the modal, gets no shifts.
+  // Map key is a day of week: 0 - Sunday, ..., 6 - Saturday. A day missing from the map gets
+  // no shifts.
   map<int64, ShiftTemplateDay> days = 6 [
     (buf.validate.field).required = true,
     (buf.validate.field).map = {
@@ -112,21 +148,33 @@ message ShiftTemplatePause {
 message CreateAgentsWorkingScheduleShiftsResponse {
   repeated AgentWorkingSchedule items = 1;
 
-  // Days the request left without shifts, and why: an absence, or a date another
-  // active schedule locks (WFM-103).
-  repeated SkippedDay skipped = 2;
+  // Days the request left without shifts, and why: storage.shift.absence, or
+  // storage.shift.locked_date with the schedule that holds the date.
+  repeated Violation skipped = 2;
 }
 
-message SkippedDay {
-  LookupEntity agent = 1;
+message UpdateAgentWorkingScheduleShiftRequest {
+  int64 working_schedule_id = 1 [(buf.validate.field).int64.gt = 0];
 
-  // A date as in DateRange: 00:00 UTC of the day, epoch milliseconds.
-  int64 date = 4;
+  // The shift with its id and the etag from a read. start_at, end_at, pauses and skills are
+  // written; the server sets the rest.
+  AgentScheduleShift shift = 2 [(buf.validate.field).required = true];
+}
 
-  // An error id, <layer>.<entity>.<what>.
-  string reason = 3;
+message UpdateAgentWorkingScheduleShiftResponse {
+  AgentScheduleShift shift = 1;
+}
 
-  reserved 2;
+message DeleteAgentWorkingScheduleShiftRequest {
+  int64 working_schedule_id = 1 [(buf.validate.field).int64.gt = 0];
+  int64 id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // The etag from a read.
+  string etag = 3 [(buf.validate.field).string.min_len = 1];
+}
+
+message DeleteAgentWorkingScheduleShiftResponse {
+  int64 id = 1;
 }
 
 message SearchAgentsWorkingScheduleRequest {
@@ -244,7 +292,7 @@ message AgentScheduleShift {
   // starts. 00:00 UTC of that day, epoch milliseconds.
   int64 working_date = 17;
 
-  // Version of the shift, returned by every read. Editing a shift requires it (WFM-99).
+  // Version of the shift, returned by every read. Editing and deleting a shift require it.
   string etag = 14;
 
   // Set by the server.
@@ -265,10 +313,16 @@ enum ShiftSource {
 message AgentSchedule {
   // The working date, a date as in DateRange: 00:00 UTC of the day, epoch milliseconds.
   int64 date = 1;
+
+  // The agent has shifts in another active schedule on this date, so no shift goes here.
   bool locked = 2;
 
   // A day has an absence or shifts, not both.
   AbsenceType absence = 3;
+
+  // Id of the absence, to delete it.
+  int64 absence_id = 7;
+
   repeated AgentScheduleShift shifts = 6;
 
   reserved 4, 5;

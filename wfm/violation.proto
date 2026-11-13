@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package wfm;
+
+import "lookup.proto";
+
+option go_package = "github.com/webitel/protos/wfm;wfm";
+
+// Violation is one broken rule: which agent, on which date, why, and which other schedule
+// or shift is in the way. A refusal lists the rules it broke; reasons are told apart by id:
+//   storage.shift.agent_not_in_schedule - the agent is not in the schedule
+//   storage.shift.agent_deactivated - the agent's user is deactivated
+//   storage.shift.outside_schedule - the date is outside the schedule's period
+//   storage.shift.absence - the agent has an absence on the date
+//   storage.shift.locked_date - the agent has shifts in another active schedule on the date
+//   storage.shift.overlap - the shift overlaps another shift of the agent, a night one included
+//   storage.absence.shift - the agent has a shift on the date in a draft, pending or active
+//     schedule, which the absence deletes once confirmed
+//   storage.working_schedule.team_active - the team already has an active schedule on
+//     overlapping dates; no agent or date
+//
+// A WFM error has the body {"id", "code", "status", "detail"}. Errors are told apart by id, not
+// by HTTP status: 400 is both a validation error and a business refusal, 409 both a version
+// conflict and a duplicate. detail is a fallback text for people; a refusal with violations
+// puts JSON there instead: {"text": "...", "violations": [Violation, ...]}, with the field names
+// of this API.
+//
+// Common to every WFM method: interceptor.validate (400) - an invalid request;
+// interceptor.auth.license and interceptor.auth.permission (403) - no WFM license or no right on
+// the object class; service.agent.access (403) - no access to the agent, never 404;
+// dbsql.query.no_rows (404) - the record is gone; storage.working_schedule.archived (400) - a
+// write to an archived schedule, which is read-only. After a version conflict (409) the record
+// has to be read again.
+message Violation {
+  // Absent when the rule is about the schedule as a whole.
+  LookupEntity agent = 1;
+
+  // A date as in DateRange: 00:00 UTC of the day, epoch milliseconds. Absent when the rule is
+  // about the schedule as a whole.
+  int64 date = 2;
+
+  // The reason id, <layer>.<entity>.<what>.
+  string reason = 3;
+
+  // The other schedule the rule is about, if any.
+  LookupEntity schedule = 4;
+
+  // The existing shift the rule is about, if any: the one an absence deletes, or the one a new
+  // shift overlaps. Absent when the overlap is between two new shifts of the same request.
+  int64 shift_id = 5;
+
+  // Start and end of that shift, epoch milliseconds.
+  int64 start_at = 6;
+  int64 end_at = 7;
+}

@@ -12,6 +12,9 @@ option go_package = "github.com/webitel/protos/wfm;wfm";
 
 service WorkingScheduleService {
   option (option.objclass) = "working_schedules";
+
+  // A new schedule is always a draft, whatever state the request carries. It gets every agent
+  // of the team the user has access to; agents who join the team later are added by hand.
   rpc CreateWorkingSchedule(CreateWorkingScheduleRequest) returns (CreateWorkingScheduleResponse) {
     option (option.access) = ACTION_CREATE;
     option (google.api.http) = {
@@ -25,16 +28,37 @@ service WorkingScheduleService {
     option (google.api.http) = {get: "/wfm/lookups/working_schedules/{id}"};
   }
 
+  // How many agents each hour of a period needs, from the forecast procedure of the team. The
+  // procedure runs on every call and nothing is stored, so edits of the schedule do not change
+  // the result. A team without a forecast calculation gets no hours.
   rpc ReadWorkingScheduleForecast(ReadWorkingScheduleForecastRequest) returns (ReadWorkingScheduleForecastResponse) {
     option (option.access) = ACTION_READ;
     option (google.api.http) = {get: "/wfm/lookups/working_schedules/{id}/forecast"};
   }
 
+  // How many agents are on a shift and not on a pause, per 15 minutes and per day. It reads
+  // only the schedule, so every edit of it changes the result.
+  rpc ReadWorkingSchedulePlanned(ReadWorkingSchedulePlannedRequest) returns (ReadWorkingSchedulePlannedResponse) {
+    option (option.access) = ACTION_READ;
+    option (google.api.http) = {get: "/wfm/lookups/working_schedules/{id}/planned"};
+  }
+
+  // Searches schedules, each with its number of agents.
   rpc SearchWorkingSchedule(SearchWorkingScheduleRequest) returns (SearchWorkingScheduleResponse) {
     option (option.access) = ACTION_READ;
     option (google.api.http) = {get: "/wfm/lookups/working_schedules"};
   }
 
+  // Updates the header of a draft schedule, with the etag from a read; the response carries the
+  // new etag. A change of the team rebuilds the schedule: every shift is deleted and the agents
+  // become the new team's agents the user has access to, so agents added by hand leave too. A
+  // change of the calendar deletes every shift; a change of the dates deletes the shifts whose
+  // working date falls outside the new period. The time scale, the name and Special time skills
+  // keep the shifts. block_outside_activity is ignored: only
+  // UpdateWorkingScheduleBlockOutsideActivity changes it.
+  //
+  // Refusals: service.working_schedule.state - not a draft;
+  // storage.working_schedule.version_conflict (409) - the header changed since the read.
   rpc UpdateWorkingSchedule(UpdateWorkingScheduleRequest) returns (UpdateWorkingScheduleResponse) {
     option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
@@ -43,6 +67,8 @@ service WorkingScheduleService {
     };
   }
 
+  // Adds agents from any team, each once: an agent already in the schedule is skipped. The
+  // response lists the added ones, with names.
   rpc UpdateWorkingScheduleAddAgents(UpdateWorkingScheduleAddAgentsRequest) returns (UpdateWorkingScheduleAddAgentsResponse) {
     option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {
@@ -51,11 +77,51 @@ service WorkingScheduleService {
     };
   }
 
+  // Removes an agent with their shifts in this schedule; absences stay.
   rpc UpdateWorkingScheduleRemoveAgent(UpdateWorkingScheduleRemoveAgentRequest) returns (UpdateWorkingScheduleRemoveAgentResponse) {
     option (option.access) = ACTION_UPDATE;
     option (google.api.http) = {delete: "/wfm/lookups/working_schedules/{id}/agents/{agent_id}"};
   }
 
+  // Moves the schedule to another state, in any order but out of archived, with the etag from
+  // a read; the response carries the schedule with the new etag.
+  //
+  // Moving to pending or active needs an answer about unplanned days: dates of the period where
+  // an agent of the schedule has neither a shift nor an absence. Without fill_days_off the call
+  // refuses with service.working_schedule.unplanned_days. The days off are written in the same
+  // transaction, as absences.
+  //
+  // Moving to active first checks the rules and refuses with
+  // storage.working_schedule.activation_refused and violations:
+  // storage.working_schedule.team_active - the team has another active schedule on overlapping
+  // dates; storage.shift.locked_date or storage.shift.overlap - an agent works in another active
+  // schedule on the same date or at the same time. storage.working_schedule.version_conflict
+  // (409) - the header changed since the read.
+  rpc UpdateWorkingScheduleState(UpdateWorkingScheduleStateRequest) returns (UpdateWorkingScheduleStateResponse) {
+    option (option.access) = ACTION_UPDATE;
+    option (google.api.http) = {
+      patch: "/wfm/lookups/working_schedules/{id}/state"
+      body: "*"
+    };
+  }
+
+  // Switches blocking outside a shift on or off in a draft, pending or active schedule, with the
+  // etag from a read; the response carries the schedule with the new etag. After creation it is
+  // the only way to change it. Switched on in an active schedule, it also takes agents who are
+  // online outside their shift offline.
+  //
+  // Refusals: storage.working_schedule.archived; storage.working_schedule.version_conflict
+  // (409) - the header changed since the read.
+  rpc UpdateWorkingScheduleBlockOutsideActivity(UpdateWorkingScheduleBlockOutsideActivityRequest) returns (UpdateWorkingScheduleBlockOutsideActivityResponse) {
+    option (option.access) = ACTION_UPDATE;
+    option (google.api.http) = {
+      patch: "/wfm/lookups/working_schedules/{id}/block_outside_activity"
+      body: "*"
+    };
+  }
+
+  // Deletes the schedule with its shifts, pauses and skills; absences stay. An active schedule
+  // refuses with storage.working_schedule.active until its state changes.
   rpc DeleteWorkingSchedule(DeleteWorkingScheduleRequest) returns (DeleteWorkingScheduleResponse) {
     option (option.access) = ACTION_DELETE;
     option (google.api.http) = {delete: "/wfm/lookups/working_schedules/{id}"};
@@ -110,12 +176,52 @@ message ReadWorkingScheduleResponse {
 }
 
 message ReadWorkingScheduleForecastRequest {
-  int64 id = 1;
-  FilterBetween date = 2;
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
+
+  DateRange date = 3 [(buf.validate.field).required = true];
 }
 
 message ReadWorkingScheduleForecastResponse {
-   map<int64, WorkingScheduleForecast> items = 1;
+  repeated ForecastHour items = 2;
+}
+
+message ForecastHour {
+  // The day of the hour in the zone of the schedule's calendar, a date as in DateRange:
+  // 00:00 UTC of the day, epoch milliseconds.
+  int64 date = 1;
+
+  // Start of the hour, epoch milliseconds.
+  int64 start_at = 2;
+
+  // Agents needed.
+  int32 agents = 3;
+}
+
+message ReadWorkingSchedulePlannedRequest {
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
+
+  DateRange date = 2 [(buf.validate.field).required = true];
+}
+
+message ReadWorkingSchedulePlannedResponse {
+  // 15-minute slots where at least one agent is on a shift and not on a pause; a slot missing
+  // from the list has 0. An agent counts as away only when a pause covers the whole slot.
+  repeated PlannedSlot slots = 1;
+
+  // Days where at least one agent has a shift, by working date.
+  repeated PlannedDay days = 2;
+}
+
+message PlannedSlot {
+  // Start of the slot, epoch milliseconds.
+  int64 start_at = 1;
+  int32 agents = 2;
+}
+
+message PlannedDay {
+  // A date as in DateRange: 00:00 UTC of the day, epoch milliseconds.
+  int64 date = 1;
+  int32 agents = 2;
 }
 
 message SearchWorkingScheduleRequest {
@@ -127,7 +233,10 @@ message SearchWorkingScheduleRequest {
   optional int32 page = 2 [(buf.validate.field).int32.gt = 0];
   optional int32 size = 3 [(buf.validate.field).int32.gt = 0];
 
-  optional string sort = 4;
+  // States sort as active, pending, draft, archived.
+  optional string sort = 4 [(buf.validate.field).string = {
+    in: ["+name", "-name", "+state", "-state"]
+  }];
 
   repeated string fields = 5 [(buf.validate.field).repeated = {
     unique: true,
@@ -197,6 +306,42 @@ message UpdateWorkingScheduleRemoveAgentResponse {
   int64 id = 1;
 }
 
+message UpdateWorkingScheduleStateRequest {
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
+
+  WorkingScheduleState state = 2 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+
+  // The etag from a read.
+  string etag = 3 [(buf.validate.field).string.min_len = 1];
+
+  // The answer about unplanned days: true fills them with days off, holidays and the calendar's
+  // days off included; false leaves them empty. Absent, the call refuses if there are any.
+  optional bool fill_days_off = 4;
+}
+
+message UpdateWorkingScheduleStateResponse {
+  WorkingSchedule item = 1;
+
+  // Days filled with days off.
+  int32 filled_days = 2;
+}
+
+message UpdateWorkingScheduleBlockOutsideActivityRequest {
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
+
+  bool block_outside_activity = 2;
+
+  // The etag from a read.
+  string etag = 3 [(buf.validate.field).string.min_len = 1];
+}
+
+message UpdateWorkingScheduleBlockOutsideActivityResponse {
+  WorkingSchedule item = 1;
+}
+
 message DeleteWorkingScheduleRequest {
   int64 id = 1 [
     (buf.validate.field).required = true,
@@ -206,15 +351,6 @@ message DeleteWorkingScheduleRequest {
 
 message DeleteWorkingScheduleResponse {
   int64 id = 1;
-}
-
-message WorkingScheduleForecast {
-  message Forecast {
-    int64 hour = 1;
-    int64 agents = 2;
-  }
-
-  repeated Forecast forecast = 1;
 }
 
 enum WorkingScheduleState {
@@ -239,6 +375,7 @@ message WorkingSchedule {
     (buf.validate.field).string.max_len = 250
   ];
 
+  // Set by the server: a new schedule is a draft, and only UpdateWorkingScheduleState changes it.
   WorkingScheduleState state = 8;
 
   LookupEntity team = 9;
@@ -266,17 +403,24 @@ message WorkingSchedule {
     }
   ];
 
+  // The time scale of the schedule, minutes from midnight in the zone of its calendar. Both
+  // absent mean 24 hours; an end before the start crosses midnight. It does not limit shifts.
   int64 start_time_at = 13;
   int64 end_time_at = 14;
 
+  // Special time skills; the shape may change to a skill group.
   repeated LookupEntity extra_skills = 15;
+
+  // Off by default. Set on creation; afterwards only UpdateWorkingScheduleBlockOutsideActivity
+  // changes it.
   bool block_outside_activity = 16;
 
   repeated LookupEntity agents = 17;
   int64 total_agents = 18;
 
-  // Version of the row, returned by every read. UpdateWorkingSchedule requires
-  // it and refuses with Aborted when the schedule has changed since.
+  // Version of the row, returned by every read. UpdateWorkingSchedule, UpdateWorkingScheduleState
+  // and UpdateWorkingScheduleBlockOutsideActivity require it and refuse with
+  // storage.working_schedule.version_conflict (409) when the schedule has changed since.
   string etag = 19;
 
   reserved 20, 21;
