@@ -139,13 +139,20 @@ message SearchAgentsWorkingScheduleRequest {
 
   optional string q = 6;
 
+  // A page of agents, ordered by name and then by id; the filters apply first.
+  optional int32 page = 8 [(buf.validate.field).int32.gt = 0];
+  optional int32 size = 9 [(buf.validate.field).int32.gt = 0];
+
   reserved 7;
 }
 
 message SearchAgentsWorkingScheduleResponse {
   repeated Holiday holidays = 1;
   repeated AgentWorkingSchedule items = 2;
+
+  // Agents that match the filters, on all pages; 0 on a page past the last one.
   int64 total = 3;
+  bool next = 5;
 
   // The calendar of the schedule, to tell working days from days off and to show
   // times in its zone.
