@@ -17,8 +17,10 @@ message FilterBetween {
   int64 to = 2;
 }
 
-// DateRange is an inclusive range of calendar dates, "YYYY-MM-DD". A calendar date
-// is a day, not an instant: it does not depend on the client's time zone.
+// DateRange is an inclusive range of calendar dates. A date anywhere in WFM is a day, not
+// an instant: 00:00 UTC of that day in epoch milliseconds, the same for every client
+// whatever its time zone. Any other value is refused, so a local midnight shows up as
+// an error instead of a day shifted by the client's offset.
 message DateRange {
   option (buf.validate.message).cel = {
     id: "between",
@@ -26,6 +28,22 @@ message DateRange {
     expression: "this.to >= this.from"
   };
 
-  string from = 1 [(buf.validate.field).string.pattern = "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"];
-  string to = 2 [(buf.validate.field).string.pattern = "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"];
+  int64 from = 1 [
+    (buf.validate.field).int64.gt = 0,
+    (buf.validate.field).cel = {
+      id: "date"
+      message: "a date is 00:00 UTC of the day, in epoch milliseconds"
+      expression: "this % 86400000 == 0"
+    }
+  ];
+
+  // The last day, included.
+  int64 to = 2 [
+    (buf.validate.field).int64.gt = 0,
+    (buf.validate.field).cel = {
+      id: "date"
+      message: "a date is 00:00 UTC of the day, in epoch milliseconds"
+      expression: "this % 86400000 == 0"
+    }
+  ];
 }

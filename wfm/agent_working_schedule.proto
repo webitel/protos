@@ -34,7 +34,7 @@ message CreateAgentsWorkingScheduleShiftsRequest {
   int64 working_schedule_id = 1;
 
   // Date from and Date to of the modal.
-  DateRange date = 5 [(buf.validate.field).required = true];
+  DateRange date = 2 [(buf.validate.field).required = true];
 
   repeated LookupEntity agents = 3 [(buf.validate.field).repeated.min_items = 1];
 
@@ -65,7 +65,7 @@ message CreateAgentsWorkingScheduleShiftsRequest {
   // skills for different ranges take separate requests.
   repeated AgentScheduleShiftSkill skills = 8;
 
-  reserved 2, 4;
+  reserved 4, 5;
 }
 
 // ShiftTemplateDay holds the shifts of one day of week, several when the agent works
@@ -120,16 +120,18 @@ message CreateAgentsWorkingScheduleShiftsResponse {
 message SkippedDay {
   LookupEntity agent = 1;
 
-  // "YYYY-MM-DD".
-  string date = 2;
+  // A date as in DateRange: 00:00 UTC of the day, epoch milliseconds.
+  int64 date = 4;
 
   // An error id, <layer>.<entity>.<what>.
   string reason = 3;
+
+  reserved 2;
 }
 
 message SearchAgentsWorkingScheduleRequest {
   int64 working_schedule_id = 1;
-  DateRange date = 7 [(buf.validate.field).required = true];
+  DateRange date = 2 [(buf.validate.field).required = true];
 
   repeated int64 supervisor_id = 3;
   repeated int64 team_id = 4;
@@ -137,7 +139,7 @@ message SearchAgentsWorkingScheduleRequest {
 
   optional string q = 6;
 
-  reserved 2;
+  reserved 7;
 }
 
 message SearchAgentsWorkingScheduleResponse {
@@ -170,11 +172,11 @@ message CalendarRange {
 }
 
 message Holiday {
-  // "YYYY-MM-DD".
-  string date = 3;
+  // A date as in DateRange: 00:00 UTC of the day, epoch milliseconds.
+  int64 date = 1;
   string name = 2;
 
-  reserved 1;
+  reserved 3;
 }
 
 message AgentScheduleShiftPause {
@@ -230,9 +232,10 @@ message AgentScheduleShift {
   repeated AgentScheduleShiftPause pauses = 9;
   repeated AgentScheduleShiftSkill skills = 10;
 
-  // Set by the server. The working date, "YYYY-MM-DD": the day the shift starts on in the
-  // time zone of the schedule's calendar, so a night shift belongs to the day it starts.
-  string working_date = 13;
+  // Set by the server. The working date, a date as in DateRange: the day the shift starts
+  // on in the time zone of the schedule's calendar, so a night shift belongs to the day it
+  // starts. 00:00 UTC of that day, epoch milliseconds.
+  int64 working_date = 17;
 
   // Version of the shift, returned by every read. Editing a shift requires it (WFM-99).
   string etag = 14;
@@ -243,7 +246,7 @@ message AgentScheduleShift {
   // Set by the server for a planner's shift: the planning run that wrote it.
   int64 planner_run_id = 16;
 
-  reserved 7, 8;
+  reserved 7, 8, 13;
 }
 
 enum ShiftSource {
@@ -253,15 +256,15 @@ enum ShiftSource {
 }
 
 message AgentSchedule {
-  // The working date, "YYYY-MM-DD".
-  string date = 5;
+  // The working date, a date as in DateRange: 00:00 UTC of the day, epoch milliseconds.
+  int64 date = 1;
   bool locked = 2;
 
   // A day has an absence or shifts, not both.
   AbsenceType absence = 3;
   repeated AgentScheduleShift shifts = 6;
 
-  reserved 1, 4;
+  reserved 4, 5;
 }
 
 message AgentWorkingSchedule {
