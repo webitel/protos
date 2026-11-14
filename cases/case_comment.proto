@@ -9,6 +9,16 @@ import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "proto/webitel/option.proto";
 
+// Visibility type of a case comment.
+enum CaseCommentType {
+  // Treated as CASE_COMMENT_TYPE_INTERNAL on create.
+  CASE_COMMENT_TYPE_UNSPECIFIED = 0;
+  // Controlled by the internal_comments permission.
+  CASE_COMMENT_TYPE_INTERNAL = 1;
+  // Controlled by the case_comments permission.
+  CASE_COMMENT_TYPE_EXTERNAL = 2;
+}
+
 // Represents a comment associated with a case.
 message CaseComment {
   // Main identifier for read, update, and delete operations.
@@ -49,6 +59,9 @@ message CaseComment {
 
   // System field
   repeated int64 role_ids = 13;
+
+  // Visibility type of the comment.
+  CaseCommentType type = 14;
 }
 
 // Contains a paginated list of comments.
@@ -132,13 +145,16 @@ service CaseComments {
 message InputCaseComment {
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     // POST /cases/{case_etag}/comments
-    example: "{\"text\":\"My new comment\"}"
+    example: "{\"text\":\"My new comment\",\"type\":\"CASE_COMMENT_TYPE_EXTERNAL\"}"
   };
   // Identifier for the comment.
   string etag = 1;
 
   // Content of the comment.
   string text = 2;
+
+  // Visibility type of the comment. Create: CASE_COMMENT_TYPE_INTERNAL when unspecified.
+  CaseCommentType type = 3;
 
   // Optional creator / updater ID. Use this to explicitly set the case creator / updater instead of deriving it from the auth token.
   general.Lookup userID = 20;
@@ -206,6 +222,9 @@ message ListCommentsRequest {
 
   // Etag or ID of the case for which comments are requested.
   string case_etag = 9;
+
+  // Filter by comment visibility type.
+  repeated CaseCommentType type = 10;
 }
 
 // Request to publish comment into a case.
