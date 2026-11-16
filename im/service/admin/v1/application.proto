@@ -9,6 +9,7 @@ import "service/admin/v1/application_push.proto";
 import "service/admin/v1/application_limit.proto";
 // import "webitel/messaging/v1/media.proto";
 
+import "buf/validate/validate.proto";
 import "google/rpc/status.proto";
 
 option go_package = "github.com/webitel/im-account-service/proto/gen/im/service/admin/v1;adminpb";
@@ -61,6 +62,16 @@ message Application {
   // Kind of client the Application serves (portal or embeddable widget).
   // Unspecified is treated as APP_TYPE_PORTAL.
   AppType type = 12;
+
+  // OPTIONAL. Recipient policy for Contacts (End-Users) that are signed-in
+  // VIA this Application: which contacts they may write to, and the default
+  // recipient. Presence matters:
+  //  - unset (nil)                        : no restriction (default, current behavior).
+  //  - set, with an empty `rules` list    : end-users may not start dialogs with anyone.
+  //  - set, with a non-empty `rules` list : only the listed contacts are allowed recipients.
+  // The rule marked `default` (at most one) is the recipient substituted when a
+  // send request has no `to`.
+  optional ContactAllowList allow_contacts = 13;
 }
 
 // AppType is the kind of client an Application serves.
@@ -84,6 +95,36 @@ message SystemMessageAllowList {
   // Allowed SystemMessage.type value(s). Empty means no system message type
   // is allowed (i.e. all system messages are suppressed for this Application).
   repeated string types = 1;
+}
+
+// ContactAllowList is the per-Application recipient policy for Contacts
+// (End-Users) signed in via that Application. Wrapped in its own message so
+// presence can distinguish "not configured" (field unset: no restriction)
+// from "configured to allow nobody" (field set, `rules` empty).
+message ContactAllowList {
+  option (buf.validate.message).cel = {
+    id: "contact_allow_list.single_default"
+    message: "at most one rule may be marked as default"
+    expression: "this.rules.filter(r, r.default).size() <= 1"
+  };
+  option (buf.validate.message).cel = {
+    id: "contact_allow_list.unique_contact_id"
+    message: "contact_id values must be unique"
+    expression: "this.rules.map(r, r.contact_id).unique()"
+  };
+
+  // Allowed recipient rule(s). Empty means no recipient is allowed.
+  repeated ContactAllowRule rules = 1;
+}
+
+// ContactAllowRule allows End-Users to write to a single Contact.
+message ContactAllowRule {
+  // REQUIRED. Contact (internal) id, UUID.
+  string contact_id = 1 [(buf.validate.field).string.uuid = true];
+
+  // Recipient used when a send request has no `to`. At most one rule per
+  // list may set this.
+  bool default = 2;
 }
 
 // Application Service Configuration
