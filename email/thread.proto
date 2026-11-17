@@ -32,8 +32,8 @@ service EmailThreads {
     option (option.access) = ACTION_UPDATE;
   }
 
-  // ListEmailThreads returns the conversations the caller handles now or took
-  // into work earlier. Nothing else in the domain is listed.
+  // ListEmailThreads returns the conversations the caller handles now, took into
+  // work earlier or started with an outbound email. Nothing else is listed.
   rpc ListEmailThreads(ListEmailThreadsRequest) returns (EmailThreadList) {
     option (google.api.http) = {
       get: "/v1/email/threads"
@@ -85,6 +85,52 @@ service EmailThreads {
     };
     option (option.access) = ACTION_READ;
   }
+
+  // SendEmailReply adds an outbound email to a conversation and queues it for
+  // SMTP; it never changes the attempt. Allowed to the current agent after Take
+  // or, with attempt_id 0, to a participant of a processed conversation without
+  // an agent. Errors: email.outbound.disabled, email.thread.reply_not_allowed,
+  // email.thread.attempt_version_conflict, email.thread.reply_parent_not_found,
+  // email.profile.send_unavailable, email.message.request_conflict.
+  rpc SendEmailReply(SendEmailReplyRequest) returns (EmailMessage) {
+    option (google.api.http) = {
+      post: "/v1/email/threads/{thread_id}/messages"
+      body: "*"
+    };
+    option (option.access) = ACTION_UPDATE;
+  }
+
+  // CreateEmailThread starts a processed conversation with an outbound email
+  // and queues it for SMTP. Errors: email.outbound.disabled,
+  // email.profile.send_unavailable, email.message.invalid_contact_mode,
+  // email.message.request_conflict.
+  rpc CreateEmailThread(CreateEmailThreadRequest) returns (CreateEmailThreadResponse) {
+    option (google.api.http) = {
+      post: "/v1/email/threads"
+      body: "*"
+    };
+    option (option.access) = ACTION_CREATE;
+  }
+
+  // ListEmailSenderProfiles returns the profiles a new email may be sent from.
+  rpc ListEmailSenderProfiles(ListEmailSenderProfilesRequest) returns (EmailSenderProfileList) {
+    option (google.api.http) = {
+      get: "/v1/email/sender_profiles"
+    };
+    option (option.access) = ACTION_CREATE;
+  }
+
+  // UploadEmailAttachment stores a file for an outbound email and returns its
+  // one-time reference. Requires read and either create or update. Errors:
+  // email.outbound.disabled, email.attachment.invalid, email.attachment.too_large,
+  // email.attachment.rejected, email.attachment.upload_busy, email.storage.unavailable.
+  rpc UploadEmailAttachment(UploadEmailAttachmentRequest) returns (EmailAttachmentUpload) {
+    option (google.api.http) = {
+      post: "/v1/email/attachments"
+      body: "*"
+    };
+    option (option.access) = ACTION_READ;
+  }
 }
 
 // BindEmailThreadContactRequest selects a conversation and the contact to link.
@@ -123,7 +169,8 @@ enum EmailThreadAccess {
   EMAIL_THREAD_ACCESS_UNSPECIFIED = 0;
   // The caller is the agent currently responsible for the conversation.
   EMAIL_THREAD_ACCESS_CURRENT = 1;
-  // The caller took the conversation into work earlier; read only.
+  // The caller took the conversation into work earlier or started it with an
+  // outbound email. SendEmailReply decides whether the caller may reply.
   EMAIL_THREAD_ACCESS_HISTORY = 2;
 }
 
@@ -201,6 +248,40 @@ enum EmailAttachmentSkippedReason {
   EMAIL_ATTACHMENT_SKIPPED_REASON_READ_ERROR = 4;
 }
 
+// EmailDeliveryStatus is the SMTP delivery of an outbound email.
+enum EmailDeliveryStatus {
+  // Inbound emails.
+  EMAIL_DELIVERY_STATUS_UNSPECIFIED = 0;
+  EMAIL_DELIVERY_STATUS_PENDING = 1;
+  EMAIL_DELIVERY_STATUS_SENT = 2;
+  EMAIL_DELIVERY_STATUS_FAILED = 3;
+}
+
+// EmailDeliveryError tells why the delivery failed.
+enum EmailDeliveryError {
+  EMAIL_DELIVERY_ERROR_UNSPECIFIED = 0;
+  EMAIL_DELIVERY_ERROR_AUTH = 1;
+  EMAIL_DELIVERY_ERROR_RECIPIENT_REJECTED = 2;
+  EMAIL_DELIVERY_ERROR_MESSAGE_TOO_LARGE = 3;
+  EMAIL_DELIVERY_ERROR_CONNECTION = 4;
+  EMAIL_DELIVERY_ERROR_PROFILE_UNAVAILABLE = 5;
+  EMAIL_DELIVERY_ERROR_REJECTED = 6;
+  EMAIL_DELIVERY_ERROR_TEMPORARY_FAILURE = 7;
+  EMAIL_DELIVERY_ERROR_INTERRUPTED = 8;
+  // The server may have accepted the email.
+  EMAIL_DELIVERY_ERROR_UNKNOWN_RESULT = 9;
+}
+
+// EmailContactMode is the operator's confirmed contact of a new conversation.
+enum EmailContactMode {
+  // Rejected.
+  EMAIL_CONTACT_MODE_UNSPECIFIED = 0;
+  // contact_id is required.
+  EMAIL_CONTACT_MODE_LINK = 1;
+  // No contact; contact_id must be 0.
+  EMAIL_CONTACT_MODE_NONE = 2;
+}
+
 // EmailAddress is one participant address of an email.
 message EmailAddress {
   string address = 1;
@@ -252,6 +333,9 @@ message EmailThread {
   // with itself for one Thread.
   int64 projection_version = 20;
   int64 workspace_version = 21;
+
+  // Plain text signature of the profile, with variables filled for the caller.
+  string reply_signature = 22;
 }
 
 // ListEmailThreadsRequest selects a page of the caller's conversations.
@@ -317,7 +401,8 @@ message EmailMessage {
   string in_reply_to = 7;
   string subject = 8;
 
-  // Blind copy recipients are never returned.
+  // Blind copy recipients are returned only in bcc, to the author of an
+  // outbound email.
   repeated EmailAddress from = 9;
   repeated EmailAddress sender = 10;
   repeated EmailAddress reply_to = 11;
@@ -336,6 +421,16 @@ message EmailMessage {
 
   EmailBounce bounce = 20;
   repeated EmailAttachment attachments = 21;
+
+  // Set for an outbound email only.
+  general.Lookup author = 22;
+  repeated EmailAddress bcc = 23;
+  EmailDeliveryStatus delivery_status = 24;
+  EmailDeliveryError delivery_error_code = 25;
+  // Short text chosen by the code; never the raw SMTP reply.
+  string delivery_error = 26;
+  // Unix milliseconds of the SMTP acceptance.
+  int64 delivered_at = 27;
 }
 
 // ListEmailThreadMessagesRequest selects a page of the emails of a conversation.
@@ -414,4 +509,87 @@ message EmailThreadActionList {
   repeated EmailThreadAction items = 1;
   bool next = 2;
   string next_cursor = 3;
+}
+
+// InputEmailMessage is the content of an outbound email.
+message InputEmailMessage {
+  // At least one.
+  repeated EmailAddress to = 1;
+  repeated EmailAddress cc = 2;
+  // SMTP envelope only, never a header.
+  repeated EmailAddress bcc = 3;
+  // A reply gets "Re: " once.
+  string subject = 4;
+  string body_html = 5;
+  // Empty: derived from body_html.
+  string body_text = 6;
+  // One-time attachment references.
+  repeated string attachment_references = 7;
+}
+
+// SendEmailReplyRequest is a reply in a conversation.
+message SendEmailReplyRequest {
+  int64 thread_id = 1;
+  // Client UUID; the same intent keeps the same id.
+  string request_id = 2;
+  // The current attempt; 0 for a reply from history.
+  int64 attempt_id = 3;
+  int64 expected_attempt_version = 4;
+  // 0 picks the parent by the default rule.
+  int64 in_reply_to_message_id = 5;
+  InputEmailMessage message = 6;
+}
+
+// CreateEmailThreadRequest is a new outbound email.
+message CreateEmailThreadRequest {
+  // Client UUID; the same intent keeps the same id.
+  string request_id = 1;
+  int64 profile_id = 2;
+  EmailContactMode contact_mode = 3;
+  int64 contact_id = 4;
+  InputEmailMessage message = 5;
+}
+
+// CreateEmailThreadResponse is the new conversation and its first email.
+message CreateEmailThreadResponse {
+  EmailThread thread = 1;
+  EmailMessage message = 2;
+}
+
+// ListEmailSenderProfilesRequest has no parameters.
+message ListEmailSenderProfilesRequest {
+}
+
+// EmailSenderProfile is a profile a new email may be sent from.
+message EmailSenderProfile {
+  int64 id = 1;
+  string name = 2;
+  string email_address = 3;
+  string sender_name = 4;
+  // Plain text, with variables filled for the caller.
+  string signature = 5;
+}
+
+// EmailSenderProfileList is the profiles available to the caller.
+message EmailSenderProfileList {
+  repeated EmailSenderProfile items = 1;
+}
+
+// UploadEmailAttachmentRequest is a file for an outbound email.
+message UploadEmailAttachmentRequest {
+  string file_name = 1;
+  // Empty is application/octet-stream.
+  string mime_type = 2;
+  bytes content = 3;
+}
+
+// EmailAttachmentUpload is a stored file the caller may attach once.
+message EmailAttachmentUpload {
+  string reference = 1;
+  // As stored, after cleanup.
+  string file_name = 2;
+  string mime_type = 3;
+  int64 size = 4;
+  // Unix milliseconds; an unused reference expires then.
+  int64 expires_at = 5;
 }
