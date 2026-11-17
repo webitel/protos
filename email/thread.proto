@@ -131,6 +131,26 @@ service EmailThreads {
     };
     option (option.access) = ACTION_READ;
   }
+
+  // RetryEmailDelivery starts a new series for the same Message-ID. Requires the author,
+  // reply rights, and read/update access. See webitel-emails/README.md for stable error IDs.
+  rpc RetryEmailDelivery(RetryEmailDeliveryRequest) returns (EmailDeliveryReceipt) {
+    option (google.api.http) = {
+      post: "/v1/email/threads/{thread_id}/messages/{message_id}/retry"
+      body: "*"
+    };
+    option (option.access) = ACTION_UPDATE;
+  }
+
+  // CancelEmailDelivery permanently stops delivery before possible SMTP acceptance.
+  // Requires the author, visibility and read/update access. See webitel-emails/README.md for error IDs.
+  rpc CancelEmailDelivery(CancelEmailDeliveryRequest) returns (EmailDeliveryReceipt) {
+    option (google.api.http) = {
+      post: "/v1/email/threads/{thread_id}/messages/{message_id}/cancel"
+      body: "*"
+    };
+    option (option.access) = ACTION_UPDATE;
+  }
 }
 
 // BindEmailThreadContactRequest selects a conversation and the contact to link.
@@ -255,6 +275,8 @@ enum EmailDeliveryStatus {
   EMAIL_DELIVERY_STATUS_PENDING = 1;
   EMAIL_DELIVERY_STATUS_SENT = 2;
   EMAIL_DELIVERY_STATUS_FAILED = 3;
+  // Stopped by its author before the server could accept it; final.
+  EMAIL_DELIVERY_STATUS_CANCELLED = 4;
 }
 
 // EmailDeliveryError tells why the delivery failed.
@@ -431,6 +453,14 @@ message EmailMessage {
   string delivery_error = 26;
   // Unix milliseconds of the SMTP acceptance.
   int64 delivered_at = 27;
+  // Grows with each visible delivery change and guards Retry and Cancel.
+  // Zero for inbound email and outbound email before its first change.
+  int64 delivery_version = 28;
+  // Unix milliseconds when a scheduled automatic retry becomes due; set only
+  // while pending. Once past, the attempt may wait for a worker or be running.
+  optional int64 delivery_retry_at = 29;
+  // The caller may call RetryEmailDelivery now; the command checks it again.
+  bool manual_retry_available = 30;
 }
 
 // ListEmailThreadMessagesRequest selects a page of the emails of a conversation.
@@ -592,4 +622,30 @@ message EmailAttachmentUpload {
   int64 size = 4;
   // Unix milliseconds; an unused reference expires then.
   int64 expires_at = 5;
+}
+
+// RetryEmailDeliveryRequest is a manual retry of a failed outbound email.
+message RetryEmailDeliveryRequest {
+  int64 thread_id = 1;
+  int64 message_id = 2;
+  // delivery_version the caller read; required, 0 included.
+  optional int64 expected_delivery_version = 3;
+  // The current attempt; 0 for a processed conversation without an agent.
+  int64 attempt_id = 4;
+  int64 expected_attempt_version = 5;
+}
+
+// CancelEmailDeliveryRequest stops the delivery of an outbound email.
+message CancelEmailDeliveryRequest {
+  int64 thread_id = 1;
+  int64 message_id = 2;
+  // delivery_version the caller read; required, 0 included.
+  optional int64 expected_delivery_version = 3;
+}
+
+// EmailDeliveryReceipt is the accepted change; the email itself is read again.
+message EmailDeliveryReceipt {
+  int64 message_id = 1;
+  EmailDeliveryStatus delivery_status = 2;
+  int64 delivery_version = 3;
 }
