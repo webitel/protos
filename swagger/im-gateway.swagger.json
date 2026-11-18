@@ -4101,6 +4101,17 @@
             "required": false,
             "type": "integer",
             "format": "int32"
+          },
+          {
+            "name": "ids",
+            "description": "Filter by thread IDs (the real thread id, see Thread.thread_id).",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -7126,7 +7137,7 @@
       "properties": {
         "to": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.Peer",
-          "description": "Recipient of the message."
+          "description": "Recipient of the message. OPTIONAL: when empty, the Application's default contact (allow_contacts) is used."
         },
         "name": {
           "type": "string",
@@ -7240,7 +7251,7 @@
       "properties": {
         "to": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.Peer",
-          "description": "Recipient of the message."
+          "description": "Recipient of the message. OPTIONAL: when empty, the Application's default contact (allow_contacts) is used."
         },
         "send_id": {
           "type": "string",
@@ -7291,7 +7302,7 @@
       "properties": {
         "to": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.Peer",
-          "description": "Recipient of the message."
+          "description": "Recipient of the message. OPTIONAL: when empty, the Application's default contact (allow_contacts) is used."
         },
         "latitude": {
           "type": "number",
@@ -7573,6 +7584,10 @@
         "queue": {
           "$ref": "#/definitions/webitel.im.api.gateway.v1.ThreadQueue",
           "description": "Queue through which the calling participant received the thread. Set by Search; unset when unknown.\nSearch sorts by queue.name with the sort-only key \"queue_name\"."
+        },
+        "thread_id": {
+          "type": "string",
+          "description": "Thread identifier. Set by SearchLeft only, where id is the caller's\nmembership-period id and thread_id is the thread itself. Empty elsewhere: use id."
         }
       },
       "description": "Thread represents a thread (aka chat or conversation) entity."
@@ -10555,6 +10570,14 @@
         "sender_name": {
           "type": "string",
           "description": "Display name of the operator (or bot) this message is from, when the channel can\nshow a per-message sender. Empty means \"use the gate's own name\"."
+        },
+        "message_id": {
+          "type": "string",
+          "description": "Internal message context for per-recipient delivery status tracking.\n\nInternal message UUID"
+        },
+        "thread_id": {
+          "type": "string",
+          "title": "Internal thread UUID"
         }
       },
       "description": "ProviderSendContactRequest sends a contact card."
@@ -10737,6 +10760,14 @@
         "sender_name": {
           "type": "string",
           "description": "Display name of the operator (or bot) this message is from, when the channel can\nshow a per-message sender. Empty means \"use the gate's own name\"."
+        },
+        "message_id": {
+          "type": "string",
+          "description": "Internal message context for per-recipient delivery status tracking.\n\nInternal message UUID"
+        },
+        "thread_id": {
+          "type": "string",
+          "title": "Internal thread UUID"
         }
       },
       "description": "ProviderSendLocationRequest sends a geographic location."
