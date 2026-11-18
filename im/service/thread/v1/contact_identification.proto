@@ -1,0 +1,169 @@
+syntax = "proto3";
+
+package webitel.im.service.thread.v1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/webitel/im-thread-service/gen/go/api/v1;impb";
+
+// ContactIdentification matches a thread to Webitel CRM contacts.
+//
+// Every run searches by the channel identifiers of the thread's external
+// member (IM contact link, WhatsApp number) and by the given criteria (OR),
+// appends the result to the thread's candidate list and applies the binding
+// rules: a single verified candidate is bound automatically unless an operator
+// has already chosen a contact.
+service ContactIdentification {
+  // Identifies the thread's contact. Called by Flow (Contact identification node);
+  // returns only a summary, the full list stays on the thread.
+  rpc Identify(IdentifyContactRequest) returns (IdentifyContactResponse);
+
+  // Lists the thread's contact candidates, verified first. The first call for a
+  // thread also runs the channel-identifier search.
+  rpc ListCandidates(ListContactCandidatesRequest) returns (ListContactCandidatesResponse);
+}
+
+// IdentificationTrust is how reliable a match is.
+enum IdentificationTrust {
+  IDENTIFICATION_TRUST_UNSPECIFIED = 0;
+  // The value was entered by the client (e.g. a phone typed or shared in a bot).
+  IDENTIFICATION_TRUST_UNVERIFIED = 1;
+  // The value came from the channel platform (messenger id, WhatsApp number).
+  IDENTIFICATION_TRUST_VERIFIED = 2;
+}
+
+// IdentificationCriterionType is what a value is matched against.
+enum IdentificationCriterionType {
+  IDENTIFICATION_CRITERION_TYPE_UNSPECIFIED = 0;
+  IDENTIFICATION_CRITERION_TYPE_PHONE = 1;
+  IDENTIFICATION_CRITERION_TYPE_EMAIL = 2;
+  // A CRM contact variable (custom attribute); `key` names it.
+  IDENTIFICATION_CRITERION_TYPE_ATTRIBUTE = 3;
+  // The thread's IM contact is linked to the CRM contact. Output only.
+  IDENTIFICATION_CRITERION_TYPE_MESSENGER_ID = 4;
+}
+
+// IdentificationOrigin is which step produced a match.
+enum IdentificationOrigin {
+  IDENTIFICATION_ORIGIN_UNSPECIFIED = 0;
+  // Channel identifiers of the thread, searched on every run.
+  IDENTIFICATION_ORIGIN_CHANNEL = 1;
+  // Criteria passed by a Flow schema.
+  IDENTIFICATION_ORIGIN_FLOW = 2;
+}
+
+// PhoneScope limits which CRM contact phones are matched.
+enum PhoneScope {
+  // Any phone of the contact (default).
+  PHONE_SCOPE_UNSPECIFIED = 0;
+  PHONE_SCOPE_PRIMARY_ONLY = 1;
+}
+
+// CrmContactSource is how the thread's CRM contact was bound.
+enum CrmContactSource {
+  // No contact was ever chosen for the thread, or it was bound before the
+  // source was tracked (then it counts as an operator's choice).
+  CRM_CONTACT_SOURCE_UNSPECIFIED = 0;
+  // Bound by identification: a single verified candidate.
+  CRM_CONTACT_SOURCE_AUTO = 1;
+  // The operator selected a candidate. With an empty crm_contact_id: the
+  // operator cleared the contact; identification does not bind one again.
+  CRM_CONTACT_SOURCE_SELECTED = 2;
+  // The operator created a new contact.
+  CRM_CONTACT_SOURCE_CREATED = 3;
+  // The operator found the contact by a manual search.
+  CRM_CONTACT_SOURCE_SEARCHED = 4;
+}
+
+message IdentificationCriterion {
+  option (buf.validate.message).cel = {
+    id: "identification_criterion.attribute_key"
+    message: "key is required for an ATTRIBUTE criterion"
+    expression: "this.type != 3 || size(this.key) > 0"
+  };
+
+  IdentificationCriterionType type = 1 [(buf.validate.field).enum = {
+    defined_only: true
+    in: [1, 2, 3]
+  }];
+
+  // Value to match. Never returned and never logged unmasked.
+  string value = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 256
+  }];
+
+  // Variable key; required for ATTRIBUTE, ignored otherwise.
+  string key = 3 [(buf.validate.field).string.max_len = 64];
+}
+
+message IdentifyContactRequest {
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  int32 domain_id = 2 [(buf.validate.field).int32.gt = 0];
+
+  // Criteria matched with OR. Empty runs the channel search only.
+  repeated IdentificationCriterion criteria = 3 [(buf.validate.field).repeated.max_items = 16];
+
+  // Match PHONE criteria by their last N digits (4..15); 0 matches the whole
+  // number, where a local and an international form of one number are equal.
+  uint32 phone_last_digits = 4 [(buf.validate.field).uint32 = {
+    in: [0, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+  }];
+
+  PhoneScope phone_scope = 5 [(buf.validate.field).enum.defined_only = true];
+}
+
+message IdentifyContactResponse {
+  // Number of candidates on the thread after this run.
+  int32 found_count = 1;
+
+  // CRM contact id. Set only when the thread has exactly one candidate, it is
+  // verified and it is the contact bound to the thread.
+  string crm_contact_id = 2;
+
+  // Highest trust among the candidates; UNSPECIFIED when there are none.
+  IdentificationTrust trust = 3;
+}
+
+message ContactMatchReason {
+  IdentificationCriterionType type = 1;
+  IdentificationTrust trust = 2;
+  IdentificationOrigin origin = 3;
+  // Variable key for ATTRIBUTE matches.
+  string key = 4;
+}
+
+message ContactCandidate {
+  string crm_contact_id = 1;
+  // Highest trust among the reasons.
+  IdentificationTrust trust = 2;
+  repeated ContactMatchReason reasons = 3;
+  // Unix time, milliseconds.
+  int64 created_at = 4;
+  // Unix time, milliseconds.
+  int64 updated_at = 5;
+}
+
+message ListContactCandidatesRequest {
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+
+  int32 domain_id = 2 [(buf.validate.field).int32.gt = 0];
+}
+
+message ListContactCandidatesResponse {
+  // Verified first, then by first match time. Bounded: at most 100 unverified
+  // candidates are kept per thread, verified ones up to 200 in total.
+  repeated ContactCandidate candidates = 1;
+
+  // CRM contact currently bound to the thread; empty if none.
+  string crm_contact_id = 2;
+
+  CrmContactSource crm_contact_source = 3;
+}

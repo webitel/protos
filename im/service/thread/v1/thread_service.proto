@@ -4,6 +4,7 @@ package webitel.im.service.thread.v1;
 
 import "buf/validate/validate.proto";
 import "google/protobuf/struct.proto";
+import "service/thread/v1/contact_identification.proto";
 import "service/thread/v1/message_history_service.proto";
 import "service/thread/v1/peer.proto";
 import "service/thread/v1/shared.proto";
@@ -642,8 +643,23 @@ message SetCrmContactRequest {
 
   int32 domain_id = 3 [(buf.validate.field).int32.gt = 0];
 
-  // Webitel CRM contact id. Empty string clears the selection.
-  string crm_contact_id = 4 [(buf.validate.field).string.pattern = "^[0-9]*$"];
+  // Webitel CRM contact id (int64). Empty string clears the selection.
+  string crm_contact_id = 4 [
+    (buf.validate.field).string.pattern = "^[0-9]*$",
+    (buf.validate.field).string.max_len = 19
+  ];
+
+  // How the operator chose the contact. UNSPECIFIED means SELECTED; AUTO is
+  // reserved for identification and rejected here.
+  CrmContactSource source = 5 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [1]
+  }];
+
+  // Also link the thread's IM contact to the chosen CRM contact (enrichment),
+  // unless another CRM contact already holds it; a link is never moved. The
+  // gateway sets it only when the caller may write the chosen contact.
+  bool link_im_contact = 6;
 }
 
 message SetCrmContactResponse {

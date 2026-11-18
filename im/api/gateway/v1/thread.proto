@@ -3,6 +3,7 @@ syntax = "proto3";
 package webitel.im.api.gateway.v1;
 
 import "api/gateway/v1/contact.proto";
+import "api/gateway/v1/contact_candidate.proto";
 import "api/gateway/v1/message_history.proto";
 import "api/gateway/v1/peer.proto";
 import "api/gateway/v1/thread_member.proto";
@@ -85,12 +86,19 @@ service ThreadManagement {
   }
 
   // Sets (or clears) the CRM contact selected by the operator for the thread.
-  // Linking the IM contact to the CRM contact itself is done via the CRM API.
+  // Needs read access to the contact. With write access, the thread's IM
+  // contact is also linked to it, unless another CRM contact holds it.
   rpc SetCrmContact(SetCrmContactRequest) returns (SetCrmContactResponse) {
     option (google.api.http) = {
       put: "/v1/threads/{thread_id}/crm_contact"
       body: "*"
     };
+  }
+
+  // Lists the CRM contact candidates identified for the thread, verified
+  // first, filtered by the caller's access to CRM contacts.
+  rpc ListContactCandidates(ListContactCandidatesRequest) returns (ListContactCandidatesResponse) {
+    option (google.api.http) = {get: "/v1/threads/{thread_id}/contact_candidates"};
   }
 
   // Sets or updates variables for a specific thread.
@@ -523,8 +531,18 @@ message SetCrmContactRequest {
     (buf.validate.field).required = true
   ];
 
-  // Webitel CRM contact id. Empty string clears the selection.
-  string crm_contact_id = 2 [(buf.validate.field).string.pattern = "^[0-9]*$"];
+  // Webitel CRM contact id (int64). Empty string clears the selection.
+  string crm_contact_id = 2 [
+    (buf.validate.field).string.pattern = "^[0-9]*$",
+    (buf.validate.field).string.max_len = 19
+  ];
+
+  // How the operator chose the contact. UNSPECIFIED means SELECTED; AUTO is
+  // reserved for identification and rejected here.
+  CrmContactSource source = 3 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [1]
+  }];
 }
 
 message SetCrmContactResponse {

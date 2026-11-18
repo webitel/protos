@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+package webitel.im.api.gateway.v1;
+
+import "buf/validate/validate.proto";
+
+// IdentificationTrust is how reliable a candidate match is.
+enum IdentificationTrust {
+  IDENTIFICATION_TRUST_UNSPECIFIED = 0;
+  // The value was entered by the client: show as "Possible match".
+  IDENTIFICATION_TRUST_UNVERIFIED = 1;
+  // The value came from the channel platform.
+  IDENTIFICATION_TRUST_VERIFIED = 2;
+}
+
+// IdentificationCriterionType is what the candidate was matched by.
+enum IdentificationCriterionType {
+  IDENTIFICATION_CRITERION_TYPE_UNSPECIFIED = 0;
+  IDENTIFICATION_CRITERION_TYPE_PHONE = 1;
+  IDENTIFICATION_CRITERION_TYPE_EMAIL = 2;
+  IDENTIFICATION_CRITERION_TYPE_ATTRIBUTE = 3;
+  IDENTIFICATION_CRITERION_TYPE_MESSENGER_ID = 4;
+}
+
+// IdentificationOrigin is which step produced a match.
+enum IdentificationOrigin {
+  IDENTIFICATION_ORIGIN_UNSPECIFIED = 0;
+  // Channel identifiers of the thread.
+  IDENTIFICATION_ORIGIN_CHANNEL = 1;
+  // Criteria from a Flow schema (Contact identification node).
+  IDENTIFICATION_ORIGIN_FLOW = 2;
+}
+
+// CrmContactSource is how the thread's CRM contact was bound.
+enum CrmContactSource {
+  // No contact was ever chosen for the thread.
+  CRM_CONTACT_SOURCE_UNSPECIFIED = 0;
+  // Bound by identification (single verified candidate).
+  CRM_CONTACT_SOURCE_AUTO = 1;
+  // The operator selected a candidate. With an empty crm_contact_id: the
+  // operator cleared the contact; it is not bound automatically again.
+  CRM_CONTACT_SOURCE_SELECTED = 2;
+  // The operator created a new contact.
+  CRM_CONTACT_SOURCE_CREATED = 3;
+  // The operator found the contact by a manual search.
+  CRM_CONTACT_SOURCE_SEARCHED = 4;
+}
+
+message ContactMatchReason {
+  IdentificationCriterionType type = 1;
+  IdentificationTrust trust = 2;
+  IdentificationOrigin origin = 3;
+  // Variable key for ATTRIBUTE matches.
+  string key = 4;
+}
+
+message ContactCandidate {
+  string crm_contact_id = 1;
+  IdentificationTrust trust = 2;
+  repeated ContactMatchReason reasons = 3;
+  // Unix time, milliseconds.
+  int64 created_at = 4;
+  // Unix time, milliseconds.
+  int64 updated_at = 5;
+}
+
+message ListContactCandidatesRequest {
+  string thread_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).required = true
+  ];
+}
+
+message ListContactCandidatesResponse {
+  // Candidates the caller may read, verified first.
+  repeated ContactCandidate candidates = 1;
+
+  // CRM contact bound to the thread; empty if none.
+  string crm_contact_id = 2;
+
+  CrmContactSource crm_contact_source = 3;
+}
