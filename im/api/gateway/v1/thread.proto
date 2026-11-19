@@ -238,6 +238,10 @@ message Thread {
   // Queue through which the calling participant received the thread. Set by Search; unset when unknown.
   // Search sorts by queue.name with the sort-only key "queue_name".
   ThreadQueue queue = 21;
+
+  // Thread identifier. Set by SearchLeft only, where id is the caller's
+  // membership-period id and thread_id is the thread itself. Empty elsewhere: use id.
+  string thread_id = 22;
 }
 
 // ThreadChannel describes the channel a thread came in through.
@@ -449,6 +453,9 @@ message SearchLeftRequest {
     (buf.validate.field).int32.gte = 1,
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
+
+  // Filter by thread IDs (the real thread id, see Thread.thread_id).
+  repeated string ids = 6 [(buf.validate.field).repeated.items.string.uuid = true];
 }
 
 message SearchLeftResponse {

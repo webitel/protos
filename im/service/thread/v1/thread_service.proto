@@ -197,6 +197,10 @@ message Thread {
 
   // Queue through which the requesting participant (self_id) received the thread. Search only.
   ThreadQueue queue = 23;
+
+  // Thread identifier. Set by SearchLeft only, where id is the member's
+  // membership-period (thread_dialog) id and thread_id is the thread itself. Empty elsewhere: use id.
+  string thread_id = 24;
 }
 
 //#endregion
@@ -447,6 +451,9 @@ message SearchLeftRequest {
   // Restrict results to threads the member has tagged with every one of these tags (AND semantics).
   // Ignored when empty.
   repeated string tags = 8;
+
+  // Filter by thread IDs (the real thread id, see Thread.thread_id).
+  repeated string ids = 9 [(buf.validate.field).repeated.items.string.uuid = true];
 }
 
 message SearchLeftResponse {
