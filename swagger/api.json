@@ -305,6 +305,73 @@
         }
       }
     },
+    "/agents/{agent_id}/exports/archive/pdfs": {
+      "get": {
+        "tags": [
+          "PdfService"
+        ],
+        "summary": "Streams an agent's completed PDF exports packed into a ZIP archive.\nThe archive is assembled on the fly without creating a temporary file.",
+        "operationId": "DownloadPdfArchive",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Unique identifier of the agent.",
+            "name": "agent_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "description": "Optional storage file IDs of selected PDFs.",
+            "name": "file_ids",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "Start of the uploaded_at range (Unix millis).",
+            "name": "from",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "End of the uploaded_at range (Unix millis).",
+            "name": "to",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "title": "Stream result of webitel_media_exporter.DownloadPdfArchiveResponse",
+              "properties": {
+                "error": {
+                  "$ref": "#/definitions/google.rpc.Status"
+                },
+                "result": {
+                  "$ref": "#/definitions/webitel_media_exporter.DownloadPdfArchiveResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        }
+      }
+    },
     "/agents/{agent_id}/exports/archive/screenrecordings": {
       "get": {
         "tags": [
@@ -79766,6 +79833,16 @@
     },
     "webitel_media_exporter.DownloadCallScreenrecordingArchiveResponse": {
       "description": "One frame of a streamed screen recording ZIP archive. The archive name is\ncarried via the \"filename\" gRPC response header set before the first frame.",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "webitel_media_exporter.DownloadPdfArchiveResponse": {
+      "description": "One frame of a streamed PDF ZIP archive.\nThe archive name is sent through the \"filename\" gRPC response header.",
       "type": "object",
       "properties": {
         "data": {
