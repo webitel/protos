@@ -46649,9 +46649,52 @@
         "tags": [
           "AgentAbsenceService"
         ],
-        "summary": "Searches absences by filters.",
+        "summary": "Every agent the user has access to, with or without absences, and their absences over a\nperiod. Ordered by name, then by id.",
         "operationId": "AgentAbsenceService_SearchAgentsAbsences",
         "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "date.from",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "The last day, included.",
+            "name": "date.to",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "name": "team_id",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "name": "supervisor_id",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi",
+            "name": "skill_id",
+            "in": "query"
+          },
           {
             "type": "string",
             "description": "Searches by agent name.",
@@ -46672,6 +46715,7 @@
           },
           {
             "type": "string",
+            "description": "+name when absent.",
             "name": "sort",
             "in": "query"
           },
@@ -46682,15 +46726,6 @@
             },
             "collectionFormat": "multi",
             "name": "fields",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
-            "name": "filters",
             "in": "query"
           }
         ],
@@ -46704,10 +46739,11 @@
         }
       },
       "post": {
+        "description": "Refusals: service.request.too_large - more than the limit, sized for a team of 200 agents\nover a month; service.agent.access (403) - no access to an agent.",
         "tags": [
           "AgentAbsenceService"
         ],
-        "summary": "Creates absences for multiple specified agents.",
+        "summary": "Sets absences of several types over ranges of dates for several agents; each day replaces\nthe absence it had. Shifts on those days are deleted as in CreateAgentAbsence: without\ndelete_shifts nothing is written and the refusal lists the shifts of every agent, with it\neverything is written.",
         "operationId": "AgentAbsenceService_CreateAgentsAbsences",
         "parameters": [
           {
@@ -46734,6 +46770,7 @@
         "tags": [
           "AgentWorkingScheduleService"
         ],
+        "summary": "A page of the schedule's agents with their days, and the holidays and working week of the\nschedule's calendar.",
         "operationId": "AgentWorkingScheduleService_SearchAgentsWorkingSchedule",
         "parameters": [
           {
@@ -46815,9 +46852,11 @@
         }
       },
       "post": {
+        "description": "Refusals of the whole request: storage.shift.refused with violations - a shift overlaps\nanother shift of the agent, or the agent or the date is not of this schedule;\nstorage.working_schedule.archived; service.request.too_large - more than the limit, sized for\na team of 200 agents over a month.",
         "tags": [
           "AgentWorkingScheduleService"
         ],
+        "summary": "Expands a weekly template into shifts for several agents over a range of dates. Days with\nan absence and days another active schedule locks are skipped and returned in skipped; the\nrest is written.",
         "operationId": "AgentWorkingScheduleService_CreateAgentsWorkingScheduleShifts",
         "parameters": [
           {
@@ -46832,7 +46871,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "description": "The Add shifts modal: a weekly template the server expands into shifts over a range\nof dates (WFM-103). Hours are wall-clock minutes from midnight in the time zone of\nthe schedule's calendar, so a shift keeps its hours across a daylight saving change.",
+              "description": "A weekly template the server expands into shifts over a range of dates. Hours are\nwall-clock minutes from midnight in the time zone of the schedule's calendar, so a shift\nkeeps its hours across a daylight saving change.",
               "type": "object",
               "properties": {
                 "agents": {
@@ -46843,11 +46882,11 @@
                   }
                 },
                 "date": {
-                  "description": "Date from and Date to of the modal.",
+                  "description": "Both ends included.",
                   "$ref": "#/definitions/wfmDateRange"
                 },
                 "days": {
-                  "description": "Map key is a day of week: 0 - Sunday, ..., 6 - Saturday. A day missing from the\nmap, one switched off in the modal, gets no shifts.",
+                  "description": "Map key is a day of week: 0 - Sunday, ..., 6 - Saturday. A day missing from the map gets\nno shifts.",
                   "type": "object",
                   "additionalProperties": {
                     "$ref": "#/definitions/wfmShiftTemplateDay"
@@ -46878,6 +46917,155 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/wfmCreateAgentsWorkingScheduleShiftsResponse"
+            }
+          }
+        }
+      }
+    },
+    "/wfm/agents/working_schedules/{working_schedule_id}/shifts/{id}": {
+      "delete": {
+        "tags": [
+          "AgentWorkingScheduleService"
+        ],
+        "summary": "Deletes a shift with its pauses and skills. Refusals as in UpdateAgentWorkingScheduleShift,\nexcept the shift rules.",
+        "operationId": "AgentWorkingScheduleService_DeleteAgentWorkingScheduleShift",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "working_schedule_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "The etag from a read.",
+            "name": "etag",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/wfmDeleteAgentWorkingScheduleShiftResponse"
+            }
+          }
+        }
+      }
+    },
+    "/wfm/agents/working_schedules/{working_schedule_id}/shifts/{shift.id}": {
+      "put": {
+        "description": "Refusals: storage.shift.version_conflict (409) - the shift changed since the read;\nstorage.shift.refused with violations - the rules of CreateAgentsWorkingScheduleShifts, plus\nan absence or a locked date; storage.working_schedule.archived; dbsql.query.no_rows (404) -\nthe shift is gone.",
+        "tags": [
+          "AgentWorkingScheduleService"
+        ],
+        "summary": "Replaces one shift whole: its time, and the pauses and skills of the request replace the\nexisting ones, so a pause is deleted by sending the shift without it. Needs the etag from a\nread; the response carries the shift with the new etag. Allowed in a draft, pending or\nactive schedule.",
+        "operationId": "AgentWorkingScheduleService_UpdateAgentWorkingScheduleShift",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "working_schedule_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "shift.id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "shift": {
+                  "description": "The shift with its id and the etag from a read. start_at, end_at, pauses and skills are\nwritten; the server sets the rest.",
+                  "type": "object",
+                  "title": "The shift with its id and the etag from a read. start_at, end_at, pauses and skills are\nwritten; the server sets the rest.",
+                  "properties": {
+                    "created_at": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "created_by": {
+                      "$ref": "#/definitions/wfmLookupEntity"
+                    },
+                    "domain_id": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "end_at": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "etag": {
+                      "description": "Version of the shift, returned by every read. Editing and deleting a shift require it.",
+                      "type": "string"
+                    },
+                    "pauses": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "$ref": "#/definitions/wfmAgentScheduleShiftPause"
+                      }
+                    },
+                    "planner_run_id": {
+                      "description": "Set by the server for a planner's shift: the planning run that wrote it.",
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "skills": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "$ref": "#/definitions/wfmAgentScheduleShiftSkill"
+                      }
+                    },
+                    "source": {
+                      "description": "Set by the server.",
+                      "$ref": "#/definitions/wfmShiftSource"
+                    },
+                    "start_at": {
+                      "description": "Epoch milliseconds. The shift ends right before end_at, so the next one can start at end_at.",
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "updated_by": {
+                      "$ref": "#/definitions/wfmLookupEntity"
+                    },
+                    "working_date": {
+                      "description": "Set by the server. The working date, a date as in DateRange: the day the shift starts\non in the time zone of the schedule's calendar, so a night shift belongs to the day it\nstarts. 00:00 UTC of that day, epoch milliseconds.",
+                      "type": "string",
+                      "format": "int64"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/wfmUpdateAgentWorkingScheduleShiftResponse"
             }
           }
         }
@@ -46944,10 +47132,11 @@
         }
       },
       "post": {
+        "description": "The agent's shifts on that day in a draft, pending or active schedule are deleted only on\nconfirmation. Without delete_shifts the call writes nothing and refuses with\nstorage.absence.shifts_to_delete, listing those shifts as storage.absence.shift violations.\nWith delete_shifts the shifts, their pauses and skills are deleted in the same transaction\nand returned in deleted_shifts. Shifts of an archived schedule stay, next to the absence.\n\nRefusals: service.agent.access (403) - no access to the agent.",
         "tags": [
           "AgentAbsenceService"
         ],
-        "summary": "Creates one-day-absence for one agent.",
+        "summary": "Sets an absence for one day. An agent has one absence a day and a new one replaces the old\none of any type, so adding and changing the type is the same call. Past days are allowed.",
         "operationId": "AgentAbsenceService_CreateAgentAbsence",
         "parameters": [
           {
@@ -46964,6 +47153,10 @@
             "schema": {
               "type": "object",
               "properties": {
+                "delete_shifts": {
+                  "description": "Deletes the agent's shifts on that day, the ones storage.absence.shifts_to_delete listed.",
+                  "type": "boolean"
+                },
                 "item": {
                   "$ref": "#/definitions/wfmAbsence"
                 }
@@ -47017,7 +47210,7 @@
         "tags": [
           "AgentAbsenceService"
         ],
-        "summary": "Deletes agent concrete absence by its id.",
+        "summary": "Deletes an absence by its id; dbsql.query.no_rows (404) if there is none.",
         "operationId": "AgentAbsenceService_DeleteAgentAbsence",
         "parameters": [
           {
@@ -47050,7 +47243,7 @@
         "tags": [
           "AgentAbsenceService"
         ],
-        "summary": "Updates agent concrete absence by its id.",
+        "summary": "Updates an absence by its id, with the result of CreateAgentAbsence. On a day with shifts it\nrefuses with storage.absence.shifts_to_delete and has no confirmation.",
         "operationId": "AgentAbsenceService_UpdateAgentAbsence",
         "parameters": [
           {
@@ -48059,6 +48252,7 @@
         "tags": [
           "WorkingScheduleService"
         ],
+        "summary": "Searches schedules, each with its number of agents.",
         "operationId": "WorkingScheduleService_SearchWorkingSchedule",
         "parameters": [
           {
@@ -48080,6 +48274,7 @@
           },
           {
             "type": "string",
+            "description": "States sort as active, pending, draft, archived.",
             "name": "sort",
             "in": "query"
           },
@@ -48106,6 +48301,7 @@
         "tags": [
           "WorkingScheduleService"
         ],
+        "summary": "A new schedule is always a draft, whatever state the request carries. It gets every agent\nof the team the user has access to; agents who join the team later are added by hand.",
         "operationId": "WorkingScheduleService_CreateWorkingSchedule",
         "parameters": [
           {
@@ -48164,6 +48360,7 @@
         "tags": [
           "WorkingScheduleService"
         ],
+        "summary": "Deletes the schedule with its shifts, pauses and skills; absences stay. An active schedule\nrefuses with storage.working_schedule.active until its state changes.",
         "operationId": "WorkingScheduleService_DeleteWorkingSchedule",
         "parameters": [
           {
@@ -48189,6 +48386,7 @@
         "tags": [
           "WorkingScheduleService"
         ],
+        "summary": "Adds agents from any team, each once: an agent already in the schedule is skipped. The\nresponse lists the added ones, with names.",
         "operationId": "WorkingScheduleService_UpdateWorkingScheduleAddAgents",
         "parameters": [
           {
@@ -48231,6 +48429,7 @@
         "tags": [
           "WorkingScheduleService"
         ],
+        "summary": "Removes an agent with their shifts in this schedule; absences stay.",
         "operationId": "WorkingScheduleService_UpdateWorkingScheduleRemoveAgent",
         "parameters": [
           {
@@ -48258,11 +48457,56 @@
         }
       }
     },
+    "/wfm/lookups/working_schedules/{id}/block_outside_activity": {
+      "patch": {
+        "description": "Refusals: storage.working_schedule.archived; storage.working_schedule.version_conflict\n(409) - the header changed since the read.",
+        "tags": [
+          "WorkingScheduleService"
+        ],
+        "summary": "Switches blocking outside a shift on or off in a draft, pending or active schedule, with the\netag from a read; the response carries the schedule with the new etag. After creation it is\nthe only way to change it. Switched on in an active schedule, it also takes agents who are\nonline outside their shift offline.",
+        "operationId": "WorkingScheduleService_UpdateWorkingScheduleBlockOutsideActivity",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "block_outside_activity": {
+                  "type": "boolean"
+                },
+                "etag": {
+                  "description": "The etag from a read.",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/wfmUpdateWorkingScheduleBlockOutsideActivityResponse"
+            }
+          }
+        }
+      }
+    },
     "/wfm/lookups/working_schedules/{id}/forecast": {
       "get": {
         "tags": [
           "WorkingScheduleService"
         ],
+        "summary": "How many agents each hour of a period needs, from the forecast procedure of the team. The\nprocedure runs on every call and nothing is stored, so edits of the schedule do not change\nthe result. A team without a forecast calculation gets no hours.",
         "operationId": "WorkingScheduleService_ReadWorkingScheduleForecast",
         "parameters": [
           {
@@ -48281,6 +48525,7 @@
           {
             "type": "string",
             "format": "int64",
+            "description": "The last day, included.",
             "name": "date.to",
             "in": "query"
           }
@@ -48295,11 +48540,100 @@
         }
       }
     },
-    "/wfm/lookups/working_schedules/{item.id}": {
-      "put": {
+    "/wfm/lookups/working_schedules/{id}/planned": {
+      "get": {
         "tags": [
           "WorkingScheduleService"
         ],
+        "summary": "How many agents are on a shift and not on a pause, per 15 minutes and per day. It reads\nonly the schedule, so every edit of it changes the result.",
+        "operationId": "WorkingScheduleService_ReadWorkingSchedulePlanned",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "date.from",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "description": "The last day, included.",
+            "name": "date.to",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/wfmReadWorkingSchedulePlannedResponse"
+            }
+          }
+        }
+      }
+    },
+    "/wfm/lookups/working_schedules/{id}/state": {
+      "patch": {
+        "description": "Moving to pending or active needs an answer about unplanned days: dates of the period where\nan agent of the schedule has neither a shift nor an absence. Without fill_days_off the call\nrefuses with service.working_schedule.unplanned_days. The days off are written in the same\ntransaction, as absences.\n\nMoving to active first checks the rules and refuses with\nstorage.working_schedule.activation_refused and violations:\nstorage.working_schedule.team_active - the team has another active schedule on overlapping\ndates; storage.shift.locked_date or storage.shift.overlap - an agent works in another active\nschedule on the same date or at the same time. storage.working_schedule.version_conflict\n(409) - the header changed since the read.",
+        "tags": [
+          "WorkingScheduleService"
+        ],
+        "summary": "Moves the schedule to another state, in any order but out of archived, with the etag from\na read; the response carries the schedule with the new etag.",
+        "operationId": "WorkingScheduleService_UpdateWorkingScheduleState",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "etag": {
+                  "description": "The etag from a read.",
+                  "type": "string"
+                },
+                "fill_days_off": {
+                  "description": "The answer about unplanned days: true fills them with days off, holidays and the calendar's\ndays off included; false leaves them empty. Absent, the call refuses if there are any.",
+                  "type": "boolean"
+                },
+                "state": {
+                  "$ref": "#/definitions/wfmWorkingScheduleState"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/wfmUpdateWorkingScheduleStateResponse"
+            }
+          }
+        }
+      }
+    },
+    "/wfm/lookups/working_schedules/{item.id}": {
+      "put": {
+        "description": "Refusals: service.working_schedule.state - not a draft;\nstorage.working_schedule.version_conflict (409) - the header changed since the read.",
+        "tags": [
+          "WorkingScheduleService"
+        ],
+        "summary": "Updates the header of a draft schedule, with the etag from a read; the response carries the\nnew etag. A change of the team rebuilds the schedule: every shift is deleted and the agents\nbecome the new team's agents the user has access to, so agents added by hand leave too. A\nchange of the calendar deletes every shift; a change of the dates deletes the shifts whose\nworking date falls outside the new period. The time scale, the name and Special time skills\nkeep the shifts. block_outside_activity is ignored: only\nUpdateWorkingScheduleBlockOutsideActivity changes it.",
         "operationId": "WorkingScheduleService_UpdateWorkingSchedule",
         "parameters": [
           {
@@ -48327,6 +48661,7 @@
                       }
                     },
                     "block_outside_activity": {
+                      "description": "Off by default. Set on creation; afterwards only UpdateWorkingScheduleBlockOutsideActivity\nchanges it.",
                       "type": "boolean"
                     },
                     "calendar": {
@@ -48352,10 +48687,11 @@
                       "format": "int64"
                     },
                     "etag": {
-                      "description": "Version of the row, returned by every read. UpdateWorkingSchedule requires\nit and refuses with Aborted when the schedule has changed since.",
+                      "description": "Version of the row, returned by every read. UpdateWorkingSchedule, UpdateWorkingScheduleState\nand UpdateWorkingScheduleBlockOutsideActivity require it and refuse with\nstorage.working_schedule.version_conflict (409) when the schedule has changed since.",
                       "type": "string"
                     },
                     "extra_skills": {
+                      "description": "Special time skills; the shape may change to a skill group.",
                       "type": "array",
                       "items": {
                         "type": "object",
@@ -48371,10 +48707,12 @@
                       "format": "int64"
                     },
                     "start_time_at": {
+                      "description": "The time scale of the schedule, minutes from midnight in the zone of its calendar. Both\nabsent mean 24 hours; an end before the start crosses midnight. It does not limit shifts.",
                       "type": "string",
                       "format": "int64"
                     },
                     "state": {
+                      "description": "Set by the server: a new schedule is a draft, and only UpdateWorkingScheduleState changes it.",
                       "$ref": "#/definitions/wfmWorkingScheduleState"
                     },
                     "team": {
@@ -48732,6 +49070,19 @@
         "group": {
           "description": "The ID of the static group that should be assigned if the condition is met.",
           "$ref": "#/definitions/webitelContactsLookup"
+        }
+      }
+    },
+    "ExecuteForecastCalculationResponseForecast": {
+      "type": "object",
+      "properties": {
+        "agents": {
+          "type": "string",
+          "format": "int64"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -80114,12 +80465,18 @@
           "description": "A day has an absence or shifts, not both.",
           "$ref": "#/definitions/wfmAbsenceType"
         },
+        "absence_id": {
+          "description": "Id of the absence, to delete it.",
+          "type": "string",
+          "format": "int64"
+        },
         "date": {
           "description": "The working date, a date as in DateRange: 00:00 UTC of the day, epoch milliseconds.",
           "type": "string",
           "format": "int64"
         },
         "locked": {
+          "description": "The agent has shifts in another active schedule on this date, so no shift goes here.",
           "type": "boolean"
         },
         "shifts": {
@@ -80150,7 +80507,7 @@
           "format": "int64"
         },
         "etag": {
-          "description": "Version of the shift, returned by every read. Editing a shift requires it (WFM-99).",
+          "description": "Version of the shift, returned by every read. Editing and deleting a shift require it.",
           "type": "string"
         },
         "id": {
@@ -80305,6 +80662,14 @@
     "wfmCreateAgentAbsenceResponse": {
       "type": "object",
       "properties": {
+        "deleted_shifts": {
+          "description": "The shifts deleted. They can differ from the ones the refusal listed if the schedule\nchanged in between.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmDeletedShift"
+          }
+        },
         "item": {
           "$ref": "#/definitions/wfmAbsence"
         }
@@ -80320,6 +80685,10 @@
             "format": "int64"
           }
         },
+        "delete_shifts": {
+          "description": "As in CreateAgentAbsenceRequest.",
+          "type": "boolean"
+        },
         "items": {
           "type": "array",
           "items": {
@@ -80332,6 +80701,14 @@
     "wfmCreateAgentsAbsencesResponse": {
       "type": "object",
       "properties": {
+        "deleted_shifts": {
+          "description": "As in CreateAgentAbsenceResponse.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmDeletedShift"
+          }
+        },
         "items": {
           "type": "array",
           "items": {
@@ -80352,11 +80729,11 @@
           }
         },
         "skipped": {
-          "description": "Days the request left without shifts, and why: an absence, or a date another\nactive schedule locks (WFM-103).",
+          "description": "Days the request left without shifts, and why: storage.shift.absence, or\nstorage.shift.locked_date with the schedule that holds the date.",
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/wfmSkippedDay"
+            "$ref": "#/definitions/wfmViolation"
           }
         }
       }
@@ -80465,6 +80842,15 @@
         }
       }
     },
+    "wfmDeleteAgentWorkingScheduleShiftResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "wfmDeleteForecastCalculationResponse": {
       "type": "object",
       "properties": {
@@ -80510,6 +80896,36 @@
         }
       }
     },
+    "wfmDeletedShift": {
+      "description": "DeletedShift is a shift an absence deleted.",
+      "type": "object",
+      "properties": {
+        "agent": {
+          "$ref": "#/definitions/wfmLookupEntity"
+        },
+        "date": {
+          "description": "The working date, a date as in DateRange: 00:00 UTC of the day, epoch milliseconds.",
+          "type": "string",
+          "format": "int64"
+        },
+        "end_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "schedule": {
+          "$ref": "#/definitions/wfmLookupEntity"
+        },
+        "start_at": {
+          "description": "Epoch milliseconds.",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "wfmExecuteForecastCalculationResponse": {
       "type": "object",
       "properties": {
@@ -80517,21 +80933,8 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/wfmExecuteForecastCalculationResponseForecast"
+            "$ref": "#/definitions/ExecuteForecastCalculationResponseForecast"
           }
-        }
-      }
-    },
-    "wfmExecuteForecastCalculationResponseForecast": {
-      "type": "object",
-      "properties": {
-        "agents": {
-          "type": "string",
-          "format": "int64"
-        },
-        "timestamp": {
-          "type": "string",
-          "format": "int64"
         }
       }
     },
@@ -80587,6 +80990,26 @@
         },
         "updated_by": {
           "$ref": "#/definitions/wfmLookupEntity"
+        }
+      }
+    },
+    "wfmForecastHour": {
+      "type": "object",
+      "properties": {
+        "agents": {
+          "description": "Agents needed.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "date": {
+          "description": "The day of the hour in the zone of the schedule's calendar, a date as in DateRange:\n00:00 UTC of the day, epoch milliseconds.",
+          "type": "string",
+          "format": "int64"
+        },
+        "start_at": {
+          "description": "Start of the hour, epoch milliseconds.",
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -80667,6 +81090,34 @@
         }
       }
     },
+    "wfmPlannedDay": {
+      "type": "object",
+      "properties": {
+        "agents": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "date": {
+          "description": "A date as in DateRange: 00:00 UTC of the day, epoch milliseconds.",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "wfmPlannedSlot": {
+      "type": "object",
+      "properties": {
+        "agents": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "start_at": {
+          "description": "Start of the slot, epoch milliseconds.",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "wfmReadAgentAbsenceResponse": {
       "type": "object",
       "properties": {
@@ -80719,9 +81170,31 @@
       "type": "object",
       "properties": {
         "items": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/wfmWorkingScheduleForecast"
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmForecastHour"
+          }
+        }
+      }
+    },
+    "wfmReadWorkingSchedulePlannedResponse": {
+      "type": "object",
+      "properties": {
+        "days": {
+          "description": "Days where at least one agent has a shift, by working date.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmPlannedDay"
+          }
+        },
+        "slots": {
+          "description": "15-minute slots where at least one agent is on a shift and not on a pause; a slot missing\nfrom the list has 0. An agent counts as away only when a pause covers the whole slot.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/wfmPlannedSlot"
           }
         }
       }
@@ -80766,6 +81239,7 @@
       "type": "object",
       "properties": {
         "items": {
+          "description": "An agent without absences in the period comes without absences.",
           "type": "array",
           "items": {
             "type": "object",
@@ -80774,6 +81248,11 @@
         },
         "next": {
           "type": "boolean"
+        },
+        "total": {
+          "description": "Agents that match the filters, on all pages.",
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -80991,23 +81470,6 @@
         }
       }
     },
-    "wfmSkippedDay": {
-      "type": "object",
-      "properties": {
-        "agent": {
-          "$ref": "#/definitions/wfmLookupEntity"
-        },
-        "date": {
-          "description": "A date as in DateRange: 00:00 UTC of the day, epoch milliseconds.",
-          "type": "string",
-          "format": "int64"
-        },
-        "reason": {
-          "description": "An error id, \u003clayer\u003e.\u003centity\u003e.\u003cwhat\u003e.",
-          "type": "string"
-        }
-      }
-    },
     "wfmUpdateAgentAbsenceResponse": {
       "type": "object",
       "properties": {
@@ -81021,6 +81483,14 @@
       "properties": {
         "item": {
           "$ref": "#/definitions/wfmAgentWorkingConditions"
+        }
+      }
+    },
+    "wfmUpdateAgentWorkingScheduleShiftResponse": {
+      "type": "object",
+      "properties": {
+        "shift": {
+          "$ref": "#/definitions/wfmAgentScheduleShift"
         }
       }
     },
@@ -81068,6 +81538,14 @@
         }
       }
     },
+    "wfmUpdateWorkingScheduleBlockOutsideActivityResponse": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/wfmWorkingSchedule"
+        }
+      }
+    },
     "wfmUpdateWorkingScheduleRemoveAgentResponse": {
       "type": "object",
       "properties": {
@@ -81082,6 +81560,57 @@
       "properties": {
         "item": {
           "$ref": "#/definitions/wfmWorkingSchedule"
+        }
+      }
+    },
+    "wfmUpdateWorkingScheduleStateResponse": {
+      "type": "object",
+      "properties": {
+        "filled_days": {
+          "description": "Days filled with days off.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "item": {
+          "$ref": "#/definitions/wfmWorkingSchedule"
+        }
+      }
+    },
+    "wfmViolation": {
+      "description": "A WFM error has the body {\"id\", \"code\", \"status\", \"detail\"}. Errors are told apart by id, not\nby HTTP status: 400 is both a validation error and a business refusal, 409 both a version\nconflict and a duplicate. detail is a fallback text for people; a refusal with violations\nputs JSON there instead: {\"text\": \"...\", \"violations\": [Violation, ...]}, with the field names\nof this API.\n\nCommon to every WFM method: interceptor.validate (400) - an invalid request;\ninterceptor.auth.license and interceptor.auth.permission (403) - no WFM license or no right on\nthe object class; service.agent.access (403) - no access to the agent, never 404;\ndbsql.query.no_rows (404) - the record is gone; storage.working_schedule.archived (400) - a\nwrite to an archived schedule, which is read-only. After a version conflict (409) the record\nhas to be read again.",
+      "type": "object",
+      "title": "Violation is one broken rule: which agent, on which date, why, and which other schedule\nor shift is in the way. A refusal lists the rules it broke; reasons are told apart by id:\n  storage.shift.agent_not_in_schedule - the agent is not in the schedule\n  storage.shift.agent_deactivated - the agent's user is deactivated\n  storage.shift.outside_schedule - the date is outside the schedule's period\n  storage.shift.absence - the agent has an absence on the date\n  storage.shift.locked_date - the agent has shifts in another active schedule on the date\n  storage.shift.overlap - the shift overlaps another shift of the agent, a night one included\n  storage.absence.shift - the agent has a shift on the date in a draft, pending or active\n    schedule, which the absence deletes once confirmed\n  storage.working_schedule.team_active - the team already has an active schedule on\n    overlapping dates; no agent or date",
+      "properties": {
+        "agent": {
+          "description": "Absent when the rule is about the schedule as a whole.",
+          "$ref": "#/definitions/wfmLookupEntity"
+        },
+        "date": {
+          "description": "A date as in DateRange: 00:00 UTC of the day, epoch milliseconds. Absent when the rule is\nabout the schedule as a whole.",
+          "type": "string",
+          "format": "int64"
+        },
+        "end_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "reason": {
+          "description": "The reason id, \u003clayer\u003e.\u003centity\u003e.\u003cwhat\u003e.",
+          "type": "string"
+        },
+        "schedule": {
+          "description": "The other schedule the rule is about, if any.",
+          "$ref": "#/definitions/wfmLookupEntity"
+        },
+        "shift_id": {
+          "description": "The existing shift the rule is about, if any: the one an absence deletes, or the one a new\nshift overlaps. Absent when the overlap is between two new shifts of the same request.",
+          "type": "string",
+          "format": "int64"
+        },
+        "start_at": {
+          "description": "Start and end of that shift, epoch milliseconds.",
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -81159,6 +81688,7 @@
           }
         },
         "block_outside_activity": {
+          "description": "Off by default. Set on creation; afterwards only UpdateWorkingScheduleBlockOutsideActivity\nchanges it.",
           "type": "boolean"
         },
         "calendar": {
@@ -81184,10 +81714,11 @@
           "format": "int64"
         },
         "etag": {
-          "description": "Version of the row, returned by every read. UpdateWorkingSchedule requires\nit and refuses with Aborted when the schedule has changed since.",
+          "description": "Version of the row, returned by every read. UpdateWorkingSchedule, UpdateWorkingScheduleState\nand UpdateWorkingScheduleBlockOutsideActivity require it and refuse with\nstorage.working_schedule.version_conflict (409) when the schedule has changed since.",
           "type": "string"
         },
         "extra_skills": {
+          "description": "Special time skills; the shape may change to a skill group.",
           "type": "array",
           "items": {
             "type": "object",
@@ -81207,10 +81738,12 @@
           "format": "int64"
         },
         "start_time_at": {
+          "description": "The time scale of the schedule, minutes from midnight in the zone of its calendar. Both\nabsent mean 24 hours; an end before the start crosses midnight. It does not limit shifts.",
           "type": "string",
           "format": "int64"
         },
         "state": {
+          "description": "Set by the server: a new schedule is a draft, and only UpdateWorkingScheduleState changes it.",
           "$ref": "#/definitions/wfmWorkingScheduleState"
         },
         "team": {
@@ -81226,31 +81759,6 @@
         },
         "updated_by": {
           "$ref": "#/definitions/wfmLookupEntity"
-        }
-      }
-    },
-    "wfmWorkingScheduleForecast": {
-      "type": "object",
-      "properties": {
-        "forecast": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/wfmWorkingScheduleForecastForecast"
-          }
-        }
-      }
-    },
-    "wfmWorkingScheduleForecastForecast": {
-      "type": "object",
-      "properties": {
-        "agents": {
-          "type": "string",
-          "format": "int64"
-        },
-        "hour": {
-          "type": "string",
-          "format": "int64"
         }
       }
     },
