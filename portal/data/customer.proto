@@ -1,0 +1,255 @@
+syntax = "proto3";
+package webitel.portal;
+option go_package = "webitel.go/api/portal;portal";
+
+// import "oauth2.proto";
+import "data/auth.proto";
+import "data/push.proto";
+// import "device.proto";
+// import "account.proto";
+// import "session.proto";
+import "data/connect.proto";
+
+// import "messaging.proto";
+// import "chat/messages/dialog.proto";
+// import "chat/messages/history.proto";
+
+// import "google/api/visibility.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+// Portal Customer Service
+service Customer {
+
+  // Network PING command
+  rpc Ping(Echo) returns (Echo);
+
+  // Obtain your user's access token to portal service(s)
+  rpc Token(TokenRequest) returns (AccessToken) {
+    option (google.api.http) = {
+      post: "/token"
+      response_body: "*"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: {
+        security_requirement: {
+          key: "Device Id";
+        }
+        security_requirement: {
+          key: "Portal App";
+        }
+      }
+    };
+  }
+
+  // Invalidate the user's session access token
+  rpc Logout(LogoutRequest) returns (UpdateDisconnect) {
+    option (google.api.http) = {
+      post: "/logout"
+      // response_body: "*"
+      // body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: {
+        security_requirement: {
+          key: "Device Id";
+        }
+        security_requirement: {
+          key: "Portal User";
+          value: {}
+        }
+      }
+    };
+  }
+
+  // Inspect authentication of the user's session access token
+  rpc Inspect(InspectRequest) returns (AccessToken) {
+    option (google.api.http) = {
+      get: "/token"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: {
+        security_requirement: {
+          key: "Device Id";
+        }
+        security_requirement: {
+          key: "Portal User";
+          value: {}
+        }
+      }
+    };
+  }
+
+  // // Self user profile
+  // rpc GetAccount(GetAccountRequest) returns (Account) {
+  //   option (google.api.http) = {
+  //     get: "/account"
+  //   };
+  // }
+
+  // // Update self profile
+  // rpc UpdateAccount(UpdateAccountRequest) returns (Account) {
+  //   option (google.api.http) = {
+  //     patch: "/account"
+  //     response_body: "*"
+  //     body: "input"
+  //   };
+  //   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+  //     security: {
+  //       security_requirement: {
+  //         key: "Portal User";
+  //         value: {}
+  //       }
+  //     }
+  //   };
+  // }
+
+  // Register PUSH subscription. App token authentication required
+  rpc RegisterDevice(RegisterDeviceRequest) returns (RegisterDeviceResponse) { // (Device) {
+    // option (google.api.http) = {
+    //   patch: "/device"
+    //   response_body: "*"
+    //   body: "*"
+    // };
+    // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //   security: {
+    //     security_requirement: {
+    //       key: "Device Id";
+    //     }
+    //     security_requirement: {
+    //       key: "Portal App";
+    //     }
+    //   }
+    // };
+  }
+
+  // ----- Experimental ----- //
+
+  // // Subscribe for real-time update notifications
+  // rpc Subscribe(SubscribeRequest) returns (stream Update);
+
+  // // Send chat media message
+  // rpc SendMedia(SendMediaRequest) returns (stream Update);
+
+  // // Send chat text message
+  // rpc SendMessage(SendMessageRequest) returns (UpdateNewMessage);
+
+  // // Search for chat history
+  // rpc ChatHistory(webitel.chat.ChatMessagesRequest) returns (webitel.chat.ChatMessages) {
+  //   option (google.api.http) = {
+  //     get: "/chat/messages"
+  //   };
+  // }
+
+  // Stay connected to the service and receive real-time updates
+  rpc Connect(stream Request) returns (stream Update) {
+    // option (google.api.http) = {
+    //   post: "/connect"
+    //   // response_body: "*"
+    //   // body: "*"
+    // };
+    // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //   security: {
+    //     security_requirement: {
+    //       key: "Portal App";
+    //       value: {}
+    //     }
+    //     security_requirement: {
+    //       key: "Portal User";
+    //       value: {}
+    //     }
+    //   }
+    // };
+  }
+}
+
+// Inspect access_token details
+message InspectRequest {
+  // // End-User Authentication
+  // string access_token = 1;
+}
+
+// // AccountUpdate input
+// message AccountUpdate {
+//   // Customer end-user account profile changes.
+//   UserAccount account = 1;
+//   // [RE]Register device to receive PUSH notifications
+//   InputDevice device = 2;
+// }
+
+// // AccountRequest info
+// message UpdateAccountRequest {
+
+//   // ------- PATCH Options ------- //
+
+//   // JSON PATCH fields mask.
+//   // List of JPath fields specified in body(input).
+//   repeated string x_json_mask = 1
+//   [(google.api.field_visibility) = {
+//     restriction: "PREVIEW" // "INTERNAL"
+//   },
+//   (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+//     read_only: true
+//     pattern: "^$"
+//   }];
+
+//   // Update profile info
+//   UserAccount input = 3;
+
+//   // // Update registration info.
+//   // AccountUpdate input = 3;
+// }
+
+message LogoutRequest {
+  // // REQUIRED. Session Authentication
+  // string access_token = 1;
+}
+
+// message LogoutResponse {
+
+// }
+
+// ---------- Account ---------- //
+
+// message GetAccountRequest {
+//   // // REQUIRED. Session Authentication
+//   // string access_token = 1;
+// }
+
+// message SetAccountRequest {
+//   // Update self profile info
+//   UserAccount input = 1;
+// }
+
+// // ---------- Device ---------- //
+
+// message RegisterDeviceRequest {
+
+//   // ------- PATCH Options ------- //
+
+//   // JSON PATCH fields mask.
+//   // List of JPath fields specified in body(input).
+//   repeated string x_json_mask = 1
+//   [(google.api.field_visibility) = {
+//     restriction: "PREVIEW" // "INTERNAL"
+//   },
+//   (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+//     read_only: true
+//     pattern: "^$"
+//   }];
+
+//   // [RE]register or reset device PUSH subscription
+//   InputDevice input = 2;
+// }
+
+message RegisterDeviceRequest {
+  // PUSH subscription update.
+  // Set provider type specific registered device token.
+  // None to deregister device PUSH subscription.
+  DevicePush push = 1;
+}
+
+message RegisterDeviceResponse {
+
+}
