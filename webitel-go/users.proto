@@ -299,21 +299,19 @@ message SearchUsersResponse {
 }
 
 message UpdatePasswordRequest {
-    int64  id = 1;
+    reserved 1, 5, 6;
     string old_password = 2;     // OLD
     string user_password = 3;    // NEW
     string confirm_password = 4; // CONFIRM
-    string username = 5;         // Username (when password expired)
-    string domain = 6;          // Domain name required for user lookup when password expired
+    string password_change_token = 7; // from the /login 412 response, required without a session
 }
 
 message UpdatePasswordResponse {
 }
 
 message GetPasswordSettingsRequest {
-    string password = 1;
-    string username = 2;
-    string domain = 3;
+    reserved 1, 2, 3;
+    string password_change_token = 4; // from the /login 412 response, required without a session
 }
 
 message GetPasswordSettingsResponse {
@@ -321,9 +319,9 @@ message GetPasswordSettingsResponse {
 }
 
 message GeneratePasswordRequest {
+    reserved 2, 3;
     string username = 1; // required to enforce password_contains_login policy
-    string password = 2; // current password, used to authenticate when no session exists
-    string domain = 3;   // domain name, required to authenticate when no session exists
+    string password_change_token = 4; // from the /login 412 response, required without a session
 }
 
 message GeneratePasswordResponse {
