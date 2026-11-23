@@ -54,6 +54,11 @@ message CreateQuickReplyRequest {
     repeated Lookup queues = 3;
     repeated Lookup teams = 4;
     Lookup article = 5;
+    // Channel: empty for non-Email replies or "email". Set on create only.
+    string channel = 6;
+    // Email only: stored sanitized; text is the plain-text fallback.
+    // Variables: ${agent_name}, ${contact_name}, ${thread_id}, ${thread_subject}.
+    string html = 7;
 }
 
 message QuickReply {
@@ -68,6 +73,8 @@ message QuickReply {
     repeated Lookup teams = 8;
     Lookup article = 9;
     repeated Lookup queues = 10;
+    string channel = 11;
+    string html = 12;
 }
 
 message SearchQuickRepliesRequest {
@@ -80,6 +87,8 @@ message SearchQuickRepliesRequest {
     repeated uint32 id = 6;
     repeated uint32 queue = 7;
     bool restrict_to_agent = 8;
+    // Empty returns replies without a channel, "email" returns Email replies.
+    string channel = 9;
 }
 
 message ListQuickReplies {
@@ -99,6 +108,8 @@ message PatchQuickReplyRequest {
     repeated Lookup teams = 5;
     Lookup article = 6;
     repeated Lookup queues = 7;
+    // Email only; applied when listed in fields.
+    string html = 8;
 }
 
 message UpdateQuickReplyRequest {
@@ -108,6 +119,8 @@ message UpdateQuickReplyRequest {
     repeated Lookup teams = 4;
     Lookup article = 5;
     repeated Lookup queues = 6;
+    // Email only; replaces the stored HTML.
+    string html = 7;
 }
 
 message DeleteQuickReplyRequest {
