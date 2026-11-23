@@ -10,6 +10,7 @@ import "service/admin/v1/application_limit.proto";
 // import "webitel/messaging/v1/media.proto";
 
 import "buf/validate/validate.proto";
+import "google/protobuf/duration.proto";
 import "google/rpc/status.proto";
 
 option go_package = "github.com/webitel/im-account-service/proto/gen/im/service/admin/v1;adminpb";
@@ -72,6 +73,10 @@ message Application {
   // The rule marked `default` (at most one) is the recipient substituted when a
   // send request has no `to`.
   optional ContactAllowList allow_contacts = 13;
+
+  // OPTIONAL. Google reCAPTCHA v3 verification of End-User login (Token)
+  // VIA this Application. Unset or `enabled = false`: no captcha required.
+  optional AppCaptcha captcha = 14;
 }
 
 // AppType is the kind of client an Application serves.
@@ -125,6 +130,28 @@ message ContactAllowRule {
   // Recipient used when a send request has no `to`. At most one rule per
   // list may set this.
   bool default = 2;
+}
+
+// AppCaptcha is the per-Application Google reCAPTCHA v3 configuration
+// checked on End-User login (Account/Token, header `X-Webitel-Captcha`).
+message AppCaptcha {
+  // Whether captcha verification is required.
+  bool enabled = 1;
+
+  // reCAPTCHA secret key. Required when enabled. Never returned by SearchApps.
+  string secret = 2;
+
+  // Minimum accepted score, 0.0..1.0. Unset (0) means default 0.5.
+  float min_score = 3;
+
+  // Expected action name. Empty: not checked.
+  string action = 4;
+
+  // Accepted hostname(s) of the site where the token was issued. Empty: not checked.
+  repeated string hostnames = 5;
+
+  // How long a successful verification stays valid for the session. Unset/0: no limit.
+  google.protobuf.Duration max_age = 6;
 }
 
 // Application Service Configuration
