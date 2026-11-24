@@ -92,6 +92,9 @@ message EmbeddingModel {
   string endpoint = 9;
   // Timestamp of the last successful validation (epoch ms); 0 if never validated.
   int64 validated_at = 10;
+  // Minimum relevance in [0, 1] for the chunks this model scores; unset means
+  // no threshold.
+  optional double min_score = 11;
   // CreatedAt timestamp (epoch ms).
   int64 created_at = 20;
   // User who created the model.
@@ -121,6 +124,12 @@ message InputEmbeddingModel {
   string endpoint = 7;
   // Write-only provider credential; encrypted at rest, never read back.
   string api_key = 8;
+  // Minimum relevance in [0, 1] for the chunks this model scores; unset means
+  // no threshold.
+  optional double min_score = 9 [(buf.validate.field).double = {
+    gte: 0
+    lte: 1
+  }];
 }
 
 // ListModelsRequest parameters.
