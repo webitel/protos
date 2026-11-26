@@ -154,7 +154,7 @@ message WorkingCondition {
   option (buf.validate.message).cel = {
     id: "working_conditions.working_hours",
     message: "workday_hours should be greater than pause_duration",
-    expression: "this.workday_hours >= (this.pause_duration / 60)"
+    expression: "!has(this.workday_hours) || this.workday_hours * 60 >= this.pause_duration"
   };
 
   option (buf.validate.message).cel = {
@@ -188,22 +188,22 @@ message WorkingCondition {
   ];
 
   optional int32 vacation = 11 [
-    (buf.validate.field).int32.gt = 0,
+    (buf.validate.field).int32.gte = 0,
     (buf.validate.field).int32.lte = 365
   ];
 
   optional int32 sick_leaves = 12 [
-    (buf.validate.field).int32.gt = 0,
+    (buf.validate.field).int32.gte = 0,
     (buf.validate.field).int32.lte = 365
   ];
 
   optional int32 days_off = 13 [
-    (buf.validate.field).int32.gt = 0,
+    (buf.validate.field).int32.gte = 0,
     (buf.validate.field).int32.lte = 365
   ];
 
   optional int32 pause_duration = 14 [
-    (buf.validate.field).int32.gt = 0,
+    (buf.validate.field).int32.gte = 0,
     (buf.validate.field).int32.lte = 1440
   ];
 
