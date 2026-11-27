@@ -59521,6 +59521,7 @@
           "type": "string"
         },
         "allow_evaluation": {
+          "description": "True when this leg is in the list of agents that can be scored for the call.",
           "type": "boolean"
         },
         "amd_ai_logs": {
@@ -59602,6 +59603,14 @@
         "duration": {
           "type": "integer",
           "format": "int32"
+        },
+        "evaluation_agents": {
+          "description": "Agents that can be scored for the call, in bridge order.\nFilled only on a root leg (no parent); empty on child legs.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/engine.HistoryCallEvaluationAgent"
+          }
         },
         "extension": {
           "type": "string"
@@ -59713,6 +59722,7 @@
           "format": "int32"
         },
         "rate_id": {
+          "description": "Latest score: on a root leg (no parent) it is the latest score of the whole\ncall including transferred legs; on a child leg it is the score of that leg only.",
           "type": "string",
           "format": "int64"
         },
@@ -59721,6 +59731,14 @@
         },
         "rated_user": {
           "$ref": "#/definitions/engine.Lookup"
+        },
+        "rates": {
+          "description": "All scores, oldest first: of the whole call on a root leg,\nof this leg only on a child leg.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/engine.HistoryCallRate"
+          }
         },
         "reporting_at": {
           "type": "string",
@@ -59927,6 +59945,60 @@
         "sip_id": {
           "type": "string",
           "title": "Унікальний ідентифікатор сесії"
+        }
+      }
+    },
+    "engine.HistoryCallEvaluationAgent": {
+      "description": "HistoryCallEvaluationAgent is an agent that can be scored for a call.",
+      "type": "object",
+      "properties": {
+        "bridged_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "call_id": {
+          "description": "Leg to pass as the call id when scoring this agent.",
+          "type": "string"
+        },
+        "rate_id": {
+          "description": "Latest score of this agent in the call; 0 when not scored yet.",
+          "type": "string",
+          "format": "int64"
+        },
+        "user": {
+          "$ref": "#/definitions/engine.Lookup"
+        }
+      }
+    },
+    "engine.HistoryCallRate": {
+      "description": "HistoryCallRate is one score of a call.",
+      "type": "object",
+      "properties": {
+        "call_id": {
+          "description": "Leg that was scored.",
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "rated_by": {
+          "$ref": "#/definitions/engine.Lookup"
+        },
+        "rated_user": {
+          "$ref": "#/definitions/engine.Lookup"
+        },
+        "score_optional": {
+          "type": "number",
+          "format": "float"
+        },
+        "score_required": {
+          "type": "number",
+          "format": "float"
         }
       }
     },
