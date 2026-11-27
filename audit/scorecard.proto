@@ -1,0 +1,241 @@
+syntax = "proto3";
+
+package webitel.audit.v1;
+
+option go_package = "github.com/webitel/webitel-audit/gen/go/audit/v1;auditv1";
+
+import "buf/validate/validate.proto";
+import "general.proto";
+import "google/api/annotations.proto";
+import "proto/webitel/option.proto";
+
+// ScorecardService manages audit scorecards (audit forms). 
+service ScorecardService {
+  option (option.objclass) = "cc_audit_form"; 
+  option (option.additional_license) = "QUALITY_AUDITOR"; 
+
+  rpc CreateScorecard(CreateScorecardRequest) returns (CreateScorecardResponse) {
+    option (google.api.http) = {
+      post: "/v1/audit/scorecards"
+      body: "*" 
+    };
+    option (option.access) = ACTION_CREATE;
+  }
+
+  rpc SearchScorecards(SearchScorecardsRequest) returns (SearchScorecardsResponse) {
+    option (google.api.http) = {
+      get: "/v1/audit/scorecards"
+    };
+    option (option.access) = ACTION_READ;
+  }
+
+  rpc ReadScorecard(ReadScorecardRequest) returns (ReadScorecardResponse) {
+    option (google.api.http) = {
+      get: "/v1/audit/scorecards/{id}"
+    };
+    option (option.access) = ACTION_READ;
+  }
+
+  rpc UpdateScorecard(UpdateScorecardRequest) returns (UpdateScorecardResponse) {
+    option (google.api.http) = {
+      put: "/v1/audit/scorecards/{id}"
+      body: "*"
+    };
+    option (option.access) = ACTION_UPDATE;
+  }
+
+  // PatchScorecard updates only the fields listed in x_json_mask.
+  rpc PatchScorecard(PatchScorecardRequest) returns (PatchScorecardResponse) {
+    option (google.api.http) = {
+      patch: "/v1/audit/scorecards/{id}"
+      body: "*"
+    };
+    option (option.access) = ACTION_UPDATE;
+  }
+
+  rpc DeleteScorecard(DeleteScorecardRequest) returns (DeleteScorecardResponse) {
+    option (google.api.http) = {
+      delete: "/v1/audit/scorecards/{id}"
+    };
+    option (option.access) = ACTION_DELETE;
+  }
+}
+
+enum CriterionType {
+  CRITERION_TYPE_UNSPECIFIED = 0;
+  CRITERION_TYPE_SCORE = 1;
+  CRITERION_TYPE_OPTION = 2;
+  CRITERION_TYPE_YES = 3;
+}
+
+enum InteractionType {
+  INTERACTION_TYPE_UNSPECIFIED = 0;
+  INTERACTION_TYPE_CALL = 1;
+  INTERACTION_TYPE_CHAT = 2;
+  INTERACTION_TYPE_EMAIL = 3;
+}
+
+message CriteriaGroup {
+  // Existing group: send its uuid back. New group: any key up to 64 characters that is not a uuid and is unique in
+  // the request (e.g. "g1"); criteria of the same request use it in group_id, and the server issues the uuid.
+  string id = 1;
+  string name = 2;
+  // Ignored on input: the server assigns positions from the array order.
+  int32 position = 3;
+}
+
+message Criterion {
+  message Option {
+    string name = 1;
+    float score = 2;
+    // Сomment is mandatory for this option.
+    bool require_comment = 3;
+    // Existing row: send its uuid back. New row: leave empty or use any short key that is not a uuid; the server
+    // issues the uuid (the response carries it).
+    string id = 4;
+    // Ignored on input: the server assigns positions from the array order.
+    int32 position = 5;
+  }
+
+  CriterionType type = 1 [(buf.validate.field).enum.defined_only = true];
+  bool required = 2;
+  string text = 3;
+  int32 min = 4;
+  int32 max = 5;
+  repeated Option options = 6;
+  string description = 7;
+  bool critical_violation = 8;
+  bool allow_na = 9;
+  // 1.00-10.00, 0 means unset (treated as 1).
+  double weight = 10 [
+    (buf.validate.field).double.gte = 0,
+    (buf.validate.field).double.lte = 10
+  ];
+  // Сomment is mandatory for this criterion.
+  bool require_comment = 11;
+  // Score type only.
+  // Сomment is mandatory when the score is at or below this threshold.
+  // Unset = no threshold; required when a Score criterion requires a comment.
+  optional int32 comment_threshold = 12;
+  // Criterion uuid, stable across updates (evaluation answers refer to it).
+  // Existing row: send its uuid back. New row: leave empty or use any short key that is not a uuid; the server
+  // issues the uuid (the response carries it).
+  string id = 13;
+  // CriteriaGroup.id, or the temporary key of a new group of the same request; empty = outside any group.
+  string group_id = 14;
+  // Ignored on input: the server assigns positions from the array order.
+  int32 position = 15;
+}
+
+message Scorecard {
+  int32 id = 1;
+  int64 created_at = 2;
+  general.Lookup created_by = 3;
+  int64 updated_at = 4;
+  general.Lookup updated_by = 5;
+
+  string name = 6;
+  string description = 7;
+  bool enabled = 8;
+  repeated Criterion criteria = 9;
+  repeated general.Lookup teams = 10;
+  bool archive = 11;
+  bool editable = 12;
+
+  repeated InteractionType interaction_type = 13 [(buf.validate.field).repeated.items.enum.defined_only = true];
+  repeated CriteriaGroup criteria_groups = 14;
+}
+
+message CreateScorecardRequest {
+  string name = 1 [(buf.validate.field).string.min_len = 3, (buf.validate.field).string.max_len = 256];
+  string description = 2 [(buf.validate.field).string.max_len = 516];
+  bool enabled = 3;
+  repeated Criterion criteria = 4;
+  repeated general.Lookup teams = 5;
+  repeated InteractionType interaction_type = 6 [(buf.validate.field).repeated.items.enum.defined_only = true];
+  repeated CriteriaGroup criteria_groups = 7;
+}
+
+message ReadScorecardRequest {
+  int32 id = 1 [(buf.validate.field).int32.gt = 0];
+}
+
+message UpdateScorecardRequest {
+  int32 id = 1 [(buf.validate.field).int32.gt = 0];
+  string name = 2 [(buf.validate.field).string.min_len = 3, (buf.validate.field).string.max_len = 256];
+  string description = 3 [(buf.validate.field).string.max_len = 516];
+  bool enabled = 4;
+  repeated Criterion criteria = 5;
+  repeated general.Lookup teams = 6;
+  bool archive = 7;
+  repeated InteractionType interaction_type = 8 [(buf.validate.field).repeated.items.enum.defined_only = true];
+  // Replaces all groups; omitted ones are deleted and their criteria become ungrouped.
+  repeated CriteriaGroup criteria_groups = 9;
+}
+
+message PatchScorecardRequest {
+  int32 id = 1 [(buf.validate.field).int32.gt = 0];
+  repeated string x_json_mask = 2;
+
+  string name = 3;
+  string description = 4;
+  bool enabled = 5;
+  repeated Criterion criteria = 6;
+  repeated general.Lookup teams = 7;
+  bool archive = 8;
+  repeated InteractionType interaction_type = 9 [(buf.validate.field).repeated.items.enum.defined_only = true];
+  // Replaces all groups; omitted ones are deleted and their criteria become ungrouped.
+  repeated CriteriaGroup criteria_groups = 10;
+}
+
+message DeleteScorecardRequest {
+  int32 id = 1 [(buf.validate.field).int32.gt = 0];
+}
+
+message CreateScorecardResponse {
+  Scorecard scorecard = 1;
+}
+
+message ReadScorecardResponse {
+  Scorecard scorecard = 1;
+}
+
+message UpdateScorecardResponse {
+  Scorecard scorecard = 1;
+}
+
+message PatchScorecardResponse {
+  Scorecard scorecard = 1;
+}
+
+message DeleteScorecardResponse {
+  Scorecard scorecard = 1;
+}
+
+message SearchScorecardsRequest {
+  int32 page = 1;
+  int32 size = 2;
+
+  string q = 3;
+
+  string sort = 4;
+  repeated string fields = 5;
+
+  repeated int32 id = 6;
+  repeated int64 team_id = 7;
+  optional bool enabled = 8;
+  optional bool archive = 9;
+  optional bool editable = 10;
+
+  // Text of a criterion, matched like q.
+  string criterion_text = 12;
+  // Non-zero = only forms without teams or with a team of the caller's agent; the user is taken
+  // from the session, the value itself is ignored.
+  int32 team_filter = 13;
+  repeated InteractionType interaction_type = 14 [(buf.validate.field).repeated.items.enum = {defined_only: true, not_in: [0]}];
+}
+
+message SearchScorecardsResponse {
+  bool next = 1;
+  repeated Scorecard items = 2;
+}
