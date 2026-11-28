@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package webitel.ai_hub;
+
+option go_package = "github.com/webitel/webitel-ai-hub/api/ai_hub;ai_hub";
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
+import "common.proto";
+
+// Catalog exposes the model catalog for pickers.
+service Catalog {
+  // ListCatalog returns catalog rows matching the filters.
+  rpc ListCatalog(ListCatalogRequest) returns (CatalogList) {
+    option (google.api.http) = {
+      get: "/v1/ai-hub/catalog"
+    };
+  }
+}
+
+// CatalogEntry is a catalog read model.
+message CatalogEntry {
+  // Provider name (openai, gemini, …).
+  string provider = 1;
+  // Vendor API surface this model is available on.
+  ConnectionChannel channel = 2;
+  // Capability class of the model.
+  ProfileKind kind = 3;
+  // Vendor model identifier (e.g. gpt-4o, gemini-2.0-flash).
+  string model_id = 4;
+  // Pricing/tier class (e.g. flash, pro); copied to profile.model_class on save.
+  string class = 5;
+  // Metering unit type for usage (tokens, characters, …).
+  string unit_type = 6;
+  // Capability flags and metadata.
+  google.protobuf.Struct capabilities = 7;
+  // How this row was written (seed, hub_sync, manual).
+  CatalogSource source = 8;
+}
+
+// ListCatalogRequest parameters.
+message ListCatalogRequest {
+  // Page size.
+  int32 size = 1;
+  // Page number (1-based).
+  int32 page = 2;
+  // Optional provider filter.
+  string provider = 3;
+  // Optional channel filter; unspecified means any.
+  ConnectionChannel channel = 4 [(buf.validate.field).enum.defined_only = true];
+  // Optional kind filter; unspecified means any.
+  ProfileKind kind = 5 [(buf.validate.field).enum.defined_only = true];
+  // Sorting criteria (e.g. +provider,-kind). Unknown fields are ignored.
+  string sort = 6;
+  // Set of fields to return.
+  repeated string fields = 7;
+}
+
+// CatalogList is a page of catalog entries.
+message CatalogList {
+  // Catalog entries on this page.
+  repeated CatalogEntry items = 1;
+  // Whether a next page exists.
+  bool next = 2;
+}

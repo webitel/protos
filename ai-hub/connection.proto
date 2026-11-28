@@ -1,0 +1,186 @@
+syntax = "proto3";
+
+package webitel.ai_hub;
+
+option go_package = "github.com/webitel/webitel-ai-hub/api/ai_hub;ai_hub";
+
+import "buf/validate/validate.proto";
+import "general.proto";
+import "google/api/annotations.proto";
+import "common.proto";
+
+// Connections manages provider connections (keys and access mode).
+// The sealed credential is never returned; it is set via credentials_json.
+service Connections {
+  // ListConnections returns connections in the caller's domain.
+  rpc ListConnections(ListConnectionsRequest) returns (ConnectionList) {
+    option (google.api.http) = {
+      get: "/v1/ai-hub/connections"
+    };
+  }
+
+  // GetConnection returns a single connection by id.
+  rpc GetConnection(GetConnectionRequest) returns (Connection) {
+    option (google.api.http) = {
+      get: "/v1/ai-hub/connections/{id}"
+    };
+  }
+
+  // CreateConnection registers a connection; mode is immutable after create.
+  rpc CreateConnection(CreateConnectionRequest) returns (Connection) {
+    option (google.api.http) = {
+      post: "/v1/ai-hub/connections",
+      body: "input"
+    };
+  }
+
+  // UpdateConnection updates a connection; mode cannot change; empty
+  // credentials_json keeps the stored secret.
+  rpc UpdateConnection(UpdateConnectionRequest) returns (Connection) {
+    option (google.api.http) = {
+      put: "/v1/ai-hub/connections/{id}",
+      body: "input"
+      additional_bindings {
+        patch: "/v1/ai-hub/connections/{id}",
+        body: "input"
+      }
+    };
+  }
+}
+
+// Connection is a connection read model (credential omitted).
+message Connection {
+  // Unique identifier (uuid string).
+  string id = 1;
+  // Owning domain id.
+  int64 domain_id = 2;
+  // Human-readable name unique within the domain.
+  string name = 3;
+  // Provider name (openai, gemini, anthropic, …).
+  string provider = 4;
+  // Vendor API surface.
+  ConnectionChannel channel = 5;
+  // Credential ownership mode; immutable after create.
+  ConnectionMode mode = 6;
+  // How the sealed credential authenticates.
+  AuthKind auth_kind = 7;
+  // Network endpoint for byom / Azure; empty when unused.
+  string base_url = 8;
+  // Cloud region (Vertex); empty for most consumer APIs.
+  string region = 9;
+  // Whether the connection requires zero-retention capable models.
+  bool zero_retention = 10;
+  // CreatedAt timestamp (epoch ms).
+  int64 created_at = 20;
+  // UpdatedAt timestamp (epoch ms).
+  int64 updated_at = 21;
+  // User who created the connection.
+  general.Lookup created_by = 22;
+  // User who last updated the connection.
+  general.Lookup updated_by = 23;
+}
+
+// InputConnection carries writable connection fields.
+message InputConnection {
+  // Human-readable name, at most 255 characters.
+  string name = 1 [(buf.validate.field).string.max_len = 255];
+  // Provider name.
+  string provider = 2;
+  // Vendor API surface.
+  ConnectionChannel channel = 3 [(buf.validate.field).enum.defined_only = true];
+  // Credential ownership mode (create only; immutable after create).
+  ConnectionMode mode = 4 [(buf.validate.field).enum.defined_only = true];
+  // Auth kind matching the credentials payload.
+  AuthKind auth_kind = 5 [(buf.validate.field).enum.defined_only = true];
+  // Write-only secret payload JSON; empty on update keeps stored.
+  string credentials_json = 6;
+  // Network endpoint; must be a URI when set.
+  string base_url = 7 [
+    (buf.validate.field).string.uri = true,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+  // Cloud region.
+  string region = 8;
+  // Zero-retention flag.
+  bool zero_retention = 9;
+}
+
+// ListConnectionsRequest parameters.
+message ListConnectionsRequest {
+  // Page size.
+  int32 size = 1;
+  // Page number (1-based).
+  int32 page = 2;
+  // Optional name search.
+  string q = 3;
+  // Optional provider filter.
+  string provider = 4;
+  // Optional mode filter; unspecified means any.
+  ConnectionMode mode = 5 [(buf.validate.field).enum.defined_only = true];
+  // Sorting criteria (e.g. +name,-created_at). Unknown fields are ignored.
+  string sort = 6;
+  // Set of fields to return.
+  repeated string fields = 7;
+}
+
+// ConnectionList is a page of connections.
+message ConnectionList {
+  // Connections on this page.
+  repeated Connection items = 1;
+  // Whether a next page exists.
+  bool next = 2;
+}
+
+// GetConnectionRequest selects a connection by id.
+message GetConnectionRequest {
+  // Connection id.
+  string id = 1 [(buf.validate.field).string.uuid = true];
+}
+
+// CreateConnectionRequest wraps the connection to create.
+message CreateConnectionRequest {
+  // Connection fields; name, provider, channel, mode, and auth_kind are required.
+  InputConnection input = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel = {
+      id: "ai_hub.connection.name_required"
+      message: "name is required"
+      expression: "this.name != ''"
+    },
+    (buf.validate.field).cel = {
+      id: "ai_hub.connection.provider_required"
+      message: "provider is required"
+      expression: "this.provider != ''"
+    },
+    (buf.validate.field).cel = {
+      id: "ai_hub.connection.channel_required"
+      message: "channel is required"
+      expression: "this.channel != 0"
+    },
+    (buf.validate.field).cel = {
+      id: "ai_hub.connection.mode_required"
+      message: "mode is required"
+      expression: "this.mode != 0"
+    },
+    (buf.validate.field).cel = {
+      id: "ai_hub.connection.auth_kind_required"
+      message: "auth_kind is required"
+      expression: "this.auth_kind != 0"
+    },
+    (buf.validate.field).cel = {
+      id: "ai_hub.connection.byom_base_url"
+      message: "base_url is required when mode is BYOM and auth_kind is not NONE"
+      expression: "this.mode != 3 || this.auth_kind == 4 || this.base_url != ''"
+    }
+  ];
+}
+
+// UpdateConnectionRequest wraps the connection id and updated fields.
+message UpdateConnectionRequest {
+  // Connection id.
+  string id = 1 [(buf.validate.field).string.uuid = true];
+  // Updated connection fields.
+  InputConnection input = 2 [(buf.validate.field).required = true];
+  // Input fields to apply, filled by the gateway from a PATCH body.
+  repeated string x_json_mask = 3;
+}

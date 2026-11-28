@@ -1,0 +1,222 @@
+syntax = "proto3";
+
+package webitel.ai_hub;
+
+option go_package = "github.com/webitel/webitel-ai-hub/api/ai_hub;ai_hub";
+
+import "buf/validate/validate.proto";
+import "general.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
+import "common.proto";
+
+// Profiles manages AI profiles bound to a connection.
+service Profiles {
+  // ListProfiles returns profiles in the caller's domain.
+  rpc ListProfiles(ListProfilesRequest) returns (ProfileList) {
+    option (google.api.http) = {
+      get: "/v1/ai-hub/profiles"
+    };
+  }
+
+  // GetProfile returns a single profile by id.
+  rpc GetProfile(GetProfileRequest) returns (Profile) {
+    option (google.api.http) = {
+      get: "/v1/ai-hub/profiles/{id}"
+    };
+  }
+
+  // CreateProfile creates a profile.
+  rpc CreateProfile(CreateProfileRequest) returns (Profile) {
+    option (google.api.http) = {
+      post: "/v1/ai-hub/profiles",
+      body: "input"
+    };
+  }
+
+  // UpdateProfile updates a profile.
+  rpc UpdateProfile(UpdateProfileRequest) returns (Profile) {
+    option (google.api.http) = {
+      put: "/v1/ai-hub/profiles/{id}",
+      body: "input"
+      additional_bindings {
+        patch: "/v1/ai-hub/profiles/{id}",
+        body: "input"
+      }
+    };
+  }
+
+  // SetProfileState changes profile lifecycle state.
+  rpc SetProfileState(SetProfileStateRequest) returns (Profile) {
+    option (google.api.http) = {
+      post: "/v1/ai-hub/profiles/{id}/state",
+      body: "*"
+    };
+  }
+}
+
+// Profile is a profile read model.
+message Profile {
+  // Unique identifier (uuid string).
+  string id = 1;
+  // Owning domain id.
+  int64 domain_id = 2;
+  // Bound connection id.
+  string connection_id = 3;
+  // Human-readable name unique within the domain.
+  string name = 4;
+  // Capability class of the profile.
+  ProfileKind kind = 5;
+  // Vendor model identifier (e.g. gpt-4o, gemini-2.0-flash).
+  string model_id = 6;
+  // Catalog pricing/tier class snapshotted on save (e.g. flash, pro).
+  string model_class = 7;
+  // Lifecycle state.
+  ProfileState state = 8;
+  // Whether this profile is the active default for its kind in the domain.
+  bool is_default = 9;
+  // Optional one-hop fallback profile id; empty when unset.
+  string fallback_profile_id = 10;
+  // Runtime params and limits (schema_version, params, limits).
+  google.protobuf.Struct config = 11;
+  // Embedding vector size; required when kind is embedding, else 0.
+  int32 embedding_dimensions = 12;
+  // Provider-specific options blob.
+  google.protobuf.Struct provider_options = 13;
+  // CreatedAt timestamp (epoch ms).
+  int64 created_at = 20;
+  // UpdatedAt timestamp (epoch ms).
+  int64 updated_at = 21;
+  // User who created the profile.
+  general.Lookup created_by = 22;
+  // User who last updated the profile.
+  general.Lookup updated_by = 23;
+}
+
+// InputProfile carries writable profile fields.
+message InputProfile {
+  // Bound connection id; required on create.
+  string connection_id = 1 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+  // Human-readable name, at most 255 characters.
+  string name = 2 [(buf.validate.field).string.max_len = 255];
+  // Capability class; required on create.
+  ProfileKind kind = 3 [(buf.validate.field).enum.defined_only = true];
+  // Vendor model identifier (e.g. gpt-4o, gemini-2.0-flash).
+  string model_id = 4;
+  // Catalog pricing/tier class snapshotted on save (e.g. flash, pro).
+  string model_class = 5;
+  // Whether this profile should be the active default for its kind.
+  bool is_default = 6;
+  // Optional one-hop fallback profile id.
+  string fallback_profile_id = 7 [
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+  // Runtime params and limits.
+  google.protobuf.Struct config = 8;
+  // Embedding vector size; required when kind is embedding.
+  int32 embedding_dimensions = 9 [(buf.validate.field).int32.gte = 0];
+  // Provider-specific options blob.
+  google.protobuf.Struct provider_options = 10;
+}
+
+// ListProfilesRequest parameters.
+message ListProfilesRequest {
+  // Page size.
+  int32 size = 1;
+  // Page number (1-based).
+  int32 page = 2;
+  // Optional name search.
+  string q = 3;
+  // Optional kind filter; unspecified means any.
+  ProfileKind kind = 4 [(buf.validate.field).enum.defined_only = true];
+  // Optional state filter; unspecified means any.
+  ProfileState state = 5 [(buf.validate.field).enum.defined_only = true];
+  // Sorting criteria (e.g. +name,-created_at). Unknown fields are ignored.
+  string sort = 6;
+  // Set of fields to return.
+  repeated string fields = 7;
+}
+
+// ProfileList is a page of profiles.
+message ProfileList {
+  // Profiles on this page.
+  repeated Profile items = 1;
+  // Whether a next page exists.
+  bool next = 2;
+}
+
+// GetProfileRequest selects a profile by id.
+message GetProfileRequest {
+  // Profile id.
+  string id = 1 [(buf.validate.field).string.uuid = true];
+}
+
+// CreateProfileRequest wraps the profile to create.
+message CreateProfileRequest {
+  // Profile fields; connection_id, name, kind, model_id, and model_class are required.
+  InputProfile input = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel = {
+      id: "ai_hub.profile.connection_id_required"
+      message: "connection_id is required"
+      expression: "this.connection_id != ''"
+    },
+    (buf.validate.field).cel = {
+      id: "ai_hub.profile.name_required"
+      message: "name is required"
+      expression: "this.name != ''"
+    },
+    (buf.validate.field).cel = {
+      id: "ai_hub.profile.kind_required"
+      message: "kind is required"
+      expression: "this.kind != 0"
+    },
+    (buf.validate.field).cel = {
+      id: "ai_hub.profile.model_id_required"
+      message: "model_id is required"
+      expression: "this.model_id != ''"
+    },
+    (buf.validate.field).cel = {
+      id: "ai_hub.profile.model_class_required"
+      message: "model_class is required"
+      expression: "this.model_class != ''"
+    },
+    (buf.validate.field).cel = {
+      id: "ai_hub.profile.embedding_dimensions"
+      message: "embedding_dimensions is required when kind is EMBEDDING"
+      expression: "this.kind != 4 || this.embedding_dimensions > 0"
+    }
+  ];
+}
+
+// UpdateProfileRequest wraps the profile id and updated fields.
+message UpdateProfileRequest {
+  // Profile id.
+  string id = 1 [(buf.validate.field).string.uuid = true];
+  // Updated profile fields.
+  InputProfile input = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel = {
+      id: "ai_hub.profile.update_embedding_dimensions"
+      message: "embedding_dimensions is required when kind is EMBEDDING"
+      expression: "this.kind != 4 || this.embedding_dimensions > 0"
+    }
+  ];
+  // Input fields to apply, filled by the gateway from a PATCH body.
+  repeated string x_json_mask = 3;
+}
+
+// SetProfileStateRequest changes profile lifecycle state.
+message SetProfileStateRequest {
+  // Profile id.
+  string id = 1 [(buf.validate.field).string.uuid = true];
+  // New lifecycle state.
+  ProfileState state = 2 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+}
