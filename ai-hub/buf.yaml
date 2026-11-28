@@ -1,0 +1,26 @@
+version: v1
+name: buf.build/webitel/ai-hub
+deps:
+  - buf.build/googleapis/googleapis
+  - buf.build/bufbuild/protovalidate
+  - buf.build/webitel/general
+breaking:
+  use:
+    - FILE
+lint:
+  use:
+    - DEFAULT
+  except:
+    # Match webitel.kb / flat module layout (no webitel/ai_hub/ dir, no .v1 suffix).
+    - PACKAGE_DIRECTORY_MATCH
+    - PACKAGE_VERSION_SUFFIX
+    # Service names are plural domain nouns (Connections, Profiles), not *Service.
+    - SERVICE_SUFFIX
+    # Shared entity responses (Connection, Profile) and *List pages, as in kb.
+    - RPC_RESPONSE_STANDARD_NAME
+    - RPC_REQUEST_RESPONSE_UNIQUE
+    # Short enum values (RESOLD, BYOK, LLM, …) match DB lowercase strings.
+    - ENUM_VALUE_PREFIX
+  ignore:
+    - google/api/annotations.proto
+    - protoc-gen-openapiv2/options/annotations.proto

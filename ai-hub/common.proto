@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package webitel.ai_hub;
+
+option go_package = "github.com/webitel/webitel-ai-hub/api/ai_hub;ai_hub";
+
+// ConnectionMode is who owns the provider credential.
+enum ConnectionMode {
+  CONNECTION_MODE_UNSPECIFIED = 0;
+  // Webitel-managed (resold) credential.
+  RESOLD = 1;
+  // Customer brings their own vendor key.
+  BYOK = 2;
+  // Customer brings their own model endpoint.
+  BYOM = 3;
+}
+
+// ConnectionChannel selects the vendor API surface (not call channel, not mode).
+enum ConnectionChannel {
+  CONNECTION_CHANNEL_UNSPECIFIED = 0;
+  // Consumer / public API surface.
+  CONSUMER = 1;
+  // Enterprise / private API surface (Azure, Vertex, …).
+  ENTERPRISE = 2;
+}
+
+// AuthKind is how the sealed credential authenticates to the vendor.
+enum AuthKind {
+  AUTH_KIND_UNSPECIFIED = 0;
+  // Bearer / API key in the sealed credentials payload.
+  API_KEY = 1;
+  // Google Cloud service-account JSON.
+  GCP_SERVICE_ACCOUNT = 2;
+  // Azure Active Directory client credentials.
+  AZURE_AD = 3;
+  // No vendor credential (e.g. local / unauthenticated BYOM).
+  NONE = 4;
+}
+
+// ProfileKind is the capability class of a profile.
+enum ProfileKind {
+  PROFILE_KIND_UNSPECIFIED = 0;
+  // Large language model (chat / completion).
+  LLM = 1;
+  // Text-to-speech.
+  TTS = 2;
+  // Speech-to-text.
+  STT = 3;
+  // Embedding / vectorization model.
+  EMBEDDING = 4;
+  // Realtime (bidirectional audio / multimodal) session.
+  REALTIME = 5;
+  // Reranker model.
+  RERANKER = 6;
+}
+
+// ProfileState is the lifecycle state of a profile.
+enum ProfileState {
+  PROFILE_STATE_UNSPECIFIED = 0;
+  // Profile is selectable for Resolve and defaults.
+  ACTIVE = 1;
+  // Profile is kept but excluded from Resolve defaults.
+  DISABLED = 2;
+  // Soft-deleted; not returned in default listings.
+  ARCHIVED = 3;
+}
+
+// CatalogSource records how a catalog row was written.
+enum CatalogSource {
+  CATALOG_SOURCE_UNSPECIFIED = 0;
+  // Bundled seed data.
+  SEED = 1;
+  // Synced from an upstream hub catalog.
+  HUB_SYNC = 2;
+  // Manually upserted by an operator.
+  MANUAL = 3;
+}
